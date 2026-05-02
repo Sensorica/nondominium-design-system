@@ -1,3 +1,7 @@
+<script>
+  import { base } from '$app/paths';
+</script>
+
 <svelte:head><title>Playbook — Nondominium DS</title></svelte:head>
 
 <h1 class="text-2xl font-bold text-gray-900 mb-1">Playbook</h1>
@@ -5,13 +9,13 @@
 
 <div class="component-grid">
   {#each [
-    { href: '/playbook/badge',  name: 'Badge',      tag: 'ndo-badge',      desc: 'Lifecycle, nature, and property regime labels' },
-    { href: '/playbook/button', name: 'Button',     tag: 'ndo-button',     desc: 'Primary, ghost, and destructive actions' },
-    { href: '/playbook/card',   name: 'Card',       tag: 'ndo-card',       desc: 'NDO listing card with badge composition' },
-    { href: '/playbook/status', name: 'Status Dot', tag: 'ndo-status-dot', desc: 'Inline status indicators' },
-    { href: '/playbook/shell',  name: 'Shell',      tag: 'ndo-shell',      desc: 'Application layout patterns' }
+    { path: '/playbook/badge',  name: 'Badge',      tag: 'ndo-badge',      desc: 'Lifecycle, nature, and property regime labels' },
+    { path: '/playbook/button', name: 'Button',     tag: 'ndo-button',     desc: 'Primary, ghost, and destructive actions' },
+    { path: '/playbook/card',   name: 'Card',       tag: 'ndo-card',       desc: 'NDO listing card with badge composition' },
+    { path: '/playbook/status', name: 'Status Dot', tag: 'ndo-status-dot', desc: 'Inline status indicators' },
+    { path: '/playbook/shell',  name: 'Shell',      tag: 'ndo-shell',      desc: 'Application layout patterns' }
   ] as c}
-    <a href={c.href} class="component-card">
+    <a href="{base}{c.path}" class="component-card">
       <span class="component-name">{c.name}</span>
       <code class="component-tag">&lt;{c.tag}&gt;</code>
       <p class="component-desc">{c.desc}</p>

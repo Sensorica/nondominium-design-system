@@ -1,11 +1,12 @@
 <script lang="ts">
   import { page } from '$app/state';
+  import { base } from '$app/paths';
 
   let { children } = $props();
 
   const scenarios = [
-    { href: '/ui-kit/browse',     label: 'Browse (Lobby)' },
-    { href: '/ui-kit/ndo-detail', label: 'NDO Detail' }
+    { path: '/ui-kit/browse',     label: 'Browse (Lobby)' },
+    { path: '/ui-kit/ndo-detail', label: 'NDO Detail' }
   ];
 </script>
 
@@ -15,9 +16,9 @@
     <nav>
       {#each scenarios as s}
         <a
-          href={s.href}
+          href="{base}{s.path}"
           class="sidebar-link"
-          class:is-active={page.url.pathname === s.href}
+          class:is-active={page.url.pathname === `${base}${s.path}`}
         >{s.label}</a>
       {/each}
     </nav>

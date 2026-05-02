@@ -1,3 +1,7 @@
+<script>
+  import { base } from '$app/paths';
+</script>
+
 <svelte:head><title>UI Kit — Nondominium DS</title></svelte:head>
 
 <div class="p-6">
@@ -6,10 +10,10 @@
 
   <div class="scenario-grid">
     {#each [
-      { href: '/ui-kit/browse',     label: 'Browse (Lobby)',  desc: 'Group sidebar + NDO browser grid — mirrors LobbyView + NdoBrowser' },
-      { href: '/ui-kit/ndo-detail', label: 'NDO Detail',      desc: 'Identity layer + tab navigation — mirrors NdoView + NdoIdentityLayer' }
+      { path: '/ui-kit/browse',     label: 'Browse (Lobby)',  desc: 'Group sidebar + NDO browser grid — mirrors LobbyView + NdoBrowser' },
+      { path: '/ui-kit/ndo-detail', label: 'NDO Detail',      desc: 'Identity layer + tab navigation — mirrors NdoView + NdoIdentityLayer' }
     ] as s}
-      <a href={s.href} class="scenario-card">
+      <a href="{base}{s.path}" class="scenario-card">
         <span class="scenario-label">{s.label}</span>
         <p class="scenario-desc">{s.desc}</p>
       </a>

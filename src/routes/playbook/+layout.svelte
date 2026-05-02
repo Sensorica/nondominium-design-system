@@ -1,14 +1,15 @@
 <script lang="ts">
   import { page } from '$app/state';
+  import { base } from '$app/paths';
 
   let { children } = $props();
 
   const sections = [
-    { href: '/playbook/badge', label: 'Badge' },
-    { href: '/playbook/button', label: 'Button' },
-    { href: '/playbook/card', label: 'Card' },
-    { href: '/playbook/status', label: 'Status Dot' },
-    { href: '/playbook/shell', label: 'Shell' }
+    { path: '/playbook/badge', label: 'Badge' },
+    { path: '/playbook/button', label: 'Button' },
+    { path: '/playbook/card', label: 'Card' },
+    { path: '/playbook/status', label: 'Status Dot' },
+    { path: '/playbook/shell', label: 'Shell' }
   ];
 </script>
 
@@ -18,9 +19,9 @@
     <nav>
       {#each sections as s}
         <a
-          href={s.href}
+          href="{base}{s.path}"
           class="sidebar-link"
-          class:is-active={page.url.pathname === s.href}
+          class:is-active={page.url.pathname === `${base}${s.path}`}
         >{s.label}</a>
       {/each}
     </nav>

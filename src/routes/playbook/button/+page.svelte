@@ -1,3 +1,7 @@
+<script>
+  import { base } from '$app/paths';
+</script>
+
 <svelte:head><title>Button — Playbook</title></svelte:head>
 
 <h1 class="text-xl font-bold text-gray-900 mb-1">Button <code class="text-blue-600 text-base font-mono">&lt;ndo-button&gt;</code></h1>
@@ -24,8 +28,8 @@
 <section class="specimen-section">
   <h2 class="specimen-heading">As Link</h2>
   <div class="specimen-row">
-    <ndo-button variant="primary" href="/playbook">Back to Playbook</ndo-button>
-    <ndo-button variant="ghost" href="/">Home</ndo-button>
+    <ndo-button variant="primary" href="{base}/playbook">Back to Playbook</ndo-button>
+    <ndo-button variant="ghost" href="{base}/">Home</ndo-button>
   </div>
 </section>
 
