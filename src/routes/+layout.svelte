@@ -2,29 +2,30 @@
   import '../app.css';
   import 'virtual:uno.css';
   import { page } from '$app/state';
+  import { base } from '$app/paths';
 
   let { children } = $props();
 
   const navLinks = [
-    { href: '/', label: 'Tokens' },
-    { href: '/playbook', label: 'Playbook' },
-    { href: '/ui-kit', label: 'UI Kit' }
+    { path: '/', label: 'Tokens' },
+    { path: '/playbook', label: 'Playbook' },
+    { path: '/ui-kit', label: 'UI Kit' }
   ];
 </script>
 
 <div class="layout">
   <header class="site-header">
-    <a href="/" class="site-logo">
+    <a href="{base}/" class="site-logo">
       <span class="logo-mark">NDO</span>
       <span class="logo-text">Design System</span>
     </a>
     <nav class="site-nav" aria-label="Main navigation">
       {#each navLinks as link}
         <a
-          href={link.href}
+          href="{base}{link.path}"
           class="nav-link"
-          class:is-active={page.url.pathname === link.href ||
-            (link.href !== '/' && page.url.pathname.startsWith(link.href))}
+          class:is-active={page.url.pathname === `${base}${link.path}` ||
+            (link.path !== '/' && page.url.pathname.startsWith(`${base}${link.path}`))}
         >
           {link.label}
         </a>
