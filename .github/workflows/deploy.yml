@@ -22,7 +22,7 @@ jobs:
         with:
           bun-version: latest
       - run: bun install
-      - run: bun run build
+      - run: bun run build:all
         env:
           BASE_PATH: /nondominium-design-system
       - uses: actions/upload-pages-artifact@v3
