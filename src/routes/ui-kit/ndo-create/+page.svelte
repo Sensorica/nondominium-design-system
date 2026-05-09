@@ -1,6 +1,8 @@
 <svelte:head><title>NDO Create — UI Kit</title></svelte:head>
 
 <script lang="ts">
+  import { base } from '$app/paths';
+
   const EXISTING_NAMES = ['Community Solar Array', 'Open Hardware CNC Bed', 'Distributed Sensor Design v3', 'Collective Laser Cutter'];
 
   const REGIME_HINTS: Record<string, string> = {
@@ -55,7 +57,7 @@
 <div class="page">
   <!-- Breadcrumb -->
   <nav class="breadcrumb" aria-label="Breadcrumb">
-    <a href="/ui-kit/group">← Sensorica</a>
+    <a href="{base}/ui-kit/group">← Sensorica</a>
     <span>/</span>
     <span>New NDO</span>
   </nav>
@@ -169,7 +171,7 @@
       </div>
 
       <div class="form-footer">
-        <ndo-button variant="ghost" href="/ui-kit/group">Cancel</ndo-button>
+        <ndo-button variant="ghost" href="{base}/ui-kit/group">Cancel</ndo-button>
         <ndo-button
           variant="primary"
           disabled={!canSubmit || undefined}
@@ -189,8 +191,8 @@
         <span>uhC0kVX5k7dL2mPqRsTuVwXyZaB3cDeF4gHiJ…</span>
       </div>
       <div class="success-actions">
-        <ndo-button variant="ghost" href="/ui-kit/group">← Back to Sensorica</ndo-button>
-        <ndo-button variant="primary" href="/ui-kit/ndo-detail">View NDO →</ndo-button>
+        <ndo-button variant="ghost" href="{base}/ui-kit/group">← Back to Sensorica</ndo-button>
+        <ndo-button variant="primary" href="{base}/ui-kit/ndo-detail">View NDO →</ndo-button>
       </div>
     </div>
   {/if}

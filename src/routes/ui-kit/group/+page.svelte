@@ -1,6 +1,8 @@
 <svelte:head><title>Group View — UI Kit</title></svelte:head>
 
 <script lang="ts">
+  import { base } from '$app/paths';
+
   const ndos = [
     {
       hash: 'uhC0kVX5k7dL2mPqRsTuVwXyZaB3cDeF',
@@ -70,7 +72,7 @@
     </div>
     <div class="header-actions">
       <ndo-button variant="ghost">🍴 Fork NDO</ndo-button>
-      <ndo-button variant="primary" href="/ui-kit/ndo-create">+ Create NDO</ndo-button>
+      <ndo-button variant="primary" href="{base}/ui-kit/ndo-create">+ Create NDO</ndo-button>
     </div>
   </div>
 
@@ -131,7 +133,7 @@
             name={ndo.name}
             description={ndo.description}
             hash={ndo.hash}
-            href="/ui-kit/ndo-detail"
+            href="{base}/ui-kit/ndo-detail"
             badges={badges(ndo)}
           ></ndo-card>
         </li>
@@ -142,7 +144,7 @@
       <div class="empty-icon">📦</div>
       <div class="empty-title">No NDOs in this group yet</div>
       <p class="empty-desc">NDOs created in this group will appear here. Start by creating your first Nondominium Object.</p>
-      <ndo-button variant="primary" href="/ui-kit/ndo-create">+ Create first NDO</ndo-button>
+      <ndo-button variant="primary" href="{base}/ui-kit/ndo-create">+ Create first NDO</ndo-button>
     </div>
   {/if}
 </div>

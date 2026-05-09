@@ -1,6 +1,8 @@
 <svelte:head><title>Agent Profile — UI Kit</title></svelte:head>
 
 <script lang="ts">
+  import { base } from '$app/paths';
+
   type Tab = 'reputation' | 'identity' | 'commitments' | 'affiliations';
 
   let activeTab = $state<Tab>('reputation');
@@ -40,7 +42,7 @@
 <!-- Profile header -->
 <div class="profile-header">
   <nav class="breadcrumb">
-    <a href="/ui-kit/group">← Lobby</a>
+    <a href="{base}/ui-kit/group">← Lobby</a>
     <span>/</span>
     <span>My Profile</span>
   </nav>
