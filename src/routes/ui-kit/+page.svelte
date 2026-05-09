@@ -10,8 +10,11 @@
 
   <div class="scenario-grid">
     {#each [
-      { path: '/ui-kit/browse',     label: 'Browse (Lobby)',  desc: 'Group sidebar + NDO browser grid — mirrors LobbyView + NdoBrowser' },
-      { path: '/ui-kit/ndo-detail', label: 'NDO Detail',      desc: 'Identity layer + tab navigation — mirrors NdoView + NdoIdentityLayer' }
+      { path: '/ui-kit/browse',        label: 'Browse (Lobby)',  desc: 'Group sidebar + NDO browser grid — mirrors LobbyView + NdoBrowser' },
+      { path: '/ui-kit/ndo-detail',    label: 'NDO Detail',      desc: 'Identity layer + tab navigation — mirrors NdoView + NdoIdentityLayer' },
+      { path: '/ui-kit/group',         label: 'Group View',      desc: 'Group panel with NDO grid, member list, filter chips, and Create NDO flow' },
+      { path: '/ui-kit/ndo-create',    label: 'NDO Create',      desc: 'Full NDO creation form with regime/nature hints, validation, and success state' },
+      { path: '/ui-kit/agent-profile', label: 'Agent Profile',   desc: 'Three-tier identity, roles, PPR reputation summary, and role promotion flow' }
     ] as s}
       <a href="{base}{s.path}" class="scenario-card">
         <span class="scenario-label">{s.label}</span>

@@ -5,8 +5,11 @@
   let { children } = $props();
 
   const scenarios = [
-    { path: '/ui-kit/browse',     label: 'Browse (Lobby)' },
-    { path: '/ui-kit/ndo-detail', label: 'NDO Detail' }
+    { path: '/ui-kit/browse',        label: 'Browse (Lobby)' },
+    { path: '/ui-kit/ndo-detail',    label: 'NDO Detail' },
+    { path: '/ui-kit/group',         label: 'Group View' },
+    { path: '/ui-kit/ndo-create',    label: 'NDO Create' },
+    { path: '/ui-kit/agent-profile', label: 'Agent Profile' }
   ];
 </script>
 
