@@ -7,11 +7,18 @@
     "skipLibCheck": true,
     "resolveJsonModule": true,
     "forceConsistentCasingInFileNames": true,
-    "esModuleInterop": true
+    "esModuleInterop": true,
+    "paths": {
+      "@nondominium/ndo-ui": ["./packages/ndo-ui/src/index.ts"]
+    }
   },
   "include": [
+    ".svelte-kit/ambient.d.ts",
+    ".svelte-kit/non-ambient.d.ts",
     "src/**/*.ts",
     "src/**/*.svelte",
+    "packages/ndo-ui/src/**/*.ts",
+    "packages/ndo-ui/src/**/*.svelte",
     "registry/**/*.svelte",
     "vite.registry.config.ts"
   ]

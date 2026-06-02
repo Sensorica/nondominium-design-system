@@ -1,5 +1,9 @@
 <svelte:head><title>Badge — Playbook</title></svelte:head>
 
+<script lang="ts">
+  import { NdoBadge } from '@nondominium/ndo-ui';
+</script>
+
 <h1 class="text-xl font-bold text-gray-900 mb-1">Badge <code class="text-blue-600 text-base font-mono">&lt;ndo-badge&gt;</code></h1>
 <p class="text-sm text-gray-600 mb-6">
   Status labels for lifecycle stage, resource nature, and property regime.
@@ -65,7 +69,34 @@
 
 <!-- Usage -->
 <section class="specimen-section">
-  <h2 class="specimen-heading">Usage</h2>
+  <h2 class="specimen-heading">Svelte badge modes (@nondominium/ndo-ui)</h2>
+  <p class="text-sm text-gray-600 mb-3">
+    Filter chips use per-stage colors; card badges simplify lifecycle to green vs gray and regime to dashed gray.
+    MVP regimes: Private, Commons, Nondominium, CommonPool.
+  </p>
+  <div class="specimen-grid mb-4">
+    <div class="specimen">
+      <span class="text-xs text-gray-500">filter</span>
+      <NdoBadge kind="lifecycle" value="Active" mode="filter" />
+    </div>
+    <div class="specimen">
+      <span class="text-xs text-gray-500">card-lifecycle</span>
+      <NdoBadge kind="lifecycle" value="Active" mode="card-lifecycle" />
+    </div>
+    <div class="specimen">
+      <span class="text-xs text-gray-500">card-regime</span>
+      <NdoBadge kind="regime" value="Nondominium" mode="card-regime" />
+    </div>
+    <div class="specimen">
+      <span class="text-xs text-gray-500">filter regime</span>
+      <NdoBadge kind="regime" value="Nondominium" mode="filter" />
+    </div>
+  </div>
+</section>
+
+<!-- Usage -->
+<section class="specimen-section">
+  <h2 class="specimen-heading">Usage (custom element)</h2>
   <pre class="code-block">{`<!-- HTML / any framework -->
 <ndo-badge variant="lifecycle-active" label="Active"></ndo-badge>
 <ndo-badge variant="nature-physical">Physical</ndo-badge>

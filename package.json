@@ -4,11 +4,14 @@
   "description": "Design system and visual language for the Nondominium app",
   "license": "Apache-2.0",
   "type": "module",
+  "workspaces": [
+    "packages/*"
+  ],
   "scripts": {
     "dev": "vite dev",
     "build": "vite build",
     "build:registry": "vite build --config vite.registry.config.ts",
-    "build:all": "svelte-kit sync && bun run build:registry && bun run build",
+    "build:all": "svelte-kit sync && bun run check && bun run build:registry && bun run build",
     "preview": "vite preview",
     "check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
     "lint": "prettier --check . && eslint .",

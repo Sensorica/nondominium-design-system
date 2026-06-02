@@ -4,20 +4,39 @@
 
   let { children } = $props();
 
-  const sections = [
+  const customElements = [
     { path: '/playbook/badge', label: 'Badge' },
     { path: '/playbook/button', label: 'Button' },
     { path: '/playbook/card', label: 'Card' },
-    { path: '/playbook/status', label: 'Status Dot' },
-    { path: '/playbook/shell', label: 'Shell' }
+    { path: '/playbook/status', label: 'Status Dot' }
+  ];
+
+  const sveltePatterns = [
+    { path: '/playbook/shell', label: 'App Shell' },
+    { path: '/playbook/sidebar', label: 'Sidebar' },
+    { path: '/playbook/filter-chip', label: 'Filter chips' },
+    { path: '/playbook/modal', label: 'Modal' },
+    { path: '/playbook/tabs', label: 'Tabs' },
+    { path: '/playbook/forms', label: 'Forms' }
   ];
 </script>
 
 <div class="playbook-layout">
   <aside class="playbook-sidebar">
-    <div class="sidebar-title">Components</div>
-    <nav>
-      {#each sections as s}
+    <div class="sidebar-title">Custom elements</div>
+    <nav class="nav-block">
+      {#each customElements as s}
+        <a
+          href="{base}{s.path}"
+          class="sidebar-link"
+          class:is-active={page.url.pathname === `${base}${s.path}`}
+        >{s.label}</a>
+      {/each}
+    </nav>
+
+    <div class="sidebar-title mt-4">@nondominium/ndo-ui</div>
+    <nav class="nav-block">
+      {#each sveltePatterns as s}
         <a
           href="{base}{s.path}"
           class="sidebar-link"
@@ -52,6 +71,8 @@
     margin-bottom: 0.5rem;
     padding: 0 0.5rem;
   }
+
+  .nav-block { margin-bottom: 0.25rem; }
 
   .sidebar-link {
     display: block;

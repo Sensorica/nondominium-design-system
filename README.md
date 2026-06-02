@@ -149,6 +149,10 @@ nondominium-design-system/
 │   ├── ndo-button.svelte
 │   ├── ndo-card.svelte
 │   └── ndo-status-dot.svelte
+├── packages/
+│   └── ndo-ui/               # @nondominium/ndo-ui — Svelte 5 component library
+├── docs/
+│   └── INTEGRATION.md        # Parallel dev + hApp adoption guide
 ├── src/routes/
 │   ├── +page.svelte          # Token showcase (colors, type, spacing, shadows)
 │   ├── playbook/             # Per-component documentation
@@ -184,3 +188,38 @@ nondominium-design-system/
 ## License
 
 Apache-2.0
+
+## @nondominium/ndo-ui (Svelte 5 component library)
+
+Presentational Svelte 5 components ported from the [nondominium hApp](https://github.com/Sensorica/nondominium) UI. No Holochain or Effect-TS dependencies — props and callbacks only.
+
+```typescript
+import {
+  AppShell,
+  Sidebar,
+  LobbyView,
+  NdoBrowser,
+  NdoCard,
+  GroupView,
+  NdoDetailLayout,
+  applyNdoFilters,
+  MOCK_NDOS
+} from '@nondominium/ndo-ui';
+import '@nondominium/ndo-ui/styles/tokens.css';
+```
+
+**UI-kit demos** (hApp-fidelity scenarios with mock data):
+
+| Route | hApp equivalent |
+|---|---|
+| `/ui-kit/browse` | Lobby + Sidebar + NdoBrowser |
+| `/ui-kit/group` | GroupView |
+| `/ui-kit/ndo-detail` | NdoView + NdoIdentityLayer |
+| `/ui-kit/ndo-create` | NdoCreateModal |
+| `/ui-kit/agent-profile` | UserProfileForm |
+
+Domain color maps live in `packages/ndo-ui/src/domain/variants.ts` (single source of truth matching hApp `NdoBrowser.svelte` filter chips and `NdoCard.svelte` card badges).
+
+Future hApp adoption: add `"@nondominium/ndo-ui": "workspace:*"` (monorepo) or publish to npm and replace inline UnoCSS in `nondominium/ui`.
+
+See [docs/INTEGRATION.md](docs/INTEGRATION.md) for parallel development workflow, badge modes, and migration checklist.
