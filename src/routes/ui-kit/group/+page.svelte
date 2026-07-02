@@ -7,24 +7,23 @@
   import {
     AppShell,
     GroupView,
-    MOCK_GROUPS,
     MOCK_NDOS,
     MOCK_LOBBY_PROFILE,
-    type GroupMember
+    getMockGroupMembers,
+    getMockGroups
   } from '@nondominium/ndo-ui';
 
   const groupId = $derived(
-    browser ? (page.url.searchParams.get('id') ?? MOCK_GROUPS[0].id) : MOCK_GROUPS[0].id
+    browser ? (page.url.searchParams.get('id') ?? getMockGroups()[0].id) : getMockGroups()[0].id
   );
-  const group = $derived(MOCK_GROUPS.find((g) => g.id === groupId) ?? MOCK_GROUPS[0]);
+
+  let groups = $state(getMockGroups());
+  const group = $derived(groups.find((g) => g.id === groupId) ?? groups[0]);
   const groupNdos = $derived(
     MOCK_NDOS.filter((d) => group.ndoHashes?.includes(d.hash))
   );
 
-  const members = $derived<GroupMember[]>([
-    { id: 'creator', name: group.createdBy ?? 'Creator', role: 'Creator' },
-    { id: 'me', name: MOCK_LOBBY_PROFILE.nickname, role: 'Member' }
-  ]);
+  const members = $derived(getMockGroupMembers(group.id, group.createdBy));
 
   let showProfileModal = $state(false);
   let autoOpenCreateModal = $derived(
@@ -33,7 +32,7 @@
 </script>
 
 <AppShell
-  groups={MOCK_GROUPS}
+  {groups}
   activePath={`${base}/ui-kit/group`}
   profileNickname={MOCK_LOBBY_PROFILE.nickname}
   browseHref={`${base}/ui-kit/browse`}

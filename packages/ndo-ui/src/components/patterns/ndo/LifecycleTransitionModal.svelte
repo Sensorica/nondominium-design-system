@@ -81,14 +81,22 @@
 
     <div class="space-y-3 px-6 py-4">
       {#if allOptions.length === 0}
-        <p class="text-sm text-gray-500">No further transitions available from <strong>{currentStage}</strong>.</p>
+        <p class="text-sm text-gray-500">
+          No further transitions available from <strong>{currentStage}</strong>.
+        </p>
       {:else}
         <fieldset>
           <legend class="mb-2 text-sm font-medium text-gray-700">Target stage:</legend>
           <div class="space-y-2">
             {#each allOptions as stage}
               <label class="flex cursor-pointer items-center gap-3">
-                <input type="radio" name="target-stage" value={stage} bind:group={selectedStage} class="h-4 w-4" />
+                <input
+                  type="radio"
+                  name="target-stage"
+                  value={stage}
+                  bind:group={selectedStage}
+                  class="h-4 w-4"
+                />
                 <span class="text-sm text-gray-700">{stage}</span>
               </label>
             {/each}
@@ -134,12 +142,18 @@
       {/if}
 
       {#if errorMessage}
-        <p class="rounded border border-red-200 bg-red-50 p-2 text-sm text-red-700">{errorMessage}</p>
+        <p class="rounded border border-red-200 bg-red-50 p-2 text-sm text-red-700">
+          {errorMessage}
+        </p>
       {/if}
     </div>
 
     <div class="flex justify-end gap-2 border-t border-gray-100 px-6 py-4">
-      <button type="button" onclick={onclose} class="rounded px-4 py-2 text-sm text-gray-600 hover:bg-gray-100">
+      <button
+        type="button"
+        onclick={onclose}
+        class="rounded px-4 py-2 text-sm text-gray-600 hover:bg-gray-100"
+      >
         Cancel
       </button>
       {#if allOptions.length > 0}

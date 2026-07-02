@@ -6,21 +6,24 @@
     AppShell,
     LobbyView,
     UserProfileForm,
-    MOCK_GROUPS,
     MOCK_NDOS,
     MOCK_LOBBY_PROFILE,
     applyNdoFilters,
     EMPTY_FILTERS,
+    getMockGroups,
     type ActiveFilters,
     type LobbyUserProfile
   } from '@nondominium/ndo-ui';
 
-  let groups = $state([...MOCK_GROUPS]);
+  let groups = $state(getMockGroups());
   let profile = $state<LobbyUserProfile | null>(MOCK_LOBBY_PROFILE);
   let activeFilters = $state<ActiveFilters>({ ...EMPTY_FILTERS });
   let showProfileModal = $state(false);
 
-  const filteredNdos = $derived(applyNdoFilters(MOCK_NDOS, activeFilters));
+  const lobbyNdos = $derived(
+    MOCK_NDOS.filter((d) => groups.some((g) => g.ndoHashes?.includes(d.hash)))
+  );
+  const visibleNdos = $derived(applyNdoFilters(lobbyNdos, activeFilters));
 </script>
 
 {#if showProfileModal}
@@ -45,7 +48,7 @@
   onprofileclick={() => { showProfileModal = true; }}
 >
   <LobbyView
-    descriptors={filteredNdos}
+    descriptors={visibleNdos}
     {activeFilters}
     agentName={profile?.nickname ?? null}
     ndoHref={(hash) => `${base}/ui-kit/ndo-detail?hash=${encodeURIComponent(hash)}`}

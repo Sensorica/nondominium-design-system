@@ -12,12 +12,7 @@
 
 <h2 class="section-label">Custom elements</h2>
 <div class="component-grid mb-8">
-  {#each [
-    { path: '/playbook/badge', name: 'Badge', tag: 'ndo-badge', desc: 'Lifecycle, nature, and property regime labels' },
-    { path: '/playbook/button', name: 'Button', tag: 'ndo-button', desc: 'Primary, ghost, and destructive actions' },
-    { path: '/playbook/card', name: 'Card', tag: 'ndo-card', desc: 'NDO listing card with badge composition' },
-    { path: '/playbook/status', name: 'Status Dot', tag: 'ndo-status-dot', desc: 'Inline status indicators' }
-  ] as c}
+  {#each [{ path: '/playbook/badge', name: 'Badge', tag: 'ndo-badge', desc: 'Lifecycle, nature, and property regime labels' }, { path: '/playbook/button', name: 'Button', tag: 'ndo-button', desc: 'Primary, ghost, and destructive actions' }, { path: '/playbook/card', name: 'Card', tag: 'ndo-card', desc: 'NDO listing card with badge composition' }, { path: '/playbook/status', name: 'Status Dot', tag: 'ndo-status-dot', desc: 'Inline status indicators' }] as c}
     <a href="{base}{c.path}" class="component-card">
       <span class="component-name">{c.name}</span>
       <code class="component-tag">&lt;{c.tag}&gt;</code>
@@ -28,14 +23,7 @@
 
 <h2 class="section-label">Svelte patterns</h2>
 <div class="component-grid">
-  {#each [
-    { path: '/playbook/shell', name: 'App Shell', desc: 'AppShell + Sidebar layout matching hApp' },
-    { path: '/playbook/sidebar', name: 'Sidebar', desc: 'Browse, groups, create/join, profile' },
-    { path: '/playbook/filter-chip', name: 'Filter chips', desc: 'NdoBrowser multi-select filters' },
-    { path: '/playbook/modal', name: 'Modal', desc: 'Backdrop blur dialog shell' },
-    { path: '/playbook/tabs', name: 'Tabs', desc: 'NDO detail four-tab navigation' },
-    { path: '/playbook/forms', name: 'Forms', desc: 'UserProfileForm and related inputs' }
-  ] as c}
+  {#each [{ path: '/playbook/shell', name: 'App Shell', desc: 'AppShell + Sidebar layout matching hApp' }, { path: '/playbook/sidebar', name: 'Sidebar', desc: 'Browse, groups, create/join, profile' }, { path: '/playbook/filter-chip', name: 'Filter chips', desc: 'NdoBrowser multi-select filters' }, { path: '/playbook/modal', name: 'Modal', desc: 'Backdrop blur dialog shell' }, { path: '/playbook/tabs', name: 'Tabs', desc: 'NDO detail four-tab navigation' }, { path: '/playbook/forms', name: 'Forms', desc: 'UserProfileForm and related inputs' }, { path: '/playbook/wizard', name: 'NDO Wizard', desc: 'Archetype launcher, narrative steps, live preview' }] as c}
     <a href="{base}{c.path}" class="component-card">
       <span class="component-name">{c.name}</span>
       <p class="component-desc">{c.desc}</p>
@@ -72,7 +60,9 @@
     box-shadow: var(--ndo-shadow-sm);
     transition: box-shadow 150ms ease;
   }
-  .component-card:hover { box-shadow: var(--ndo-shadow-md); }
+  .component-card:hover {
+    box-shadow: var(--ndo-shadow-md);
+  }
 
   .component-name {
     font-size: 0.9375rem;

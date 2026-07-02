@@ -1,14 +1,28 @@
 <script lang="ts">
-  import type { NdoDescriptor, NdoInput, PropertyRegime, ResourceNature } from '../../../domain/types.js';
-  import type { CreatableNdoLifecycleStage } from '../../../domain/enums.js';
+  import type {
+    NdoDescriptor,
+    NdoInput,
+    NdoArchetypeId,
+    WizardResult
+  } from '../../../domain/types.js';
+  import { getArchetype } from '../../../domain/wizard-archetypes.js';
   import {
-    CREATABLE_NDO_LIFECYCLE_STAGES,
-    MVP_REGIMES,
-    ALL_RESOURCE_NATURES
-  } from '../../../domain/enums.js';
-  import { REGIME_TOOLTIPS, NATURE_TOOLTIPS } from '../../../domain/tooltips.js';
+    buildWizardResult,
+    createInitialKernel,
+    createInitialRefinement,
+    getWizardSteps,
+    validateKernel,
+    validateRefinement,
+    type WizardStepId
+  } from '../../../domain/wizard-state.js';
   import Modal from '../../primitives/Modal.svelte';
   import NdoButton from '../../primitives/NdoButton.svelte';
+  import WizardStepper from '../wizard/WizardStepper.svelte';
+  import ArchetypeStep from '../wizard/ArchetypeStep.svelte';
+  import NarrativeKernelStep from '../wizard/NarrativeKernelStep.svelte';
+  import RefinementStep from '../wizard/RefinementStep.svelte';
+  import ReviewStep from '../wizard/ReviewStep.svelte';
+  import NdoPreviewPanel from '../wizard/NdoPreviewPanel.svelte';
 
   interface Props {
     groupId: string;
@@ -16,8 +30,11 @@
     existingNdos?: NdoDescriptor[];
     isSubmitting?: boolean;
     errorMessage?: string | null;
+    /** Pre-select archetype for demos (e.g. source_ndo walkthrough) */
+    initialArchetype?: NdoArchetypeId;
     onclose: () => void;
     onsubmit?: (input: NdoInput) => void | Promise<void>;
+    onwizardcomplete?: (result: WizardResult) => void | Promise<void>;
   }
 
   let {
@@ -26,142 +43,136 @@
     existingNdos = [],
     isSubmitting = false,
     errorMessage = null,
+    initialArchetype = 'stub',
     onclose,
-    onsubmit
+    onsubmit,
+    onwizardcomplete
   }: Props = $props();
 
-  let name = $state('');
-  let property_regime = $state<PropertyRegime>('Commons');
-  let resource_nature = $state<ResourceNature>('Physical');
-  let lifecycle_stage = $state<CreatableNdoLifecycleStage>('Ideation');
-  let description = $state('');
+  let stepIndex = $state(0);
+  let kernel = $state(createInitialKernel(initialArchetype));
+  let refinement = $state(createInitialRefinement(initialArchetype, kernel.resource_nature));
   let localError = $state('');
 
+  const steps = $derived(getWizardSteps(kernel.archetype));
+  const currentStep = $derived(steps[stepIndex]?.id ?? 'archetype');
+  const archetype = $derived(getArchetype(kernel.archetype));
+
   const nameWarning = $derived(
-    name.trim() &&
-      existingNdos.some((d) => d.name.toLowerCase() === name.trim().toLowerCase())
+    kernel.name.trim() &&
+      existingNdos.some((d) => d.name.toLowerCase() === kernel.name.trim().toLowerCase())
       ? 'An NDO with this name already exists in the Lobby.'
       : ''
   );
 
-  async function handleSubmit() {
-    if (!name.trim()) {
-      localError = 'Name is required.';
-      return;
-    }
-    localError = '';
-    const input: NdoInput = {
-      name: name.trim(),
-      property_regime,
-      resource_nature,
-      lifecycle_stage,
-      ...(description.trim() && { description: description.trim() })
-    };
-    await onsubmit?.(input);
+  const displayError = $derived(errorMessage ?? localError);
+
+  function selectArchetype(id: NdoArchetypeId) {
+    kernel = createInitialKernel(id);
+    refinement = createInitialRefinement(id, kernel.resource_nature);
   }
 
-  const displayError = $derived(errorMessage ?? localError);
+  function patchKernel(patch: Partial<typeof kernel>) {
+    const next = { ...kernel, ...patch };
+    kernel = next;
+    if (patch.resource_nature && archetype.isSourceNdo) {
+      refinement = createInitialRefinement(next.archetype, patch.resource_nature);
+    }
+  }
+
+  function goNext() {
+    localError = '';
+    if (currentStep === 'kernel') {
+      const err = validateKernel(kernel);
+      if (err) {
+        localError = err;
+        return;
+      }
+    }
+    if (currentStep === 'refinement') {
+      const err = validateRefinement(refinement, archetype.isSourceNdo);
+      if (err) {
+        localError = err;
+        return;
+      }
+    }
+    if (stepIndex < steps.length - 1) stepIndex += 1;
+  }
+
+  function goBack() {
+    localError = '';
+    if (stepIndex > 0) stepIndex -= 1;
+  }
+
+  async function handleSubmit() {
+    const kernelErr = validateKernel(kernel);
+    if (kernelErr) {
+      localError = kernelErr;
+      return;
+    }
+    if (archetype.showRefinement) {
+      const refineErr = validateRefinement(refinement, archetype.isSourceNdo);
+      if (refineErr) {
+        localError = refineErr;
+        return;
+      }
+    }
+    localError = '';
+    const result = buildWizardResult(kernel, refinement);
+    await onwizardcomplete?.(result);
+    await onsubmit?.(result.ndo_input);
+  }
+
+  const stepTitles: Record<WizardStepId, string> = {
+    archetype: 'What are you creating?',
+    kernel: 'Describe your resource',
+    refinement: 'Governance arrangement',
+    review: 'Review and create'
+  };
+
+  const stepTitle = $derived(stepTitles[currentStep as WizardStepId] ?? 'Create NDO');
 </script>
 
-<Modal
-  title="Create NDO"
-  subtitle="Register a new NondominiumIdentity Layer 0 within {groupName}."
-  maxWidth="lg"
->
+<Modal title={stepTitle} subtitle="Register Layer 0 identity within {groupName}." maxWidth="2xl">
   {#snippet children()}
-    <div class="space-y-4">
-      <div>
-        <label class="mb-1 block text-sm font-medium text-gray-700" for="ndo-name">
-          Name <span class="text-red-500">*</span>
-        </label>
-        <input
-          id="ndo-name"
-          type="text"
-          bind:value={name}
-          placeholder="Unique identifier for this NDO"
-          class="w-full rounded border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
-        />
-        {#if nameWarning}
-          <p class="mt-1 text-xs text-amber-600">{nameWarning}</p>
+    <WizardStepper {steps} currentIndex={stepIndex} />
+
+    <div class="grid gap-6 lg:grid-cols-5">
+      <div class="lg:col-span-3">
+        {#if currentStep === 'archetype'}
+          <ArchetypeStep selected={kernel.archetype} onselect={selectArchetype} />
+        {:else if currentStep === 'kernel'}
+          <NarrativeKernelStep {kernel} {nameWarning} onchange={patchKernel} />
+        {:else if currentStep === 'refinement'}
+          <RefinementStep {kernel} {refinement} onchange={(r) => (refinement = r)} />
+        {:else if currentStep === 'review'}
+          <ReviewStep {kernel} {refinement} />
+        {/if}
+
+        {#if displayError}
+          <p class="mt-4 rounded border border-red-200 bg-red-50 p-2 text-sm text-red-700">
+            {displayError}
+          </p>
         {/if}
       </div>
 
-      <div>
-        <label class="mb-1 block text-sm font-medium text-gray-700" for="ndo-regime">
-          Property Regime
-        </label>
-        <select
-          id="ndo-regime"
-          bind:value={property_regime}
-          class="w-full rounded border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none"
-        >
-          {#each MVP_REGIMES as r}
-            <option value={r}>{r}</option>
-          {/each}
-        </select>
-        <p class="mt-1 text-xs text-gray-500">{REGIME_TOOLTIPS[property_regime]}</p>
+      <div class="lg:col-span-2">
+        <NdoPreviewPanel {kernel} {refinement} />
       </div>
-
-      <div>
-        <label class="mb-1 block text-sm font-medium text-gray-700" for="ndo-nature">
-          Resource Nature
-        </label>
-        <select
-          id="ndo-nature"
-          bind:value={resource_nature}
-          class="w-full rounded border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none"
-        >
-          {#each ALL_RESOURCE_NATURES as n}
-            <option value={n}>{n}</option>
-          {/each}
-        </select>
-        <p class="mt-1 text-xs text-gray-500">{NATURE_TOOLTIPS[resource_nature]}</p>
-      </div>
-
-      <div>
-        <label class="mb-1 block text-sm font-medium text-gray-700" for="ndo-stage">
-          Initial Lifecycle Stage
-        </label>
-        <select
-          id="ndo-stage"
-          bind:value={lifecycle_stage}
-          class="w-full rounded border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none"
-        >
-          {#each CREATABLE_NDO_LIFECYCLE_STAGES as s}
-            <option value={s}>{s}</option>
-          {/each}
-        </select>
-        <p class="mt-1 text-xs text-gray-500">
-          Choose emergence (Ideation–Prototype) for something still forming, or
-          <span class="font-medium">Stable</span> / <span class="font-medium">Distributed</span> /
-          <span class="font-medium">Active</span> for an already mature or in-use resource.
-        </p>
-      </div>
-
-      <div>
-        <label class="mb-1 block text-sm text-gray-600" for="ndo-desc">
-          Description <span class="text-gray-400">(optional)</span>
-        </label>
-        <textarea
-          id="ndo-desc"
-          bind:value={description}
-          rows="3"
-          placeholder="What is this NDO about?"
-          class="w-full rounded border border-gray-200 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
-        ></textarea>
-      </div>
-
-      {#if displayError}
-        <p class="rounded border border-red-200 bg-red-50 p-2 text-sm text-red-700">
-          {displayError}
-        </p>
-      {/if}
     </div>
   {/snippet}
+
   {#snippet footer()}
     <NdoButton variant="ghost" onclick={onclose}>Cancel</NdoButton>
-    <NdoButton disabled={isSubmitting} onclick={() => void handleSubmit()}>
-      {isSubmitting ? 'Creating…' : 'Create NDO'}
-    </NdoButton>
+    {#if stepIndex > 0}
+      <NdoButton variant="ghost" onclick={goBack}>Back</NdoButton>
+    {/if}
+    {#if currentStep === 'review'}
+      <NdoButton disabled={isSubmitting} onclick={() => void handleSubmit()}>
+        {isSubmitting ? 'Creating…' : 'Create NDO'}
+      </NdoButton>
+    {:else}
+      <NdoButton onclick={goNext}>Continue</NdoButton>
+    {/if}
   {/snippet}
 </Modal>

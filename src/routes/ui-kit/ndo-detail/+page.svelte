@@ -8,17 +8,34 @@
     AppShell,
     NdoDetailLayout,
     LifecycleTransitionModal,
-    MOCK_GROUPS,
     MOCK_NDOS,
-    MOCK_LOBBY_PROFILE
+    MOCK_LOBBY_PROFILE,
+    getMockInitiatorName,
+    getMockGroups,
+    applyMockNdoGroupAssociations,
+    getAssociatedGroupIds
   } from '@nondominium/ndo-ui';
 
   const hash = $derived(
     browser ? (page.url.searchParams.get('hash') ?? MOCK_NDOS[0].hash) : MOCK_NDOS[0].hash
   );
   const descriptor = $derived(MOCK_NDOS.find((d) => d.hash === hash) ?? MOCK_NDOS[0]);
+  const initiatorName = $derived(getMockInitiatorName(descriptor.hash));
+
+  let groups = $state(getMockGroups());
+  const associatedGroupIds = $derived(getAssociatedGroupIds(groups, descriptor.hash));
 
   let showTransitionModal = $state(false);
+  let associateMessage = $state<string | null>(null);
+
+  async function handleAssociate(groupIds: string[]) {
+    applyMockNdoGroupAssociations(descriptor.hash, groupIds);
+    groups = getMockGroups();
+    associateMessage = `Associated with ${groupIds.length} group${groupIds.length !== 1 ? 's' : ''}.`;
+    setTimeout(() => {
+      associateMessage = null;
+    }, 4000);
+  }
 </script>
 
 {#if showTransitionModal}
@@ -31,17 +48,26 @@
 {/if}
 
 <AppShell
-  groups={MOCK_GROUPS}
+  {groups}
   activePath={`${base}/ui-kit/ndo-detail`}
   profileNickname={MOCK_LOBBY_PROFILE.nickname}
   browseHref={`${base}/ui-kit/browse`}
   groupHref={(id) => `${base}/ui-kit/group?id=${id}`}
   onprofileclick={() => {}}
 >
+  {#if associateMessage}
+    <div class="border-b border-emerald-200 bg-emerald-50 px-6 py-2 text-sm text-emerald-800">
+      {associateMessage}
+    </div>
+  {/if}
+
   <NdoDetailLayout
     {descriptor}
-    initiatorName="Alice M."
+    initiatorName={initiatorName}
     isInitiator={true}
+    {groups}
+    {associatedGroupIds}
+    onassociate={handleAssociate}
     ontransitionclick={() => { showTransitionModal = true; }}
     transitionHistory={[
       {

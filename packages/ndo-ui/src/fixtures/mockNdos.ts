@@ -1,4 +1,5 @@
 import type { NdoDescriptor } from '../domain/types.js';
+import { MOCK_AGENT_NAMES } from './mockAgents.js';
 
 export const MOCK_NDOS: NdoDescriptor[] = [
   {
@@ -29,7 +30,8 @@ export const MOCK_NDOS: NdoDescriptor[] = [
   {
     hash: 'uhC0kZyXwVuTsRqPoNmLkJiHgFeDcBa9',
     name: 'Distributed Sensor Design v3',
-    description: 'Open-source IoT sensor design file for environmental monitoring in urban commons.',
+    description:
+      'Open-source IoT sensor design file for environmental monitoring in urban commons.',
     lifecycle_stage: 'Distributed',
     resource_nature: 'Digital',
     property_regime: 'Commons',
@@ -41,7 +43,7 @@ export const MOCK_NDOS: NdoDescriptor[] = [
   {
     hash: 'uhC0k1234abcdefghijklmnopqrstuvwx',
     name: 'Collective Laser Cutter',
-    description: 'Shared laser cutter maintained by the Open Hardware collective.',
+    description: 'Shared laser cutter maintained by OpenSourceEcology.',
     lifecycle_stage: 'Prototype',
     resource_nature: 'Physical',
     property_regime: 'CommonPool',
@@ -61,5 +63,28 @@ export const MOCK_NDOS: NdoDescriptor[] = [
     created_at: 1706000000000000,
     successor_ndo_hash: null,
     hibernation_origin: null
+  },
+  {
+    hash: 'uhC0kSourceNdoRiverExample01',
+    name: 'Mill Creek Watershed',
+    description: 'Generative hydrological source stewarded by WaterFrance.',
+    lifecycle_stage: 'Specification',
+    resource_nature: 'Physical',
+    property_regime: 'Nondominium',
+    initiator: 'uhCAk2vMp8X3nRwsQzLtYd4uJcFe7gHiKoNbPmVa',
+    created_at: 1710500000000000,
+    successor_ndo_hash: null,
+    hibernation_origin: null,
+    ndo_archetype: 'source_ndo',
+    source_profile: {
+      source_type: 'Hydrological',
+      regime_state: 'Stable',
+      stewarded_by: [MOCK_AGENT_NAMES.sacha, MOCK_AGENT_NAMES.lynn],
+      current_stock: 850000,
+      flux_rate: 12000,
+      assimilation_capacity: 450,
+      resilience: 0.72,
+      complex_interior: true
+    }
   }
 ];

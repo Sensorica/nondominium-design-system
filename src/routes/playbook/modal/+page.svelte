@@ -44,6 +44,7 @@
     <li><code class="font-mono">lobby/UserProfileForm.svelte</code> (modal mode)</li>
     <li><code class="font-mono">ndo/LifecycleTransitionModal.svelte</code></li>
     <li><code class="font-mono">ndo/ForkNdoModal.svelte</code></li>
+    <li><code class="font-mono">ndo/AssociateNdoModal.svelte</code></li>
   </ul>
 </section>
 

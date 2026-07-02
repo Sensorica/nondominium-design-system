@@ -1,9 +1,10 @@
 <svelte:head><title>Tabs — Playbook</title></svelte:head>
 
 <script lang="ts">
-  import { NdoDetailLayout, MOCK_NDOS } from '@nondominium/ndo-ui';
+  import { NdoDetailLayout, MOCK_NDOS, getMockInitiatorName } from '@nondominium/ndo-ui';
 
   const descriptor = MOCK_NDOS.find((d) => d.lifecycle_stage === 'Active') ?? MOCK_NDOS[0];
+  const initiatorName = getMockInitiatorName(descriptor.hash);
 </script>
 
 <h1 class="text-xl font-bold text-gray-900 mb-1">Tabs</h1>
@@ -17,7 +18,7 @@
   <div class="rounded-lg border border-gray-200 overflow-hidden">
     <NdoDetailLayout
       {descriptor}
-      initiatorName="Alice M."
+      initiatorName={initiatorName}
       isInitiator={true}
       showFork={false}
       showAssociate={false}

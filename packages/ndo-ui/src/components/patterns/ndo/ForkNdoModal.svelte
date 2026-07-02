@@ -39,12 +39,12 @@
 
       <div class="space-y-2 text-sm text-gray-700">
         <p>
-          <span class="font-medium">Step 1 — Negotiate:</span> Contact the NDO initiator and present
-          your case for a fork.
+          <span class="font-medium">Step 1 — Negotiate:</span> Contact the NDO initiator and present your
+          case for a fork.
         </p>
         <p>
-          <span class="font-medium">Step 2 — Consensus:</span> A fork requires agreement from active
-          participants, not just the initiator.
+          <span class="font-medium">Step 2 — Consensus:</span> A fork requires agreement from active participants,
+          not just the initiator.
         </p>
         <p>
           <span class="font-medium text-gray-400">Step 3 — Unyt payment (future):</span>
@@ -56,10 +56,16 @@
         <p class="mb-2 text-sm font-medium text-gray-700">Contact the NDO initiator:</p>
         {#if descriptor.initiator}
           <div class="flex items-center gap-2">
-            <code class="flex-1 truncate rounded border border-gray-200 bg-white px-2 py-1 text-xs text-gray-600">
+            <code
+              class="flex-1 truncate rounded border border-gray-200 bg-white px-2 py-1 text-xs text-gray-600"
+            >
               {descriptor.initiator}
             </code>
-            <NdoButton variant="ghost" class="shrink-0 px-2.5 py-1 text-xs" onclick={copyInitiatorKey}>
+            <NdoButton
+              variant="ghost"
+              class="shrink-0 px-2.5 py-1 text-xs"
+              onclick={copyInitiatorKey}
+            >
               {copied ? '✓ Copied' : 'Copy'}
             </NdoButton>
           </div>

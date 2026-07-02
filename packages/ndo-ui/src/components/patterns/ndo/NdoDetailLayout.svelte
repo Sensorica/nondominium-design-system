@@ -1,15 +1,22 @@
 <script lang="ts">
-  import type { NdoDescriptor, NdoTransitionHistoryEvent } from '../../../domain/types.js';
+  import type {
+    GroupDescriptor,
+    NdoDescriptor,
+    NdoTransitionHistoryEvent
+  } from '../../../domain/types.js';
   import { truncateHash } from '../../../domain/format.js';
   import NdoIdentityPanel from './NdoIdentityPanel.svelte';
   import ForkNdoModal from './ForkNdoModal.svelte';
+  import AssociateNdoModal from './AssociateNdoModal.svelte';
   import ResourcesTabStub from './ResourcesTabStub.svelte';
   import GovernanceTabStub from './GovernanceTabStub.svelte';
   import ActivityTabStub from './ActivityTabStub.svelte';
   import CompositionTabStub from './CompositionTabStub.svelte';
+  import SpecificationTab from './SpecificationTab.svelte';
   import NdoButton from '../../primitives/NdoButton.svelte';
+  import type { NdoSpecificationDraft, SourceProfile } from '../../../domain/types.js';
 
-  type TabId = 'resources' | 'governance' | 'composition' | 'activity';
+  type TabId = 'specification' | 'resources' | 'governance' | 'composition' | 'activity';
 
   interface Props {
     descriptor: NdoDescriptor | null;
@@ -22,6 +29,16 @@
     showFork?: boolean;
     showAssociate?: boolean;
     showJoin?: boolean;
+    specDraft?: NdoSpecificationDraft;
+    sourceProfile?: SourceProfile | null;
+    onspecchange?: (draft: NdoSpecificationDraft) => void;
+    onsourcechange?: (profile: SourceProfile) => void;
+    onspecsave?: () => void;
+    defaultTab?: TabId;
+    groups?: GroupDescriptor[];
+    associatedGroupIds?: string[];
+    groupsLoading?: boolean;
+    onassociate?: (groupIds: string[]) => void | Promise<void>;
     onrefresh?: () => void;
     ontransitionclick?: () => void;
     onassociateclick?: () => void;
@@ -38,16 +55,30 @@
     showFork = true,
     showAssociate = true,
     showJoin = true,
+    specDraft,
+    sourceProfile,
+    onspecchange,
+    onsourcechange,
+    onspecsave,
+    defaultTab = 'resources',
+    groups,
+    associatedGroupIds = [],
+    groupsLoading = false,
+    onassociate,
     onrefresh,
     ontransitionclick,
     onassociateclick
   }: Props = $props();
 
-  let tab = $state<TabId>('resources');
+  let tab = $state<TabId>(defaultTab);
   let showForkModal = $state(false);
+  let showAssociateModal = $state(false);
   let showJoinSoon = $state(false);
 
+  const canAssociate = $derived(Boolean(groups && onassociate && descriptor));
+
   const tabs: { id: TabId; label: string }[] = [
+    { id: 'specification', label: 'Specification' },
     { id: 'resources', label: 'Resources' },
     { id: 'governance', label: 'Governance' },
     { id: 'composition', label: 'Composition' },
@@ -56,7 +87,27 @@
 </script>
 
 {#if showForkModal && descriptor}
-  <ForkNdoModal {descriptor} onclose={() => { showForkModal = false; }} />
+  <ForkNdoModal
+    {descriptor}
+    onclose={() => {
+      showForkModal = false;
+    }}
+  />
+{/if}
+
+{#if showAssociateModal && descriptor && groups && onassociate}
+  <AssociateNdoModal
+    ndoName={descriptor.name}
+    {groups}
+    {associatedGroupIds}
+    isLoading={groupsLoading}
+    onclose={() => {
+      showAssociateModal = false;
+    }}
+    onconfirm={async (groupIds) => {
+      await onassociate(groupIds);
+    }}
+  />
 {/if}
 
 <div class="border-b border-gray-200 bg-white px-6 pt-4">
@@ -76,23 +127,48 @@
     <div class="ml-4 flex shrink-0 items-center gap-2">
       {#if showJoin}
         <div class="relative">
-          <NdoButton variant="ghost" class="px-3 py-1.5 text-xs" onclick={() => { showJoinSoon = !showJoinSoon; }}>
+          <NdoButton
+            variant="ghost"
+            class="px-3 py-1.5 text-xs"
+            onclick={() => {
+              showJoinSoon = !showJoinSoon;
+            }}
+          >
             Join NDO
           </NdoButton>
           {#if showJoinSoon}
-            <div class="absolute right-0 top-full z-10 mt-1 whitespace-nowrap rounded border border-gray-200 bg-white px-3 py-1.5 text-xs text-gray-500 shadow-md">
+            <div
+              class="absolute right-0 top-full z-10 mt-1 whitespace-nowrap rounded border border-gray-200 bg-white px-3 py-1.5 text-xs text-gray-500 shadow-md"
+            >
               Coming soon
             </div>
           {/if}
         </div>
       {/if}
       {#if showAssociate}
-        <NdoButton variant="ghost" class="border-blue-300 text-blue-600 hover:bg-blue-50 px-3 py-1.5 text-xs" onclick={() => onassociateclick?.()}>
+        <NdoButton
+          variant="ghost"
+          class="border-blue-300 text-blue-600 hover:bg-blue-50 px-3 py-1.5 text-xs"
+          disabled={canAssociate && !groupsLoading && groups?.length === associatedGroupIds.length}
+          onclick={() => {
+            if (canAssociate) {
+              showAssociateModal = true;
+            } else {
+              onassociateclick?.();
+            }
+          }}
+        >
           Associate with a group
         </NdoButton>
       {/if}
       {#if showFork && descriptor}
-        <NdoButton variant="ghost" class="px-3 py-1.5 text-xs" onclick={() => { showForkModal = true; }}>
+        <NdoButton
+          variant="ghost"
+          class="px-3 py-1.5 text-xs"
+          onclick={() => {
+            showForkModal = true;
+          }}
+        >
           Fork this NDO
         </NdoButton>
       {/if}
@@ -102,10 +178,13 @@
     {#each tabs as t}
       <button
         type="button"
-        class="rounded-t border border-b-0 px-3 py-2 text-sm font-medium transition-colors {tab === t.id
+        class="rounded-t border border-b-0 px-3 py-2 text-sm font-medium transition-colors {tab ===
+        t.id
           ? 'border-gray-200 bg-gray-50 text-gray-900'
           : 'border-transparent text-gray-500 hover:text-gray-800'}"
-        onclick={() => { tab = t.id; }}
+        onclick={() => {
+          tab = t.id;
+        }}
       >
         {t.label}
       </button>
@@ -116,7 +195,9 @@
 {#if loadError}
   <div class="mx-6 mt-4 rounded border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
     {loadError}
-    <button type="button" onclick={() => onrefresh?.()} class="ml-3 underline hover:text-red-900">Retry</button>
+    <button type="button" onclick={() => onrefresh?.()} class="ml-3 underline hover:text-red-900"
+      >Retry</button
+    >
   </div>
 {/if}
 
@@ -156,7 +237,16 @@
 />
 
 <div class="p-6">
-  {#if tab === 'resources'}
+  {#if tab === 'specification' && descriptor}
+    <SpecificationTab
+      {descriptor}
+      {specDraft}
+      sourceProfile={sourceProfile ?? descriptor.source_profile ?? null}
+      {onspecchange}
+      {onsourcechange}
+      onsave={onspecsave}
+    />
+  {:else if tab === 'resources'}
     <ResourcesTabStub />
   {:else if tab === 'governance'}
     <GovernanceTabStub />

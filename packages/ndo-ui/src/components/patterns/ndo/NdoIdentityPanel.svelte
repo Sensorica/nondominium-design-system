@@ -47,21 +47,30 @@
       <div class="flex flex-wrap items-center gap-2">
         {#if descriptor.lifecycle_stage}
           <span
-            class="rounded px-2 py-0.5 text-xs font-semibold {badgeClass(STAGE_IDENTITY_COLORS, descriptor.lifecycle_stage)}"
+            class="rounded px-2 py-0.5 text-xs font-semibold {badgeClass(
+              STAGE_IDENTITY_COLORS,
+              descriptor.lifecycle_stage
+            )}"
           >
             {descriptor.lifecycle_stage}
           </span>
         {/if}
         {#if descriptor.property_regime}
           <span
-            class="rounded border border-dashed px-2 py-0.5 text-xs font-medium {badgeClass(REGIME_IDENTITY_COLORS, descriptor.property_regime)}"
+            class="rounded border border-dashed px-2 py-0.5 text-xs font-medium {badgeClass(
+              REGIME_IDENTITY_COLORS,
+              descriptor.property_regime
+            )}"
           >
             {descriptor.property_regime}
           </span>
         {/if}
         {#if descriptor.resource_nature}
           <span
-            class="rounded px-2 py-0.5 text-xs font-medium {badgeClass(NATURE_IDENTITY_COLORS, descriptor.resource_nature)}"
+            class="rounded px-2 py-0.5 text-xs font-medium {badgeClass(
+              NATURE_IDENTITY_COLORS,
+              descriptor.resource_nature
+            )}"
           >
             {descriptor.resource_nature}
           </span>
@@ -73,11 +82,15 @@
           <span>
             By
             {#if initiatorName && initiatorHref}
-              <a href={initiatorHref} class="font-medium text-blue-600 hover:underline">{initiatorName}</a>
+              <a href={initiatorHref} class="font-medium text-blue-600 hover:underline"
+                >{initiatorName}</a
+              >
             {:else if initiatorName}
               <span class="font-medium text-gray-700">{initiatorName}</span>
             {:else}
-              <span class="font-mono" title={descriptor.initiator}>{truncateHash(descriptor.initiator, 10)}</span>
+              <span class="font-mono" title={descriptor.initiator}
+                >{truncateHash(descriptor.initiator, 10)}</span
+              >
             {/if}
           </span>
         {/if}
@@ -102,15 +115,22 @@
     {/if}
 
     {#if descriptor.lifecycle_stage === 'Hibernating' && descriptor.hibernation_origin}
-      <div class="mt-2 flex items-center gap-2 rounded bg-yellow-50 px-3 py-1.5 text-xs text-yellow-700">
+      <div
+        class="mt-2 flex items-center gap-2 rounded bg-yellow-50 px-3 py-1.5 text-xs text-yellow-700"
+      >
         <span class="font-medium">Hibernating</span>
         <span class="text-yellow-500">·</span>
-        <span>Will resume from: <span class="font-semibold">{descriptor.hibernation_origin}</span></span>
+        <span
+          >Will resume from: <span class="font-semibold">{descriptor.hibernation_origin}</span
+          ></span
+        >
       </div>
     {/if}
 
     {#if descriptor.lifecycle_stage === 'Deprecated' && descriptor.successor_ndo_hash}
-      <div class="mt-2 flex items-center gap-2 rounded bg-orange-50 px-3 py-1.5 text-xs text-orange-700">
+      <div
+        class="mt-2 flex items-center gap-2 rounded bg-orange-50 px-3 py-1.5 text-xs text-orange-700"
+      >
         <span class="font-medium">Deprecated</span>
         <span class="text-orange-400">·</span>
         <span>
