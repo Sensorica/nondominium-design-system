@@ -5,19 +5,20 @@
 // catalogue and the representative URL for each key, so the comments pack and
 // the screen map never depend on each other.
 import { paths } from './paths';
+import {
+  AGENT,
+  BARE_NDO,
+  DEPRECATED_NDO,
+  GROUP,
+  HIBERNATING_NDO,
+  MISSING_NDO,
+  MY_NDO,
+  NDO,
+  TERMINAL_NDO
+} from './records';
 import { labelForKey, screenKeyForUrl } from './surface-keys';
 
 export const screenMap = $state({ open: false });
-
-/** Representative records, chosen so every entry lands on a fully rendered
- *  screen. The solar array is mature (resources, rules, events, a transition
- *  trail) but was initiated by someone else, so its identity bar has no
- *  transition button; the router cell was initiated by the prototype's agent,
- *  which is why the lifecycle modal points there. */
-const NDO = 'uhC0kVX5k7dL2mPqR8sT1uW4xY7zA0bC3dE6fG9h';
-const MY_NDO = 'uhC0kNb8j3fK9pQ2rS5tU8vW1xY4zA7bC0dE3fG6';
-const GROUP = 'sensorica-lab-7f3a';
-const AGENT = 'uhCAkZ4x0cV7bN2mQ5wE8rT1yU4iO7pA0sD3fG6hJ9kL2';
 
 export const SCREEN_KEY_TO_URL: Record<string, string> = {
   connecting: paths.connecting(),
@@ -29,10 +30,21 @@ export const SCREEN_KEY_TO_URL: Record<string, string> = {
   'lobby-edit-profile': paths.lobbyEditProfile(),
   'lobby-create-group': paths.lobbyCreateGroup(),
   'lobby-join-group': paths.lobbyJoinGroup(),
+  'lobby-invite': paths.lobbyInvite(GROUP),
+  'lobby-loading': paths.lobbyState('loading'),
+  'lobby-error': paths.lobbyState('error'),
+  'lobby-empty': paths.lobbyState('empty'),
+  'lobby-onboarding': paths.lobbyState('onboarding'),
+  'lobby-filtered': paths.lobbyState('filtered'),
+  'lobby-filtered-empty': paths.lobbyState('filtered-empty'),
+  'lobby-no-profile': paths.lobbyState('no-profile'),
 
   'group-detail': paths.groupDetail(GROUP),
   'group-create-ndo': paths.groupCreateNdo(GROUP),
   'group-profile': paths.groupProfile(GROUP),
+  'group-loading': paths.groupState(GROUP, 'loading'),
+  'group-error': paths.groupState(GROUP, 'error'),
+  'group-empty': paths.groupState(GROUP, 'empty'),
 
   'ndo-new': paths.ndoNew(),
   'ndo-resources': paths.ndoDetail(NDO),
@@ -43,6 +55,14 @@ export const SCREEN_KEY_TO_URL: Record<string, string> = {
   'ndo-fork': paths.ndoModal(NDO, 'fork'),
   'ndo-associate': paths.ndoModal(NDO, 'associate'),
   'ndo-join': paths.ndoJoin(NDO),
+  'ndo-hibernating': paths.ndoDetail(HIBERNATING_NDO),
+  'ndo-deprecated': paths.ndoDetail(DEPRECATED_NDO),
+  'ndo-terminal': paths.ndoDetail(TERMINAL_NDO),
+  'ndo-bare': paths.ndoDetail(BARE_NDO),
+  'ndo-missing': paths.ndoDetail(MISSING_NDO),
+  'ndo-loading': paths.ndoState(NDO, 'loading'),
+  'ndo-error': paths.ndoState(NDO, 'error'),
+  'ndo-anonymous': paths.ndoState(NDO, 'anonymous'),
 
   'agent-profile': paths.agentProfile(AGENT)
 };
@@ -55,9 +75,38 @@ export const SCREEN_MAP_GROUPS: ScreenMapGroup[] = [
   { title: 'Connection', keys: ['connecting', 'connection-error', 'disconnected'] },
   {
     title: 'Lobby',
-    keys: ['lobby', 'lobby-profile-setup', 'lobby-edit-profile', 'lobby-create-group', 'lobby-join-group']
+    keys: [
+      'lobby',
+      'lobby-profile-setup',
+      'lobby-edit-profile',
+      'lobby-create-group',
+      'lobby-join-group',
+      'lobby-invite'
+    ]
   },
-  { title: 'Groups', keys: ['group-detail', 'group-create-ndo', 'group-profile'] },
+  {
+    title: 'Lobby — data states',
+    keys: [
+      'lobby-loading',
+      'lobby-error',
+      'lobby-empty',
+      'lobby-onboarding',
+      'lobby-filtered',
+      'lobby-filtered-empty',
+      'lobby-no-profile'
+    ]
+  },
+  {
+    title: 'Groups',
+    keys: [
+      'group-detail',
+      'group-create-ndo',
+      'group-profile',
+      'group-loading',
+      'group-error',
+      'group-empty'
+    ]
+  },
   {
     title: 'NDO',
     keys: [
@@ -70,6 +119,19 @@ export const SCREEN_MAP_GROUPS: ScreenMapGroup[] = [
       'ndo-fork',
       'ndo-associate',
       'ndo-join'
+    ]
+  },
+  {
+    title: 'NDO — lifecycle and data states',
+    keys: [
+      'ndo-hibernating',
+      'ndo-deprecated',
+      'ndo-terminal',
+      'ndo-bare',
+      'ndo-missing',
+      'ndo-loading',
+      'ndo-error',
+      'ndo-anonymous'
     ]
   },
   { title: 'Agents', keys: ['agent-profile'] }

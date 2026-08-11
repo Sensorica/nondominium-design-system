@@ -13,6 +13,13 @@
 // them out of the path is what lets the replica components stay byte-identical
 // to the app's, which is the whole point.
 import { paths } from './paths';
+import {
+  BARE_NDO,
+  DEPRECATED_NDO,
+  HIBERNATING_NDO,
+  MISSING_NDO,
+  TERMINAL_NDO
+} from './records';
 
 /** A surface's shape: a route pattern with `:id` for any single segment, plus
  *  the query params that must be present for the key to match. */
@@ -46,15 +53,43 @@ export const SCREEN_SHAPE: Record<string, Shape> = {
   'lobby-edit-profile': shapeOf(paths.lobbyEditProfile()),
   'lobby-create-group': shapeOf(paths.lobbyCreateGroup()),
   'lobby-join-group': shapeOf(paths.lobbyJoinGroup()),
+  'lobby-invite': withId(paths.lobbyInvite(ID), ID),
+
+  // Lobby data states — implemented in NdoBrowser and LobbyProfileBar, but
+  // only reachable in production when the conductor is slow, broken, or the
+  // agent is brand new.
+  'lobby-loading': shapeOf(paths.lobbyState('loading')),
+  'lobby-error': shapeOf(paths.lobbyState('error')),
+  'lobby-empty': shapeOf(paths.lobbyState('empty')),
+  'lobby-onboarding': shapeOf(paths.lobbyState('onboarding')),
+  'lobby-filtered': shapeOf(paths.lobbyState('filtered')),
+  'lobby-filtered-empty': shapeOf(paths.lobbyState('filtered-empty')),
+  'lobby-no-profile': shapeOf(paths.lobbyState('no-profile')),
 
   // Groups
   'group-detail': withId(paths.groupDetail(ID), ID),
   'group-create-ndo': withId(paths.groupCreateNdo(ID), ID),
   'group-profile': withId(paths.groupProfile(ID), ID),
+  'group-loading': withId(paths.groupState(ID, 'loading'), ID),
+  'group-error': withId(paths.groupState(ID, 'error'), ID),
+  'group-empty': withId(paths.groupState(ID, 'empty'), ID),
 
-  // NDO — one route, seven states
+  // NDO — one route, many states.
+  //
+  // Most are query-param states of any record, so they match with `:id`. Four
+  // are properties of a particular record instead: hibernation, deprecation,
+  // the terminal stage, and a hash with nothing behind it. Those pin the hash,
+  // and win over `:id` because the scorer counts concrete segments.
   'ndo-new': shapeOf(paths.ndoNew()),
   'ndo-resources': withId(paths.ndoDetail(ID), ID),
+  'ndo-hibernating': shapeOf(paths.ndoDetail(HIBERNATING_NDO)),
+  'ndo-deprecated': shapeOf(paths.ndoDetail(DEPRECATED_NDO)),
+  'ndo-terminal': shapeOf(paths.ndoDetail(TERMINAL_NDO)),
+  'ndo-bare': shapeOf(paths.ndoDetail(BARE_NDO)),
+  'ndo-missing': shapeOf(paths.ndoDetail(MISSING_NDO)),
+  'ndo-loading': withId(paths.ndoState(ID, 'loading'), ID),
+  'ndo-error': withId(paths.ndoState(ID, 'error'), ID),
+  'ndo-anonymous': withId(paths.ndoState(ID, 'anonymous'), ID),
   'ndo-governance': withId(paths.ndoTab(ID, 'governance'), ID),
   'ndo-composition': withId(paths.ndoTab(ID, 'composition'), ID),
   'ndo-activity': withId(paths.ndoTab(ID, 'activity'), ID),
@@ -87,11 +122,30 @@ export const KEY_LABEL: Record<string, string> = {
   'lobby-edit-profile': 'Edit Lobby profile',
   'lobby-create-group': 'Create group (sidebar)',
   'lobby-join-group': 'Join group (sidebar)',
+  'lobby-invite': 'Invite link landing',
+  'lobby-loading': 'Lobby — loading NDOs',
+  'lobby-error': 'Lobby — load failed',
+  'lobby-empty': 'Lobby — no NDOs yet',
+  'lobby-onboarding': 'Lobby — first run, no groups',
+  'lobby-filtered': 'Lobby — filters applied',
+  'lobby-filtered-empty': 'Lobby — filters match nothing',
+  'lobby-no-profile': 'Lobby — no Level 1 profile',
   'group-detail': 'Group view',
   'group-create-ndo': 'Create NDO',
   'group-profile': 'Group disclosure choice',
+  'group-loading': 'Group — loading',
+  'group-error': 'Group — load failed',
+  'group-empty': 'Group — nothing in it yet',
   'ndo-new': 'New NDO without a group',
   'ndo-resources': 'NDO — Resources tab',
+  'ndo-hibernating': 'NDO — hibernating',
+  'ndo-deprecated': 'NDO — deprecated, with successor',
+  'ndo-terminal': 'NDO — end of life',
+  'ndo-bare': 'NDO — every tab empty',
+  'ndo-missing': 'NDO — no such record',
+  'ndo-loading': 'NDO — loading',
+  'ndo-error': 'NDO — load failed',
+  'ndo-anonymous': 'NDO — no agent key',
   'ndo-governance': 'NDO — Governance tab',
   'ndo-composition': 'NDO — Composition tab',
   'ndo-activity': 'NDO — Activity tab',

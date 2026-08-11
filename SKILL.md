@@ -16,7 +16,7 @@ designsystem:
     scenarios:     { routes: /scenarios, count: 6 }
     surface-keys:  { module: src/lib/surface-keys.ts, namespaces: [screen, scenario] }
     mock-state:    { module: src/lib/replica/stores.svelte.ts }
-    prototype-app: { routes: /app, screens: 21, groups: [app, connection], mode: replica }
+    prototype-app: { routes: /app, screens: 39, groups: [app, connection], mode: replica, data-states: 'src/lib/replica/stores.svelte.ts' }
     replica:       { source: ../nondominium/ui/src/lib/components, components: 24, check: 'bun run check:fidelity' }
     screen-map:    { shortcut: m, overlay: svelte }
     review:        { backend: github-discussions, repo: Sensorica/nondominium-design-review, category_id: DIC_kwDOT06gls4DDH2j }
@@ -42,6 +42,8 @@ Key facts:
 - **Radii:** `rounded` for controls, `rounded-lg` for cards, `rounded-xl` for modals. A **dashed border** means declarative, empty, or not-yet-built.
 - **No emoji and no icons** in the app, only text glyphs: `+`, `→`, `⎘`, `✓`, `⧉`. The three connection states are the sole exception.
 - **Every URL comes from `src/lib/paths.ts`.** No route segment literal belongs anywhere else.
+- **Half the screens are ones you cannot reach in a running app** — loading, error, empty, first-run onboarding, no-profile, no-agent-key, no-such-record. `?state=` serves them from the mock store; the components never see the param. `src/lib/records.ts` names the records the lifecycle screens are keyed to.
+- **`lobby/GroupSidebar.svelte` is dead code in the app** (nothing imports it; `shell/Sidebar.svelte` replaced it) and is deliberately not replicated.
 - **Every commentable or navigable surface has a key** in `src/lib/surface-keys.ts`, resolved from the whole URL because modal and tab states are query params.
 - **The lifecycle transition table lives verbatim in `src/lib/replica/ndo/LifecycleTransitionModal.svelte`** and mirrors the Rust integrity zome. Check `documentation/specifications/specifications.md` §7.5 before touching it.
 - Voice is plain and technical. Name constraints and say why; show nulls rather than inventing values.

@@ -53,8 +53,11 @@
   // synchronous, so it derives — which also means a lifecycle transition is
   // reflected here the moment it is written, with no refresh call.
   const ndoDescriptor = $derived<NdoDescriptor | null>(ndoService.getDescriptor(specHashB64));
-  const isLoading = false;
-  const loadError = null;
+  // Production writes these two in the async load; nothing in a mock lookup can
+  // be slow or fail, so the mock layer serves them from `?state=` instead. Both
+  // screens are the app's — see stores.svelte.ts.
+  const isLoading = $derived(ndoService.isLoading);
+  const loadError = $derived(ndoService.loadError);
   let showForkModal = $state(false);
   let showAssociateModal = $state(false);
   let showTransitionModal = $state(false);

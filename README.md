@@ -35,7 +35,7 @@ bun run dev
 | `/tokens` | The palette and scale the app uses, rendered live |
 | `/playbook` | Seven categories of pattern, each citing its source file |
 | `/scenarios` | Six composed pages, each arguing one design question |
-| `/app` | **The replica** — 21 keyed states of the real app, on mock data |
+| `/app` | **The replica** — 39 keyed states of the real app, on mock data |
 
 ---
 
@@ -65,9 +65,34 @@ Seventeen of the twenty-four have byte-identical markup. The other seven differ 
 
 Neither changes a class. `bun run check:fidelity` fails the build if any of them ever does.
 
+### The states you cannot reach in a running app
+
+Roughly half the screens the app implements are ones nobody can open on demand. A spinner shows for as long as the conductor takes. An error banner needs a broken conductor. The onboarding panel needs an agent with no groups, which you are exactly once. A not-found NDO needs a link that outlived its record. They ship, they go unreviewed, and they are usually where the rough edges are.
+
+`?state=` picks which one the mock layer serves:
+
+| Param | Renders |
+|---|---|
+| `loading` | the in-flight spinner on the lobby, a group, or an NDO |
+| `error` | the load-failure banner and its Retry, with the app's own copy |
+| `empty` | nothing in it yet: no NDOs, no members, no soft links, no work log |
+| `onboarding` | first run, no groups — the dashed Create-or-join panel |
+| `filtered` / `filtered-empty` | filters applied, with and without matches |
+| `no-profile` | no Level 1 profile: the Set-up-profile call to action |
+| `anonymous` | no agent key: which write actions survive, and which do not |
+
+Four more are properties of a record rather than a route, so they are keyed to a hash: hibernating, deprecated with a successor, end of life, and every tab empty. `src/lib/records.ts` names them and says why each earns a key.
+
+The replica components never see the param. They read `lobbyStore.isLoading` and `appContext.myAgentPubKey` exactly as they always have; the mock store decides what those mean. That is what lets the components stay copies rather than forks.
+
 ### What the replica does not have
 
 No conductor, no DHT, no gossip. Everything eventually consistent in production is immediate here — which is exactly the gap the group-collaboration scenario exists to discuss.
+
+### What the app has that this does not
+
+- **`lobby/GroupSidebar.svelte` is orphaned.** Nothing imports it; `shell/Sidebar.svelte` superseded it and the two have drifted (different widths, different palettes, different copy for the same two buttons). Replicating dead code would misrepresent the app, so it is recorded here instead. Deleting it is a call for the team.
+- **`HolochainProvider.svelte`** is replicated as `replica/ConnectionState.svelte`, which reproduces all three of its branches. It differs in one respect: the app's disconnected branch offers a Connect button when `autoConnect` is false, and the app always passes true, so that button is unreachable in production and is not shown here.
 
 ---
 

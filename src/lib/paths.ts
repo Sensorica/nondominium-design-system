@@ -17,6 +17,20 @@
 
 import { base } from '$app/paths';
 
+/** Which data state a screen asks the mock layer for. The union per surface is
+ *  narrowed to the variants that surface actually renders differently, so a
+ *  meaningless combination cannot be linked. See replica/stores.svelte.ts. */
+type LobbyState =
+  | 'loading'
+  | 'error'
+  | 'empty'
+  | 'onboarding'
+  | 'filtered'
+  | 'filtered-empty'
+  | 'no-profile';
+type GroupState = 'loading' | 'error' | 'empty';
+type NdoState = 'loading' | 'error' | 'anonymous';
+
 const app = (suffix = '') => `${base}/app${suffix}`;
 const scenarios = (suffix = '') => `${base}/scenarios${suffix}`;
 const playbook = (suffix = '') => `${base}/playbook${suffix}`;
@@ -45,11 +59,16 @@ export const paths = {
   lobbyJoinGroup: () => app('?openJoinGroup=1'),
   lobbyEditProfile: () => app('?editProfile=1'),
   lobbyInvite: (groupId: string) => app(`?group=${encodeURIComponent(groupId)}`),
+  /** Data states of the lobby: what the browser renders when the load is in
+   *  flight, failed, empty, filtered, or the agent has no Level 1 profile. */
+  lobbyState: (state: LobbyState) => app(`?state=${state}`),
 
   // ── Prototype: groups ──
   groupDetail: (id: string) => app(`/group/${encodeURIComponent(id)}`),
   groupCreateNdo: (id: string) => app(`/group/${encodeURIComponent(id)}?createNdo=1`),
   groupProfile: (id: string) => app(`/group/${encodeURIComponent(id)}?groupProfile=1`),
+  groupState: (id: string, state: GroupState) =>
+    app(`/group/${encodeURIComponent(id)}?state=${state}`),
 
   // ── Prototype: NDOs ──
   ndoNew: () => app('/ndo/new'),
@@ -59,6 +78,8 @@ export const paths = {
   ndoModal: (hash: string, modal: 'fork' | 'associate' | 'lifecycle') =>
     app(`/ndo/${encodeURIComponent(hash)}?modal=${modal}`),
   ndoJoin: (hash: string) => app(`/ndo/${encodeURIComponent(hash)}?join=1`),
+  ndoState: (hash: string, state: NdoState) =>
+    app(`/ndo/${encodeURIComponent(hash)}?state=${state}`),
 
   // ── Prototype: agents ──
   agentProfile: (key: string) => app(`/agent/${encodeURIComponent(key)}`),

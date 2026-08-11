@@ -210,6 +210,37 @@ transparency, split into a full lockup and a square mark, and sampled into five
 gradient call to action, teal active state. `/app` does not, because the app has
 no brand layer and a replica that invented one would be lying.
 
+## Phase 4 — every implemented screen (2026-08-11)
+
+The prototype held 21 screens: the ones a reviewer can reach by clicking. An
+audit of `ui/src/routes` and all 26 components against those keys found the
+other half — the states the app implements and nobody can open on demand.
+`NdoBrowser` alone branches six ways before it renders a card; `GroupView` and
+`NdoView` each carry loading and error states that need a broken conductor.
+
+18 keys added, 39 total. Seven lobby data states, three group states, and eight
+NDO states covering lifecycle records (hibernating, deprecated with successor,
+end of life, every tab empty), a hash with no record behind it, and the loading,
+error and no-agent-key cases.
+
+The mechanism is a `?state=` param read by the **mock stores**, never by the
+components. `appContext` became accessors over an inner `$state` so a variant can
+withhold the Level 1 profile or the agent key without any component knowing.
+Fidelity is unchanged: 17/24 byte-identical, 24/24 identical class sets.
+
+Four findings, all recorded rather than fixed, because they are the app's:
+
+1. **A missing NDO shows a spinner forever.** `NdoIdentityLayer` renders
+   "Loading Layer 0 identity…" whenever the descriptor is null, and a record
+   that does not exist is indistinguishable from one still loading. Keyed as
+   `ndo-missing`.
+2. **`isAuthenticated` gates one action out of three.** Without an agent key,
+   Fork disappears; Join NDO and Associate with a group stay clickable.
+3. **`lobby/GroupSidebar.svelte` is orphaned** — nothing imports it, and it has
+   drifted from `shell/Sidebar.svelte` that replaced it.
+4. **The exit chip covered the sidebar's profile button**, introduced in Phase 3
+   and caught by rendering this phase. Offset past the sidebar.
+
 ## Changelog
 
 - 2026-08-11 — ISA written; review repo `Sensorica/nondominium-design-review` created with Discussions enabled.

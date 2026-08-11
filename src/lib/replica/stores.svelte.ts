@@ -31,6 +31,7 @@ import type {
   ResourceSpecificationListing,
   VfEconomicEvent
 } from './types';
+import { urlParam } from './url-state.svelte';
 import {
   INITIAL_EVENTS,
   INITIAL_GROUPS,
@@ -49,9 +50,44 @@ import {
 
 export { ME_AGENT_B64 };
 
+// ── data states ─────────────────────────────────────────────────────────────
+//
+// Every screen below is one the app renders today. Most of them nobody can
+// reach on demand: a spinner shows for as long as the conductor takes, an error
+// banner needs a broken conductor, an onboarding panel needs a fresh agent with
+// no groups. They are implemented, they are unreachable, and so they go
+// unreviewed — which is exactly the class of screen a design system exists to
+// hold still.
+//
+// `?state=` picks which one the mock layer serves. The replica components never
+// see the param: they read `lobbyStore.isLoading` and `appContext.myAgentPubKey`
+// as they always have, and the store decides what those mean. That is the whole
+// trick, and it is why the components stay copies rather than forks.
+
+export type DataState =
+  | 'default'
+  | 'loading'
+  | 'error'
+  | 'empty'
+  | 'onboarding'
+  | 'filtered'
+  | 'filtered-empty'
+  | 'no-profile'
+  | 'anonymous';
+
+/** The variant the URL asks for. Reactive: `page` is, and `urlParam` reads it. */
+const ds = (): DataState => (urlParam('state') as DataState | null) ?? 'default';
+
+/** Preset filters for the two filtered variants, so the reviewer sees the
+ *  "(N results)" count and the Clear filters affordance without clicking. */
+const FILTER_PRESET: Record<string, ActiveFilters> = {
+  filtered: { stages: ['Active', 'Stable'], natures: [], regimes: [] },
+  'filtered-empty': { stages: ['Ideation'], natures: ['Digital'], regimes: [] }
+};
+
 // ── appContext ──────────────────────────────────────────────────────────────
 
-export const appContext = $state({
+const ctx = $state({
   lobbyUserProfile: { ...INITIAL_LOBBY_PROFILE } as LobbyUserProfile | null,
   /** Base64 in the prototype; a Uint8Array in production. */
   myAgentPubKey: ME_AGENT_B64 as string | null,
@@ -62,6 +98,51 @@ export const appContext = $state({
   /** Per-group Level 2 disclosure choices. localStorage in production. */
   groupMemberProfiles: {} as Record<string, GroupMemberProfile>
 });
+
+/** Accessors rather than a plain `$state` object, so `?state=` can withhold the
+ *  Level 1 profile or the agent key without any component knowing. Production is
+ *  a plain object; the shape a component sees is identical. */
+export const appContext = {
+  get lobbyUserProfile() {
+    return ds() === 'no-profile' ? null : ctx.lobbyUserProfile;
+  },
+  set lobbyUserProfile(v: LobbyUserProfile | null) {
+    ctx.lobbyUserProfile = v;
+  },
+  get myAgentPubKey() {
+    return ds() === 'anonymous' ? null : ctx.myAgentPubKey;
+  },
+  set myAgentPubKey(v: string | null) {
+    ctx.myAgentPubKey = v;
+  },
+  get myPerson() {
+    return ds() === 'anonymous' ? null : ctx.myPerson;
+  },
+  set myPerson(v: Person | null) {
+    ctx.myPerson = v;
+  },
+  get currentView() {
+    return ctx.currentView;
+  },
+  set currentView(v: 'lobby' | 'group' | 'ndo') {
+    ctx.currentView = v;
+  },
+  get selectedGroupId() {
+    return ctx.selectedGroupId;
+  },
+  set selectedGroupId(v: string | null) {
+    ctx.selectedGroupId = v;
+  },
+  get selectedNdoId() {
+    return ctx.selectedNdoId;
+  },
+  set selectedNdoId(v: string | null) {
+    ctx.selectedNdoId = v;
+  },
+  get groupMemberProfiles() {
+    return ctx.groupMemberProfiles;
+  }
+};
 
 // ── shared mutable data ─────────────────────────────────────────────────────
 
@@ -99,13 +180,25 @@ const lobbyState = $state({
   errorMessage: null as string | null
 });
 
+/** Variants that leave the browser with nothing to list. `onboarding` also
+ *  withholds the groups, which is what swaps the plain empty line for the
+ *  dashed Create-or-join panel. */
+const EMPTY_STATES = new Set<DataState>(['loading', 'error', 'empty', 'onboarding']);
+
 export const lobbyStore = {
-  get groups() { return data.groups; },
+  get groups() { return ds() === 'onboarding' ? [] : data.groups; },
   get ndos() { return data.ndos; },
-  get filteredNdos() { return data.ndos.filter((d) => matchesFilters(d, lobbyState.activeFilters)); },
-  get activeFilters() { return lobbyState.activeFilters; },
-  get isLoading() { return lobbyState.isLoading; },
-  get errorMessage() { return lobbyState.errorMessage; },
+  get filteredNdos() {
+    if (EMPTY_STATES.has(ds())) return [];
+    return data.ndos.filter((d) => matchesFilters(d, this.activeFilters));
+  },
+  get activeFilters() { return FILTER_PRESET[ds()] ?? lobbyState.activeFilters; },
+  get isLoading() { return ds() === 'loading' || lobbyState.isLoading; },
+  get errorMessage() {
+    return ds() === 'error'
+      ? 'Failed to load NDOs: the conductor closed the connection.'
+      : lobbyState.errorMessage;
+  },
   get myPerson() { return appContext.myPerson; },
 
   loadLobby() { return Promise.resolve(); },
@@ -163,12 +256,20 @@ const groupState = $state({
 export const groupStore = {
   get group() { return data.groups.find((g) => g.id === groupState.groupId) ?? null; },
   get groupNdos() {
+    if (EMPTY_STATES.has(ds())) return [];
     const hashes = groupState.groupId ? (data.groupNdoHashes[groupState.groupId] ?? []) : [];
     return hashes.map((h) => data.ndos.find((n) => n.hash === h)).filter((n): n is NdoDescriptor => !!n);
   },
-  get members() { return groupState.groupId ? (data.groupMembers[groupState.groupId] ?? []) : []; },
-  get isLoading() { return groupState.isLoading; },
-  get errorMessage() { return groupState.errorMessage; },
+  get members() {
+    if (EMPTY_STATES.has(ds())) return [];
+    return groupState.groupId ? (data.groupMembers[groupState.groupId] ?? []) : [];
+  },
+  get isLoading() { return ds() === 'loading' || groupState.isLoading; },
+  get errorMessage() {
+    return ds() === 'error'
+      ? 'Failed to load the group: this clone cell is not installed on your conductor.'
+      : groupState.errorMessage;
+  },
 
   loadGroupData(groupId: string) {
     groupState.groupId = groupId;
@@ -211,10 +312,19 @@ export const resourceStore = {
 // ── service-shaped lookups (what the Effect services return) ────────────────
 
 export const ndoService = {
+  /** Production holds these in NdoView's own `$state`, written by an async load.
+   *  Here they come from `?state=`, because a lookup against module state can
+   *  neither be slow nor fail, and both screens exist in the app. */
+  get isLoading() { return ds() === 'loading'; },
+  get loadError() {
+    return ds() === 'error' ? 'Failed to load this NDO: no such record on the DHT.' : null;
+  },
   getDescriptor(hash: string): NdoDescriptor | null {
+    if (ds() === 'loading' || ds() === 'error') return null;
     return data.ndos.find((n) => n.hash === hash) ?? null;
   },
   getTransitionHistory(hash: string): NdoTransitionHistoryEvent[] {
+    if (EMPTY_STATES.has(ds())) return [];
     return data.transitions[hash] ?? [];
   },
   updateLifecycleStage(hash: string, newStage: LifecycleStage, successorHash?: string) {

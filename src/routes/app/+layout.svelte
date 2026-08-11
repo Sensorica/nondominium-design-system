@@ -34,7 +34,10 @@
   .exit {
     position: fixed;
     bottom: 24px;
-    left: 24px;
+    /* Clear of the app's sidebar (w-52 = 13rem), whose own footer button sits at
+       the same corner. Prototype chrome must never cover app chrome — a control
+       you cannot click is worse than no shortcut at all. */
+    left: calc(13rem + 24px);
     z-index: 60;
     display: flex;
     align-items: stretch;
@@ -75,7 +78,7 @@
   }
 
   @media (max-width: 640px) {
-    .exit { bottom: 16px; left: 16px; }
+    .exit { bottom: 16px; left: calc(13rem + 12px); }
     .exit__home span { display: none; }
   }
 </style>
