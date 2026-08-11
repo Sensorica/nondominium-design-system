@@ -1,185 +1,141 @@
 // Surface keys: the stable identity of every commentable / navigable surface.
 //
-// A "surface" is a page something else needs to point at by name rather than by
+// A surface is anything something else needs to point at by name rather than by
 // URL: the screen-map catalogue, a comment thread, the parity inventory. URLs
 // change; keys must not.
 //
 // Two namespaces, one resolver:
-//   screen keys     'ndo-detail'              (prototype app screens)
+//   screen keys     'ndo-governance'          (prototype app states)
 //   scenario keys   'scenario:lobby-browse'   (composed showcase pages)
 //
-// This module owns key resolution and NOTHING else. It must not import the
-// screen-map overlay, the comments client, or any UI. Packs that need a key
-// depend on this module, never on each other.
-//
-// All URLs come from `paths`, so keys resolve identically in dev and under the
-// GitHub Pages base prefix.
+// Resolution is URL-aware, not pathname-aware, because in this prototype a
+// modal, a tab and a panel are query-param states of the same route. Keeping
+// them out of the path is what lets the replica components stay byte-identical
+// to the app's, which is the whole point.
 import { paths } from './paths';
 
-/** Screen key → canonical URL. Detail screens point at a representative record
- *  so every catalogue entry lands on a fully rendered page: `ndo-detail` at a
- *  mature NDO, `ndo-lifecycle` at one mid-ladder, `ndo-history` at the only NDO
- *  with a seeded transition trail. */
-export const SCREEN_KEY_TO_URL: Record<string, string> = {
-  // ── Gates (the identity ladder) ──
-  connecting: paths.connecting(),
-  'profile-setup': paths.profileSetup(),
-  'profile-guard': paths.profileGuard(),
-  'invite-landing': paths.inviteLanding('gr2'),
+/** A surface's shape: a route pattern with `:id` for any single segment, plus
+ *  the query params that must be present for the key to match. */
+type Shape = { path: string; params?: Record<string, string> };
 
-  // ── Lobby & self ──
-  lobby: paths.appHome(),
-  profile: paths.profile(),
-  'profile-edit': paths.profileEdit(),
-
-  // ── Agents ──
-  agents: paths.agents(),
-  'agent-profile': paths.agentProfile('ag3'),
-
-  // ── Groups ──
-  groups: paths.groups(),
-  'group-create': paths.groupCreate(),
-  'group-join': paths.groupJoin(),
-  'group-detail': paths.groupDetail('gr1'),
-  'group-members': paths.groupMembers('gr1'),
-  'group-work-log': paths.groupWorkLog('gr1'),
-  'group-links': paths.groupLinks('gr1'),
-  'group-profile': paths.groupProfile('gr1'),
-
-  // ── NDOs ──
-  'ndo-create': paths.ndoCreate('gr1'),
-  'ndo-detail': paths.ndoDetail('ndo1'),
-  'ndo-activity': paths.ndoActivity('ndo1'),
-  'ndo-composition': paths.ndoComposition('ndo3'),
-  'ndo-governance': paths.ndoGovernance('ndo1'),
-  'ndo-resources': paths.ndoResources('ndo1'),
-  'ndo-lifecycle': paths.ndoLifecycle('ndo4'),
-  'ndo-history': paths.ndoHistory('ndo1'),
-  'ndo-fork': paths.ndoFork('ndo3'),
-  'ndo-associate': paths.ndoAssociate('ndo7'),
+const shapeOf = (url: string): Shape => {
+  const [path, query] = url.split('?');
+  if (!query) return { path };
+  const params: Record<string, string> = {};
+  for (const [k, v] of new URLSearchParams(query)) params[k] = v;
+  return { path, params };
 };
 
-/** Scenario route → scenario key. Exact match, base-prefixed. */
+const withId = (url: string, sentinel: string): Shape => {
+  const s = shapeOf(url);
+  return { ...s, path: s.path.replace(encodeURIComponent(sentinel), ':id') };
+};
+
+const ID = '__ID__';
+
+/** Screen key → the shape that identifies it. */
+export const SCREEN_SHAPE: Record<string, Shape> = {
+  // Connection states — the screens nobody can demo in a running app.
+  connecting: shapeOf(paths.connecting()),
+  'connection-error': shapeOf(paths.connectionError()),
+  disconnected: shapeOf(paths.disconnected()),
+
+  // Lobby
+  lobby: shapeOf(paths.appHome()),
+  'lobby-profile-setup': shapeOf(paths.lobbyProfileSetup()),
+  'lobby-edit-profile': shapeOf(paths.lobbyEditProfile()),
+  'lobby-create-group': shapeOf(paths.lobbyCreateGroup()),
+  'lobby-join-group': shapeOf(paths.lobbyJoinGroup()),
+
+  // Groups
+  'group-detail': withId(paths.groupDetail(ID), ID),
+  'group-create-ndo': withId(paths.groupCreateNdo(ID), ID),
+  'group-profile': withId(paths.groupProfile(ID), ID),
+
+  // NDO — one route, seven states
+  'ndo-new': shapeOf(paths.ndoNew()),
+  'ndo-resources': withId(paths.ndoDetail(ID), ID),
+  'ndo-governance': withId(paths.ndoTab(ID, 'governance'), ID),
+  'ndo-composition': withId(paths.ndoTab(ID, 'composition'), ID),
+  'ndo-activity': withId(paths.ndoTab(ID, 'activity'), ID),
+  'ndo-lifecycle': withId(paths.ndoModal(ID, 'lifecycle'), ID),
+  'ndo-fork': withId(paths.ndoModal(ID, 'fork'), ID),
+  'ndo-associate': withId(paths.ndoModal(ID, 'associate'), ID),
+  'ndo-join': withId(paths.ndoJoin(ID), ID),
+
+  // Agents
+  'agent-profile': withId(paths.agentProfile(ID), ID)
+};
+
+/** Scenario route → scenario key. Exact path match. */
 export const SCENARIO_KEY: Record<string, string> = {
   [paths.scenarioLobbyBrowse()]: 'scenario:lobby-browse',
   [paths.scenarioNdoCreation()]: 'scenario:ndo-creation',
   [paths.scenarioNdoLifecycle()]: 'scenario:ndo-lifecycle',
   [paths.scenarioGroupCollaboration()]: 'scenario:group-collaboration',
   [paths.scenarioAgentIdentity()]: 'scenario:agent-identity',
-  [paths.scenarioGovernanceReview()]: 'scenario:governance-review',
-};
-
-/**
- * Screen key → route SHAPE, with `:id` standing in for any single segment.
- *
- * This exists because the catalogue above points at representative records
- * (`ndo-detail` → ndo1), and a reader on ndo5 is still on the ndo-detail screen.
- * Resolving by URL prefix alone would fail them twice over: `/app/ndo/ndo5`
- * does not start with `/app/ndo/ndo1`, and `lobby` — whose URL is `/app` — is a
- * prefix of every app path, so it would swallow the lot and file their comment
- * on the wrong thread.
- *
- * Shapes are built from `paths` with a sentinel id, so a route restructure
- * updates them for free.
- */
-const shape = (url: string) => url.split('?')[0];
-
-export const SCREEN_KEY_PATTERN: Record<string, string> = {
-  connecting: shape(paths.connecting()),
-  'profile-setup': shape(paths.profileSetup()),
-  'profile-guard': shape(paths.profileGuard()),
-  'invite-landing': shape(paths.inviteLanding()),
-
-  lobby: shape(paths.appHome()),
-  profile: shape(paths.profile()),
-  'profile-edit': shape(paths.profileEdit()),
-
-  agents: shape(paths.agents()),
-  'agent-profile': shape(paths.agentProfile(':id')),
-
-  groups: shape(paths.groups()),
-  'group-create': shape(paths.groupCreate()),
-  'group-join': shape(paths.groupJoin()),
-  'group-detail': shape(paths.groupDetail(':id')),
-  'group-members': shape(paths.groupMembers(':id')),
-  'group-work-log': shape(paths.groupWorkLog(':id')),
-  'group-links': shape(paths.groupLinks(':id')),
-  'group-profile': shape(paths.groupProfile(':id')),
-
-  'ndo-create': shape(paths.ndoCreate()),
-  'ndo-detail': shape(paths.ndoDetail(':id')),
-  'ndo-activity': shape(paths.ndoActivity(':id')),
-  'ndo-composition': shape(paths.ndoComposition(':id')),
-  'ndo-governance': shape(paths.ndoGovernance(':id')),
-  'ndo-resources': shape(paths.ndoResources(':id')),
-  'ndo-lifecycle': shape(paths.ndoLifecycle(':id')),
-  'ndo-history': shape(paths.ndoHistory(':id')),
-  'ndo-fork': shape(paths.ndoFork(':id')),
-  'ndo-associate': shape(paths.ndoAssociate(':id')),
+  [paths.scenarioGovernanceReview()]: 'scenario:governance-review'
 };
 
 /** Human labels, for drawer headers and catalogue entries. */
 export const KEY_LABEL: Record<string, string> = {
   connecting: 'Connecting to the conductor',
-  'profile-setup': 'Lobby profile setup (level 1)',
-  'profile-guard': 'Person entry required (level 3)',
-  'invite-landing': 'Group invite landing',
-  lobby: 'Lobby — NDO browser',
-  profile: 'My lobby profile',
-  'profile-edit': 'Edit lobby profile',
-  agents: 'Agent directory',
-  'agent-profile': 'Agent profile',
-  groups: 'My groups',
-  'group-create': 'Create a group',
-  'group-join': 'Join a group',
+  'connection-error': 'Connection failed',
+  disconnected: 'Not connected',
+  lobby: 'Lobby — Browse NDOs',
+  'lobby-profile-setup': 'Lobby profile setup (first launch)',
+  'lobby-edit-profile': 'Edit Lobby profile',
+  'lobby-create-group': 'Create group (sidebar)',
+  'lobby-join-group': 'Join group (sidebar)',
   'group-detail': 'Group view',
-  'group-members': 'Group members',
-  'group-work-log': 'Group work log',
-  'group-links': 'Group soft links',
-  'group-profile': 'Group disclosure choice (level 2)',
-  'ndo-create': 'Create an NDO',
-  'ndo-detail': 'NDO identity panel',
-  'ndo-activity': 'NDO activity tab',
-  'ndo-composition': 'NDO composition tab',
-  'ndo-governance': 'NDO governance tab',
-  'ndo-resources': 'NDO resources tab',
-  'ndo-lifecycle': 'NDO lifecycle transition',
-  'ndo-history': 'NDO transition history',
-  'ndo-fork': 'Fork an NDO',
-  'ndo-associate': 'Associate an NDO with a group',
+  'group-create-ndo': 'Create NDO',
+  'group-profile': 'Group disclosure choice',
+  'ndo-new': 'New NDO without a group',
+  'ndo-resources': 'NDO — Resources tab',
+  'ndo-governance': 'NDO — Governance tab',
+  'ndo-composition': 'NDO — Composition tab',
+  'ndo-activity': 'NDO — Activity tab',
+  'ndo-lifecycle': 'Advance lifecycle stage',
+  'ndo-fork': 'Fork this NDO',
+  'ndo-associate': 'Associate with a group',
+  'ndo-join': 'NDO membership panel',
+  'agent-profile': 'Agent profile (not implemented in the app)',
   'scenario:lobby-browse': 'Lobby browse scenario',
   'scenario:ndo-creation': 'NDO creation scenario',
   'scenario:ndo-lifecycle': 'NDO lifecycle scenario',
   'scenario:group-collaboration': 'Group collaboration scenario',
   'scenario:agent-identity': 'Agent identity scenario',
-  'scenario:governance-review': 'Governance review scenario',
+  'scenario:governance-review': 'Governance review scenario'
 };
 
-/** Does a pathname match a route shape, segment for segment? `:id` matches any
- *  single non-empty segment. Exact arity: no prefix matching, so `/app` cannot
- *  claim `/app/ndo/ndo5`. */
-function matchesShape(pathname: string, pattern: string): boolean {
+function pathMatches(pathname: string, pattern: string): boolean {
   const a = pathname.split('/');
   const b = pattern.split('/');
   if (a.length !== b.length) return false;
   return b.every((seg, i) => (seg === ':id' ? a[i].length > 0 : seg === a[i]));
 }
 
+function paramsMatch(search: URLSearchParams, want: Record<string, string> | undefined): boolean {
+  if (!want) return true;
+  return Object.entries(want).every(([k, v]) => search.get(k) === v);
+}
+
 /**
- * Screen key for a pathname. Shapes are matched with exact arity, so
- * `/app/ndo/ndo5/governance` resolves to `ndo-governance` for any id, and the
- * lobby claims only itself. Concrete segments beat `:id` when two shapes both
- * match — `/app/ndo/create` is `ndo-create`, not `ndo-detail`.
+ * Screen key for a URL. Exact path arity, then required query params. The most
+ * specific match wins: more concrete path segments first, then more required
+ * params — so `/app/ndo/x?modal=fork` is `ndo-fork` rather than `ndo-resources`,
+ * and `/app/ndo/new` is `ndo-new` rather than `ndo-resources`.
  *
- * '' means "not a keyed screen": no catalogue entry, no comment thread.
+ * '' means "not a keyed surface": no catalogue entry, no comment thread.
  */
-export function screenKeyForPath(pathname: string): string {
+export function screenKeyForUrl(url: URL): string {
   let bestKey = '';
   let bestScore = -1;
-  for (const [key, pattern] of Object.entries(SCREEN_KEY_PATTERN)) {
-    if (!matchesShape(pathname, pattern)) continue;
-    // More concrete segments wins the tie.
-    const score = pattern.split('/').filter((s) => s !== ':id').length;
+  for (const [key, shape] of Object.entries(SCREEN_SHAPE)) {
+    if (!pathMatches(url.pathname, shape.path)) continue;
+    if (!paramsMatch(url.searchParams, shape.params)) continue;
+    const concrete = shape.path.split('/').filter((s) => s !== ':id').length;
+    const score = concrete * 10 + Object.keys(shape.params ?? {}).length;
     if (score > bestScore) {
       bestKey = key;
       bestScore = score;
@@ -188,15 +144,12 @@ export function screenKeyForPath(pathname: string): string {
   return bestKey;
 }
 
-/**
- * Unified resolver across both namespaces. Scenario routes match exactly and
- * win, because they are the more specific namespace. '' means this pathname has
- * no stable identity: no comment thread, no catalogue entry.
- */
-export function surfaceKeyForPath(pathname: string): string {
-  const scenario = SCENARIO_KEY[pathname];
+/** Unified resolver across both namespaces. Scenario paths match exactly and
+ *  win, because they are the more specific namespace. */
+export function surfaceKeyForUrl(url: URL): string {
+  const scenario = SCENARIO_KEY[url.pathname];
   if (scenario) return scenario;
-  return screenKeyForPath(pathname);
+  return screenKeyForUrl(url);
 }
 
 /** Label for a resolved key; falls back to the key itself. */

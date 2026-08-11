@@ -9,9 +9,9 @@
   // events to reach it.
   import { page } from '$app/state';
   import { goto } from '$app/navigation';
-  import { screenMap, SCREEN_MAP_GROUPS, urlForKey, labelForKey, screenKeyForPath } from '$lib/screen-map.svelte';
+  import { screenMap, SCREEN_MAP_GROUPS, urlForKey, labelForKey, screenKeyForUrl } from '$lib/screen-map.svelte';
 
-  const currentKey = $derived(screenKeyForPath(page.url.pathname));
+  const currentKey = $derived(screenKeyForUrl(page.url));
 
   function onKeydown(e: KeyboardEvent) {
     const tag = (e.target as HTMLElement)?.tagName;
@@ -50,7 +50,7 @@
       <div class="ndo-modal__body">
         {#each SCREEN_MAP_GROUPS as group (group.title)}
           <section>
-            <p class="ndo-label mb-2">{group.icon} {group.title}</p>
+            <p class="ndo-label mb-2">{group.title}</p>
             <div class="grid gap-1.5" style="grid-template-columns:repeat(auto-fill,minmax(200px,1fr))">
               {#each group.keys as key (key)}
                 <button

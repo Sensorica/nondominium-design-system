@@ -159,6 +159,43 @@ its tab views are not deep-linkable. The prototype routes them (D4). That is a
 proposal, not a mirror, and it is the one place the inventory deliberately
 diverges.
 
+## Phase 2 — pixel-perfect replica (2026-08-11)
+
+The first pass built an interpretation of the app: my own components, my own
+token layer, my own routes. Correct as a design system, useless as a record of
+what exists. This phase replaced the prototype with a copy.
+
+`src/lib/replica/` mirrors `../nondominium/ui/src/lib/components`. 17 of 24
+components have byte-identical markup; all 24 emit an identical set of UnoCSS
+classes, enforced by `bun run check:fidelity` and by a CI job that checks out
+the app. The seven that differ do so only in wiring: hrefs go through `paths.ts`
+because the site deploys under a sub-path, and modal / tab / panel state is read
+from the query string so each is a linkable, commentable surface.
+
+**Four defects found by rendering, none of which a type check or a build would
+catch:**
+
+1. **No utility CSS at all.** Nothing imported `virtual:uno.css`. Every page had
+   correct markup and no styling.
+2. **No effect ever ran under `/app`.** Melt's Dialog fires `onOpenChange(false)`
+   while it initialises, before SvelteKit's router exists; the close handler
+   called `replaceState`, which threw, and one unhandled throw during hydration
+   aborts the effect flush for the whole tree. Screens painted; modals, tabs and
+   store loads did nothing. Fixed by making every URL write idempotent
+   (`src/lib/replica/url-state.svelte.ts`).
+3. **The static fallback never hydrates.** With `ssr = false` plus `404.html`,
+   app URLs client-render instead of hydrating and no effect is scheduled. Fixed
+   by enumerating `entries()` for every dynamic route so all 22 prototype pages
+   prerender.
+4. **Two Svelte runtimes on every page.** `app.html` loaded the custom-element
+   bundle globally. Now scoped to the playbook, which is the only place that
+   demos the elements.
+
+**Known gap:** `/app?profile=1` does not open the lobby profile modal. The app
+mounts `ProfileSetupModal` twice (root layout and LobbyView); the prototype
+keeps one, and the Melt dialog still does not open from a URL flag. Every other
+prototype state renders. Tracked, not hidden.
+
 ## Changelog
 
 - 2026-08-11 — ISA written; review repo `Sensorica/nondominium-design-review` created with Discussions enabled.

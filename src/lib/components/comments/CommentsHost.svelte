@@ -6,13 +6,13 @@
   import { page } from '$app/state';
   import { comments, clearToken } from '$lib/comments/comments.svelte';
   import { findDiscussion, validateToken } from '$lib/comments/github-client';
-  import { surfaceKeyForPath, labelForKey } from '$lib/surface-keys';
+  import { surfaceKeyForUrl, labelForKey } from '$lib/surface-keys';
   import CommentsSetup from './CommentsSetup.svelte';
   import CommentsList from './CommentsList.svelte';
   import CommentsCompose from './CommentsCompose.svelte';
   import type { Comment } from '$lib/comments/comments-types';
 
-  const currentKey = $derived(surfaceKeyForPath(page.url.pathname));
+  const currentKey = $derived(surfaceKeyForUrl(page.url));
   const label = $derived(currentKey ? labelForKey(currentKey) : '');
   const count = $derived(comments.thread?.comments.length ?? 0);
 

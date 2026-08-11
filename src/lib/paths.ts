@@ -1,11 +1,19 @@
 // Centralized routing module — the ONLY place route segments live.
 //
-// Every page imports `paths` and calls a typed function instead of hand-writing
-// a template literal (`paths.ndoDetail(n.id)`, never `${base}/app/ndo/${n.id}`).
-// The repo previously prefixed `{base}` by hand in twelve pages, which produced
-// three separate "fix base path" commits; this module ends that class of bug.
+// The prototype's paths mirror the app's one for one, shifted under /app and a
+// deployment base prefix:
 //
-// The four prefix helpers are file-private. External code only sees `paths.*`.
+//   app                     prototype
+//   /                       {base}/app
+//   /group/{id}             {base}/app/group/{id}
+//   /ndo/{hash}             {base}/app/ndo/{hash}
+//   /ndo/new                {base}/app/ndo/new
+//   /agent/{key}            {base}/app/agent/{key}   (404s in the app; see the route)
+//
+// Modal, tab and panel states are query params rather than local component
+// state, so each one is a surface a reviewer can link to and comment on. The
+// param names are the app's own where it already has them (`createNdo`,
+// `openCreateGroup`, `openJoinGroup`, `group`).
 
 import { base } from '$app/paths';
 
@@ -14,56 +22,43 @@ const scenarios = (suffix = '') => `${base}/scenarios${suffix}`;
 const playbook = (suffix = '') => `${base}/playbook${suffix}`;
 
 export const paths = {
-  // ── Design-system hub ──
+  // ── Design-system surfaces ──
   home: () => base || '/',
   tokens: () => `${base}/tokens`,
-
-  // ── Static assets (base-prefixed; served under the deployment sub-path) ──
-  /** The built custom-element bundle, loaded by the playbook. */
   registryBundle: () => `${base}/registry/bundle.js`,
-  /** The token stylesheet, linked from app.html and documented in the playbook. */
   tokenSheet: () => `${base}/tokens.css`,
 
-  // ── App: the prototype's entry surface ──
-  appHome: () => app(),
+  // ── Prototype: connection states ──
   connecting: () => app('/connecting'),
+  connectionError: () => app('/connection-error'),
+  disconnected: () => app('/disconnected'),
 
-  // ── App: gates (identity ladder) ──
-  profileSetup: () => app('/profile-setup'),
-  profileGuard: () => app('/profile-guard'),
-  inviteLanding: (code = 'demo') => app(`/invite?group=${code}`),
+  // ── Prototype: lobby ──
+  appHome: () => app(),
+  lobbyProfileSetup: () => app('?profile=1'),
+  lobbyCreateGroup: () => app('?openCreateGroup=1'),
+  lobbyJoinGroup: () => app('?openJoinGroup=1'),
+  lobbyEditProfile: () => app('?editProfile=1'),
+  lobbyInvite: (groupId: string) => app(`?group=${encodeURIComponent(groupId)}`),
 
-  // ── App: the agent's own identity ──
-  profile: () => app('/profile'),
-  profileEdit: () => app('/profile/edit'),
+  // ── Prototype: groups ──
+  groupDetail: (id: string) => app(`/group/${encodeURIComponent(id)}`),
+  groupCreateNdo: (id: string) => app(`/group/${encodeURIComponent(id)}?createNdo=1`),
+  groupProfile: (id: string) => app(`/group/${encodeURIComponent(id)}?groupProfile=1`),
 
-  // ── App: agents ──
-  agents: () => app('/agents'),
-  agentProfile: (id: string) => app(`/agents/${id}`),
+  // ── Prototype: NDOs ──
+  ndoNew: () => app('/ndo/new'),
+  ndoDetail: (hash: string) => app(`/ndo/${encodeURIComponent(hash)}`),
+  ndoTab: (hash: string, tab: 'governance' | 'composition' | 'activity') =>
+    app(`/ndo/${encodeURIComponent(hash)}?tab=${tab}`),
+  ndoModal: (hash: string, modal: 'fork' | 'associate' | 'lifecycle') =>
+    app(`/ndo/${encodeURIComponent(hash)}?modal=${modal}`),
+  ndoJoin: (hash: string) => app(`/ndo/${encodeURIComponent(hash)}?join=1`),
 
-  // ── App: groups ──
-  groups: () => app('/groups'),
-  groupCreate: () => app('/groups/create'),
-  groupJoin: () => app('/groups/join'),
-  groupDetail: (id: string) => app(`/groups/${id}`),
-  groupMembers: (id: string) => app(`/groups/${id}/members`),
-  groupWorkLog: (id: string) => app(`/groups/${id}/work-log`),
-  groupLinks: (id: string) => app(`/groups/${id}/links`),
-  groupProfile: (id: string) => app(`/groups/${id}/profile`),
+  // ── Prototype: agents ──
+  agentProfile: (key: string) => app(`/agent/${encodeURIComponent(key)}`),
 
-  // ── App: NDOs ──
-  ndoCreate: (groupId?: string) => app(`/ndo/create${groupId ? `?group=${groupId}` : ''}`),
-  ndoDetail: (id: string) => app(`/ndo/${id}`),
-  ndoActivity: (id: string) => app(`/ndo/${id}/activity`),
-  ndoComposition: (id: string) => app(`/ndo/${id}/composition`),
-  ndoGovernance: (id: string) => app(`/ndo/${id}/governance`),
-  ndoResources: (id: string) => app(`/ndo/${id}/resources`),
-  ndoLifecycle: (id: string) => app(`/ndo/${id}/lifecycle`),
-  ndoHistory: (id: string) => app(`/ndo/${id}/history`),
-  ndoFork: (id: string) => app(`/ndo/${id}/fork`),
-  ndoAssociate: (id: string) => app(`/ndo/${id}/associate`),
-
-  // ── Scenarios (composed showcase pages) ──
+  // ── Scenarios ──
   scenarios: () => scenarios(),
   scenarioLobbyBrowse: () => scenarios('/lobby-browse'),
   scenarioNdoCreation: () => scenarios('/ndo-creation'),
@@ -72,7 +67,7 @@ export const paths = {
   scenarioAgentIdentity: () => scenarios('/agent-identity'),
   scenarioGovernanceReview: () => scenarios('/governance-review'),
 
-  // ── Playbook (component docs) ──
+  // ── Playbook ──
   playbook: () => playbook(),
   playbookButtons: () => playbook('/buttons'),
   playbookBadges: () => playbook('/badges'),

@@ -5,7 +5,12 @@
   //
   // The prototype at /app renders WITHOUT this chrome: it is meant to look like
   // the product, not like documentation about the product.
+  // Import order matches ui/src/routes/+layout.svelte: the Tailwind reset, then
+  // the generated utility sheet. Without `virtual:uno.css` no utility class is
+  // emitted at all, which is silent — the markup is right and the page is
+  // unstyled.
   import '../app.css';
+  import 'virtual:uno.css';
   import '$lib/styles/app.css';
   import { page } from '$app/state';
   import { paths } from '$lib/paths';
@@ -94,6 +99,16 @@
 {/if}
 
 <style>
+  /* The token sheet deliberately sets no body styles, so the chrome sets its
+     own. The prototype at /app sets none and inherits the Tailwind reset,
+     exactly as the app does. */
+  :global(body) {
+    margin: 0;
+    font-family: var(--ndo-font-sans);
+    color: var(--ndo-color-text-primary);
+    background: var(--ndo-color-bg-app);
+  }
+
   .chrome { display: grid; grid-template-columns: var(--ndo-sidebar-width) 1fr; min-height: 100vh; }
   .rail {
     background: rgb(var(--ndo-gray-900));

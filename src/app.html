@@ -4,7 +4,11 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link rel="stylesheet" href="%sveltekit.assets%/tokens.css" />
-    <script type="module" src="%sveltekit.assets%/registry/bundle.js"></script>
+    <!-- The ndo-* custom-element bundle is NOT loaded here. It carries its own
+         copy of the Svelte runtime, and loading it on every page put two
+         runtimes on the prototype, which it has no use for — it renders the
+         app's components, not the custom elements. The playbook, which does
+         demo them, loads it from its own layout. -->
     %sveltekit.head%
   </head>
   <body data-sveltekit-preload-data="hover">

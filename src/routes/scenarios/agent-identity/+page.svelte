@@ -1,120 +1,83 @@
 <script lang="ts">
-  // Scenario: the identity ladder. Three levels, each with a cost and a
-  // capability. The point of the page is that the costs are asymmetric — level 1
-  // is free and reversible, level 3 is permanent — and the UI should make that
-  // asymmetry visible rather than smoothing it over.
+  // The three-level identity ladder, as the app implements it.
   import { paths } from '$lib/paths';
-  import { capabilitiesFor, type JoiningStatus } from '$lib/guards/useJoiningGuard.svelte';
 
-  const rungs: { status: JoiningStatus; level: string; title: string; where: string; cost: string }[] = [
+  const rungs = [
     {
-      status: 'no-lobby-profile',
       level: 'Level 0',
       title: 'Anonymous',
       where: 'nothing stored',
-      cost: 'None. Browse the lobby, read every NDO.',
+      cost: 'None. Browse the lobby, open any NDO.',
+      surface: 'The lobby renders in full with no profile at all.'
     },
     {
-      status: 'browsing',
       level: 'Level 1',
       title: 'LobbyUserProfile',
       where: 'localStorage',
-      cost: 'A nickname. Reversible, private to this browser, never gossiped.',
+      cost: 'A nickname. Reversible, local to this browser, never gossiped.',
+      surface: 'ProfileSetupModal on first launch; it cannot be dismissed until a nickname exists.'
     },
     {
-      status: 'member',
       level: 'Level 2',
       title: 'GroupMemberProfile',
       where: 'localStorage, per group',
-      cost: 'A disclosure choice per group. Membership itself is a DHT entry on that group cell.',
+      cost: 'A disclosure choice per group. Membership itself is a DHT entry on the group cell.',
+      surface: 'GroupProfileModal on first entry to each group.'
     },
     {
-      status: 'active',
       level: 'Level 3',
       title: 'Person entry',
       where: 'zome_person, public DHT',
-      cost: 'Permanent. Person entries cannot be deleted — contribution history is not erasable.',
-    },
+      cost: 'Permanent. Person entries cannot be deleted.',
+      surface: 'No screen. It is committed as a side effect of acting.'
+    }
   ];
-
-  let selected = $state<JoiningStatus>('browsing');
-  const can = $derived(capabilitiesFor(selected));
 </script>
 
-<div class="ndo-shell__content">
-  <header>
-    <h1 class="ndo-h1">🪪 Agent identity</h1>
-    <p class="ndo-p mt-2" style="max-width:64ch">
-      Most applications ask for an account before they show anything. Nondominium inverts that: the
-      whole lobby is readable with no identity, and each rung of the ladder is climbed only when an
-      action actually needs it. The last rung is the expensive one, so it is the last one.
+<div class="p-6">
+  <header class="mb-6">
+    <h1 class="text-2xl font-bold text-gray-900">Agent identity</h1>
+    <p class="mt-2 max-w-2xl text-sm text-gray-600">
+      Most applications ask for an account before showing anything. Nondominium inverts that: the
+      whole lobby reads with no identity, and each rung is climbed only when an action needs it.
     </p>
   </header>
 
-  <div class="rungs">
-    {#each rungs as rung (rung.status)}
-      <button
-        class="rung"
-        class:rung--on={selected === rung.status}
-        onclick={() => (selected = rung.status)}
-      >
-        <span class="ndo-label">{rung.level}</span>
-        <strong class="ndo-h3">{rung.title}</strong>
-        <span class="ndo-mono">{rung.where}</span>
-        <span class="ndo-small">{rung.cost}</span>
-      </button>
+  <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+    {#each rungs as rung (rung.level)}
+      <div class="rounded-lg border border-gray-200 bg-white p-4 shadow-sm">
+        <p class="text-xs font-semibold tracking-wide text-gray-400 uppercase">{rung.level}</p>
+        <h2 class="mt-1 text-lg font-semibold text-gray-900">{rung.title}</h2>
+        <p class="mt-1 font-mono text-xs text-gray-400">{rung.where}</p>
+        <p class="mt-2 text-sm text-gray-600">{rung.cost}</p>
+        <p class="mt-2 text-xs text-gray-500">{rung.surface}</p>
+      </div>
     {/each}
   </div>
 
-  <section class="ndo-panel">
-    <div class="ndo-panel__head"><h2 class="ndo-h3">What that rung permits</h2></div>
-    <div class="ndo-panel__body">
-      <ul class="caps">
-        <li class={can.canBrowse ? 'yes' : 'no'}>Browse the lobby</li>
-        <li class={can.canJoinGroup ? 'yes' : 'no'}>Join or create a group</li>
-        <li class={can.canWriteToDht ? 'yes' : 'no'}>Create an NDO, accept a commitment</li>
-        <li class={can.canParticipateInGovernance ? 'yes' : 'no'}>Participate in governance</li>
-      </ul>
-    </div>
+  <section class="mt-6 rounded-lg border border-gray-200 bg-white p-4 shadow-sm">
+    <h2 class="text-base font-semibold text-gray-900">Where the ladder shows in the UI</h2>
+    <ul class="mt-2 list-disc space-y-1 pl-5 text-sm text-gray-600">
+      <li>The sidebar's bottom row reads <em>Set up profile</em> at level 0 and <em>nickname · Edit profile</em> from level 1.</li>
+      <li>The lobby's top strip reads <em>No Lobby profile yet</em> or <em>Signed in as …</em>, duplicating that state two hundred pixels away.</li>
+      <li>The lobby header adds <em>Agent: name</em> only once a Person entry exists — the only level-3 indicator anywhere.</li>
+      <li>An NDO's initiator renders as a linked name if a Person exists, and as a truncated key if not.</li>
+    </ul>
   </section>
 
-  <section class="ndo-panel">
-    <div class="ndo-panel__head"><h2 class="ndo-h3">Why the gate is late, not early</h2></div>
-    <div class="ndo-panel__body flex flex-col gap-3">
-      <p class="ndo-small">
-        Asking for identity up front is a high-information-cost solution applied to a
-        low-information-need situation. Reading a public commons register needs no credential, the
-        same way boarding a bus needs a ticket rather than a passport.
-      </p>
-      <p class="ndo-small">
-        Deferring it also keeps the permanent record honest. A Person entry that exists because
-        somebody wanted to look around is noise in a structure whose whole value is that its
-        contribution history cannot be rewritten.
-      </p>
-    </div>
+  <section class="mt-6 rounded-lg border border-amber-200 bg-amber-50 p-4">
+    <h2 class="text-sm font-semibold text-amber-800">Open questions</h2>
+    <ul class="mt-1 list-disc space-y-1 pl-5 text-sm text-amber-700">
+      <li>Three different places tell you who you are, and none of them tells you which level you are on.</li>
+      <li>Nothing warns before the level-3 write. A Person entry is permanent and is created as a side effect.</li>
+      <li>The initiator link points at <code class="font-mono text-xs">/agent/&lt;key&gt;</code>, a route the app does not have.</li>
+    </ul>
   </section>
 
-  <p class="ndo-small">
-    Live version: <a href={paths.profileSetup()}>level 1</a>,
-    <a href={paths.groupProfile('gr1')}>level 2</a>,
-    <a href={paths.profileGuard()}>level 3</a>.
+  <p class="mt-4 text-sm text-gray-500">
+    Live:
+    <a class="text-blue-600 hover:underline" href={paths.lobbyProfileSetup()}>level 1</a>,
+    <a class="text-blue-600 hover:underline" href={paths.groupProfile('sensorica-lab-7f3a')}>level 2</a>,
+    <a class="text-blue-600 hover:underline" href={paths.agentProfile('uhCAkZ4x0cV7bN2mQ5wE8rT1yU4iO7pA0sD3fG6hJ9kL2')}>the missing agent route</a>.
   </p>
 </div>
-
-<style>
-  .rungs { display: grid; gap: var(--ndo-spacing-3); grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }
-  .rung {
-    display: flex; flex-direction: column; gap: 4px; text-align: left;
-    padding: var(--ndo-spacing-4); border: 1px solid var(--ndo-color-border);
-    border-radius: var(--ndo-radius-lg); background: rgb(var(--ndo-color-card-bg));
-    font: inherit; cursor: pointer; transition: var(--ndo-transition-colors);
-  }
-  .rung:hover { border-color: rgb(var(--ndo-primary-300)); }
-  .rung--on { border-color: rgb(var(--ndo-primary-500)); background: rgb(var(--ndo-primary-50)); }
-  .caps { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; font-size: var(--ndo-text-sm); }
-  .caps li::before { margin-right: 8px; }
-  .yes::before { content: '✅'; }
-  .no::before { content: '⬜'; }
-  .no { color: var(--ndo-color-text-muted); }
-  a { color: var(--ndo-color-link); }
-</style>

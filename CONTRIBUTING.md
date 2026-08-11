@@ -25,24 +25,36 @@ bun run dev
 2. Numbered scales are absolute and are never redefined in the dark-mode block. If a value should change with the theme, it belongs in the semantic layer.
 3. Add it to `/tokens` so it is visible. That page reads the live properties rather than restating them, so most additions need only a new entry in the relevant array.
 
-## Adding a component
+## The replica is a copy, not a design
 
-1. Put the Svelte component in `src/lib/components/shared/`.
-2. Put anything with brand meaning — a variant, a state, a recipe — in `src/lib/styles/app.css` as an `.ndo-*` class. UnoCSS utilities are for layout in markup; they are not where a badge variant lives.
-3. Never hardcode a colour, radius, or spacing value. Every one of them has a token.
-4. Add a specimen to the matching `/playbook` page using `Specimen.svelte`: what it is for, the live thing, and the markup.
+`src/lib/replica/` mirrors `../nondominium/ui/src/lib/components`. Its value is that it renders what the app renders, which is a property that decays the moment either side changes.
 
-If the component also needs to be embeddable, add it to `registry/` as a custom element. Two constraints apply there and only there: no runes (use `export let`), and no UnoCSS classes (UnoCSS's stylesheet does not cross the shadow DOM — style through `var(--ndo-*)`).
+**Do not improve a replica component.** If a pattern is wrong, change it in the app and re-copy it here. If you copy something new, copy the markup byte for byte and change only the script — imports, and mock data in place of the Effect services.
 
-## Adding a screen to the prototype
+```bash
+bun run check:fidelity          # sibling ../nondominium assumed
+bun run check:fidelity -- --app /path/to/ui
+```
 
-1. Create the route under `src/routes/app/(shell)/` or `src/routes/app/(gate)/`.
+The check compares the set of UnoCSS classes each component can emit, not the bytes: seven components legitimately differ in wiring (hrefs go through `paths.ts`, modal and tab state is read from the query string). A class difference is a visual difference, and it fails the build.
+
+## Adding a state to the prototype
+
+The prototype's routes mirror the app's, so a new *route* only appears here after it appears there. What you will add more often is a **state** of an existing route — a modal, a tab, a panel — which is a query param here and local component state in the app.
+
+1. Add the state to the replica component, driven by `page.url.searchParams`.
 2. Add a URL function to `src/lib/paths.ts`.
-3. Add a key to `SCREEN_KEY_TO_URL` in `src/lib/surface-keys.ts`, pointing at a representative record so the entry lands on a fully rendered page.
-4. Add a label to `KEY_LABEL`, and the key to the right group in `SCREEN_MAP_GROUPS` in `src/lib/screen-map.svelte.ts`.
+3. Add a shape to `SCREEN_SHAPE` in `src/lib/surface-keys.ts`, and a label to `KEY_LABEL`.
+4. Add a representative URL to `SCREEN_KEY_TO_URL` and the key to a group in `SCREEN_MAP_GROUPS`.
 5. Bump `prototype-app.screens` in `SKILL.md`.
 
-Steps 3 and 4 are what make the screen navigable and commentable. A screen without a key is invisible to the screen map and cannot hold a review thread.
+Steps 3 and 4 are what make the state navigable and commentable. A state without a key is invisible to the screen map and cannot hold a review thread.
+
+## Adding to the playbook
+
+A playbook page documents a pattern that **exists in the app**. Show it with the app's own class string, cite the file it came from, and where the app is inconsistent, say so in the "Drift worth fixing" block rather than picking a winner. That block is the deliverable: it is the list a future refactor works from.
+
+Never invent a component and document it as though the app had it.
 
 ## Adding a scenario
 
@@ -71,7 +83,7 @@ Conventional Commits with a scope: `feat(playbook):`, `fix(tokens):`, `docs(read
 Before opening a PR:
 
 ```bash
-bun run check    # svelte-check must be clean
+bun run check    # svelte-check plus the replica fidelity check
 bun run build    # the static build must succeed
 ```
 

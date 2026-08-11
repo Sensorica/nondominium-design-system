@@ -15,6 +15,24 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  # Runs against the app itself, so drift between the replica and
+  # ../nondominium/ui is caught on every push. Deliberately not a dependency of
+  # the deploy: a legitimate change in the app should surface here loudly
+  # without blocking the docs site from publishing.
+  fidelity:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          repository: Sensorica/nondominium
+          path: .app-checkout
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+      - name: Compare the replica against the app
+        run: bun run check:fidelity -- --app .app-checkout/ui
+
   build:
     runs-on: ubuntu-latest
     steps:
@@ -25,7 +43,7 @@ jobs:
       - name: Install dependencies
         run: bun install
       - name: Type check
-        run: bun run check
+        run: bunx svelte-kit sync && bunx svelte-check --tsconfig ./tsconfig.json
       - name: Build site (registry bundle first)
         run: bun run build
       - uses: actions/upload-pages-artifact@v3

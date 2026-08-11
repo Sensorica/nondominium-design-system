@@ -9,9 +9,10 @@
     "build": "svelte-kit sync && bun run build:registry && vite build",
     "build:registry": "vite build --config vite.registry.config.ts",
     "preview": "vite preview",
-    "check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
+    "check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json && bun run check:fidelity",
     "lint": "prettier --check . && eslint .",
-    "format": "prettier --write ."
+    "format": "prettier --write .",
+    "check:fidelity": "bun run scripts/check-fidelity.ts"
   },
   "devDependencies": {
     "@sveltejs/adapter-static": "^3.0.0",

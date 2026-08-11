@@ -280,26 +280,19 @@
 }
 
 /* =========================================================
-   GLOBAL BASE
+   NO GLOBAL BASE
+   ---------------------------------------------------------
+   This file declares tokens and nothing else. It used to set
+   `body { font-family; background; color }`, which quietly
+   changed how the prototype rendered compared with the app —
+   the app sets neither, and inherits UnoCSS's Tailwind reset.
+   A token file that also has opinions about the body cannot
+   be dropped into a page without changing it, which defeats
+   the point of shipping it alongside the custom elements.
+
+   Consumers that want the design-system chrome import
+   src/lib/styles/app.css as well.
    ========================================================= */
-*, *::before, *::after { box-sizing: border-box; }
-
-body {
-  margin: 0;
-  font-family: var(--ndo-font-sans);
-  font-size: var(--ndo-text-base);
-  line-height: var(--ndo-lh-base);
-  color: var(--ndo-color-text-primary);
-  background: var(--ndo-color-bg-app);
-  -webkit-font-smoothing: antialiased;
-}
-
-:where(a):focus-visible,
-:where(button):focus-visible,
-:where(input, textarea, select):focus-visible {
-  outline: none;
-  box-shadow: var(--ndo-focus-ring);
-}
 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {

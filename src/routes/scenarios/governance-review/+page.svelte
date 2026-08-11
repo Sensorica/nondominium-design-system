@@ -1,108 +1,83 @@
 <script lang="ts">
-  // Scenario: governance on a mature NDO. The claim worth arguing with is that
-  // reputation stays private while the events that would justify it stay public.
+  // What the Governance tab actually shows today, and what it does not.
   import { paths } from '$lib/paths';
-  import { INITIAL_AGENTS, INITIAL_AGREEMENTS, INITIAL_CONTRIBUTIONS, INITIAL_NDOS } from '$lib/mock';
-  import NdoBadge from '$lib/components/shared/NdoBadge.svelte';
+  import { INITIAL_NDOS, INITIAL_RULES } from '$lib/replica/mock';
 
   const ndo = INITIAL_NDOS[0];
-  const agreement = INITIAL_AGREEMENTS.find((a) => a.ndoId === ndo.id)!;
-  const contributions = INITIAL_CONTRIBUTIONS.filter((c) => c.ndoId === ndo.id);
-  const label = (id: string) => INITIAL_AGENTS.find((a) => a.id === id)?.person?.name ?? id;
+  const rules = INITIAL_RULES[ndo.hash] ?? [];
 </script>
 
-<div class="ndo-shell__content">
-  <header>
-    <h1 class="ndo-h1">⚖️ Governance review</h1>
-    <p class="ndo-p mt-2" style="max-width:64ch">
-      What governance looks like on an object that people actually use: work recorded, work
-      countersigned, and benefit split by a versioned agreement.
+<div class="p-6">
+  <header class="mb-6">
+    <h1 class="text-2xl font-bold text-gray-900">Governance review</h1>
+    <p class="mt-2 max-w-2xl text-sm text-gray-600">
+      The Governance tab is two lists: the rules attached to this specification, and the roles the
+      viewing agent holds. Both are rendered raw.
     </p>
   </header>
 
-  <section class="ndo-panel">
-    <div class="ndo-panel__head">
-      <h2 class="ndo-h3">{ndo.name}</h2>
-      <span class="flex gap-1.5">
-        <NdoBadge stage={ndo.lifecycle_stage} />
-        <NdoBadge regime={ndo.property_regime} />
-      </span>
-    </div>
-    <div class="ndo-panel__body">
-      <p class="ndo-small">
-        Under the Nondominium regime no rule may assign or transfer ownership. Custody moves between
-        agents; title does not exist to move. That is a protocol constraint, not a clause the parties
-        agreed to and could later agree away.
-      </p>
-    </div>
+  <section class="rounded-lg border border-gray-200 bg-white p-4 shadow-sm">
+    <h2 class="text-base font-semibold text-gray-900">Governance rules, as rendered</h2>
+    <p class="mt-1 text-sm text-gray-600">
+      A rule is a type string plus a JSON blob, and the tab prints the blob in a
+      <code class="font-mono text-xs">&lt;pre&gt;</code>. That is honest about the data model —
+      <code class="font-mono text-xs">rule_data</code> really is an untyped JSON string in the zome —
+      and it puts the raw shape in front of whoever has to act on it.
+    </p>
+    <ul class="mt-3 space-y-2">
+      {#each rules as rule, i (i)}
+        <li class="rounded border border-gray-200 bg-white p-3 text-sm">
+          <div class="font-medium text-gray-800">{rule.rule_type}</div>
+          <pre class="mt-1 overflow-x-auto text-xs text-gray-600">{rule.rule_data}</pre>
+          {#if rule.enforced_by}
+            <div class="mt-1 text-xs text-gray-500">Enforced by: {rule.enforced_by}</div>
+          {/if}
+        </li>
+      {/each}
+    </ul>
   </section>
 
-  <section class="ndo-panel">
-    <div class="ndo-panel__head"><h2 class="ndo-h3">Contributions and who countersigned them</h2></div>
-    <div class="ndo-panel__body">
-      <ul class="list">
-        {#each contributions as c (c.id)}
-          <li>
-            <div>
-              <strong class="ndo-small">{label(c.provider)}</strong>
-              <span class="ndo-badge ndo-badge--neutral ml-2">{c.action}</span>
-              {#if c.note}<p class="ndo-field__hint mt-1">{c.note}</p>{/if}
-            </div>
-            <span class="ndo-field__hint">
-              {c.effort_hours ? `${c.effort_hours}h · ` : ''}validated by {c.validated_by.map(label).join(', ')}
-            </span>
-          </li>
-        {/each}
+  <section class="mt-6 rounded-lg border border-gray-200 bg-white p-4 shadow-sm">
+    <h2 class="text-base font-semibold text-gray-900">Roles, and the disabled button</h2>
+    <p class="mt-1 text-sm text-gray-600">
+      Under the role list sits a permanently disabled amber button reading
+      <em>AccountableAgent (governance-gated)</em>. It is a placeholder for role promotion, and it is
+      the clearest statement in the app of something the protocol specifies and the UI has not built.
+    </p>
+    <div class="mt-3">
+      <ul class="space-y-2">
+        <li class="rounded border border-gray-200 bg-white px-3 py-2 text-sm">
+          <span class="font-medium text-gray-800">AccountableAgent</span>
+        </li>
+        <li class="rounded border border-gray-200 bg-white px-3 py-2 text-sm">
+          <span class="font-medium text-gray-800">Repair</span>
+        </li>
       </ul>
+      <button type="button" class="mt-3 rounded bg-amber-100 px-3 py-1.5 text-xs text-amber-800" disabled>
+        AccountableAgent (governance-gated)
+      </button>
     </div>
   </section>
 
-  <section class="ndo-panel">
-    <div class="ndo-panel__head">
-      <h2 class="ndo-h3">Benefit redistribution</h2>
-      <span class="ndo-field__hint">version {agreement.version}</span>
-    </div>
-    <div class="ndo-panel__body flex flex-col gap-4">
-      <div class="bar" aria-hidden="true">
-        {#each agreement.clauses as clause, i (clause.id)}
-          <span style="width:{clause.share * 100}%;background:rgb(var(--ndo-primary-{300 + i * 200}))"></span>
-        {/each}
-      </div>
-      <ul class="list">
-        {#each agreement.clauses as clause (clause.id)}
-          <li>
-            <div><strong class="ndo-small">{clause.label}</strong><p class="ndo-field__hint">{clause.beneficiary}</p></div>
-            <span class="share">{Math.round(clause.share * 100)}%</span>
-          </li>
-        {/each}
-      </ul>
-    </div>
+  <section class="mt-6 rounded-lg border border-gray-200 bg-white p-4 shadow-sm">
+    <h2 class="text-base font-semibold text-gray-900">Where reputation is not</h2>
+    <p class="mt-2 text-sm text-gray-600">
+      Nothing on this tab is a score, and that is deliberate. Private Participation Receipts are
+      private entries on each agent's own source chain: bilaterally signed, non-transferable, and
+      invisible to third parties by default. There is no aggregator to render and none to capture.
+    </p>
   </section>
 
-  <section class="ndo-panel">
-    <div class="ndo-panel__head"><h2 class="ndo-h3">Where reputation is not</h2></div>
-    <div class="ndo-panel__body flex flex-col gap-3">
-      <p class="ndo-small">
-        Nothing above is a score. Private Participation Receipts are private entries on each agent's
-        own source chain: bilaterally signed, non-transferable, and invisible to third parties by
-        default. There is no aggregator to consult and none to capture.
-      </p>
-      <p class="ndo-small">
-        What a reader gets instead is the evidence: events happened, and named accountable agents
-        countersigned them. An agent may derive a summary from their own receipts and share it — that
-        is their disclosure to make, not the network's to publish.
-      </p>
-    </div>
+  <section class="mt-6 rounded-lg border border-amber-200 bg-amber-50 p-4">
+    <h2 class="text-sm font-semibold text-amber-800">Open questions</h2>
+    <ul class="mt-1 list-disc space-y-1 pl-5 text-sm text-amber-700">
+      <li>Rules render as raw JSON. Useful to a developer, opaque to the custodian the rule governs.</li>
+      <li>The tab shows <em>my</em> roles rather than who is accountable for this NDO, which is the question the page's title implies.</li>
+      <li>The disabled button has no explanation of what would enable it.</li>
+    </ul>
   </section>
 
-  <p class="ndo-small">Live version: <a href={paths.ndoGovernance('ndo1')}>the governance tab</a>.</p>
+  <p class="mt-4 text-sm text-gray-500">
+    Live: <a class="text-blue-600 hover:underline" href={paths.ndoTab(ndo.hash, 'governance')}>the Governance tab</a>.
+  </p>
 </div>
-
-<style>
-  .list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: var(--ndo-spacing-3); }
-  .list li { display: flex; align-items: flex-start; justify-content: space-between; gap: var(--ndo-spacing-4); flex-wrap: wrap; }
-  .bar { display: flex; height: 12px; border-radius: var(--ndo-radius-pill); overflow: hidden; }
-  .bar span { display: block; height: 100%; }
-  .share { font-size: var(--ndo-text-sm); font-weight: var(--ndo-weight-semibold); }
-  a { color: var(--ndo-color-link); }
-</style>
