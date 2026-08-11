@@ -11,9 +11,14 @@
       body: 'The palette, scale and radii the app actually uses, plus the brand colours sampled from the logo.',
     },
     {
-      href: paths.playbook(),
-      title: 'Playbook',
-      body: 'Seven categories of pattern, each shown with the app\'s own class string and the file it came from.',
+      href: paths.patterns(),
+      title: 'Patterns',
+      body: 'Seven categories, each shown with the app\'s own class string and the file it came from.',
+    },
+    {
+      href: paths.ndoUiPlaybook(),
+      title: 'ndo-ui library',
+      body: 'The component library the app is meant to move to: sheets per component, and screens composed from them.',
     },
     {
       href: paths.scenarios(),
@@ -23,7 +28,7 @@
     {
       href: paths.appHome(),
       title: 'Prototype',
-      body: 'A replica of the app: twenty-one states, the same markup and classes, on mock data.',
+      body: 'A replica of the app: thirty-nine states, the same markup and classes, on mock data.',
     },
   ];
 </script>

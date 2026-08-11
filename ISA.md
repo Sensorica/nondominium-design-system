@@ -241,6 +241,26 @@ Four findings, all recorded rather than fixed, because they are the app's:
 4. **The exit chip covered the sidebar's profile button**, introduced in Phase 3
    and caught by rendering this phase. Offset past the sidebar.
 
+## Phase 5 — merging with master (2026-08-11)
+
+The branch was cut from `5ddbcf5`; master had moved five commits ahead with
+Tibi's work, 71 files the rewrite never saw: the `@nondominium/ndo-ui` package,
+the `/ui-kit` routes, and the Complexity Driven Development docs. A clean merge
+of the PR would have deleted all of it, so it was reconciled instead.
+
+Everything of master's is kept. The collision was that both lines of work called
+their component documentation a "playbook" and neither meant the same thing:
+Tibi's documents the library the app should move to, the rewrite's documents the
+classes the app writes today. His stays at `/playbook` because it was there
+first; the rewrite's moved to `/patterns`, and the rail and hub now name each for
+its subject.
+
+Three other resolutions: master's full Apache text replaced the branch's stub
+LICENSE; `package.json` took the branch's scripts plus master's `workspaces` and
+`build:all`; `tsconfig.json` merged both, and needed `$lib` restated by hand,
+because declaring `paths` replaces SvelteKit's generated block rather than
+merging with it — which silently broke 79 imports until it was fixed.
+
 ## Changelog
 
 - 2026-08-11 — ISA written; review repo `Sensorica/nondominium-design-review` created with Discussions enabled.

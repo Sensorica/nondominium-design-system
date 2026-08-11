@@ -1,6 +1,6 @@
 # Contributing to the Nondominium Design System
 
-This repo is the design system and prototype playground for the [Nondominium](https://github.com/Sensorica/nondominium) hApp. It ships four things: the tokens, the component playbook, six composed scenarios, and a navigable prototype of every screen the app has.
+This repo is the design system and prototype playground for the [Nondominium](https://github.com/Sensorica/nondominium) hApp. It ships five things: the tokens, the pattern sheets at `/patterns`, the `@nondominium/ndo-ui` library at `/playbook` and `/ui-kit`, six composed scenarios, and a navigable prototype of every screen the app has.
 
 ## What is in this repo
 
@@ -13,7 +13,7 @@ See the tree in [README.md](README.md#what-is-in-this-repo). Two files are load-
 
 ```bash
 bun install
-bun run build:registry   # the playbook loads static/registry/bundle.js from disk
+bun run build:registry   # the pattern sheets load static/registry/bundle.js from disk
 bun run dev
 ```
 
@@ -50,9 +50,9 @@ The prototype's routes mirror the app's, so a new *route* only appears here afte
 
 Steps 3 and 4 are what make the state navigable and commentable. A state without a key is invisible to the screen map and cannot hold a review thread.
 
-## Adding to the playbook
+## Adding a pattern sheet
 
-A playbook page documents a pattern that **exists in the app**. Show it with the app's own class string, cite the file it came from, and where the app is inconsistent, say so in the "Drift worth fixing" block rather than picking a winner. That block is the deliverable: it is the list a future refactor works from.
+A `/patterns` page documents a pattern that **exists in the app**. Show it with the app's own class string, cite the file it came from, and where the app is inconsistent, say so in the "Drift worth fixing" block rather than picking a winner. That block is the deliverable: it is the list a future refactor works from.
 
 Never invent a component and document it as though the app had it.
 
@@ -78,7 +78,7 @@ The README is also the brand brief. Its four brand sections — **CONTENT FUNDAM
 
 ## Commits and PRs
 
-Conventional Commits with a scope: `feat(playbook):`, `fix(tokens):`, `docs(readme):`, `refactor(paths):`. Branch prefixes follow the app repo: `feat/`, `fix/`, `refactor/`, `docs/`, `chore/`.
+Conventional Commits with a scope: `feat(patterns):`, `fix(tokens):`, `docs(readme):`, `refactor(paths):`. Branch prefixes follow the app repo: `feat/`, `fix/`, `refactor/`, `docs/`, `chore/`.
 
 Before opening a PR:
 

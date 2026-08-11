@@ -24,14 +24,23 @@
   // No icons in the lists. The app has no icon set, and inventing one for the
   // documentation would be the design system asserting something the product
   // does not do.
-  const playbookLinks = [
-    { href: paths.playbookButtons(), label: 'Buttons' },
-    { href: paths.playbookBadges(), label: 'Badges' },
-    { href: paths.playbookCards(), label: 'Cards' },
-    { href: paths.playbookInputs(), label: 'Inputs' },
-    { href: paths.playbookNavigation(), label: 'Navigation' },
-    { href: paths.playbookStatus(), label: 'Status' },
-    { href: paths.playbookShell(), label: 'Shell' },
+  // Two component vocabularies live in this repo and they are not the same
+  // thing. `patternsLinks` documents the classes the app writes inline today;
+  // `ndoUiLinks` documents @nondominium/ndo-ui, the library Tibi is building
+  // for the app to move to. Naming both "playbook" is what collided when the
+  // rewrite merged, so the rail names each for its subject.
+  const patternsLinks = [
+    { href: paths.patternsButtons(), label: 'Buttons' },
+    { href: paths.patternsBadges(), label: 'Badges' },
+    { href: paths.patternsCards(), label: 'Cards' },
+    { href: paths.patternsInputs(), label: 'Inputs' },
+    { href: paths.patternsNavigation(), label: 'Navigation' },
+    { href: paths.patternsStatus(), label: 'Status' },
+    { href: paths.patternsShell(), label: 'Shell' },
+  ];
+  const ndoUiLinks = [
+    { href: paths.ndoUiPlaybook(), label: 'Component sheets' },
+    { href: paths.uiKit(), label: 'Screen compositions' },
   ];
   const scenarioLinks = [
     { href: paths.scenarioLobbyBrowse(), label: 'Lobby browse' },
@@ -71,11 +80,24 @@
         </div>
 
         <div class="group">
-          <a class="grouphead" href={paths.playbook()} class:on={current.startsWith(paths.playbook())}>
-            Playbook
+          <a class="grouphead" href={paths.patterns()} class:on={current.startsWith(paths.patterns())}>
+            Patterns
           </a>
-          {#each playbookLinks as link (link.href)}
+          {#each patternsLinks as link (link.href)}
             <a class="item" href={link.href} class:item--on={current === link.href}>{link.label}</a>
+          {/each}
+        </div>
+
+        <div class="group">
+          <a
+            class="grouphead"
+            href={paths.ndoUiPlaybook()}
+            class:on={current.startsWith(paths.ndoUiPlaybook()) || current.startsWith(paths.uiKit())}
+          >
+            ndo-ui library
+          </a>
+          {#each ndoUiLinks as link (link.href)}
+            <a class="item" href={link.href} class:item--on={current.startsWith(link.href)}>{link.label}</a>
           {/each}
         </div>
 

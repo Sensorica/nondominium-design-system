@@ -33,7 +33,8 @@ bun run dev
 |-----|------|
 | `/` | Hub |
 | `/tokens` | The palette and scale the app uses, rendered live |
-| `/playbook` | Seven categories of pattern, each citing its source file |
+| `/patterns` | Seven categories of pattern the app writes today, each citing its source file |
+| `/playbook`, `/ui-kit` | `@nondominium/ndo-ui`: component sheets, and screens composed from them |
 | `/scenarios` | Six composed pages, each arguing one design question |
 | `/app` | **The replica** — 39 keyed states of the real app, on mock data |
 
@@ -277,3 +278,53 @@ Everything below is a statement about the app, not about this repo.
 - **`presetIcons` is configured and unused.**
 - **Transition event hashes are real in the app and mocked here.** The prototype seeds plausible hashes so the history panel renders; the app shows whatever the zome returns.
 - **The token file is this repo's invention.** The app has no design tokens. `static/tokens.css` exists to serve the custom elements and to give the values a name; it declares no `body` styles precisely so that including it cannot change how a page renders.
+---
+
+## Two component vocabularies, and why
+
+This repo now holds both, and they are not the same thing. Keeping them apart is deliberate.
+
+| | Subject | Where |
+|---|---|---|
+| **Patterns** | The classes the app writes inline **today**. Descriptive: change the app, then re-copy. | `/patterns`, `src/lib/replica/` |
+| **ndo-ui library** | The component library the app is meant to **move to**. Prescriptive. | `/playbook`, `/ui-kit`, `packages/ndo-ui/` |
+
+Both were called "playbook" before the two lines of work met, which is what collided in the merge. The rewrite's moved to `/patterns`; `@nondominium/ndo-ui` kept `/playbook`, because it was there first.
+
+The open question is what happens when they disagree, and they already do: `packages/ndo-ui/src/domain/variants.ts` declares one canonical stage colour map, while the app still writes three that contradict each other. That is the library doing its job, and it is a decision for the team rather than something either side should settle alone.
+
+## @nondominium/ndo-ui (Svelte 5 component library)
+
+Presentational Svelte 5 components ported from the [nondominium hApp](https://github.com/Sensorica/nondominium) UI. No Holochain or Effect-TS dependencies — props and callbacks only.
+
+```typescript
+import {
+  AppShell,
+  Sidebar,
+  LobbyView,
+  NdoBrowser,
+  NdoCard,
+  GroupView,
+  NdoDetailLayout,
+  applyNdoFilters,
+  MOCK_NDOS
+} from '@nondominium/ndo-ui';
+import '@nondominium/ndo-ui/styles/tokens.css';
+```
+
+**UI-kit demos** (hApp-fidelity scenarios with mock data):
+
+| Route | hApp equivalent |
+|---|---|
+| `/ui-kit/browse` | Lobby + Sidebar + NdoBrowser |
+| `/ui-kit/group` | GroupView |
+| `/ui-kit/ndo-detail` | NdoView + NdoIdentityLayer |
+| `/ui-kit/ndo-create` | NdoCreateModal |
+| `/ui-kit/agent-profile` | UserProfileForm |
+
+Domain color maps live in `packages/ndo-ui/src/domain/variants.ts` (single source of truth matching hApp `NdoBrowser.svelte` filter chips and `NdoCard.svelte` card badges).
+
+Future hApp adoption: add `"@nondominium/ndo-ui": "workspace:*"` (monorepo) or publish to npm and replace inline UnoCSS in `nondominium/ui`.
+
+See [docs/INTEGRATION.md](docs/INTEGRATION.md) for parallel development workflow, badge modes, and migration checklist.
+

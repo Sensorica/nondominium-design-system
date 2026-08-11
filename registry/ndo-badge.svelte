@@ -25,6 +25,12 @@
     | 'regime-pool'
     | 'regime-common-pool'
     | 'regime-private'
+    | 'regime-nondominium-filter'
+    | 'regime-commons-filter'
+    | 'regime-collective-filter'
+    | 'regime-pool-filter'
+    | 'regime-common-pool-filter'
+    | 'regime-private-filter'
     | 'coming-soon'
     | 'neutral' = 'neutral';
 
@@ -70,7 +76,7 @@
   .badge.nature-hybrid      { background: rgb(var(--ndo-teal-100));   color: rgb(var(--ndo-teal-700)); }
   .badge.nature-information { background: rgb(var(--ndo-indigo-100)); color: rgb(var(--ndo-indigo-700)); }
 
-  /* Property regime — dashed border style */
+  /* Property regime on cards — dashed gray (hApp NdoCard) */
   .badge.regime-nondominium,
   .badge.regime-commons,
   .badge.regime-collective,
@@ -81,11 +87,38 @@
     border: 1px dashed rgb(var(--ndo-gray-400));
     color: rgb(var(--ndo-gray-700));
   }
-  .badge.regime-nondominium { border-color: rgb(var(--ndo-blue-700)); color: rgb(var(--ndo-blue-700)); }
-  .badge.regime-commons      { border-color: rgb(var(--ndo-cyan-700)); color: rgb(var(--ndo-cyan-700)); }
-  .badge.regime-collective   { border-color: rgb(var(--ndo-violet-700)); color: rgb(var(--ndo-violet-700)); }
-  .badge.regime-pool         { border-color: rgb(var(--ndo-teal-700)); color: rgb(var(--ndo-teal-700)); }
-  .badge.regime-common-pool  { border-color: rgb(var(--ndo-rose-700)); color: rgb(var(--ndo-rose-700)); }
+
+  /* Property regime filter chips — filled colors (hApp NdoBrowser) */
+  .badge.regime-private-filter {
+    background: rgb(var(--ndo-gray-100));
+    color: rgb(var(--ndo-gray-600));
+    border: 1px dashed rgb(var(--ndo-gray-300));
+  }
+  .badge.regime-commons-filter {
+    background: rgb(var(--ndo-cyan-100));
+    color: rgb(var(--ndo-cyan-700));
+    border: 1px dashed rgb(var(--ndo-cyan-300));
+  }
+  .badge.regime-nondominium-filter {
+    background: rgb(var(--ndo-emerald-100));
+    color: rgb(var(--ndo-emerald-700));
+    border: 1px dashed rgb(var(--ndo-emerald-300));
+  }
+  .badge.regime-common-pool-filter {
+    background: rgb(var(--ndo-rose-100));
+    color: rgb(var(--ndo-rose-700));
+    border: 1px dashed rgb(var(--ndo-rose-300));
+  }
+  .badge.regime-collective-filter {
+    background: rgb(var(--ndo-violet-100));
+    color: rgb(var(--ndo-violet-700));
+    border: 1px dashed rgb(var(--ndo-violet-300));
+  }
+  .badge.regime-pool-filter {
+    background: rgb(var(--ndo-teal-100));
+    color: rgb(var(--ndo-teal-700));
+    border: 1px dashed rgb(var(--ndo-teal-300));
+  }
 
   /* Special */
   .badge.coming-soon { background: rgb(var(--ndo-amber-50)); color: rgb(var(--ndo-amber-600)); }

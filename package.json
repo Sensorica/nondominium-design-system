@@ -4,10 +4,14 @@
   "description": "Design system, component registry and UI prototype for the Nondominium hApp",
   "license": "Apache-2.0",
   "type": "module",
+  "workspaces": [
+    "packages/*"
+  ],
   "scripts": {
     "dev": "DEV=true vite dev",
     "build": "svelte-kit sync && bun run build:registry && vite build",
     "build:registry": "vite build --config vite.registry.config.ts",
+    "build:all": "svelte-kit sync && bun run check && bun run build:registry && bun run build",
     "preview": "vite preview",
     "check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json && bun run check:fidelity",
     "lint": "prettier --check . && eslint .",

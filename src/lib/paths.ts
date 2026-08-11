@@ -33,7 +33,7 @@ type NdoState = 'loading' | 'error' | 'anonymous';
 
 const app = (suffix = '') => `${base}/app${suffix}`;
 const scenarios = (suffix = '') => `${base}/scenarios${suffix}`;
-const playbook = (suffix = '') => `${base}/playbook${suffix}`;
+const patterns = (suffix = '') => `${base}/patterns${suffix}`;
 
 export const paths = {
   // ── Design-system surfaces ──
@@ -93,13 +93,17 @@ export const paths = {
   scenarioAgentIdentity: () => scenarios('/agent-identity'),
   scenarioGovernanceReview: () => scenarios('/governance-review'),
 
-  // ── Playbook ──
-  playbook: () => playbook(),
-  playbookButtons: () => playbook('/buttons'),
-  playbookBadges: () => playbook('/badges'),
-  playbookCards: () => playbook('/cards'),
-  playbookInputs: () => playbook('/inputs'),
-  playbookNavigation: () => playbook('/navigation'),
-  playbookStatus: () => playbook('/status'),
-  playbookShell: () => playbook('/shell'),
+  // ── @nondominium/ndo-ui (Tibi's component library, on master) ──
+  uiKit: () => `${base}/ui-kit`,
+  ndoUiPlaybook: () => `${base}/playbook`,
+
+  // ── Patterns (this rewrite's playbook: the app's own classes) ──
+  patterns: () => patterns(),
+  patternsButtons: () => patterns('/buttons'),
+  patternsBadges: () => patterns('/badges'),
+  patternsCards: () => patterns('/cards'),
+  patternsInputs: () => patterns('/inputs'),
+  patternsNavigation: () => patterns('/navigation'),
+  patternsStatus: () => patterns('/status'),
+  patternsShell: () => patterns('/shell'),
 } as const;
