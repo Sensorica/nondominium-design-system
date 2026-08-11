@@ -144,6 +144,32 @@ Voice is **plain, technical and slightly terse**. Sentences state what a thing i
 
 ---
 
+## BRAND
+
+There is one brand asset: the **Nondominium logo** — a linked-node monogram in teal, violet and blue over a near-black navy wordmark, at `static/assets/`.
+
+| Asset | Use |
+|---|---|
+| `nondominium-logo.png` | The full lockup: mark plus wordmark. The hub's hero. |
+| `nondominium-mark.png` | The mark alone, square. Rails, chips, anywhere the wordmark will not fit. |
+| `favicon.png` | The mark at 256px. |
+
+Both are white-keyed to transparency, so the mark sits correctly on the ink rail as well as on white.
+
+Sampled from the file, and the only values in `tokens.css` that are a brand decision rather than a Tailwind default:
+
+| Token | Value | Where it comes from |
+|---|---|---|
+| `--ndo-brand-teal-500` | `#14b8b8` | The mark's largest area, so it leads |
+| `--ndo-brand-violet-500` | `#7048d8` | Upper-right node |
+| `--ndo-brand-blue-500` | `#2f6bcc` | Lower-left node |
+| `--ndo-brand-ink` | `#0b1a38` | The wordmark |
+| `--ndo-brand-gradient` | teal → blue → violet, 135° | Repeats the mark's own left-to-right run |
+
+**These dress the design system's own chrome and nothing else.** The rail is brand ink with a gradient hairline down its edge; the hub's cards carry the gradient on their top edge; the active nav item is marked in brand teal. Inside `/app` none of it appears, because the app has no brand layer and the replica must not invent one. The one exception is the chip at the bottom left, which is prototype chrome rather than app UI, and which exists because the design-system rail is hidden inside the prototype and the app has no link back out.
+
+---
+
 ## VISUAL FOUNDATIONS
 
 The app reads as **a plain, dense administrative interface**. Grey canvas, white cards, hairline borders, one blue for action, and colour used almost exclusively to carry domain meaning. There is no brand layer at all: no logo, no wordmark, no illustration, no icon set.
@@ -216,7 +242,8 @@ The one exception is `HolochainProvider.svelte`, which uses three large emoji fo
 
 Everything below is a statement about the app, not about this repo.
 
-- **There is no brand.** No logo, no wordmark, no typeface, no icon set, no illustration. The palette is Tailwind's defaults. Anything this repo shows as brand is documentation of an accident, not a decision — and that is worth deciding on.
+- **The app has no brand layer.** There is a logo, and this repo uses it, but nothing in `ui/` references it: no logo, no wordmark, no typeface, no icon set. The app's palette is Tailwind's defaults. Bringing the brand into the product is an open decision, not something this repo should quietly assume.
+- **The brand palette is sampled, not specified.** The five brand tokens come from reading pixels out of the logo file. If there is a brand guide with authoritative values, they should replace these.
 - **The stage colour map is written out three times** and the three do not agree: `NdoBrowser` has ten colours with borders, `NdoIdentityLayer` has the same ten without borders, and `NdoCard` collapses all ten into green-or-grey. See `/playbook/badges`.
 - **Two sidebars exist.** `shell/Sidebar.svelte` is mounted; `lobby/GroupSidebar.svelte` is unreferenced and differs in width, background and hover colour.
 - **`/agent/<key>` does not exist.** `NdoIdentityLayer` links an initiator's name to it whenever a Person entry resolves. The prototype keeps the link and renders an explanation at that route rather than hiding the defect.

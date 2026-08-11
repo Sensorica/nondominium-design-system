@@ -36,6 +36,7 @@ If the user invokes this skill without further guidance, ask what they want to b
 Key facts:
 
 - **This repo documents the app as it is.** `src/lib/replica/` is a copy of `../nondominium/ui/src/lib/components`, rendering the same markup and the same UnoCSS classes. `bun run check:fidelity` fails if the classes ever diverge. Do not "improve" a replica component; change the app, then re-copy.
+- **The brand is one logo, and it dresses this repo only.** `static/assets/nondominium-{logo,mark}.png` plus five `--ndo-brand-*` tokens sampled from it (teal `#14b8b8`, violet `#7048d8`, blue `#2f6bcc`, ink `#0b1a38`, and a gradient). They style the design-system chrome. Nothing inside `/app` uses them, because the app has no brand layer and the replica must not invent one.
 - **The app has no design tokens, no component library and no icon set.** It styles entirely in UnoCSS utility classes written inline. `static/tokens.css` is this repo's documentation of the Tailwind values in use, and exists to serve the `ndo-*` custom elements; the app does not import it.
 - **Action colour is `blue-600`**; the canvas is `gray-100` page over `gray-50` sidebar over white cards. Colour that is not blue and not grey is carrying domain meaning.
 - **Radii:** `rounded` for controls, `rounded-lg` for cards, `rounded-xl` for modals. A **dashed border** means declarative, empty, or not-yet-built.

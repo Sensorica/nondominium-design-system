@@ -21,26 +21,30 @@
   const current = $derived(page.url.pathname);
   const isApp = $derived(current.startsWith(paths.appHome()));
 
+  // No icons in the lists. The app has no icon set, and inventing one for the
+  // documentation would be the design system asserting something the product
+  // does not do.
   const playbookLinks = [
-    { href: paths.playbookButtons(), label: 'Buttons', icon: '🔘' },
-    { href: paths.playbookBadges(), label: 'Badges', icon: '🏷️' },
-    { href: paths.playbookCards(), label: 'Cards', icon: '🃏' },
-    { href: paths.playbookInputs(), label: 'Inputs', icon: '✏️' },
-    { href: paths.playbookNavigation(), label: 'Navigation', icon: '🧭' },
-    { href: paths.playbookStatus(), label: 'Status', icon: '🟢' },
-    { href: paths.playbookShell(), label: 'Shell', icon: '🖼️' },
+    { href: paths.playbookButtons(), label: 'Buttons' },
+    { href: paths.playbookBadges(), label: 'Badges' },
+    { href: paths.playbookCards(), label: 'Cards' },
+    { href: paths.playbookInputs(), label: 'Inputs' },
+    { href: paths.playbookNavigation(), label: 'Navigation' },
+    { href: paths.playbookStatus(), label: 'Status' },
+    { href: paths.playbookShell(), label: 'Shell' },
   ];
   const scenarioLinks = [
-    { href: paths.scenarioLobbyBrowse(), label: 'Lobby browse', icon: '🏛️' },
-    { href: paths.scenarioNdoCreation(), label: 'NDO creation', icon: '➕' },
-    { href: paths.scenarioNdoLifecycle(), label: 'NDO lifecycle', icon: '🔄' },
-    { href: paths.scenarioGroupCollaboration(), label: 'Group collaboration', icon: '👥' },
-    { href: paths.scenarioAgentIdentity(), label: 'Agent identity', icon: '🪪' },
-    { href: paths.scenarioGovernanceReview(), label: 'Governance review', icon: '⚖️' },
+    { href: paths.scenarioLobbyBrowse(), label: 'Lobby browse' },
+    { href: paths.scenarioNdoCreation(), label: 'NDO creation' },
+    { href: paths.scenarioNdoLifecycle(), label: 'NDO lifecycle' },
+    { href: paths.scenarioGroupCollaboration(), label: 'Group collaboration' },
+    { href: paths.scenarioAgentIdentity(), label: 'Agent identity' },
+    { href: paths.scenarioGovernanceReview(), label: 'Governance review' },
   ];
 </script>
 
 <svelte:head>
+  <link rel="icon" href={paths.favicon()} />
   <link rel="stylesheet" href={paths.tokenSheet()} />
 </svelte:head>
 
@@ -52,39 +56,35 @@
   <div class="chrome">
     <aside class="rail">
       <a class="brand" href={paths.home()}>
-        <span class="brand__mark" aria-hidden="true">🧿</span>
+        <img class="brand__mark" src={paths.logoMark()} alt="" width="34" height="34" />
         <span>
           <span class="brand__title">Nondominium</span>
           <span class="brand__sub">Design System</span>
         </span>
       </a>
 
-      <a class="appmode" href={paths.appHome()}>🚀 App mode</a>
+      <a class="appmode" href={paths.appHome()}>Open the prototype →</a>
 
       <nav class="nav">
         <div class="group">
-          <a class="grouphead" href={paths.tokens()} class:on={current === paths.tokens()}>🎨 Tokens</a>
+          <a class="grouphead" href={paths.tokens()} class:on={current === paths.tokens()}>Tokens</a>
         </div>
 
         <div class="group">
           <a class="grouphead" href={paths.playbook()} class:on={current.startsWith(paths.playbook())}>
-            📖 Playbook
+            Playbook
           </a>
           {#each playbookLinks as link (link.href)}
-            <a class="item" href={link.href} class:item--on={current === link.href}>
-              <span class="ic" aria-hidden="true">{link.icon}</span>{link.label}
-            </a>
+            <a class="item" href={link.href} class:item--on={current === link.href}>{link.label}</a>
           {/each}
         </div>
 
         <div class="group">
           <a class="grouphead" href={paths.scenarios()} class:on={current.startsWith(paths.scenarios())}>
-            🖼️ Scenarios
+            Scenarios
           </a>
           {#each scenarioLinks as link (link.href)}
-            <a class="item" href={link.href} class:item--on={current === link.href}>
-              <span class="ic" aria-hidden="true">{link.icon}</span>{link.label}
-            </a>
+            <a class="item" href={link.href} class:item--on={current === link.href}>{link.label}</a>
           {/each}
         </div>
       </nav>
@@ -110,8 +110,10 @@
   }
 
   .chrome { display: grid; grid-template-columns: var(--ndo-sidebar-width) 1fr; min-height: 100vh; }
+
+  /* Brand ink, from the logo's wordmark. */
   .rail {
-    background: rgb(var(--ndo-gray-900));
+    background: rgb(var(--ndo-brand-ink));
     padding: var(--ndo-spacing-4) var(--ndo-spacing-3);
     position: sticky;
     top: 0;
@@ -121,26 +123,40 @@
     flex-direction: column;
     gap: var(--ndo-spacing-4);
   }
+  /* A hairline of the mark's own gradient down the rail's edge. */
+  .rail::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    right: 0;
+    width: 2px;
+    background: var(--ndo-brand-gradient);
+  }
+
   .brand { display: flex; align-items: center; gap: 10px; text-decoration: none; }
-  .brand__mark { font-size: 22px; }
+  .brand__mark { width: 34px; height: 34px; flex-shrink: 0; }
   .brand__title { display: block; font-size: var(--ndo-text-sm); font-weight: var(--ndo-weight-bold); color: #fff; }
-  .brand__sub { display: block; font-size: var(--ndo-text-xs); color: rgb(255 255 255 / 0.5); }
+  .brand__sub {
+    display: block;
+    font-size: var(--ndo-text-xs);
+    color: rgb(var(--ndo-brand-teal-300));
+  }
 
   .appmode {
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 8px;
     padding: 9px 12px;
     border-radius: var(--ndo-radius-lg);
-    background: rgb(var(--ndo-primary-600));
+    background: var(--ndo-brand-gradient);
     color: #fff;
     font-size: var(--ndo-text-sm);
     font-weight: var(--ndo-weight-semibold);
     text-decoration: none;
-    transition: var(--ndo-transition-colors);
+    transition: filter var(--ndo-duration-base) var(--ndo-easing);
   }
-  .appmode:hover { background: rgb(var(--ndo-primary-500)); }
+  .appmode:hover { filter: brightness(1.12); }
 
   .nav { display: flex; flex-direction: column; gap: var(--ndo-spacing-4); flex: 1; }
   .group { display: flex; flex-direction: column; gap: 2px; }
@@ -153,23 +169,25 @@
     color: rgb(255 255 255 / 0.4);
     text-decoration: none;
   }
-  .grouphead:hover, .grouphead.on { color: rgb(255 255 255 / 0.75); }
+  .grouphead:hover, .grouphead.on { color: rgb(var(--ndo-brand-teal-300)); }
   .item {
-    display: flex;
-    align-items: center;
-    gap: 8px;
+    display: block;
     padding: 6px 10px;
     border-radius: var(--ndo-radius-md);
     font-size: var(--ndo-text-sm);
     color: rgb(255 255 255 / 0.65);
     text-decoration: none;
+    border-left: 2px solid transparent;
     transition: var(--ndo-transition-colors);
   }
-  .item:hover { background: rgb(255 255 255 / 0.08); color: rgb(255 255 255 / 0.92); }
-  .item--on { background: rgb(255 255 255 / 0.12); color: #fff; }
-  .ic { width: 18px; text-align: center; }
+  .item:hover { background: rgb(255 255 255 / 0.07); color: rgb(255 255 255 / 0.92); }
+  .item--on {
+    background: rgb(255 255 255 / 0.1);
+    color: #fff;
+    border-left-color: rgb(var(--ndo-brand-teal-500));
+  }
 
-  .version { margin: auto 0 0; padding: 0 8px; font-size: var(--ndo-text-xs); color: rgb(255 255 255 / 0.28); }
+  .version { margin: auto 0 0; padding: 0 8px; font-size: var(--ndo-text-xs); color: rgb(255 255 255 / 0.3); }
   kbd {
     font-family: var(--ndo-font-mono);
     border: 1px solid rgb(255 255 255 / 0.2);
@@ -182,5 +200,6 @@
   @media (max-width: 860px) {
     .chrome { grid-template-columns: 1fr; }
     .rail { position: static; height: auto; }
+    .rail::after { display: none; }
   }
 </style>

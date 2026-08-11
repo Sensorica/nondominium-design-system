@@ -16,8 +16,49 @@
 :root {
   color-scheme: light;
 
+
   /* =========================================================
-     BRAND PRIMARY — the action color
+     BRAND
+     ---------------------------------------------------------
+     Sampled from nondominium_logo.png. These are the only
+     values in this file that are a brand decision rather than
+     a Tailwind default: the app itself has no brand layer, so
+     they dress the design system's own chrome and nothing
+     inside the /app replica.
+
+     The mark is three linked nodes in teal, violet and blue
+     over a near-black navy wordmark. Teal is the largest area,
+     so it leads.
+     ========================================================= */
+  --ndo-brand-teal-100:  212 246 245;
+  --ndo-brand-teal-300:   95 214 210;
+  --ndo-brand-teal-500:   20 184 184;   /* #14b8b8 — the mark's dominant hue */
+  --ndo-brand-teal-700:   14 138 138;
+
+  --ndo-brand-violet-100: 231 222 251;
+  --ndo-brand-violet-300: 155 123 234;
+  --ndo-brand-violet-500: 112  72 216;  /* #7048d8 */
+  --ndo-brand-violet-700:  82  50 171;
+
+  --ndo-brand-blue-100:   214 227 249;
+  --ndo-brand-blue-300:   109 154 228;
+  --ndo-brand-blue-500:    47 107 204;  /* #2f6bcc */
+  --ndo-brand-blue-700:    35  80 155;
+
+  /* The wordmark's navy. The design-system rail and footer use it. */
+  --ndo-brand-ink:         11  26  56;  /* #0b1a38 */
+  --ndo-brand-ink-soft:    22  39  76;
+
+  /* The mark reads left-to-right teal → violet; the gradient repeats that. */
+  --ndo-brand-gradient: linear-gradient(
+    135deg,
+    rgb(var(--ndo-brand-teal-500)),
+    rgb(var(--ndo-brand-blue-500)) 55%,
+    rgb(var(--ndo-brand-violet-500))
+  );
+
+  /* =========================================================
+     APP PRIMARY — the action color
      Nondominium has no logo-derived brand hue. The app's
      dominant action color is Tailwind blue; it is promoted
      here to the primary scale so components stop reaching

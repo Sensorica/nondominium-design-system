@@ -7,48 +7,44 @@
   const doors = [
     {
       href: paths.tokens(),
-      icon: '🎨',
       title: 'Tokens',
-      body: 'Colour, type, spacing, radii and elevation. Every value in the system starts here.',
+      body: 'The palette, scale and radii the app actually uses, plus the brand colours sampled from the logo.',
     },
     {
       href: paths.playbook(),
-      icon: '📖',
       title: 'Playbook',
-      body: 'Seven component categories with their canonical recipes and the props they accept.',
+      body: 'Seven categories of pattern, each shown with the app\'s own class string and the file it came from.',
     },
     {
       href: paths.scenarios(),
-      icon: '🖼️',
       title: 'Scenarios',
-      body: 'Six composed pages showing how the pieces behave together in a real flow.',
+      body: 'Six composed pages, each arguing one open design question.',
     },
     {
       href: paths.appHome(),
-      icon: '🚀',
       title: 'Prototype',
-      body: 'Twenty-seven keyed screens: the whole Nondominium app, navigable, on mock state.',
+      body: 'A replica of the app: twenty-one states, the same markup and classes, on mock data.',
     },
   ];
 </script>
 
 <div class="ndo-shell__content">
-  <header>
-    <h1 class="ndo-h1">🧿 Nondominium Design System</h1>
-    <p class="ndo-p mt-3" style="max-width:62ch">
-      The visual language for
-      <a href="https://github.com/Sensorica/nondominium">Nondominium</a> — resource governance
-      without ownership, on Holochain and ValueFlows. Lifecycle stage, resource nature and property
-      regime are encoded directly into the tokens and the component API, so the ontology is legible
-      before you read a label.
+  <header class="hero">
+    <img class="hero__logo" src={paths.logo()} alt="Nondominium" />
+    <h1 class="ndo-h1">Design System</h1>
+    <p class="ndo-p mt-3" style="max-width:64ch">
+      The visual language of
+      <a href="https://github.com/Sensorica/nondominium">Nondominium</a>, a Holochain application
+      for resource governance without ownership. This documents the app as it is today, not an
+      aspiration: the prototype is a replica of its components, and a check fails the build if the
+      two drift apart.
     </p>
   </header>
 
   <div class="doors">
     {#each doors as door (door.href)}
       <a class="ndo-card ndo-card--interactive door" href={door.href}>
-        <span class="door__icon" aria-hidden="true">{door.icon}</span>
-        <h2 class="ndo-h3 mt-3">{door.title}</h2>
+        <h2 class="ndo-h3">{door.title}</h2>
         <p class="ndo-small mt-2">{door.body}</p>
       </a>
     {/each}
@@ -60,22 +56,34 @@
     </div>
     <div class="ndo-panel__body flex flex-col gap-3">
       <p class="ndo-small">
-        Every prototype screen and every scenario carries a comment thread. Press <kbd>c</kbd> or
-        use the floating button to open the drawer; threads are stored as GitHub Discussions in a
-        private Sensorica repository, so the site stays static and the review history stays with
-        the org.
+        Every prototype state and every scenario carries a comment thread. Press <kbd>c</kbd> or
+        use the floating button to open the drawer; threads live as GitHub Discussions in a private
+        Sensorica repository, so the site stays static and the review history stays with the org.
       </p>
       <p class="ndo-small">
-        Inside the prototype, press <kbd>m</kbd> for the screen map: every keyed screen, grouped,
-        one click away.
+        Inside the prototype, press <kbd>m</kbd> for the screen map, and use the chip at the bottom
+        left to come back here.
       </p>
     </div>
   </section>
 </div>
 
 <style>
+  .hero { display: flex; flex-direction: column; align-items: flex-start; gap: var(--ndo-spacing-3); }
+  .hero__logo { width: 200px; max-width: 55vw; height: auto; }
   .doors { display: grid; gap: var(--ndo-spacing-4); grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); }
-  .door__icon { font-size: 1.75rem; }
+  /* The door's top edge carries the mark's gradient. A pseudo-element, not
+     border-image: border-image paints all four edges and swallows the card. */
+  .door { position: relative; overflow: hidden; }
+  .door::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: var(--ndo-brand-gradient);
+  }
   kbd {
     font-family: var(--ndo-font-mono);
     font-size: var(--ndo-text-xs);

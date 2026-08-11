@@ -196,6 +196,20 @@ mounts `ProfileSetupModal` twice (root layout and LobbyView); the prototype
 keeps one, and the Melt dialog still does not open from a URL flag. Every other
 prototype state renders. Tracked, not hidden.
 
+## Phase 3 — brand and a way out (2026-08-11)
+
+The prototype was a one-way door: the design-system rail is hidden inside
+`/app`, and the app has no link to a design system, so a reviewer who opened a
+screen was stuck. A chip at the bottom left, opposite the comments button, now
+goes home and opens the screen map. It lives in the `/app` layout, outside every
+replica component, so nothing that mirrors the app was touched.
+
+The Nondominium logo is now the design system's brand: trimmed, white-keyed to
+transparency, split into a full lockup and a square mark, and sampled into five
+`--ndo-brand-*` tokens. The chrome wears them — ink rail, gradient hairline,
+gradient call to action, teal active state. `/app` does not, because the app has
+no brand layer and a replica that invented one would be lying.
+
 ## Changelog
 
 - 2026-08-11 — ISA written; review repo `Sensorica/nondominium-design-review` created with Discussions enabled.

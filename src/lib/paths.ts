@@ -27,6 +27,11 @@ export const paths = {
   tokens: () => `${base}/tokens`,
   registryBundle: () => `${base}/registry/bundle.js`,
   tokenSheet: () => `${base}/tokens.css`,
+  /** The full logo: mark plus wordmark, white-keyed to transparent. */
+  logo: () => `${base}/assets/nondominium-logo.png`,
+  /** The mark alone, square. Used wherever the wordmark would not fit. */
+  logoMark: () => `${base}/assets/nondominium-mark.png`,
+  favicon: () => `${base}/favicon.png`,
 
   // ── Prototype: connection states ──
   connecting: () => app('/connecting'),
