@@ -1,21 +1,22 @@
 {
   "name": "nondominium-design-system",
   "version": "0.1.0",
-  "description": "Design system and visual language for the Nondominium app",
+  "description": "Design system, component registry and UI prototype for the Nondominium hApp",
   "license": "Apache-2.0",
   "type": "module",
   "workspaces": [
     "packages/*"
   ],
   "scripts": {
-    "dev": "vite dev",
-    "build": "vite build",
+    "dev": "DEV=true vite dev",
+    "build": "svelte-kit sync && bun run build:registry && vite build",
     "build:registry": "vite build --config vite.registry.config.ts",
     "build:all": "svelte-kit sync && bun run check && bun run build:registry && bun run build",
     "preview": "vite preview",
-    "check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
+    "check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json && bun run check:fidelity",
     "lint": "prettier --check . && eslint .",
-    "format": "prettier --write ."
+    "format": "prettier --write .",
+    "check:fidelity": "bun run scripts/check-fidelity.ts"
   },
   "devDependencies": {
     "@sveltejs/adapter-static": "^3.0.0",
@@ -37,5 +38,12 @@
     "typescript-eslint": "^8.20.0",
     "unocss": "^66.6.8",
     "vite": "^7.0.4"
-  }
+  },
+  "keywords": [
+    "design-system",
+    "holochain",
+    "nondominium",
+    "valueflows",
+    "svelte"
+  ]
 }

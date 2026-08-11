@@ -8,13 +8,20 @@
     "resolveJsonModule": true,
     "forceConsistentCasingInFileNames": true,
     "esModuleInterop": true,
+    /* Declaring `paths` here REPLACES the block SvelteKit generates rather than
+       merging with it, so `$lib` and `$app/types` have to be restated or every
+       `$lib/...` import stops resolving. */
     "paths": {
-      "@nondominium/ndo-ui": ["./packages/ndo-ui/src/index.ts"]
+      "@nondominium/ndo-ui": ["./packages/ndo-ui/src/index.ts"],
+      "$lib": ["./src/lib"],
+      "$lib/*": ["./src/lib/*"],
+      "$app/types": ["./.svelte-kit/types/index.d.ts"]
     }
   },
   "include": [
-    ".svelte-kit/ambient.d.ts",
-    ".svelte-kit/non-ambient.d.ts",
+    "./.svelte-kit/ambient.d.ts",
+    "./.svelte-kit/non-ambient.d.ts",
+    "./.svelte-kit/types/**/$types.d.ts",
     "src/**/*.ts",
     "src/**/*.svelte",
     "packages/ndo-ui/src/**/*.ts",

@@ -1,155 +1,101 @@
-<svelte:head><title>Nondominium Design System</title></svelte:head>
+<script lang="ts">
+  // The hub. Four doors, each a section of the system, in the order a newcomer
+  // needs them: what it looks like, what the pieces are, what they compose into,
+  // and what the product actually is.
+  import { paths } from '$lib/paths';
 
-<div class="page">
-  <header class="page-header">
-    <h1 class="text-2xl font-bold text-gray-900">Design Tokens</h1>
-    <p class="text-sm text-gray-500 mt-1">
-      All tokens are CSS custom properties on <code>:root</code>.
-      Use <code>rgb(var(--ndo-*) / alpha)</code> for transparency.
+  const doors = [
+    {
+      href: paths.tokens(),
+      title: 'Tokens',
+      body: 'The palette, scale and radii the app actually uses, plus the brand colours sampled from the logo.',
+    },
+    {
+      href: paths.patterns(),
+      title: 'Patterns',
+      body: 'Seven categories, each shown with the app\'s own class string and the file it came from.',
+    },
+    {
+      href: paths.ndoUiPlaybook(),
+      title: 'ndo-ui library',
+      body: 'The component library the app is meant to move to: sheets per component, and screens composed from them.',
+    },
+    {
+      href: paths.scenarios(),
+      title: 'Scenarios',
+      body: 'Six composed pages, each arguing one open design question.',
+    },
+    {
+      href: paths.appHome(),
+      title: 'Prototype',
+      body: 'A replica of the app: thirty-nine states, the same markup and classes, on mock data.',
+    },
+  ];
+</script>
+
+<div class="ndo-shell__content">
+  <header class="hero">
+    <img class="hero__logo" src={paths.logo()} alt="Nondominium" />
+    <h1 class="ndo-h1">Design System</h1>
+    <p class="ndo-p mt-3" style="max-width:64ch">
+      The visual language of
+      <a href="https://github.com/Sensorica/nondominium">Nondominium</a>, a Holochain application
+      for resource governance without ownership. This documents the app as it is today, not an
+      aspiration: the prototype is a replica of its components, and a check fails the build if the
+      two drift apart.
     </p>
   </header>
 
-  <!-- Color palette -->
-  <section class="section">
-    <h2 class="section-title">Colors</h2>
+  <div class="doors">
+    {#each doors as door (door.href)}
+      <a class="ndo-card ndo-card--interactive door" href={door.href}>
+        <h2 class="ndo-h3">{door.title}</h2>
+        <p class="ndo-small mt-2">{door.body}</p>
+      </a>
+    {/each}
+  </div>
 
-    <h3 class="subsection-title">Gray Scale</h3>
-    <div class="swatch-row">
-      {#each [50, 100, 200, 300, 400, 500, 600, 700, 800, 900] as step}
-        <div class="swatch">
-          <div class="swatch-color" style="background: rgb(var(--ndo-gray-{step})); border: 1px solid rgb(var(--ndo-gray-200))"></div>
-          <span class="swatch-label">{step}</span>
-        </div>
-      {/each}
+  <section class="ndo-panel">
+    <div class="ndo-panel__head">
+      <h2 class="ndo-h3">Reviewing this system</h2>
     </div>
-
-    <h3 class="subsection-title mt-6">Lifecycle Status</h3>
-    <div class="swatch-row flex-wrap">
-      {#each [
-        { name: 'Ideation', bg: '--ndo-gray-100', text: '--ndo-gray-600' },
-        { name: 'Specification', bg: '--ndo-blue-50', text: '--ndo-blue-600' },
-        { name: 'Development', bg: '--ndo-indigo-100', text: '--ndo-indigo-700' },
-        { name: 'Prototype', bg: '--ndo-amber-100', text: '--ndo-amber-700' },
-        { name: 'Stable', bg: '--ndo-green-100', text: '--ndo-green-700' },
-        { name: 'Distributed', bg: '--ndo-teal-100', text: '--ndo-teal-700' },
-        { name: 'Active', bg: '--ndo-emerald-100', text: '--ndo-emerald-700' },
-        { name: 'Hibernating', bg: '--ndo-yellow-100', text: '--ndo-yellow-700' },
-        { name: 'Deprecated', bg: '--ndo-orange-100', text: '--ndo-orange-700' },
-        { name: 'End of Life', bg: '--ndo-red-100', text: '--ndo-red-700' }
-      ] as s}
-        <ndo-badge variant="lifecycle-{s.name.toLowerCase().replace(/ /g, '-')}" label={s.name}></ndo-badge>
-      {/each}
-    </div>
-
-    <h3 class="subsection-title mt-6">Resource Nature</h3>
-    <div class="swatch-row">
-      <ndo-badge variant="nature-physical" label="Physical"></ndo-badge>
-      <ndo-badge variant="nature-digital" label="Digital"></ndo-badge>
-      <ndo-badge variant="nature-service" label="Service"></ndo-badge>
-      <ndo-badge variant="nature-hybrid" label="Hybrid"></ndo-badge>
-      <ndo-badge variant="nature-information" label="Information"></ndo-badge>
-    </div>
-
-    <h3 class="subsection-title mt-6">Property Regime</h3>
-    <div class="swatch-row">
-      <ndo-badge variant="regime-nondominium" label="Nondominium"></ndo-badge>
-      <ndo-badge variant="regime-commons" label="Commons"></ndo-badge>
-      <ndo-badge variant="regime-collective" label="Collective"></ndo-badge>
-      <ndo-badge variant="regime-pool" label="Pool"></ndo-badge>
-      <ndo-badge variant="regime-common-pool" label="CommonPool"></ndo-badge>
-      <ndo-badge variant="regime-private" label="Private"></ndo-badge>
-    </div>
-  </section>
-
-  <!-- Typography -->
-  <section class="section">
-    <h2 class="section-title">Typography</h2>
-    <div class="type-scale">
-      <div class="type-row">
-        <span class="type-label">2xl · 24px</span>
-        <span style="font-size: var(--ndo-text-2xl); font-weight: var(--ndo-weight-bold)">Community Solar Array</span>
-      </div>
-      <div class="type-row">
-        <span class="type-label">xl · 20px</span>
-        <span style="font-size: var(--ndo-text-xl); font-weight: var(--ndo-weight-semibold)">NDO Identity Layer</span>
-      </div>
-      <div class="type-row">
-        <span class="type-label">lg · 18px</span>
-        <span style="font-size: var(--ndo-text-lg); font-weight: var(--ndo-weight-semibold)">Open Hardware CNC</span>
-      </div>
-      <div class="type-row">
-        <span class="type-label">base · 16px</span>
-        <span style="font-size: var(--ndo-text-base)">Shared photovoltaic infrastructure governed under nondominium principles.</span>
-      </div>
-      <div class="type-row">
-        <span class="type-label">sm · 14px</span>
-        <span style="font-size: var(--ndo-text-sm); color: rgb(var(--ndo-gray-600))">Browse resources and economic events on your conductor.</span>
-      </div>
-      <div class="type-row">
-        <span class="type-label">xs mono</span>
-        <span style="font-size: var(--ndo-text-xs); font-family: var(--ndo-font-mono); color: rgb(var(--ndo-gray-400))">#uhC0kVX5k7dL2mPqR…</span>
-      </div>
-    </div>
-  </section>
-
-  <!-- Spacing -->
-  <section class="section">
-    <h2 class="section-title">Spacing</h2>
-    <div class="spacing-scale">
-      {#each [
-        { token: '--ndo-spacing-1', px: '4px', label: '1' },
-        { token: '--ndo-spacing-2', px: '8px', label: '2' },
-        { token: '--ndo-spacing-3', px: '12px', label: '3' },
-        { token: '--ndo-spacing-4', px: '16px', label: '4' },
-        { token: '--ndo-spacing-6', px: '24px', label: '6' },
-        { token: '--ndo-spacing-8', px: '32px', label: '8' }
-      ] as s}
-        <div class="spacing-row">
-          <span class="spacing-label">{s.label} · {s.px}</span>
-          <div class="spacing-bar" style="width: var({s.token}); height: 1rem; background: rgb(var(--ndo-blue-600))"></div>
-        </div>
-      {/each}
-    </div>
-  </section>
-
-  <!-- Shadows -->
-  <section class="section">
-    <h2 class="section-title">Shadows</h2>
-    <div class="shadow-demos">
-      <div class="shadow-card" style="box-shadow: var(--ndo-shadow-sm)">
-        <span class="text-xs text-gray-500">shadow-sm</span>
-      </div>
-      <div class="shadow-card" style="box-shadow: var(--ndo-shadow-md)">
-        <span class="text-xs text-gray-500">shadow-md</span>
-      </div>
-      <div class="shadow-card" style="box-shadow: var(--ndo-shadow-lg)">
-        <span class="text-xs text-gray-500">shadow-lg</span>
-      </div>
+    <div class="ndo-panel__body flex flex-col gap-3">
+      <p class="ndo-small">
+        Every prototype state and every scenario carries a comment thread. Press <kbd>c</kbd> or
+        use the floating button to open the drawer; threads live as GitHub Discussions in a private
+        Sensorica repository, so the site stays static and the review history stays with the org.
+      </p>
+      <p class="ndo-small">
+        Inside the prototype, press <kbd>m</kbd> for the screen map, and use the chip at the bottom
+        left to come back here.
+      </p>
     </div>
   </section>
 </div>
 
 <style>
-  .page { padding: 2rem 1.5rem; max-width: 64rem; margin: 0 auto; }
-  .page-header { margin-bottom: 2rem; padding-bottom: 1rem; border-bottom: 1px solid rgb(var(--ndo-gray-200)); }
-  .section { margin-bottom: 2.5rem; }
-  .section-title { font-size: 1.125rem; font-weight: 600; color: rgb(var(--ndo-gray-900)); margin: 0 0 1rem; }
-  .subsection-title { font-size: 0.8125rem; font-weight: 600; color: rgb(var(--ndo-gray-500)); text-transform: uppercase; letter-spacing: 0.05em; margin: 0 0 0.5rem; }
-  .mt-6 { margin-top: 1.5rem; }
-
-  .swatch-row { display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap; }
-  .swatch { display: flex; flex-direction: column; align-items: center; gap: 0.25rem; }
-  .swatch-color { width: 3rem; height: 3rem; border-radius: 0.375rem; }
-  .swatch-label { font-size: 0.6875rem; color: rgb(var(--ndo-gray-500)); }
-
-  .type-scale { display: flex; flex-direction: column; gap: 0.75rem; }
-  .type-row { display: flex; align-items: baseline; gap: 1rem; }
-  .type-label { font-size: 0.6875rem; color: rgb(var(--ndo-gray-400)); font-family: var(--ndo-font-mono); width: 7rem; flex-shrink: 0; }
-
-  .spacing-scale { display: flex; flex-direction: column; gap: 0.5rem; }
-  .spacing-row { display: flex; align-items: center; gap: 1rem; }
-  .spacing-label { font-size: 0.6875rem; color: rgb(var(--ndo-gray-400)); font-family: var(--ndo-font-mono); width: 6rem; flex-shrink: 0; }
-
-  .shadow-demos { display: flex; gap: 1.5rem; }
-  .shadow-card { background: #fff; border-radius: 0.5rem; padding: 1.5rem 2rem; display: flex; align-items: center; justify-content: center; }
+  .hero { display: flex; flex-direction: column; align-items: flex-start; gap: var(--ndo-spacing-3); }
+  .hero__logo { width: 200px; max-width: 55vw; height: auto; }
+  .doors { display: grid; gap: var(--ndo-spacing-4); grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); }
+  /* The door's top edge carries the mark's gradient. A pseudo-element, not
+     border-image: border-image paints all four edges and swallows the card. */
+  .door { position: relative; overflow: hidden; }
+  .door::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: var(--ndo-brand-gradient);
+  }
+  kbd {
+    font-family: var(--ndo-font-mono);
+    font-size: var(--ndo-text-xs);
+    background: var(--ndo-color-surface);
+    border: 1px solid var(--ndo-color-border);
+    border-radius: var(--ndo-radius-sm);
+    padding: 0 4px;
+  }
+  a { color: var(--ndo-color-link); }
 </style>

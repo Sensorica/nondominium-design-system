@@ -1,4 +1,8 @@
 node_modules/
+# A worktree links its deps rather than reinstalling them, so ignore the
+# symlink form too.
+node_modules
+.worktrees/
 .svelte-kit/
 build/
 static/registry/bundle.js
