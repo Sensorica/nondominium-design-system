@@ -69,6 +69,55 @@ export const SCENARIO_KEY: Record<string, string> = {
   [paths.scenarioGovernanceReview()]: 'scenario:governance-review',
 };
 
+/**
+ * Screen key → route SHAPE, with `:id` standing in for any single segment.
+ *
+ * This exists because the catalogue above points at representative records
+ * (`ndo-detail` → ndo1), and a reader on ndo5 is still on the ndo-detail screen.
+ * Resolving by URL prefix alone would fail them twice over: `/app/ndo/ndo5`
+ * does not start with `/app/ndo/ndo1`, and `lobby` — whose URL is `/app` — is a
+ * prefix of every app path, so it would swallow the lot and file their comment
+ * on the wrong thread.
+ *
+ * Shapes are built from `paths` with a sentinel id, so a route restructure
+ * updates them for free.
+ */
+const shape = (url: string) => url.split('?')[0];
+
+export const SCREEN_KEY_PATTERN: Record<string, string> = {
+  connecting: shape(paths.connecting()),
+  'profile-setup': shape(paths.profileSetup()),
+  'profile-guard': shape(paths.profileGuard()),
+  'invite-landing': shape(paths.inviteLanding()),
+
+  lobby: shape(paths.appHome()),
+  profile: shape(paths.profile()),
+  'profile-edit': shape(paths.profileEdit()),
+
+  agents: shape(paths.agents()),
+  'agent-profile': shape(paths.agentProfile(':id')),
+
+  groups: shape(paths.groups()),
+  'group-create': shape(paths.groupCreate()),
+  'group-join': shape(paths.groupJoin()),
+  'group-detail': shape(paths.groupDetail(':id')),
+  'group-members': shape(paths.groupMembers(':id')),
+  'group-work-log': shape(paths.groupWorkLog(':id')),
+  'group-links': shape(paths.groupLinks(':id')),
+  'group-profile': shape(paths.groupProfile(':id')),
+
+  'ndo-create': shape(paths.ndoCreate()),
+  'ndo-detail': shape(paths.ndoDetail(':id')),
+  'ndo-activity': shape(paths.ndoActivity(':id')),
+  'ndo-composition': shape(paths.ndoComposition(':id')),
+  'ndo-governance': shape(paths.ndoGovernance(':id')),
+  'ndo-resources': shape(paths.ndoResources(':id')),
+  'ndo-lifecycle': shape(paths.ndoLifecycle(':id')),
+  'ndo-history': shape(paths.ndoHistory(':id')),
+  'ndo-fork': shape(paths.ndoFork(':id')),
+  'ndo-associate': shape(paths.ndoAssociate(':id')),
+};
+
 /** Human labels, for drawer headers and catalogue entries. */
 export const KEY_LABEL: Record<string, string> = {
   connecting: 'Connecting to the conductor',
@@ -106,19 +155,34 @@ export const KEY_LABEL: Record<string, string> = {
   'scenario:governance-review': 'Governance review scenario',
 };
 
+/** Does a pathname match a route shape, segment for segment? `:id` matches any
+ *  single non-empty segment. Exact arity: no prefix matching, so `/app` cannot
+ *  claim `/app/ndo/ndo5`. */
+function matchesShape(pathname: string, pattern: string): boolean {
+  const a = pathname.split('/');
+  const b = pattern.split('/');
+  if (a.length !== b.length) return false;
+  return b.every((seg, i) => (seg === ':id' ? a[i].length > 0 : seg === a[i]));
+}
+
 /**
- * Screen key for a pathname. Longest URL prefix wins, so /ndo/ndo1/governance
- * resolves to `ndo-governance` rather than `ndo-detail`. '' means "not a keyed
- * screen".
+ * Screen key for a pathname. Shapes are matched with exact arity, so
+ * `/app/ndo/ndo5/governance` resolves to `ndo-governance` for any id, and the
+ * lobby claims only itself. Concrete segments beat `:id` when two shapes both
+ * match — `/app/ndo/create` is `ndo-create`, not `ndo-detail`.
+ *
+ * '' means "not a keyed screen": no catalogue entry, no comment thread.
  */
 export function screenKeyForPath(pathname: string): string {
   let bestKey = '';
-  let bestLen = -1;
-  for (const [key, url] of Object.entries(SCREEN_KEY_TO_URL)) {
-    const path = url.split('?')[0];
-    if ((pathname === path || pathname.startsWith(path + '/')) && path.length > bestLen) {
+  let bestScore = -1;
+  for (const [key, pattern] of Object.entries(SCREEN_KEY_PATTERN)) {
+    if (!matchesShape(pathname, pattern)) continue;
+    // More concrete segments wins the tie.
+    const score = pattern.split('/').filter((s) => s !== ':id').length;
+    if (score > bestScore) {
       bestKey = key;
-      bestLen = path.length;
+      bestScore = score;
     }
   }
   return bestKey;

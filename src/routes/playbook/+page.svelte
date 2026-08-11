@@ -1,66 +1,41 @@
-<script>
-  import { base } from '$app/paths';
+<script lang="ts">
+  // The playbook index. Seven categories, in the order a screen is built:
+  // the things you press, the things that label, the things that hold, the
+  // things you fill, the things that move you, the things that report, and the
+  // frame around all of it.
+  import { paths } from '$lib/paths';
+
+  const categories = [
+    { href: paths.playbookButtons(), icon: '🔘', title: 'Buttons', body: 'Primary, ghost and destructive, in two sizes.' },
+    { href: paths.playbookBadges(), icon: '🏷️', title: 'Badges', body: 'The three domain axes: stage, nature, regime. Twenty-one variants.' },
+    { href: paths.playbookCards(), icon: '🃏', title: 'Cards', body: 'The NDO card and the panel, with their canonical recipes.' },
+    { href: paths.playbookInputs(), icon: '✏️', title: 'Inputs', body: 'Field, input, select, textarea, and the error state.' },
+    { href: paths.playbookNavigation(), icon: '🧭', title: 'Navigation', body: 'Tabs, sidebar items and the screen-map entry.' },
+    { href: paths.playbookStatus(), icon: '🟢', title: 'Status', body: 'Status dots and filter chips.' },
+    { href: paths.playbookShell(), icon: '🖼️', title: 'Shell', body: 'The app frame: rail, content column, modal and toast.' },
+  ];
 </script>
 
-<svelte:head><title>Playbook — Nondominium DS</title></svelte:head>
+<header>
+  <h1 class="ndo-h1">📖 Playbook</h1>
+  <p class="ndo-p mt-2" style="max-width:62ch">
+    Every component in the system, with its variants and the markup that produces them. Components
+    come in two forms: Svelte components for the prototype, and <code>ndo-*</code> custom elements
+    for embedding anywhere else. They share the token layer, so they render identically.
+  </p>
+</header>
 
-<h1 class="text-2xl font-bold text-gray-900 mb-1">Playbook</h1>
-<p class="text-sm text-gray-500 mb-6">Custom elements available in the <code>ndo-*</code> namespace.</p>
-
-<div class="component-grid">
-  {#each [
-    { path: '/playbook/badge',  name: 'Badge',      tag: 'ndo-badge',      desc: 'Lifecycle, nature, and property regime labels' },
-    { path: '/playbook/button', name: 'Button',     tag: 'ndo-button',     desc: 'Primary, ghost, and destructive actions' },
-    { path: '/playbook/card',   name: 'Card',       tag: 'ndo-card',       desc: 'NDO listing card with badge composition' },
-    { path: '/playbook/status', name: 'Status Dot', tag: 'ndo-status-dot', desc: 'Inline status indicators' },
-    { path: '/playbook/shell',  name: 'Shell',      tag: 'ndo-shell',      desc: 'Application layout patterns' }
-  ] as c}
-    <a href="{base}{c.path}" class="component-card">
-      <span class="component-name">{c.name}</span>
-      <code class="component-tag">&lt;{c.tag}&gt;</code>
-      <p class="component-desc">{c.desc}</p>
+<div class="grid">
+  {#each categories as category (category.href)}
+    <a class="ndo-card ndo-card--interactive" href={category.href}>
+      <span style="font-size:1.5rem" aria-hidden="true">{category.icon}</span>
+      <h2 class="ndo-h3 mt-2">{category.title}</h2>
+      <p class="ndo-small mt-1">{category.body}</p>
     </a>
   {/each}
 </div>
 
 <style>
-  .component-grid {
-    display: grid;
-    gap: 1rem;
-    grid-template-columns: repeat(auto-fill, minmax(14rem, 1fr));
-  }
-
-  .component-card {
-    display: flex;
-    flex-direction: column;
-    gap: 0.25rem;
-    padding: 1rem;
-    background: #fff;
-    border: 1px solid rgb(var(--ndo-gray-200));
-    border-radius: 0.5rem;
-    text-decoration: none;
-    color: inherit;
-    box-shadow: var(--ndo-shadow-sm);
-    transition: box-shadow 150ms ease;
-  }
-  .component-card:hover { box-shadow: var(--ndo-shadow-md); }
-
-  .component-name {
-    font-size: 0.9375rem;
-    font-weight: 600;
-    color: rgb(var(--ndo-gray-900));
-  }
-
-  .component-tag {
-    font-size: 0.75rem;
-    color: rgb(var(--ndo-blue-600));
-    font-family: var(--ndo-font-mono);
-  }
-
-  .component-desc {
-    margin: 0.25rem 0 0;
-    font-size: 0.8125rem;
-    color: rgb(var(--ndo-gray-600));
-    line-height: 1.4;
-  }
+  .grid { display: grid; gap: var(--ndo-spacing-4); grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); }
+  code { font-family: var(--ndo-font-mono); font-size: var(--ndo-text-sm); }
 </style>

@@ -58,6 +58,12 @@
   color: var(--ndo-color-text-muted);
 }
 
+/* Specificity note: the button, tab and interactive-card rules below double
+   their class (`.ndo-btn.ndo-btn--primary`) so they survive a page-level
+   `a { color: … }` in a Svelte-scoped style block. Svelte compiles those to
+   `a.svelte-hash` (0,1,1), which would otherwise win against a single class
+   (0,1,0) and paint a primary button's label the same blue as its background. */
+
 /* ── Buttons ────────────────────────────────────────────── */
 .ndo-btn {
   display: inline-flex;
@@ -79,25 +85,25 @@
   opacity: 0.5;
   cursor: not-allowed;
 }
-.ndo-btn--primary {
+.ndo-btn.ndo-btn--primary {
   background: rgb(var(--ndo-primary-600));
   color: rgb(var(--ndo-color-text-inverse));
 }
-.ndo-btn--primary:hover:not(:disabled) { background: rgb(var(--ndo-primary-700)); }
-.ndo-btn--ghost {
+.ndo-btn.ndo-btn--primary:hover:not(:disabled) { background: rgb(var(--ndo-primary-700)); }
+.ndo-btn.ndo-btn--ghost {
   background: transparent;
   color: var(--ndo-color-text-secondary);
   border-color: var(--ndo-color-border);
 }
-.ndo-btn--ghost:hover:not(:disabled) {
+.ndo-btn.ndo-btn--ghost:hover:not(:disabled) {
   background: var(--ndo-color-surface);
   color: var(--ndo-color-text-primary);
 }
-.ndo-btn--destructive {
+.ndo-btn.ndo-btn--destructive {
   background: rgb(var(--ndo-red-600));
   color: rgb(var(--ndo-color-text-inverse));
 }
-.ndo-btn--destructive:hover:not(:disabled) { background: rgb(var(--ndo-red-700)); }
+.ndo-btn.ndo-btn--destructive:hover:not(:disabled) { background: rgb(var(--ndo-red-700)); }
 .ndo-btn--sm {
   padding: var(--ndo-spacing-1) var(--ndo-spacing-3);
   font-size: var(--ndo-text-xs);
@@ -112,7 +118,7 @@
   box-shadow: var(--ndo-shadow-sm);
   transition: var(--ndo-transition-shadow), var(--ndo-transition-colors);
 }
-.ndo-card--interactive { cursor: pointer; text-decoration: none; display: block; }
+.ndo-card.ndo-card--interactive { cursor: pointer; text-decoration: none; display: block; }
 .ndo-card--interactive:hover {
   box-shadow: var(--ndo-shadow-md);
   border-color: rgb(var(--ndo-primary-300));
@@ -255,7 +261,7 @@
   gap: var(--ndo-spacing-1);
   border-bottom: 1px solid var(--ndo-color-border);
 }
-.ndo-tab {
+.ndo-tab.ndo-tab {
   padding: var(--ndo-spacing-2) var(--ndo-spacing-3);
   border-bottom: 2px solid transparent;
   color: var(--ndo-color-text-secondary);
@@ -264,8 +270,8 @@
   text-decoration: none;
   transition: var(--ndo-transition-colors);
 }
-.ndo-tab:hover { color: var(--ndo-color-text-primary); }
-.ndo-tab[aria-current='page'] {
+.ndo-tab.ndo-tab:hover { color: var(--ndo-color-text-primary); }
+.ndo-tab.ndo-tab[aria-current='page'] {
   color: rgb(var(--ndo-primary-700));
   border-bottom-color: rgb(var(--ndo-primary-600));
 }
