@@ -1,0 +1,344 @@
+/* =========================================================
+   Nondominium Design System — component layer
+   ---------------------------------------------------------
+   Hand-written CSS over the token file. UnoCSS handles layout
+   utilities in markup; anything with brand meaning (a badge
+   variant, a button, a card) lives here so it has ONE
+   definition and the prototype cannot drift from the playbook.
+
+   Nothing in this file hardcodes a color. Every value is a
+   --ndo-* token.
+   ========================================================= */
+
+/* ── Typography helpers ─────────────────────────────────── */
+.ndo-h1 {
+  font-size: var(--ndo-text-3xl);
+  line-height: var(--ndo-lh-3xl);
+  font-weight: var(--ndo-weight-bold);
+  color: var(--ndo-color-text-primary);
+  margin: 0;
+}
+.ndo-h2 {
+  font-size: var(--ndo-text-2xl);
+  line-height: var(--ndo-lh-2xl);
+  font-weight: var(--ndo-weight-semibold);
+  color: var(--ndo-color-text-primary);
+  margin: 0;
+}
+.ndo-h3 {
+  font-size: var(--ndo-text-lg);
+  line-height: var(--ndo-lh-lg);
+  font-weight: var(--ndo-weight-semibold);
+  color: var(--ndo-color-text-primary);
+  margin: 0;
+}
+.ndo-p {
+  font-size: var(--ndo-text-base);
+  line-height: var(--ndo-lh-base);
+  color: var(--ndo-color-text-secondary);
+  margin: 0;
+}
+.ndo-small {
+  font-size: var(--ndo-text-sm);
+  line-height: var(--ndo-lh-sm);
+  color: var(--ndo-color-text-secondary);
+  margin: 0;
+}
+.ndo-mono {
+  font-family: var(--ndo-font-mono);
+  font-size: var(--ndo-text-xs);
+  color: var(--ndo-color-text-mono);
+}
+.ndo-label {
+  font-size: var(--ndo-text-xs);
+  line-height: var(--ndo-lh-xs);
+  font-weight: var(--ndo-weight-semibold);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ndo-color-text-muted);
+}
+
+/* ── Buttons ────────────────────────────────────────────── */
+.ndo-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--ndo-spacing-2);
+  padding: var(--ndo-spacing-2) var(--ndo-spacing-4);
+  border-radius: var(--ndo-radius-lg);
+  border: 1px solid transparent;
+  font-family: inherit;
+  font-size: var(--ndo-text-sm);
+  line-height: var(--ndo-lh-sm);
+  font-weight: var(--ndo-weight-medium);
+  cursor: pointer;
+  text-decoration: none;
+  transition: var(--ndo-transition-colors), var(--ndo-transition-shadow);
+}
+.ndo-btn:disabled,
+.ndo-btn[aria-disabled='true'] {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.ndo-btn--primary {
+  background: rgb(var(--ndo-primary-600));
+  color: rgb(var(--ndo-color-text-inverse));
+}
+.ndo-btn--primary:hover:not(:disabled) { background: rgb(var(--ndo-primary-700)); }
+.ndo-btn--ghost {
+  background: transparent;
+  color: var(--ndo-color-text-secondary);
+  border-color: var(--ndo-color-border);
+}
+.ndo-btn--ghost:hover:not(:disabled) {
+  background: var(--ndo-color-surface);
+  color: var(--ndo-color-text-primary);
+}
+.ndo-btn--destructive {
+  background: rgb(var(--ndo-red-600));
+  color: rgb(var(--ndo-color-text-inverse));
+}
+.ndo-btn--destructive:hover:not(:disabled) { background: rgb(var(--ndo-red-700)); }
+.ndo-btn--sm {
+  padding: var(--ndo-spacing-1) var(--ndo-spacing-3);
+  font-size: var(--ndo-text-xs);
+}
+
+/* ── Cards ──────────────────────────────────────────────── */
+.ndo-card {
+  background: rgb(var(--ndo-color-card-bg));
+  border: 1px solid var(--ndo-color-border);
+  border-radius: var(--ndo-radius-lg);
+  padding: var(--ndo-spacing-4);
+  box-shadow: var(--ndo-shadow-sm);
+  transition: var(--ndo-transition-shadow), var(--ndo-transition-colors);
+}
+.ndo-card--interactive { cursor: pointer; text-decoration: none; display: block; }
+.ndo-card--interactive:hover {
+  box-shadow: var(--ndo-shadow-md);
+  border-color: rgb(var(--ndo-primary-300));
+}
+.ndo-card--flush { padding: 0; overflow: hidden; }
+
+/* ── Panels & sections ──────────────────────────────────── */
+.ndo-panel {
+  background: rgb(var(--ndo-color-card-bg));
+  border: 1px solid var(--ndo-color-border);
+  border-radius: var(--ndo-radius-lg);
+}
+.ndo-panel__head {
+  padding: var(--ndo-spacing-3) var(--ndo-spacing-4);
+  border-bottom: 1px solid var(--ndo-color-border-subtle);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--ndo-spacing-3);
+}
+.ndo-panel__body { padding: var(--ndo-spacing-4); }
+
+/* ── Badges ─────────────────────────────────────────────── */
+/* Base. Every variant sets only --b (background) and --f (foreground), so a new
+   domain value is two custom-property lines rather than a new rule. */
+.ndo-badge {
+  --b: var(--ndo-gray-100);
+  --f: var(--ndo-gray-700);
+  display: inline-flex;
+  align-items: center;
+  gap: var(--ndo-spacing-1);
+  padding: var(--ndo-spacing-0-5) var(--ndo-spacing-2);
+  border-radius: var(--ndo-radius-pill);
+  background: rgb(var(--b));
+  color: rgb(var(--f));
+  font-size: var(--ndo-text-xs);
+  line-height: var(--ndo-lh-xs);
+  font-weight: var(--ndo-weight-medium);
+  white-space: nowrap;
+}
+
+/* Lifecycle — cool (early) → warm (late) → red (terminal) */
+.ndo-badge--lifecycle-ideation      { --b: var(--ndo-gray-100);    --f: var(--ndo-gray-700); }
+.ndo-badge--lifecycle-specification { --b: var(--ndo-indigo-100);  --f: var(--ndo-indigo-700); }
+.ndo-badge--lifecycle-development   { --b: var(--ndo-indigo-100);  --f: var(--ndo-indigo-700); }
+.ndo-badge--lifecycle-prototype     { --b: var(--ndo-amber-100);   --f: var(--ndo-amber-800); }
+.ndo-badge--lifecycle-stable        { --b: var(--ndo-green-100);   --f: var(--ndo-green-700); }
+.ndo-badge--lifecycle-distributed   { --b: var(--ndo-teal-100);    --f: var(--ndo-teal-700); }
+.ndo-badge--lifecycle-active        { --b: var(--ndo-emerald-100); --f: var(--ndo-emerald-700); }
+.ndo-badge--lifecycle-hibernating   { --b: var(--ndo-yellow-100);  --f: var(--ndo-yellow-700); }
+.ndo-badge--lifecycle-deprecated    { --b: var(--ndo-orange-100);  --f: var(--ndo-orange-700); }
+.ndo-badge--lifecycle-end-of-life   { --b: var(--ndo-red-100);     --f: var(--ndo-red-700); }
+
+/* Resource nature */
+.ndo-badge--nature-physical    { --b: var(--ndo-blue-100);   --f: var(--ndo-blue-700); }
+.ndo-badge--nature-digital     { --b: var(--ndo-purple-100); --f: var(--ndo-purple-700); }
+.ndo-badge--nature-service     { --b: var(--ndo-sky-100);    --f: var(--ndo-sky-700); }
+.ndo-badge--nature-hybrid      { --b: var(--ndo-teal-100);   --f: var(--ndo-teal-700); }
+.ndo-badge--nature-information { --b: var(--ndo-indigo-100); --f: var(--ndo-indigo-700); }
+
+/* Property regime */
+.ndo-badge--regime-private      { --b: var(--ndo-gray-200);    --f: var(--ndo-gray-700); }
+.ndo-badge--regime-commons      { --b: var(--ndo-cyan-100);    --f: var(--ndo-cyan-700); }
+.ndo-badge--regime-collective   { --b: var(--ndo-violet-100);  --f: var(--ndo-violet-700); }
+.ndo-badge--regime-pool         { --b: var(--ndo-gray-200);    --f: var(--ndo-gray-700); }
+.ndo-badge--regime-common-pool  { --b: var(--ndo-rose-100);    --f: var(--ndo-rose-700); }
+.ndo-badge--regime-nondominium  { --b: var(--ndo-emerald-100); --f: var(--ndo-emerald-700); }
+
+/* Special */
+.ndo-badge--coming-soon { --b: var(--ndo-violet-100); --f: var(--ndo-violet-700); }
+.ndo-badge--neutral     { --b: var(--ndo-gray-100);   --f: var(--ndo-gray-700); }
+
+/* ── Filter chips ───────────────────────────────────────── */
+.ndo-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--ndo-spacing-1);
+  padding: var(--ndo-spacing-1) var(--ndo-spacing-3);
+  border-radius: var(--ndo-radius-pill);
+  border: 1px solid var(--ndo-color-border);
+  background: rgb(var(--ndo-color-card-bg));
+  color: var(--ndo-color-text-secondary);
+  font-size: var(--ndo-text-xs);
+  line-height: var(--ndo-lh-xs);
+  font-weight: var(--ndo-weight-medium);
+  cursor: pointer;
+  transition: var(--ndo-transition-colors);
+}
+.ndo-chip:hover { background: var(--ndo-color-surface); }
+.ndo-chip[aria-pressed='true'] {
+  background: rgb(var(--ndo-primary-50));
+  border-color: rgb(var(--ndo-primary-300));
+  color: rgb(var(--ndo-primary-700));
+}
+
+/* ── Status dot ─────────────────────────────────────────── */
+.ndo-status {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--ndo-spacing-1-5);
+  font-size: var(--ndo-text-xs);
+  color: var(--ndo-color-text-secondary);
+}
+
+/* ── Form fields ────────────────────────────────────────── */
+.ndo-field { display: flex; flex-direction: column; gap: var(--ndo-spacing-1-5); }
+.ndo-field__label {
+  font-size: var(--ndo-text-sm);
+  font-weight: var(--ndo-weight-medium);
+  color: var(--ndo-color-text-primary);
+}
+.ndo-field__hint { font-size: var(--ndo-text-xs); color: var(--ndo-color-text-muted); }
+.ndo-field__error { font-size: var(--ndo-text-xs); color: rgb(var(--ndo-red-600)); }
+.ndo-input,
+.ndo-select,
+.ndo-textarea {
+  width: 100%;
+  padding: var(--ndo-spacing-2) var(--ndo-spacing-3);
+  border: 1px solid var(--ndo-color-border-strong);
+  border-radius: var(--ndo-radius-lg);
+  background: rgb(var(--ndo-color-card-bg));
+  color: var(--ndo-color-text-primary);
+  font-family: inherit;
+  font-size: var(--ndo-text-sm);
+  line-height: var(--ndo-lh-sm);
+  outline: none;
+  transition: var(--ndo-transition-colors);
+}
+.ndo-input:focus,
+.ndo-select:focus,
+.ndo-textarea:focus {
+  border-color: rgb(var(--ndo-primary-500));
+  box-shadow: var(--ndo-focus-ring);
+}
+.ndo-textarea { resize: vertical; min-height: 96px; }
+
+/* ── Tabs ───────────────────────────────────────────────── */
+.ndo-tabs {
+  display: flex;
+  gap: var(--ndo-spacing-1);
+  border-bottom: 1px solid var(--ndo-color-border);
+}
+.ndo-tab {
+  padding: var(--ndo-spacing-2) var(--ndo-spacing-3);
+  border-bottom: 2px solid transparent;
+  color: var(--ndo-color-text-secondary);
+  font-size: var(--ndo-text-sm);
+  font-weight: var(--ndo-weight-medium);
+  text-decoration: none;
+  transition: var(--ndo-transition-colors);
+}
+.ndo-tab:hover { color: var(--ndo-color-text-primary); }
+.ndo-tab[aria-current='page'] {
+  color: rgb(var(--ndo-primary-700));
+  border-bottom-color: rgb(var(--ndo-primary-600));
+}
+
+/* ── Empty state ────────────────────────────────────────── */
+.ndo-empty {
+  text-align: center;
+  padding: var(--ndo-spacing-12) var(--ndo-spacing-4);
+  color: var(--ndo-color-text-muted);
+}
+.ndo-empty__icon { font-size: 2rem; display: block; margin-bottom: var(--ndo-spacing-3); }
+
+/* ── Modal ──────────────────────────────────────────────── */
+.ndo-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  background: var(--ndo-color-overlay);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--ndo-spacing-4);
+}
+.ndo-modal {
+  background: rgb(var(--ndo-color-card-bg));
+  border-radius: var(--ndo-radius-xl);
+  box-shadow: var(--ndo-shadow-xl);
+  width: 100%;
+  max-width: 560px;
+  max-height: 88vh;
+  overflow-y: auto;
+}
+.ndo-modal__head {
+  padding: var(--ndo-spacing-4);
+  border-bottom: 1px solid var(--ndo-color-border-subtle);
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--ndo-spacing-3);
+}
+.ndo-modal__body { padding: var(--ndo-spacing-4); display: flex; flex-direction: column; gap: var(--ndo-spacing-4); }
+.ndo-modal__foot {
+  padding: var(--ndo-spacing-4);
+  border-top: 1px solid var(--ndo-color-border-subtle);
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--ndo-spacing-2);
+}
+
+/* ── App shell ──────────────────────────────────────────── */
+.ndo-shell { display: grid; grid-template-columns: var(--ndo-sidebar-width) 1fr; min-height: 100vh; }
+.ndo-shell__aside {
+  background: rgb(var(--ndo-gray-900));
+  padding: var(--ndo-spacing-4) var(--ndo-spacing-3);
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--ndo-spacing-4);
+}
+.ndo-shell__main { min-height: 100vh; background: var(--ndo-color-bg-app); }
+.ndo-shell__content {
+  max-width: var(--ndo-content-max);
+  margin: 0 auto;
+  padding: var(--ndo-spacing-6) var(--ndo-spacing-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--ndo-spacing-6);
+}
+
+@media (max-width: 860px) {
+  .ndo-shell { grid-template-columns: 1fr; }
+  .ndo-shell__aside { position: static; height: auto; }
+}

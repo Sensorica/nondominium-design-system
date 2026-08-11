@@ -1,104 +1,171 @@
 <script lang="ts">
+  // The true root. Owns the token sheet, the design-system chrome, and the
+  // comments host (mounted once so it covers the playbook, the scenarios, and
+  // the prototype alike).
+  //
+  // The prototype at /app renders WITHOUT this chrome: it is meant to look like
+  // the product, not like documentation about the product.
   import '../app.css';
-  import 'virtual:uno.css';
+  import '$lib/styles/app.css';
   import { page } from '$app/state';
-  import { base } from '$app/paths';
+  import { paths } from '$lib/paths';
+  import CommentsHost from '$lib/components/comments/CommentsHost.svelte';
 
   let { children } = $props();
 
-  const navLinks = [
-    { path: '/', label: 'Tokens' },
-    { path: '/playbook', label: 'Playbook' },
-    { path: '/ui-kit', label: 'UI Kit' }
+  const current = $derived(page.url.pathname);
+  const isApp = $derived(current.startsWith(paths.appHome()));
+
+  const playbookLinks = [
+    { href: paths.playbookButtons(), label: 'Buttons', icon: '🔘' },
+    { href: paths.playbookBadges(), label: 'Badges', icon: '🏷️' },
+    { href: paths.playbookCards(), label: 'Cards', icon: '🃏' },
+    { href: paths.playbookInputs(), label: 'Inputs', icon: '✏️' },
+    { href: paths.playbookNavigation(), label: 'Navigation', icon: '🧭' },
+    { href: paths.playbookStatus(), label: 'Status', icon: '🟢' },
+    { href: paths.playbookShell(), label: 'Shell', icon: '🖼️' },
+  ];
+  const scenarioLinks = [
+    { href: paths.scenarioLobbyBrowse(), label: 'Lobby browse', icon: '🏛️' },
+    { href: paths.scenarioNdoCreation(), label: 'NDO creation', icon: '➕' },
+    { href: paths.scenarioNdoLifecycle(), label: 'NDO lifecycle', icon: '🔄' },
+    { href: paths.scenarioGroupCollaboration(), label: 'Group collaboration', icon: '👥' },
+    { href: paths.scenarioAgentIdentity(), label: 'Agent identity', icon: '🪪' },
+    { href: paths.scenarioGovernanceReview(), label: 'Governance review', icon: '⚖️' },
   ];
 </script>
 
-<div class="layout">
-  <header class="site-header">
-    <a href="{base}/" class="site-logo">
-      <span class="logo-mark">NDO</span>
-      <span class="logo-text">Design System</span>
-    </a>
-    <nav class="site-nav" aria-label="Main navigation">
-      {#each navLinks as link}
-        <a
-          href="{base}{link.path}"
-          class="nav-link"
-          class:is-active={page.url.pathname === `${base}${link.path}` ||
-            (link.path !== '/' && page.url.pathname.startsWith(`${base}${link.path}`))}
-        >
-          {link.label}
-        </a>
-      {/each}
-    </nav>
-  </header>
+<svelte:head>
+  <link rel="stylesheet" href={paths.tokenSheet()} />
+</svelte:head>
 
-  <main class="site-main">
-    {@render children()}
-  </main>
-</div>
+<CommentsHost />
+
+{#if isApp}
+  {@render children()}
+{:else}
+  <div class="chrome">
+    <aside class="rail">
+      <a class="brand" href={paths.home()}>
+        <span class="brand__mark" aria-hidden="true">🧿</span>
+        <span>
+          <span class="brand__title">Nondominium</span>
+          <span class="brand__sub">Design System</span>
+        </span>
+      </a>
+
+      <a class="appmode" href={paths.appHome()}>🚀 App mode</a>
+
+      <nav class="nav">
+        <div class="group">
+          <a class="grouphead" href={paths.tokens()} class:on={current === paths.tokens()}>🎨 Tokens</a>
+        </div>
+
+        <div class="group">
+          <a class="grouphead" href={paths.playbook()} class:on={current.startsWith(paths.playbook())}>
+            📖 Playbook
+          </a>
+          {#each playbookLinks as link (link.href)}
+            <a class="item" href={link.href} class:item--on={current === link.href}>
+              <span class="ic" aria-hidden="true">{link.icon}</span>{link.label}
+            </a>
+          {/each}
+        </div>
+
+        <div class="group">
+          <a class="grouphead" href={paths.scenarios()} class:on={current.startsWith(paths.scenarios())}>
+            🖼️ Scenarios
+          </a>
+          {#each scenarioLinks as link (link.href)}
+            <a class="item" href={link.href} class:item--on={current === link.href}>
+              <span class="ic" aria-hidden="true">{link.icon}</span>{link.label}
+            </a>
+          {/each}
+        </div>
+      </nav>
+
+      <p class="version">v0.2.0 · press <kbd>c</kbd> to comment</p>
+    </aside>
+
+    <main class="main">
+      {@render children()}
+    </main>
+  </div>
+{/if}
 
 <style>
-  .layout {
-    display: flex;
-    flex-direction: column;
-    min-height: 100vh;
-  }
-
-  .site-header {
-    display: flex;
-    align-items: center;
-    gap: 2rem;
-    padding: 0 1.5rem;
-    height: 3.5rem;
-    background: #fff;
-    border-bottom: 1px solid rgb(var(--ndo-gray-200));
+  .chrome { display: grid; grid-template-columns: var(--ndo-sidebar-width) 1fr; min-height: 100vh; }
+  .rail {
+    background: rgb(var(--ndo-gray-900));
+    padding: var(--ndo-spacing-4) var(--ndo-spacing-3);
     position: sticky;
     top: 0;
-    z-index: 10;
+    height: 100vh;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: var(--ndo-spacing-4);
   }
+  .brand { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+  .brand__mark { font-size: 22px; }
+  .brand__title { display: block; font-size: var(--ndo-text-sm); font-weight: var(--ndo-weight-bold); color: #fff; }
+  .brand__sub { display: block; font-size: var(--ndo-text-xs); color: rgb(255 255 255 / 0.5); }
 
-  .site-logo {
+  .appmode {
     display: flex;
     align-items: center;
-    gap: 0.5rem;
-    text-decoration: none;
-    color: inherit;
-  }
-
-  .logo-mark {
-    background: rgb(var(--ndo-blue-600));
+    justify-content: center;
+    gap: 8px;
+    padding: 9px 12px;
+    border-radius: var(--ndo-radius-lg);
+    background: rgb(var(--ndo-primary-600));
     color: #fff;
-    font-size: 0.7rem;
-    font-weight: 700;
-    padding: 0.15rem 0.4rem;
-    border-radius: 0.25rem;
-    letter-spacing: 0.05em;
-  }
-
-  .logo-text {
-    font-size: 0.9375rem;
-    font-weight: 600;
-    color: rgb(var(--ndo-gray-900));
-  }
-
-  .site-nav {
-    display: flex;
-    gap: 0.25rem;
-  }
-
-  .nav-link {
-    padding: 0.375rem 0.75rem;
-    border-radius: 0.375rem;
-    font-size: 0.875rem;
-    font-weight: 500;
-    color: rgb(var(--ndo-gray-600));
+    font-size: var(--ndo-text-sm);
+    font-weight: var(--ndo-weight-semibold);
     text-decoration: none;
-    transition: background-color 150ms ease, color 150ms ease;
+    transition: var(--ndo-transition-colors);
+  }
+  .appmode:hover { background: rgb(var(--ndo-primary-500)); }
+
+  .nav { display: flex; flex-direction: column; gap: var(--ndo-spacing-4); flex: 1; }
+  .group { display: flex; flex-direction: column; gap: 2px; }
+  .grouphead {
+    padding: 6px 8px 4px;
+    font-size: var(--ndo-text-xs);
+    font-weight: var(--ndo-weight-semibold);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: rgb(255 255 255 / 0.4);
+    text-decoration: none;
+  }
+  .grouphead:hover, .grouphead.on { color: rgb(255 255 255 / 0.75); }
+  .item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 10px;
+    border-radius: var(--ndo-radius-md);
+    font-size: var(--ndo-text-sm);
+    color: rgb(255 255 255 / 0.65);
+    text-decoration: none;
+    transition: var(--ndo-transition-colors);
+  }
+  .item:hover { background: rgb(255 255 255 / 0.08); color: rgb(255 255 255 / 0.92); }
+  .item--on { background: rgb(255 255 255 / 0.12); color: #fff; }
+  .ic { width: 18px; text-align: center; }
+
+  .version { margin: auto 0 0; padding: 0 8px; font-size: var(--ndo-text-xs); color: rgb(255 255 255 / 0.28); }
+  kbd {
+    font-family: var(--ndo-font-mono);
+    border: 1px solid rgb(255 255 255 / 0.2);
+    border-radius: var(--ndo-radius-sm);
+    padding: 0 3px;
   }
 
-  .nav-link:hover { background: rgb(var(--ndo-gray-100)); color: rgb(var(--ndo-gray-900)); }
-  .nav-link.is-active { background: rgb(var(--ndo-blue-50)); color: rgb(var(--ndo-blue-700)); }
+  .main { min-height: 100vh; background: var(--ndo-color-bg-app); }
 
-  .site-main { flex: 1; }
+  @media (max-width: 860px) {
+    .chrome { grid-template-columns: 1fr; }
+    .rail { position: static; height: auto; }
+  }
 </style>
