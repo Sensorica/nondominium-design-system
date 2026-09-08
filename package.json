@@ -16,7 +16,8 @@
     "check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json && bun run check:fidelity",
     "lint": "prettier --check . && eslint .",
     "format": "prettier --write .",
-    "check:fidelity": "bun run scripts/check-fidelity.ts"
+    "check:fidelity": "bun run scripts/check-fidelity.ts",
+    "check:fixture": "bun run scripts/check-fixture-keys.ts"
   },
   "devDependencies": {
     "@sveltejs/adapter-static": "^3.0.0",

@@ -440,6 +440,29 @@ export const INITIAL_RESOURCES: Record<string, EconomicResourceRow[]> = {
 // `Nondominium` NDO, which is the case the constraint checker refuses, because
 // a nondominium resource has no ownership to transfer.
 export const INITIAL_RULES: Record<string, GovernanceRule[]> = {
+  // Keyed by the Mounting Rig SPECIFICATION, not by the NDO. This is the row that
+  // makes the rules lookup falsifiable. GovernanceTab calls
+  // getGovernanceRules(listing.action_hash), which is correct and mirrors the app
+  // reading governance_rules off the specification, but every other rule here is
+  // keyed by a value that is simultaneously a specification hash and an NDO hash,
+  // so a lookup keyed on the NDO would have returned the same rules and no probe
+  // could have told the difference. Change that lookup to the NDO hash and this
+  // rule disappears from the tab.
+  'uhC0kSpec2Mount9rT4vX7zB1dF5hK8mQ2sU6wY0aC3': [
+    {
+      rule_data: {
+        MaintenanceSchedule: {
+          interval_days: 180,
+          required_role: 'Repair'
+        }
+      },
+      enforced_by: 'Repair',
+      ndo_identity_hash: 'uhC0kVX5k7dL2mPqR8sT1uW4xY7zA0bC3dE6fG9h',
+      property_regime: 'Nondominium',
+      resource_nature: 'Physical',
+      rivalry_override: 'Rivalrous'
+    }
+  ],
   'uhC0kVX5k7dL2mPqR8sT1uW4xY7zA0bC3dE6fG9h': [
     {
       rule_data: {
