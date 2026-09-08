@@ -303,3 +303,51 @@ extension. Every route was hard-navigated, so each one also exercises the
 
 Both were only findable by rendering. Neither would have failed a type check or
 a build.
+
+---
+
+## Phase 6 — parity against the app as it stands today (2026-09-08)
+
+Phases 1 to 5 built the replica and proved it against the app on 2026-08-11. Since then the app moved: `#128` per-NDO-cell model A with `DnaHash` binding, and `#129` NDO membership (join, list, is-member). This phase re-establishes fidelity against the app at branch `dev`, commit `d9eb38b`, and closes the gaps the first pass left open. Run coordinated as a two-peer covenant (`ds-shell`, `ds-ndo`); ledger at `.local/convene`.
+
+**Anti-claims for this phase.**
+
+- `../nondominium` is never modified. The app tree is read-only for this run.
+
+- No replica component acquires markup, copy, or structure the app does not have. A design improvement smuggled into a replica destroys the thing the replica is for.
+
+- No domain vocabulary is invented. Every enum variant shown traces to `crates/shared/src/types.rs` or `crates/shared/src/rule_data.rs` at `d9eb38b`.
+
+- The parity claim never closes on `check:fidelity` alone. That instrument reads a hardcoded file list and compares only class-token sets; it is one probe, and this phase found it blind to two whole components before a line was written.
+
+### Criteria
+
+| # | Claim | Falsifier |
+|---|---|---|
+| 15 | `scripts/check-fidelity.ts` enumerates every `.svelte` under `ui/src/lib/components` at `d9eb38b` | A component in the app tree absent from `FILES` |
+| 16 | `bun run check:fidelity` exits 0 with the completed file list | Non-zero exit, or a `CLASS DRIFT` row |
+| 17 | Every replica component is byte-identical to its original except for wiring differences named in the file | A markup delta that is not a `paths.ts` href or a query-string state read |
+| 18 | Every route body under `ui/src/routes` has a prototype counterpart rendering the same markup | A production route whose markup no prototype surface renders |
+| 19 | The DS classification vocabulary equals the Rust enums at `d9eb38b` | A Rust variant with no badge, or a badge with no Rust variant |
+| 20 | The Layer 1 rule vocabulary from local `master@5a90171` is present, or its absence is recorded in Decisions | A `5a90171` badge variant that is neither in the tree nor written down as dropped |
+| 21 | Every prototype screen renders in a real browser with zero console errors at this tree | Any console error at any surface |
+| 22 | `/app?profile=1` opens the lobby profile modal (the Phase 2 known gap) | The flag navigates and no modal appears |
+| 23 | The parity inventory table is regenerated against `d9eb38b`, not recalled | A row naming a file that does not exist at that SHA |
+
+### Test strategy
+
+- `bun run check:fidelity` after completing `FILES` (claims 15, 16, 17).
+
+- A second probe of different shape for claim 17: `diff` each replica file against its original directly, so a component the class-token comparison would pass on identical classes and different copy is still caught.
+
+- `grep` the Rust enums and the DS badge variants into two sorted lists and `comm` them (claim 19). Neither side is read from memory.
+
+- Interceptor renders every screen-map entry and reads the console per surface (claims 21, 22).
+
+### Known state at phase open
+
+- `check:fidelity` reports 16/24 byte-identical, 23/24 same-classes; one `CLASS DRIFT` on `ndo/NdoView.svelte` (replica carries `implemented not yet`).
+
+- `FILES` omits `HolochainProvider.svelte` and `lobby/GroupSidebar.svelte`, so the green number above is measured over 24 of the app's 26 components.
+
+- `origin/master` (`df8c1be`) does not contain local `master`'s two commits (`97575ad`, `5a90171`); the Layer 1 rule vocabulary from `5a90171` may have been lost in the rewrite. Claim 20 settles it.
