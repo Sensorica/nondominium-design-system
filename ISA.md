@@ -303,3 +303,69 @@ extension. Every route was hard-navigated, so each one also exercises the
 
 Both were only findable by rendering. Neither would have failed a type check or
 a build.
+
+---
+
+## Phase 6 — parity against the app as it stands today (2026-09-08)
+
+Phases 1 to 5 built the replica and proved it against the app on 2026-08-11. Since then the app moved: `#128` per-NDO-cell model A with `DnaHash` binding, and `#129` NDO membership (join, list, is-member). This phase re-establishes fidelity against the app at branch `dev`, commit `d9eb38b`, and closes the gaps the first pass left open. Run coordinated as a two-peer covenant (`ds-shell`, `ds-ndo`); ledger at `.local/convene`.
+
+**Anti-claims for this phase.**
+
+- `../nondominium` is never modified. The app tree is read-only for this run.
+
+- No replica component acquires markup, copy, or structure the app does not have. A design improvement smuggled into a replica destroys the thing the replica is for.
+
+- No domain vocabulary is invented. Every enum variant shown traces to `crates/shared/src/types.rs` or `crates/shared/src/rule_data.rs` at `d9eb38b`.
+
+- The parity claim never closes on `check:fidelity` alone. That instrument reads a hardcoded file list and compares only class-token sets; it is one probe, and this phase found it blind to two whole components before a line was written.
+
+### Criteria
+
+| # | Claim | Falsifier |
+|---|---|---|
+| 15 | `scripts/check-fidelity.ts` enumerates every `.svelte` under `ui/src/lib/components` at `d9eb38b` | A component in the app tree absent from `FILES` |
+| 16 | `bun run check:fidelity` exits 0 with the completed file list | Non-zero exit, or a `CLASS DRIFT` row |
+| 17 | Every replica component is byte-identical to its original except for wiring differences named in the file | A markup delta that is not a `paths.ts` href or a query-string state read |
+| 18 | Every route body under `ui/src/routes` has a prototype counterpart rendering the same markup | A production route whose markup no prototype surface renders |
+| 19 | The DS classification vocabulary equals the Rust enums at `d9eb38b` | A Rust variant with no badge, or a badge with no Rust variant |
+| 20 | The Layer 1 rule vocabulary from local `master@5a90171` is present, or its absence is recorded in Decisions | A `5a90171` badge variant that is neither in the tree nor written down as dropped |
+| 21 | Every prototype screen renders in a real browser with zero console errors at this tree | Any console error at any surface |
+| 22 | `/app?profile=1` opens the lobby profile modal (the Phase 2 known gap) | The flag navigates and no modal appears |
+| 23 | The parity inventory table is regenerated against `d9eb38b`, not recalled | A row naming a file that does not exist at that SHA |
+
+### Test strategy
+
+- `bun run check:fidelity` after completing `FILES` (claims 15, 16, 17).
+
+- A second probe of different shape for claim 17: `diff` each replica file against its original directly, so a component the class-token comparison would pass on identical classes and different copy is still caught.
+
+- `grep` the Rust enums and the DS badge variants into two sorted lists and `comm` them (claim 19). Neither side is read from memory.
+
+- Interceptor renders every screen-map entry and reads the console per surface (claims 21, 22).
+
+### Known state at phase open
+
+- `check:fidelity` reports 16/24 byte-identical, 23/24 same-classes; one `CLASS DRIFT` on `ndo/NdoView.svelte` (replica carries `implemented not yet`).
+
+- `FILES` omits `HolochainProvider.svelte` and `lobby/GroupSidebar.svelte`, so the green number above is measured over 24 of the app's 26 components.
+
+- `origin/master` (`df8c1be`) does not contain local `master`'s two commits (`97575ad`, `5a90171`); the Layer 1 rule vocabulary from `5a90171` may have been lost in the rewrite. Claim 20 settles it.
+
+### What the phase learned, and where it stopped
+
+**The baseline in the phase header was wrong when it was written.** `d9eb38b` is the local `dev` checkout, seven days behind `origin/dev` at `20adb11`, which carries PR #132 (24 files, 2183 insertions in `ui/src`). Every claim in this phase measures against `20adb11`. The correction came from the peer session and was re-derived here from `git rev-parse`, `git log dev..origin/dev` and `git ls-tree` before adoption. The app has 30 components at that revision, not 26, and four of the six the replica was missing arrived with #132.
+
+**Claim 15 closed.** `scripts/check-fidelity.ts` now derives its file list from the app at a pinned revision instead of a hardcoded array. That removes the class of defect rather than its instances: the previous version was blind to two components, and #132 added four more it would never have seen. Commit `78e7054`.
+
+**Claim 19 closed.** All six classification enums in `src/lib/replica/types.ts` match `crates/shared/src/types.rs` at `20adb11` exactly: LifecycleStage 10, PropertyRegime 7, ResourceNature 5, Rivalry 2, ResourceScope 3, OperationalState 7. `RuleData`'s four discriminants and their payload structs match `crates/shared/src/rule_data.rs`.
+
+**Claim 20 closed, and the 2026-08-18 defects with it.** The three defects that plan recorded are gone at the type level: the invented rule names (`AccessControl`, `TransferPolicy`) are replaced by the four real `RuleData` variants, `OperationalState` is a separate seven-value axis rather than a lifecycle badge, and `Rivalry` and `ResourceScope` both exist. What is not yet done is the badge layer: the registry and playbook still need variants for them, and `src/routes/scenarios/governance-review/+page.svelte` still asserts in prose that `rule_data` is an untyped JSON string, which stopped being true at #132. That page needs a rewrite, not a type patch.
+
+**Claim 16 is open at 3 errors, down from 25.** `bunx svelte-check` fell from 25 to 3 as the types landed, and every error it raised was a real replica-versus-app gap rather than a type-level nuisance: three property regimes missing from two filter maps, a dropped rivalry override field, a two-field `Person`. Two of the remaining three are in the `ndo/` half; the third is the governance-review scenario above.
+
+**Anti-claim held.** `../nondominium` was never modified. Every app-side read went through `git show <rev>:<path>`.
+
+#### Why this phase stopped where it did
+
+The run was coordinated as a two-peer covenant, and the covenant's ledger stopped being trustworthy. Both handles were driven by more than one session; `chains/ds-shell.jsonl` acquired a hard defect this session did not author, accusing the hold owner of intruding on its own held files, and one acknowledged append is missing from the chain entirely. An append-only log with two writers under one identity loses records, and `convene replay` cannot see the hole because the survivors still chain correctly. The code work is unaffected and is committed with only its author's paths staged (`78e7054`, `4d65d7a`). The coordination substrate is what needs Soushi's ruling, because he spawned the sessions and no peer can settle it from inside.

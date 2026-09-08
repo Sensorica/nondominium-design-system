@@ -54,6 +54,10 @@ export const SCREEN_KEY_TO_URL: Record<string, string> = {
   'ndo-lifecycle': paths.ndoModal(MY_NDO, 'lifecycle'),
   'ndo-fork': paths.ndoModal(NDO, 'fork'),
   'ndo-associate': paths.ndoModal(NDO, 'associate'),
+  'ndo-rule-edit': paths.ndoModal(NDO, 'rule-edit'),
+  'ndo-spec-create': paths.ndoModal(NDO, 'spec-create'),
+  'ndo-commitment': paths.ndoModal(NDO, 'commitment'),
+  'ndo-event': paths.ndoModal(NDO, 'event'),
   'ndo-join': paths.ndoJoin(NDO),
   'ndo-hibernating': paths.ndoDetail(HIBERNATING_NDO),
   'ndo-deprecated': paths.ndoDetail(DEPRECATED_NDO),
@@ -118,6 +122,10 @@ export const SCREEN_MAP_GROUPS: ScreenMapGroup[] = [
       'ndo-lifecycle',
       'ndo-fork',
       'ndo-associate',
+      'ndo-rule-edit',
+      'ndo-spec-create',
+      'ndo-commitment',
+      'ndo-event',
       'ndo-join'
     ]
   },

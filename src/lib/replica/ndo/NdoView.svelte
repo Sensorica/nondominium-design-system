@@ -66,11 +66,23 @@
   let joinLoading = $state(false);
   let ndoMembers = $state<{ id: string; name: string; role?: string }[]>([]);
   let membersLoading = $state(false);
-  let membersStubMessage = $state<string | null>(null);
+  let membersError = $state<string | null>(null);
+  let joinError = $state<string | null>(null);
+
+  // Each of the four creation modals lives inside a tab, so a key that names the
+  // modal has to select its tab too. Without this, ?modal=rule-edit resolves to
+  // the Resources tab with nothing open, and the screen map would count the
+  // surface as covered while showing the wrong one.
+  const MODAL_TAB: Record<string, TabId> = {
+    'spec-create': 'resources',
+    'rule-edit': 'governance',
+    commitment: 'activity',
+    event: 'activity'
+  };
 
   // URL → state (deep links and the screen map land here).
   $effect(() => {
-    tab = paramTab;
+    tab = (paramModal && MODAL_TAB[paramModal]) || paramTab;
     showForkModal = paramModal === 'fork';
     showAssociateModal = paramModal === 'associate';
     showTransitionModal = paramModal === 'lifecycle';
@@ -103,27 +115,46 @@
   // derived descriptor there is nothing to re-fetch.
   function handleRefresh() {}
 
+  // NDO membership. This block rendered "not yet implemented on the DHT" until
+  // 2026-09-08, citing a planned-section of the zome docs. That was true before
+  // app PR #129 and false after it: #129 shipped join, list and is-member on the
+  // per-NDO cell. A stub that says a shipped feature does not exist is worse than
+  // no stub, because it answers the question instead of leaving it open.
+  //
+  // Mirrors `ui/src/lib/components/ndo/NdoView.svelte` at 20adb11, including its
+  // two failure strings. The load failure is worth keeping reachable: members
+  // reaching a node late is the normal case on a gossiping DHT, not an edge one.
   function loadNdoMembers() {
     membersLoading = true;
-    // Production returns a stub failure here; the screen shows that message
-    // verbatim, which is the honest thing for a feature that is not built.
-    membersStubMessage =
-      'NDO member listing is not yet implemented on the DHT. See documentation/zomes/resource_zome.md § NDO membership (planned).';
-    ndoMembers = ndoService.getNdoMembers();
+    membersError = null;
+    const members = ndoService.getNdoMembers(specHashB64);
     membersLoading = false;
+    if (ndoService.loadError) {
+      membersError = 'Could not load members. They may not have reached this node yet.';
+      ndoMembers = [];
+    } else {
+      ndoMembers = members;
+    }
   }
 
-  function handleJoinNdo() {
+  async function handleJoinNdo() {
     joinLoading = true;
-    joinMessage =
-      'NDO membership is not yet implemented on the DHT. See documentation/zomes/resource_zome.md § NDO membership (planned).';
+    joinMessage = null;
+    joinError = null;
+    const ok = await ndoService.joinNdo(specHashB64);
     joinLoading = false;
+    if (!ok) {
+      joinError = 'Could not join this NDO. Please try again.';
+    } else {
+      joinMessage = 'You have joined this NDO.';
+      loadNdoMembers();
+    }
     showJoinPanel = true;
     syncUrl({ join: true });
   }
 
   $effect(() => {
-    if (showJoinPanel && ndoMembers.length === 0 && !membersLoading && !membersStubMessage) {
+    if (showJoinPanel && ndoMembers.length === 0 && !membersLoading && !membersError) {
       loadNdoMembers();
     }
   });
@@ -294,24 +325,20 @@
           onclick={handleJoinNdo}
           class="rounded bg-blue-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-blue-700 disabled:opacity-50"
         >
-          {joinLoading ? 'Requesting…' : 'Request to join'}
+          {joinLoading ? 'Joining…' : 'Join this NDO'}
         </button>
       </div>
-      {#if joinMessage}
-        <p
-          class="mt-2 text-xs {joinMessage.includes('not yet implemented')
-            ? 'text-amber-700'
-            : 'text-gray-600'}"
-        >
-          {joinMessage}
-        </p>
+      {#if joinError}
+        <p class="mt-2 text-xs text-amber-700">{joinError}</p>
+      {:else if joinMessage}
+        <p class="mt-2 text-xs text-gray-600">{joinMessage}</p>
       {/if}
       <div class="mt-4">
         <MemberList members={ndoMembers} />
         {#if membersLoading}
           <p class="mt-2 text-xs text-gray-400 italic">Loading members…</p>
-        {:else if membersStubMessage}
-          <p class="mt-2 text-xs text-amber-700">{membersStubMessage}</p>
+        {:else if membersError}
+          <p class="mt-2 text-xs text-amber-700">{membersError}</p>
         {/if}
       </div>
     </div>
@@ -326,13 +353,33 @@
 
   <div class="p-6">
     {#if tab === 'resources'}
-      <ResourcesTab specActionHash={specActionHash!} />
+      <!-- ndoCellId is app-only state: the app resolves a clone cell per NDO and
+           the prototype has no conductor, so null is the honest value rather
+           than a stand-in. lifecycleStage is what drives the Layer 1 gate. -->
+      <ResourcesTab
+        specActionHash={specActionHash!}
+        ndoCellId={null}
+        lifecycleStage={ndoDescriptor?.lifecycle_stage ?? null}
+        propertyRegime={ndoDescriptor?.property_regime ?? null}
+      />
     {:else if tab === 'governance'}
-      <GovernanceTab specActionHash={specActionHash!} />
+      <GovernanceTab
+        specActionHash={specActionHash!}
+        ndoCellId={null}
+        propertyRegime={ndoDescriptor?.property_regime ?? null}
+        resourceNature={ndoDescriptor?.resource_nature ?? null}
+        rivalryOverride={ndoDescriptor?.rivalry_override ?? null}
+      />
     {:else if tab === 'composition'}
       <CompositionTab />
     {:else}
-      <ActivityTab specActionHash={specActionHash!} />
+      <ActivityTab
+        specActionHash={specActionHash!}
+        ndoCellId={null}
+        propertyRegime={ndoDescriptor?.property_regime ?? null}
+        resourceNature={ndoDescriptor?.resource_nature ?? null}
+        rivalryOverride={ndoDescriptor?.rivalry_override ?? null}
+      />
     {/if}
   </div>
 {/if}

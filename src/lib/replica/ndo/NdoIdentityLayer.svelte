@@ -7,8 +7,9 @@
   // through to the truncated-key branch — which is a real state and one of the
   // reasons this screen is worth reviewing.
   import { paths } from '$lib/paths';
-  import type { NdoDescriptor } from '../types';
+  import type { NdoDescriptor, ResourceNature } from '../types';
   import { appContext, personService } from '../stores.svelte';
+  import { effectiveRivalryLabel } from '../rivalry';
   import LifecycleTransitionModal from './LifecycleTransitionModal.svelte';
   import TransitionHistoryPanel from './TransitionHistoryPanel.svelte';
 
@@ -40,10 +41,19 @@
   };
 
   const regimeColorMap: Record<string, string> = {
+    // All seven variants of PropertyRegime, matching crates/shared/src/types.rs
+    // and the packages/shared-types union at 20adb11. A shorter map is not a
+    // simplification: Collective, Pool and Public are live variants, and
+    // dropping them renders those NDOs in the fallback grey while the app gives
+    // each its own colour. Nothing in check-fidelity can see this, because the
+    // values live in a script-level record rather than in a class attribute.
     Private: 'bg-gray-100 text-gray-600',
     Commons: 'bg-cyan-100 text-cyan-700',
-    Nondominium: 'bg-emerald-100 text-emerald-700',
-    CommonPool: 'bg-rose-100 text-rose-700'
+    Collective: 'bg-violet-100 text-violet-700',
+    Pool: 'bg-amber-100 text-amber-700',
+    CommonPool: 'bg-rose-100 text-rose-700',
+    Public: 'bg-sky-100 text-sky-700',
+    Nondominium: 'bg-emerald-100 text-emerald-700'
   };
 
   const natureColorMap: Record<string, string> = {
@@ -57,6 +67,18 @@
   function badgeClass(map: Record<string, string>, value: string | null): string {
     return value ? (map[value] ?? 'bg-gray-100 text-gray-600') : 'bg-gray-100 text-gray-400';
   }
+
+  // Restored with the app's own derivation. #132 added the rivalry badge and the
+  // replica had neither it nor the util behind it; effectiveRivalryLabel now
+  // lives at replica/rivalry.ts. The label distinguishes an explicit override
+  // from the nature's default, and returns null for Service, whose rivalry the
+  // ontology leaves ambiguous on purpose.
+  const rivalryBadge = $derived(
+    effectiveRivalryLabel(
+      descriptor?.resource_nature as ResourceNature | null,
+      descriptor?.rivalry_override
+    )
+  );
 
   const formattedDate = $derived(
     descriptor?.created_at ? new Date(descriptor.created_at / 1000).toLocaleString() : null
@@ -123,6 +145,11 @@
             class={`rounded px-2 py-0.5 text-xs font-medium ${badgeClass(natureColorMap, descriptor.resource_nature)}`}
           >
             {descriptor.resource_nature}
+          </span>
+        {/if}
+        {#if rivalryBadge}
+          <span class="rounded border border-gray-200 bg-white px-2 py-0.5 text-xs font-medium text-gray-700">
+            {rivalryBadge}
           </span>
         {/if}
       </div>

@@ -6,8 +6,10 @@
 
 <h1 class="text-xl font-bold text-gray-900 mb-1">Badge <code class="text-blue-600 text-base font-mono">&lt;ndo-badge&gt;</code></h1>
 <p class="text-sm text-gray-600 mb-6">
-  Status labels for lifecycle stage, resource nature, and property regime.
-  Styled entirely via CSS custom properties — safe for shadow DOM.
+  Status labels for the whole domain vocabulary: Layer 0 lifecycle stage, resource nature, property regime
+  and rivalry; Layer 1 scope and governance-rule type; Layer 2 operational state. Every variant traces to a
+  Rust enum in <code class="font-mono text-xs">crates/shared</code>. Styled entirely via CSS custom properties,
+  so it is safe for shadow DOM.
 </p>
 
 <!-- Lifecycle -->
@@ -43,10 +45,80 @@
 <section class="specimen-section">
   <h2 class="specimen-heading">Property Regime</h2>
   <div class="specimen-grid">
-    {#each ['nondominium', 'commons', 'collective', 'pool', 'common-pool', 'private'] as regime}
+    {#each ['nondominium', 'commons', 'collective', 'pool', 'common-pool', 'private', 'public'] as regime}
       <div class="specimen">
         <ndo-badge variant="regime-{regime}" label={regime.replace('-', ' ')}></ndo-badge>
         <code class="specimen-code">variant="regime-{regime}"</code>
+      </div>
+    {/each}
+  </div>
+</section>
+
+<!-- Operational state -->
+<section class="specimen-section">
+  <h2 class="specimen-heading">Operational State <span class="text-xs font-normal text-gray-500">(Layer 2)</span></h2>
+  <p class="mb-3 text-sm text-gray-600">
+    Where a specific resource instance is right now. This is <strong>not</strong> a lifecycle stage and the
+    two are orthogonal: a resource under repair is <code class="font-mono text-xs">LifecycleStage.Active</code>
+    and <code class="font-mono text-xs">OperationalState.InMaintenance</code> at the same time. The kit used to
+    render <code class="font-mono text-xs">available</code> inside <code class="font-mono text-xs">variant="lifecycle-stable"</code>,
+    which welded the two axes back together after PR #132 spent a type separating them. These carry no coloured
+    background at all: the colour is in the dot, and no lifecycle badge has a dot.
+  </p>
+  <div class="specimen-grid">
+    {#each ['available', 'reserved', 'in-transit', 'in-storage', 'in-maintenance', 'in-use', 'pending-validation'] as op}
+      <div class="specimen">
+        <ndo-badge variant="op-{op}" label={op.replace(/-/g, ' ')}></ndo-badge>
+        <code class="specimen-code">variant="op-{op}"</code>
+      </div>
+    {/each}
+  </div>
+</section>
+
+<!-- Rivalry and scope -->
+<section class="specimen-section">
+  <h2 class="specimen-heading">Rivalry and Scope</h2>
+  <p class="mb-3 text-sm text-gray-600">
+    Rivalry decides whether a governance rule is even coherent, which is why
+    <code class="font-mono text-xs">GovernanceRule</code> carries a
+    <code class="font-mono text-xs">rivalry_override</code>. It is shown outlined rather than filled because it
+    qualifies a regime rather than standing beside it: effective rivalry is the nature's default unless the
+    creator overrode it, and <code class="font-mono text-xs">Service</code> has no confident default.
+    Scope lives on the Layer 1 specification and is the one field that can quietly undo a Layer 0 guarantee, so
+    narrowing an open-access regime below <code class="font-mono text-xs">Public</code> is a Hard refusal.
+  </p>
+  <div class="specimen-grid">
+    {#each ['rivalrous', 'non-rivalrous'] as r}
+      <div class="specimen">
+        <ndo-badge variant="rivalry-{r}" label={r.replace('-', ' ')}></ndo-badge>
+        <code class="specimen-code">variant="rivalry-{r}"</code>
+      </div>
+    {/each}
+    {#each ['project', 'network', 'public'] as s}
+      <div class="specimen">
+        <ndo-badge variant="scope-{s}" label={s}></ndo-badge>
+        <code class="specimen-code">variant="scope-{s}"</code>
+      </div>
+    {/each}
+  </div>
+</section>
+
+<!-- Governance rules -->
+<section class="specimen-section">
+  <h2 class="specimen-heading">Governance Rule Types <span class="text-xs font-normal text-gray-500">(Layer 1)</span></h2>
+  <p class="mb-3 text-sm text-gray-600">
+    The four discriminants of the <code class="font-mono text-xs">RuleData</code> tagged union. These deliberately
+    leave the pill language: square corners, monospace, a left accent bar. A classification says what a resource
+    <em>is</em>; a rule says what an agent <em>may do</em> and carries a typed payload, and a rule badge that looks
+    like a classification teaches the wrong model to whoever designs the rule surface next. The kit previously
+    shipped <code class="font-mono text-xs">AccessControl</code> and <code class="font-mono text-xs">TransferPolicy</code>,
+    which exist in no zome; these four are the real Rust variants.
+  </p>
+  <div class="specimen-grid">
+    {#each ['access-requirement', 'usage-limit', 'transfer-condition', 'maintenance-schedule'] as rule}
+      <div class="specimen">
+        <ndo-badge variant="rule-{rule}" label={rule.replace(/-/g, ' ')}></ndo-badge>
+        <code class="specimen-code">variant="rule-{rule}"</code>
       </div>
     {/each}
   </div>
@@ -72,7 +144,8 @@
   <h2 class="specimen-heading">Svelte badge modes (@nondominium/ndo-ui)</h2>
   <p class="text-sm text-gray-600 mb-3">
     Filter chips use per-stage colors; card badges simplify lifecycle to green vs gray and regime to dashed gray.
-    MVP regimes: Private, Commons, Nondominium, CommonPool.
+    All seven regimes: Private, Commons, Collective, Pool, CommonPool, Public, Nondominium. The four-regime
+    "MVP" set this page used to name was a 2026-08-11 UI narrowing that the shared types have since abandoned.
   </p>
   <div class="specimen-grid mb-4">
     <div class="specimen">

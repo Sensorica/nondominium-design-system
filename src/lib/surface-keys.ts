@@ -96,6 +96,12 @@ export const SCREEN_SHAPE: Record<string, Shape> = {
   'ndo-lifecycle': withId(paths.ndoModal(ID, 'lifecycle'), ID),
   'ndo-fork': withId(paths.ndoModal(ID, 'fork'), ID),
   'ndo-associate': withId(paths.ndoModal(ID, 'associate'), ID),
+  // Layer 1 creation surfaces (PR #132). Each is a modal state of the NDO
+  // route, following the ndoModal convention the three above already use.
+  'ndo-rule-edit': withId(paths.ndoModal(ID, 'rule-edit'), ID),
+  'ndo-spec-create': withId(paths.ndoModal(ID, 'spec-create'), ID),
+  'ndo-commitment': withId(paths.ndoModal(ID, 'commitment'), ID),
+  'ndo-event': withId(paths.ndoModal(ID, 'event'), ID),
   'ndo-join': withId(paths.ndoJoin(ID), ID),
 
   // Agents
@@ -146,6 +152,10 @@ export const KEY_LABEL: Record<string, string> = {
   'ndo-loading': 'NDO — loading',
   'ndo-error': 'NDO — load failed',
   'ndo-anonymous': 'NDO — no agent key',
+  'ndo-rule-edit': 'NDO — edit governance rule',
+  'ndo-spec-create': 'NDO — create resource specification',
+  'ndo-commitment': 'NDO — create commitment',
+  'ndo-event': 'NDO — record economic event',
   'ndo-governance': 'NDO — Governance tab',
   'ndo-composition': 'NDO — Composition tab',
   'ndo-activity': 'NDO — Activity tab',

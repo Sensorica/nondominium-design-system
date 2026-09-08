@@ -7,6 +7,7 @@
   // off on a flow that cannot ship.
   import type { LifecycleStage, NdoDescriptor } from '../types';
   import { lobbyStore, ndoService } from '../stores.svelte';
+  import { urlParam } from '../url-state.svelte';
 
   interface Props {
     descriptor: NdoDescriptor;
@@ -67,6 +68,20 @@
     }
     isSubmitting = true;
     errorMessage = '';
+
+    // The app awaits an Effect and branches on Exit: on failure it sets
+    // errorMessage and does NOT call onadvanced, so the modal stays open with
+    // the transition unapplied. A synchronous lookup against module state can
+    // never fail, so without this the error paragraph below is markup nothing
+    // can reach, and a reviewer would sign off on a flow whose failure path has
+    // never been rendered. `?state=error` is the repo's existing idiom for the
+    // same problem, already used by ndoService.loadError.
+    if (urlParam('state') === 'error') {
+      isSubmitting = false;
+      errorMessage = 'Failed to advance stage: the chain rejected the transition.';
+      return;
+    }
+
     ndoService.updateLifecycleStage(
       descriptor.hash,
       selectedStage as LifecycleStage,
