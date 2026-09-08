@@ -289,7 +289,12 @@ export const groupStore = {
       initiator: ME_AGENT_B64,
       created_at: Date.now() * 1000,
       successor_ndo_hash: null,
-      hibernation_origin: null
+      hibernation_origin: null,
+      // `null`, not the nature default. The descriptor field records whether the
+      // creator OVERRODE the nature's rivalry, and NdoCreateModal leaves it unset
+      // unless they picked one, so writing a default here would show every new NDO
+      // as carrying an explicit override it never had.
+      rivalry_override: input.rivalry_override ?? null
     };
     data.ndos = [descriptor, ...data.ndos];
     if (groupState.groupId) {
