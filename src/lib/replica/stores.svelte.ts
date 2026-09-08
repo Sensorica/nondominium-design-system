@@ -13,7 +13,11 @@
 // would buy nothing.
 
 import type {
+  ActionHash,
   ActiveFilters,
+  AgentPubKey,
+  CellId,
+  ConstraintViolation,
   EconomicResourceRow,
   GovernanceRule,
   GroupDescriptor,
@@ -28,9 +32,24 @@ import type {
   PersonRole,
   PropertyRegime,
   ResourceNature,
+  ResourceScope,
+  ResourceSpecificationInput,
   ResourceSpecificationListing,
+  Rivalry,
+  RuleData,
+  GovernanceRuleInput,
+  LogEconomicEventInput,
+  VfAction,
+  VfCommitment,
   VfEconomicEvent
 } from './types';
+import {
+  checkActionPermitted,
+  checkRuleDataPermitted,
+  checkScopeCoherence,
+  hasHardViolation,
+  type ResourceClassification
+} from './constraints';
 import { urlParam } from './url-state.svelte';
 import {
   INITIAL_EVENTS,
@@ -44,6 +63,7 @@ import {
   INITIAL_RESOURCES,
   INITIAL_RULES,
   INITIAL_SPEC_LISTINGS,
+  INITIAL_COMMITMENTS,
   INITIAL_TRANSITIONS,
   ME_AGENT_B64
 } from './mock';
@@ -151,7 +171,15 @@ const data = $state({
   groups: INITIAL_GROUPS.map((g) => ({ ...g })) as GroupDescriptor[],
   groupNdoHashes: { ...INITIAL_GROUP_NDOS } as Record<string, string[]>,
   groupMembers: { ...INITIAL_GROUP_MEMBERS } as Record<string, Member[]>,
-  transitions: { ...INITIAL_TRANSITIONS } as Record<string, NdoTransitionHistoryEvent[]>
+  transitions: { ...INITIAL_TRANSITIONS } as Record<string, NdoTransitionHistoryEvent[]>,
+  // Layer 1 and Layer 2 collections live here rather than being read straight
+  // off the INITIAL_* constants, because a create has to show up on the next
+  // screen (ISA criterion 6) and a module constant cannot carry that.
+  specListings: INITIAL_SPEC_LISTINGS.map((l) => ({ ...l })) as ResourceSpecificationListing[],
+  resources: structuredClone(INITIAL_RESOURCES) as Record<string, EconomicResourceRow[]>,
+  rules: structuredClone(INITIAL_RULES) as Record<string, GovernanceRule[]>,
+  events: structuredClone(INITIAL_EVENTS) as Record<string, VfEconomicEvent[]>,
+  commitments: structuredClone(INITIAL_COMMITMENTS) as Record<string, VfCommitment[]>
 });
 
 export const persons: Person[] = INITIAL_PERSONS;
@@ -309,9 +337,171 @@ export const groupStore = {
 
 // ── resourceStore ───────────────────────────────────────────────────────────
 
+/** Production surfaces a failed write as a message under the form. `?state=error`
+ *  is what drives it here, since a lookup against module state cannot fail. */
+const storeError = (verb: string) => (ds() === 'error' ? `Failed to ${verb}: the conductor rejected the write.` : null);
+
 export const resourceStore = {
-  get resourceSpecificationListings(): ResourceSpecificationListing[] { return INITIAL_SPEC_LISTINGS; },
-  fetchAllResourceSpecifications() { return Promise.resolve(); }
+  get resourceSpecificationListings(): ResourceSpecificationListing[] { return data.specListings; },
+  fetchAllResourceSpecifications() { return Promise.resolve(); },
+  get errorMessage() { return storeError('create'); },
+
+  /** Layer 1 activation. Refuses on a Hard scope violation, the way the zome does. */
+  createResourceSpecification(input: ResourceSpecificationInput, _cellId?: CellId): Promise<ActionHash | null> {
+    const ndo = data.ndos.find((n) => n.hash === input.ndo_identity_hash);
+    const ctx: ResourceClassification = {
+      property_regime: (ndo?.property_regime ?? 'Private') as PropertyRegime,
+      resource_nature: (ndo?.resource_nature ?? 'Physical') as ResourceNature,
+      rivalry_override: (ndo?.rivalry_override ?? null) as Rivalry | null
+    };
+    const scopeViolation = checkScopeCoherence(ctx, input.scope);
+    if (scopeViolation && scopeViolation.severity === 'Hard') return Promise.resolve(null);
+
+    const hash = mockHash('uhC0k');
+    data.specListings = [
+      ...data.specListings,
+      {
+        action_hash: hash,
+        specification: {
+          name: input.name,
+          description: input.description,
+          category: input.category,
+          image_url: input.image_url,
+          tags: input.tags,
+          is_active: true,
+          scope: input.scope,
+          ndo_identity_hash: input.ndo_identity_hash
+        }
+      }
+    ];
+    data.resources[hash] = [];
+    for (const nested of input.governance_rules) {
+      data.rules[hash] = [
+        ...(data.rules[hash] ?? []),
+        {
+          rule_data: nested.rule_data,
+          enforced_by: nested.enforced_by,
+          ndo_identity_hash: input.ndo_identity_hash,
+          property_regime: ctx.property_regime,
+          resource_nature: ctx.resource_nature,
+          rivalry_override: ctx.rivalry_override ?? undefined
+        }
+      ];
+    }
+    return Promise.resolve(hash);
+  },
+
+  /** Attaches a typed rule. Refuses on Hard, accepts on Soft, like the zome. */
+  createGovernanceRule(input: GovernanceRuleInput, _cellId?: CellId): Promise<boolean> {
+    const ctx: ResourceClassification = {
+      property_regime: input.property_regime,
+      resource_nature: input.resource_nature,
+      rivalry_override: input.rivalry_override
+    };
+    if (hasHardViolation(checkRuleDataPermitted(ctx, input.rule_data))) return Promise.resolve(false);
+    const key = input.specification_hash ?? input.ndo_identity_hash;
+    data.rules[key] = [
+      ...(data.rules[key] ?? []),
+      {
+        rule_data: input.rule_data,
+        enforced_by: input.enforced_by,
+        ndo_identity_hash: input.ndo_identity_hash,
+        property_regime: input.property_regime,
+        resource_nature: input.resource_nature,
+        rivalry_override: input.rivalry_override
+      }
+    ];
+    return Promise.resolve(true);
+  },
+
+  /** The dry-run path: the form calls this as it changes and renders the verdict. */
+  checkRuleDataConstraints(
+    input: { property_regime: PropertyRegime; resource_nature: ResourceNature; rivalry_override?: Rivalry; rule_data: RuleData },
+    _cellId?: CellId
+  ): Promise<ConstraintViolation[]> {
+    return Promise.resolve(checkRuleDataPermitted(input, input.rule_data));
+  },
+
+  /** Same dry run for the scope lock SpecificationCreateModal needs (REQ-RES-03). */
+  checkScopeConstraints(
+    input: { property_regime: PropertyRegime; resource_nature: ResourceNature; rivalry_override?: Rivalry; scope: ResourceScope },
+    _cellId?: CellId
+  ): Promise<ConstraintViolation[]> {
+    const v = checkScopeCoherence(input, input.scope);
+    return Promise.resolve(v ? [v] : []);
+  }
+};
+
+// ── governanceStore ─────────────────────────────────────────────────────────
+
+export const governanceStore = {
+  get errorMessage() { return storeError('write'); },
+
+  getCommitments(ndoHash: string): VfCommitment[] { return data.commitments[ndoHash] ?? []; },
+
+  proposeCommitment(
+    input: { action: VfAction; provider: AgentPubKey; due_date: number; note: string | null; ndo_identity_hash: ActionHash },
+    _cellId?: CellId
+  ): Promise<ActionHash | null> {
+    const ndo = data.ndos.find((n) => n.hash === input.ndo_identity_hash);
+    const ctx: ResourceClassification = {
+      property_regime: (ndo?.property_regime ?? 'Private') as PropertyRegime,
+      resource_nature: (ndo?.resource_nature ?? 'Physical') as ResourceNature,
+      rivalry_override: (ndo?.rivalry_override ?? null) as Rivalry | null
+    };
+    if (hasHardViolation(checkActionPermitted(ctx, input.action))) return Promise.resolve(null);
+    const hash = mockHash('uhCkk');
+    data.commitments[input.ndo_identity_hash] = [
+      ...(data.commitments[input.ndo_identity_hash] ?? []),
+      {
+        action: input.action,
+        provider: input.provider,
+        receiver: ME_AGENT_B64,
+        resource_inventoried_as: null,
+        resource_conforms_to: null,
+        input_of: null,
+        due_date: input.due_date,
+        note: input.note,
+        committed_at: Date.now() * 1000,
+        ndo_identity_hash: input.ndo_identity_hash
+      }
+    ];
+    return Promise.resolve(hash);
+  },
+
+  logEconomicEvent(input: LogEconomicEventInput, _cellId?: CellId): Promise<ActionHash | null> {
+    const ndo = data.ndos.find((n) => n.hash === input.ndo_identity_hash);
+    const ctx: ResourceClassification = {
+      property_regime: (ndo?.property_regime ?? 'Private') as PropertyRegime,
+      resource_nature: (ndo?.resource_nature ?? 'Physical') as ResourceNature,
+      rivalry_override: (ndo?.rivalry_override ?? null) as Rivalry | null
+    };
+    if (hasHardViolation(checkActionPermitted(ctx, input.action))) return Promise.resolve(null);
+    const hash = mockHash('uhCkk');
+    const key = input.resource_inventoried_as;
+    data.events[key] = [
+      ...(data.events[key] ?? []),
+      {
+        action: input.action,
+        provider: input.provider,
+        receiver: input.receiver,
+        resource_inventoried_as: key,
+        affects: key,
+        resource_quantity: input.resource_quantity,
+        event_time: Date.now() * 1000,
+        note: input.note,
+        ndo_identity_hash: input.ndo_identity_hash
+      }
+    ];
+    return Promise.resolve(hash);
+  },
+
+  checkActionConstraints(
+    input: { property_regime: PropertyRegime; resource_nature: ResourceNature; rivalry_override?: Rivalry; action: VfAction },
+    _cellId?: CellId
+  ): Promise<ConstraintViolation[]> {
+    return Promise.resolve(checkActionPermitted(input, input.action));
+  }
 };
 
 // ── service-shaped lookups (what the Effect services return) ────────────────
@@ -362,16 +552,16 @@ export const personService = {
 
 export const resourceService = {
   getResourcesBySpecification(specHash: string): EconomicResourceRow[] {
-    return INITIAL_RESOURCES[specHash] ?? [];
+    return data.resources[specHash] ?? [];
   },
   getGovernanceRules(specHash: string): GovernanceRule[] {
-    return INITIAL_RULES[specHash] ?? [];
+    return data.rules[specHash] ?? [];
   }
 };
 
 export const governanceService = {
   getEventsByResource(resourceHash: string): VfEconomicEvent[] {
-    return INITIAL_EVENTS[resourceHash] ?? [];
+    return data.events[resourceHash] ?? [];
   }
 };
 
