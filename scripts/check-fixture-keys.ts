@@ -27,6 +27,7 @@
  *   bun run check:fixture
  */
 
+import { readFileSync, writeFileSync } from 'node:fs';
 import {
   INITIAL_EVENTS,
   INITIAL_GROUPS,
@@ -60,6 +61,8 @@ type Role =
   | 'groupNdos.value'
   | 'groupMembers.key'
   | 'person.agent_pub_key';
+
+const has = (flag: string) => process.argv.includes(`--${flag}`);
 
 const roles = new Map<Role, Set<string>>();
 const note = (role: Role, value: string | null | undefined) => {
@@ -162,16 +165,24 @@ const DECLARED: Record<string, string> = {
 };
 
 const roleList = [...roles.entries()];
-const collisions: Array<{ pair: string; values: string[] }> = [];
+const collisions: Array<{ pair: string; values: string[]; separating: number }> = [];
 
 for (let i = 0; i < roleList.length; i++) {
   for (let j = i + 1; j < roleList.length; j++) {
     const [ra, va] = roleList[i];
     const [rb, vb] = roleList[j];
     const shared = [...va].filter((v) => vb.has(v));
-    if (shared.length) {
-      collisions.push({ pair: [ra, rb].sort().join('|'), values: shared });
-    }
+    if (!shared.length) continue;
+    // Separating instances: values one role holds and the other does not. One is
+    // enough. A pair with zero of them is a question that cannot be posed; a pair
+    // with one is a question that has an answer, and the separating row is the
+    // proof. Counting only collisions makes those two look identical in the
+    // report, which under-states the fixture's own progress: `ndo.hash` and
+    // `spec.action_hash` collide four times and are separated once, by "Solar
+    // Array Mounting Rig", so that query is now demonstrably answerable.
+    const separating =
+      [...va].filter((v) => !vb.has(v)).length + [...vb].filter((v) => !va.has(v)).length;
+    collisions.push({ pair: [ra, rb].sort().join('|'), values: shared, separating });
   }
 }
 
@@ -183,28 +194,89 @@ console.log('definitional. The undeclared ones are parity questions nobody can a
 console.log('');
 
 const undeclared = collisions.filter((c) => !(c.pair in DECLARED));
+const unposable = undeclared.filter((c) => c.separating === 0);
+const answerable = undeclared.filter((c) => c.separating > 0);
 
 for (const c of collisions.filter((c) => c.pair in DECLARED)) {
-  console.log(`  declared    ${c.pair}  (${c.values.length})`);
+  console.log(`  declared    ${c.pair}  (${c.values.length} colliding)`);
 }
 console.log('');
 
-if (undeclared.length === 0) {
-  console.log('No undeclared collisions. Every shared value has a stated reason.');
+for (const c of answerable) {
+  console.log(
+    `  separated   ${c.pair}  (${c.values.length} colliding, ${c.separating} separating)`
+  );
+}
+if (answerable.length) {
+  console.log('      Undeclared, but at least one value distinguishes the two roles, so a query');
+  console.log('      keyed on either is falsifiable against this fixture.');
+  console.log('');
+}
+
+if (unposable.length === 0) {
+  console.log('No unposable pairs. Every undeclared collision has a separating instance.');
 } else {
-  for (const c of undeclared) {
-    console.log(`  UNDECLARED  ${c.pair}`);
+  for (const c of unposable) {
+    console.log(`  UNPOSABLE   ${c.pair}`);
     for (const v of c.values) console.log(`      ${v}`);
-    console.log('      A query keyed on either role is indistinguishable from the other here.');
-    console.log('      Either seed a discriminating row, or add the pair to DECLARED with a reason.');
+    console.log('      Every value in one role is in the other, so a query keyed on either is');
+    console.log('      indistinguishable. Seed a discriminating row, or declare the pair.');
   }
 }
 
 console.log('');
-console.log(`${roleList.length} key roles, ${collisions.length} colliding pairs, ${undeclared.length} undeclared`);
+console.log(
+  `${roleList.length} key roles, ${collisions.length} colliding pairs: ` +
+    `${collisions.length - undeclared.length} declared, ${answerable.length} separated, ${unposable.length} unposable`
+);
+/**
+ * The ratchet.
+ *
+ * Two obvious designs are both wrong. A tool that fails on every undeclared pair
+ * gets its list declared away within a week and the finding disappears. A tool
+ * that can never fail gets ignored, which is the same death more slowly.
+ *
+ * So: exit 0 on everything in the baseline, non-zero only on a pair that is NEW.
+ * Nobody is asked to retrofit the existing set, and nobody can add another
+ * without writing down why at the moment they create it, which is the one moment
+ * the reason is actually known. Declaring away a new pair then costs a sentence
+ * somebody has to believe, rather than a line added to silence a build.
+ */
+const BASELINE_PATH = new URL('./fixture-keys.baseline.json', import.meta.url);
+let baseline: string[] = [];
+try {
+  baseline = JSON.parse(readFileSync(BASELINE_PATH, 'utf8'));
+} catch {
+  baseline = [];
+}
+
+// `--write-baseline` records the current undeclared set as accepted. Run it
+// deliberately, never to clear a red: the point of the ratchet is that a new pair
+// costs a written reason at the moment it is created.
+if (has('write-baseline')) {
+  const pairs = [...new Set(undeclared.map((c) => c.pair))].sort();
+  writeFileSync(BASELINE_PATH, JSON.stringify(pairs, null, 2) + '\n');
+  console.log('');
+  console.log(`Baseline written: ${pairs.length} pairs recorded as accepted.`);
+  process.exit(0);
+}
+
+const known = new Set(baseline);
+const novel = undeclared.filter((c) => !known.has(c.pair));
+
 console.log('');
-console.log('This exits 0 by design. An undeclared collision is not a build break, it is a');
-console.log('parity question the fixture cannot currently be asked, and the list is the');
-console.log('deliverable. Closing one means seeding a row that separates the two roles, the');
-console.log('way "Solar Array Mounting Rig" separates a specification hash from an NDO hash.');
-console.log('Turning the list green by declaring everything would delete the finding.');
+if (novel.length === 0) {
+  console.log('Ratchet: no collision pairs beyond the recorded baseline.');
+} else {
+  console.log('Ratchet: NEW collision pairs, absent from the baseline.');
+  for (const c of novel) {
+    console.log(`  NEW  ${c.pair}  (${c.values.length} colliding, ${c.separating} separating)`);
+  }
+  console.log('');
+  console.log('A new pair means two roles that used to be distinguishable no longer are, or a');
+  console.log('new role was added onto existing values. Seed a row that separates them, add the');
+  console.log('pair to DECLARED with a reason, or record it in the baseline deliberately.');
+  console.log(`Baseline: ${BASELINE_PATH.pathname}`);
+}
+
+if (novel.length > 0) process.exit(1);
