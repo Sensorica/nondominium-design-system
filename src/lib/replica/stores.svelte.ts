@@ -59,6 +59,7 @@ import {
   INITIAL_LOBBY_PROFILE,
   INITIAL_MY_ROLES,
   INITIAL_NDOS,
+  INITIAL_NDO_MEMBERS,
   INITIAL_PERSONS,
   INITIAL_RESOURCES,
   INITIAL_RULES,
@@ -179,7 +180,8 @@ const data = $state({
   resources: structuredClone(INITIAL_RESOURCES) as Record<string, EconomicResourceRow[]>,
   rules: structuredClone(INITIAL_RULES) as Record<string, GovernanceRule[]>,
   events: structuredClone(INITIAL_EVENTS) as Record<string, VfEconomicEvent[]>,
-  commitments: structuredClone(INITIAL_COMMITMENTS) as Record<string, VfCommitment[]>
+  commitments: structuredClone(INITIAL_COMMITMENTS) as Record<string, VfCommitment[]>,
+  ndoMembers: structuredClone(INITIAL_NDO_MEMBERS) as Record<string, Member[]>
 });
 
 export const persons: Person[] = INITIAL_PERSONS;
@@ -541,8 +543,40 @@ export const ndoService = {
       }
     ];
   },
-  /** Production returns a stub error here; the screen renders that message. */
-  getNdoMembers(): Member[] { return []; }
+  // NDO membership. This was a hardcoded empty array with a comment saying
+  // "production returns a stub error here", and NdoView rendered a matching
+  // "not yet implemented on the DHT" notice. That was true of the app until
+  // PR #129 (join, list, is-member on the per-NDO cell) and has been false
+  // since. The replica kept telling reviewers that a shipped feature does not
+  // exist, which is worse than omitting it: an omission looks like a gap, and
+  // this looked like an answer.
+  //
+  // The app's `NdoView` holds `ndoMembers`, `membersLoading` and `membersError`
+  // in its own `$state` and fills them from `NdoServiceTag.getNdoMembers`.
+  // `joinNdo` is idempotent behind an `is_ndo_member` guard, so joining twice
+  // is a no-op rather than a duplicate row, and that is mirrored here.
+
+  isNdoMember(hash: string): boolean {
+    return (data.ndoMembers[hash] ?? []).some((m) => m.id === 'me');
+  },
+
+  getNdoMembers(hash: string): Member[] {
+    if (EMPTY_STATES.has(ds())) return [];
+    return data.ndoMembers[hash] ?? [];
+  },
+
+  joinNdo(hash: string): Promise<boolean> {
+    if (this.isNdoMember(hash)) return Promise.resolve(true);
+    data.ndoMembers[hash] = [
+      ...(data.ndoMembers[hash] ?? []),
+      {
+        id: 'me',
+        name: appContext.lobbyUserProfile?.nickname ?? 'You',
+        role: 'Member'
+      }
+    ];
+    return Promise.resolve(true);
+  }
 };
 
 export const personService = {

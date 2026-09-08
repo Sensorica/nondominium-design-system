@@ -243,6 +243,28 @@ export const INITIAL_GROUP_NDOS: Record<string, string[]> = {
   ]
 };
 
+// NDO membership, per NDO identity hash. Distinct from group membership: an NDO
+// is its own cloned cell (ADR-010) and joining a group does not join you to the
+// NDOs anchored in it. PR #129 shipped join, list and is-member on that cell;
+// the prototype rendered "not yet implemented on the DHT" until 2026-09-08,
+// which was true before #129 and has been false since.
+//
+// The Solar Array carries four members and the CNC Router two, so a reviewer can
+// see a populated list and a sparse one. The Sensor Firmware deliberately has no
+// entry at all, which is how the empty state gets a surface: an NDO nobody has
+// joined renders the invitation to join rather than an empty table. `me` is
+// absent from all three, so the Join button has something to do on every one.
+export const INITIAL_NDO_MEMBERS: Record<string, Member[]> = {
+  'uhC0kVX5k7dL2mPqR8sT1uW4xY7zA0bC3dE6fG9h': [
+    { id: 'm2', name: 'Tomas Belén', role: 'Member' },
+    { id: 'm3', name: 'Kesse Nyarko', role: 'Member' },
+    { id: 'm4', name: 'Mira Solano', role: 'Member' }
+  ],
+  'uhC0kNb8j3fK9pQ2rS5tU8vW1xY4zA7bC0dE3fG6': [
+    { id: 'm3', name: 'Kesse Nyarko', role: 'Member' }
+  ]
+};
+
 export const INITIAL_GROUP_MEMBERS: Record<string, Member[]> = {
   'sensorica-lab-7f3a': [
     { id: 'm1', name: 'Ada Riverstone' },
