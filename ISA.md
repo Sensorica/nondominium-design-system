@@ -351,3 +351,21 @@ Phases 1 to 5 built the replica and proved it against the app on 2026-08-11. Sin
 - `FILES` omits `HolochainProvider.svelte` and `lobby/GroupSidebar.svelte`, so the green number above is measured over 24 of the app's 26 components.
 
 - `origin/master` (`df8c1be`) does not contain local `master`'s two commits (`97575ad`, `5a90171`); the Layer 1 rule vocabulary from `5a90171` may have been lost in the rewrite. Claim 20 settles it.
+
+### What the phase learned, and where it stopped
+
+**The baseline in the phase header was wrong when it was written.** `d9eb38b` is the local `dev` checkout, seven days behind `origin/dev` at `20adb11`, which carries PR #132 (24 files, 2183 insertions in `ui/src`). Every claim in this phase measures against `20adb11`. The correction came from the peer session and was re-derived here from `git rev-parse`, `git log dev..origin/dev` and `git ls-tree` before adoption. The app has 30 components at that revision, not 26, and four of the six the replica was missing arrived with #132.
+
+**Claim 15 closed.** `scripts/check-fidelity.ts` now derives its file list from the app at a pinned revision instead of a hardcoded array. That removes the class of defect rather than its instances: the previous version was blind to two components, and #132 added four more it would never have seen. Commit `78e7054`.
+
+**Claim 19 closed.** All six classification enums in `src/lib/replica/types.ts` match `crates/shared/src/types.rs` at `20adb11` exactly: LifecycleStage 10, PropertyRegime 7, ResourceNature 5, Rivalry 2, ResourceScope 3, OperationalState 7. `RuleData`'s four discriminants and their payload structs match `crates/shared/src/rule_data.rs`.
+
+**Claim 20 closed, and the 2026-08-18 defects with it.** The three defects that plan recorded are gone at the type level: the invented rule names (`AccessControl`, `TransferPolicy`) are replaced by the four real `RuleData` variants, `OperationalState` is a separate seven-value axis rather than a lifecycle badge, and `Rivalry` and `ResourceScope` both exist. What is not yet done is the badge layer: the registry and playbook still need variants for them, and `src/routes/scenarios/governance-review/+page.svelte` still asserts in prose that `rule_data` is an untyped JSON string, which stopped being true at #132. That page needs a rewrite, not a type patch.
+
+**Claim 16 is open at 3 errors, down from 25.** `bunx svelte-check` fell from 25 to 3 as the types landed, and every error it raised was a real replica-versus-app gap rather than a type-level nuisance: three property regimes missing from two filter maps, a dropped rivalry override field, a two-field `Person`. Two of the remaining three are in the `ndo/` half; the third is the governance-review scenario above.
+
+**Anti-claim held.** `../nondominium` was never modified. Every app-side read went through `git show <rev>:<path>`.
+
+#### Why this phase stopped where it did
+
+The run was coordinated as a two-peer covenant, and the covenant's ledger stopped being trustworthy. Both handles were driven by more than one session; `chains/ds-shell.jsonl` acquired a hard defect this session did not author, accusing the hold owner of intruding on its own held files, and one acknowledged append is missing from the chain entirely. An append-only log with two writers under one identity loses records, and `convene replay` cannot see the hole because the survivors still chain correctly. The code work is unaffected and is committed with only its author's paths staged (`78e7054`, `4d65d7a`). The coordination substrate is what needs Soushi's ruling, because he spawned the sessions and no peer can settle it from inside.
