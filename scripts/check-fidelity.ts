@@ -178,6 +178,41 @@ function utilityClasses(text: string): string[] {
   return out.filter((t) => t && !t.startsWith('{') && !t.startsWith('/')).sort();
 }
 
+/**
+ * The visible text a file renders: the literal copy between its tags.
+ *
+ * This exists because of what a class list cannot say. The instrument has no
+ * vocabulary for "this button is missing", so it reports the button's absence
+ * as `bg-blue-600 disabled:cursor-not-allowed text-white` sitting in the
+ * app-only column. Read as styling that is noise, and it was skimmed twice by
+ * two sessions on 2026-09-08, hiding a whole spec-creation gate: four missing
+ * props, a disabled button and an amber notice, all of it announced by the
+ * instrument in the only words it had. Text is legible where classes are not:
+ * `Cannot create while NDO is` names the feature outright.
+ */
+function visibleText(markup: string): string[] {
+  // Order matters: braces first, tags second. A Svelte handler like
+  // `onclick={() => { ... }}` contains a `>`, which terminates the tag matcher
+  // early and spills the rest of the attribute list out as if it were copy.
+  // Stripping expressions first removes every `>` that is not a tag's own.
+  const stripped = markup
+    .replace(/<script[\s\S]*?<\/script>/g, ' ')
+    .replace(/<style[\s\S]*?<\/style>/g, ' ')
+    .replace(/<!--[\s\S]*?-->/g, ' ')
+    .replace(/\{[^{}]*(?:\{[^{}]*(?:\{[^{}]*\}[^{}]*)*\}[^{}]*)*\}/g, ' ')
+    .replace(/<[^>]*>/g, '\n');
+  return [
+    ...new Set(
+      stripped
+        .split('\n')
+        .map((t) => t.replace(/\s+/g, ' ').trim())
+        // An attribute fragment that survived anyway is not copy: it has an
+        // `="` in it, and no sentence a user reads does.
+        .filter((t) => t.length > 3 && /[a-z]{3}/i.test(t) && !t.includes('="'))
+    )
+  ].sort();
+}
+
 /** Crude line-level divergence, enough to say how much behaviour differs. */
 function divergentLines(a: string, b: string): number {
   const left = new Map<string, number>();
@@ -202,6 +237,9 @@ console.log(`Replica fidelity: ${DST}`);
 console.log(`against          ${APP}`);
 console.log(`at revision      ${WORKTREE ? resolvedRev : `${REV} = ${resolvedRev}`}`);
 console.log('='.repeat(72));
+console.log('A MISSING UI row is a feature list, not a palette. A class or a line of copy the');
+console.log('app emits and the replica does not is a thing the replica cannot render.');
+console.log('');
 
 if (WORKTREE) {
   console.warn('WARNING: --worktree measures an unpinned checkout. This result names no commit');
@@ -257,9 +295,24 @@ for (const file of FILES) {
     classDrift++;
     const onlyApp = [...new Set(ca)].filter((c) => !cb.includes(c));
     const onlyReplica = [...new Set(cb)].filter((c) => !ca.includes(c));
-    console.log(`  CLASS DRIFT           ${file}`);
-    if (onlyApp.length) console.log(`      app only:     ${onlyApp.join(' ')}`);
-    if (onlyReplica.length) console.log(`      replica only: ${onlyReplica.join(' ')}`);
+    const ta = visibleText(a);
+    const tb = visibleText(b);
+    const textOnlyApp = ta.filter((t) => !tb.includes(t));
+    const textOnlyReplica = tb.filter((t) => !ta.includes(t));
+    // Say what it means. A class the app emits and the replica does not is a
+    // feature the replica does not have, so the row is named for the finding
+    // rather than for the measurement that produced it.
+    console.log(`  MISSING UI            ${file}`);
+    if (textOnlyApp.length) {
+      console.log(`      copy the app renders and the replica does not:`);
+      for (const t of textOnlyApp) console.log(`        "${t}"`);
+    }
+    if (textOnlyReplica.length) {
+      console.log(`      copy the replica renders and the app does not:`);
+      for (const t of textOnlyReplica) console.log(`        "${t}"`);
+    }
+    if (onlyApp.length) console.log(`      classes, app only:     ${onlyApp.join(' ')}`);
+    if (onlyReplica.length) console.log(`      classes, replica only: ${onlyReplica.join(' ')}`);
   } else {
     const mark = sameBytes ? 'byte-identical' : 'same classes ';
     const note = scriptDelta > 0 ? `  [script ±${scriptDelta}]` : '';
