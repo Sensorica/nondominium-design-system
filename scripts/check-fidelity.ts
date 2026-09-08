@@ -125,6 +125,27 @@ function appComponents(): string[] {
   return raw.filter((p) => p.endsWith('.svelte')).sort();
 }
 
+/**
+ * Components the replica deliberately does not mirror one to one, each with the
+ * reason it is exempt. This list is the only legitimate way for a component to
+ * be absent or renamed: anything else missing is a real gap, and an unlisted
+ * replica file with no original is an invention.
+ *
+ * The bar for adding an entry is a fact about the app, verified at the pinned
+ * revision, not a preference about the prototype.
+ */
+const EXCEPTIONS: Record<string, { reason: string; replica?: string }> = {
+  'lobby/GroupSidebar.svelte': {
+    reason:
+      'Dead in the app: `git grep GroupSidebar` over ui/src at 20adb11 returns only its own definition, so no route and no component imports it, and the group create/join affordances it holds ship from shell/Sidebar.svelte instead. Replicated anyway, deliberately. A design system exists to give a designer something to work on, dead-in-app is a fact to record rather than a reason to omit, and this is a component somebody may well wire up. The note is the record; the file is the deliverable.'
+  },
+  'HolochainProvider.svelte': {
+    replica: 'ConnectionState.svelte',
+    reason:
+      "Replicated under a different name and reduced to its three renderable states (connecting, error, disconnected). The app component is a connection wrapper whose body is a conductor call; the prototype has no conductor, so what it can faithfully hold is the wrapper's markup, which is what ConnectionState carries."
+  }
+};
+
 /** Everything after the script block: the part that renders. */
 function markup(source: string): string {
   const i = source.indexOf('</script>');
@@ -192,11 +213,29 @@ let classDrift = 0;
 let missing = 0;
 const behaviouralDelta: Array<[string, number]> = [];
 
+/** Replica paths claimed by an exception, so they are never reported as orphans. */
+const ALIASED = new Set(
+  Object.values(EXCEPTIONS)
+    .map((e) => e.replica)
+    .filter((r): r is string => Boolean(r))
+);
+const annotated: Array<[string, string]> = [];
+
 for (const file of FILES) {
-  const replicaPath = join(DST, file);
+  const exception = EXCEPTIONS[file];
+  const replicaPath = join(DST, exception?.replica ?? file);
+  if (exception) annotated.push([file, exception.reason]);
   if (!existsSync(replicaPath)) {
     console.log(`  MISSING IN REPLICA    ${file}`);
     missing++;
+    continue;
+  }
+  if (exception?.replica) {
+    // An aliased component is not a markup comparison: it exists under a
+    // different name precisely because it could not be copied as it stands.
+    // Recording the alias is the whole claim; comparing classes would fail on a
+    // divergence the exception already accounts for.
+    console.log(`  ALIASED               ${file}  →  ${exception.replica}`);
     continue;
   }
   const appSource = appFile(file);
@@ -233,9 +272,15 @@ const orphans = FILES.length
   ? execFileSync('find', [DST, '-name', '*.svelte'], { encoding: 'utf8' })
       .split('\n')
       .map((p) => p.replace(DST + '/', '').trim())
-      .filter((p) => p.endsWith('.svelte') && !FILES.includes(p))
+      .filter((p) => p.endsWith('.svelte') && !FILES.includes(p) && !ALIASED.has(p))
   : [];
 for (const orphan of orphans) console.log(`  NO ORIGINAL           ${orphan}`);
+
+if (annotated.length) {
+  console.log('');
+  console.log('Deliberate divergence, each with the fact it rests on:');
+  for (const [file, reason] of annotated) console.log(`  ${file}\n      ${reason}`);
+}
 
 console.log('');
 console.log(`${FILES.length} components in the app at ${resolvedRev.slice(0, 12)}`);
