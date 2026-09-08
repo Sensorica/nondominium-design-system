@@ -441,6 +441,25 @@ export const governanceStore = {
 
   getCommitments(ndoHash: string): VfCommitment[] { return data.commitments[ndoHash] ?? []; },
 
+  /**
+   * Every commitment on the cell, unfiltered, mirroring `fetchAllCommitments`.
+   *
+   * `getCommitments(ndoHash)` above answers the same question with a narrower
+   * query, and that difference is the last declared divergence in the replica.
+   * It matters more than it looks: the app's `ActivityTab` reads ALL commitments
+   * and filters client-side on `ndo_identity_hash`, so what a reviewer is looking
+   * at is a screen whose cost grows with the whole cell rather than with this
+   * NDO. A prototype that pre-filters shows the same rows and hides that fact,
+   * and hiding it is how a performance question stops being askable from the kit.
+   *
+   * The `data.commitments` map is keyed by NDO hash purely for cheap writes, so
+   * flattening here is an implementation detail rather than a second source.
+   */
+  fetchAllCommitments(_cellId?: CellId): Promise<VfCommitment[]> {
+    if (EMPTY_STATES.has(ds())) return Promise.resolve([]);
+    return Promise.resolve(Object.values(data.commitments).flat());
+  },
+
   proposeCommitment(
     input: { action: VfAction; provider: AgentPubKey; due_date: number; note: string | null; ndo_identity_hash: ActionHash },
     _cellId?: CellId
