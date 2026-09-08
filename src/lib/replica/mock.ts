@@ -310,6 +310,27 @@ export const INITIAL_SPEC_LISTINGS: ResourceSpecificationListing[] = [
     }
   },
   {
+    // The ONE listing whose action_hash differs from its ndo_identity_hash, and it
+    // exists to make two queries separable that the rest of this fixture cannot
+    // tell apart. Every other listing here was seeded with action_hash equal to
+    // the NDO hash, and `INITIAL_RESOURCES` was keyed by those same values, so
+    // `getResourcesBySpecification(ndoHash)` and a proper walk through
+    // `specificationsForNdo` returned identical rows. A walk that used the wrong
+    // key was indistinguishable from a correct one, and no typecheck, class
+    // comparison or browser pass could say otherwise: the instruments were fine,
+    // the data could not answer the question. A fixture whose keys collide cannot
+    // discriminate between two queries that differ only in which key they use.
+    action_hash: 'uhC0kSpec2Mount9rT4vX7zB1dF5hK8mQ2sU6wY0aC3',
+    specification: {
+      name: 'Solar Array Mounting Rig',
+      description: 'Roof mounting rails and ballast for the panel array, specified separately from the panels.',
+      category: 'Fabrication',
+      is_active: true,
+      scope: 'Network',
+      ndo_identity_hash: 'uhC0kVX5k7dL2mPqR8sT1uW4xY7zA0bC3dE6fG9h'
+    }
+  },
+  {
     action_hash: 'uhC0kNb8j3fK9pQ2rS5tU8vW1xY4zA7bC0dE3fG6',
     specification: {
       name: 'CNC Router Cell',
@@ -372,6 +393,20 @@ export const INITIAL_RESOURCES: Record<string, EconomicResourceRow[]> = {
         custodian: 'uhCAkM1p8dR4tY7uI0oP3aS6dF9gH2jK5lZ8xC1vB4nM7',
         current_location: 'Bench 3',
         operational_state: 'InMaintenance'
+      }
+    }
+  ],
+  // Keyed by the SECOND Solar Array specification, not by the NDO hash. The
+  // specification walk reaches this row; a query keyed on the NDO hash does not.
+  'uhC0kSpec2Mount9rT4vX7zB1dF5hK8mQ2sU6wY0aC3': [
+    {
+      actionHash: 'uhCkkR4d5E6f7G8h9J0k1L2m3N4p5Q6r7S8t9U0v1W2x',
+      resource: {
+        quantity: 8,
+        unit: 'rail',
+        custodian: 'uhCAkZ4x0cV7bN2mQ5wE8rT1yU4iO7pA0sD3fG6hJ9kL2',
+        current_location: 'Roof, north run',
+        operational_state: 'InStorage'
       }
     }
   ],
@@ -503,6 +538,40 @@ export const INITIAL_RULE_VIOLATIONS: Record<string, ConstraintViolation[]> = {
 // #132 added `ndo_identity_hash` to every event, which is what binds an event
 // to the per-NDO cell it was written in.
 export const INITIAL_EVENTS: Record<string, VfEconomicEvent[]> = {
+  // Reachable only through the second Solar Array specification.
+  'uhCkkR4d5E6f7G8h9J0k1L2m3N4p5Q6r7S8t9U0v1W2x': [
+    {
+      action: 'Move',
+      provider: 'uhCAkZ4x0cV7bN2mQ5wE8rT1yU4iO7pA0sD3fG6hJ9kL2',
+      receiver: ME_AGENT_B64,
+      resource_inventoried_as: 'uhCkkR4d5E6f7G8h9J0k1L2m3N4p5Q6r7S8t9U0v1W2x',
+      affects: 'uhCkkR4d5E6f7G8h9J0k1L2m3N4p5Q6r7S8t9U0v1W2x',
+      resource_quantity: 8,
+      event_time: µs('2026-08-04'),
+      note: 'Rails carried up to the north run.',
+      ndo_identity_hash: 'uhC0kVX5k7dL2mPqR8sT1uW4xY7zA0bC3dE6fG9h'
+    }
+  ],
+  // THE ORPHAN, and the only reason `getAllEconomicEvents` exists. It carries the
+  // Solar Array's ndo_identity_hash, but its resource hangs off no specification
+  // of that NDO, so the specification walk cannot reach it by construction. The
+  // app handles this with a second pass over every event on the cell, filtered on
+  // ndo_identity_hash and deduped against the walk. Without a row of this shape
+  // the second pass is unfalsifiable: it would merge nothing, and a prototype
+  // missing it would render an activity feed that is silently short.
+  'uhCkkR9z8Y7x6W5v4U3t2S1r0Q9p8N7m6L5k4J3h2G1f': [
+    {
+      action: 'Cite',
+      provider: 'uhCAkQ9s5tG2hJ6kL9zX3cV7bN1mQ4wE7rT0yU3iO6pA9',
+      receiver: ME_AGENT_B64,
+      resource_inventoried_as: 'uhCkkR9z8Y7x6W5v4U3t2S1r0Q9p8N7m6L5k4J3h2G1f',
+      affects: 'uhCkkR9z8Y7x6W5v4U3t2S1r0Q9p8N7m6L5k4J3h2G1f',
+      resource_quantity: 1,
+      event_time: µs('2026-08-21'),
+      note: 'Array output cited in the watershed energy report.',
+      ndo_identity_hash: 'uhC0kVX5k7dL2mPqR8sT1uW4xY7zA0bC3dE6fG9h'
+    }
+  ],
   uhCkkR1a2B3c4D5e6F7g8H9j0K1l2M3n4P5q6R7s8T9u: [
     {
       action: 'Work',
