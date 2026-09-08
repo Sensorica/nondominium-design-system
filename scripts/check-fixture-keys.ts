@@ -164,8 +164,34 @@ const DECLARED: Record<string, string> = {
     'Transitively an NDO hash.'
 };
 
+
+/**
+ * Does this value trace to an NDO a reviewer can actually reach?
+ *
+ * SEPARATION IS NOT FALSIFIABILITY, and the tool claimed the second while
+ * measuring the first. Separation is a fact about the fixture: two roles differ
+ * on at least one value. Falsifiability also needs the exercised path: swapping
+ * the key has to change something somebody looks at. A pair separated only by a
+ * value on a terminal NDO, or on one no group points at, reports as separated
+ * while the swap stays invisible on every screen anyone opens.
+ *
+ * This is a floor, not a proof. It answers "is this value on an NDO the lobby
+ * lists and whose lifecycle is not terminal", which is cheap and derivable here.
+ * It does not answer "does a rendered screen read this value", which needs the
+ * screen map and a render. A reachable count is evidence that a separating
+ * instance is worth something; it is not evidence that anyone has looked.
+ */
+function isReachable(value: string): boolean {
+  const spec = INITIAL_SPEC_LISTINGS.find((l) => l.action_hash === value);
+  const ndoHash = spec?.specification.ndo_identity_hash ?? value;
+  const ndo = INITIAL_NDOS.find((n) => n.hash === ndoHash);
+  if (!ndo) return false;
+  if (ndo.lifecycle_stage === 'EndOfLife') return false;
+  return new Set(Object.values(INITIAL_GROUP_NDOS).flat()).has(ndoHash);
+}
+
 const roleList = [...roles.entries()];
-const collisions: Array<{ pair: string; values: string[]; separating: number }> = [];
+const collisions: Array<{ pair: string; values: string[]; separating: number; reachable: number }> = [];
 
 for (let i = 0; i < roleList.length; i++) {
   for (let j = i + 1; j < roleList.length; j++) {
@@ -180,9 +206,14 @@ for (let i = 0; i < roleList.length; i++) {
     // report, which under-states the fixture's own progress: `ndo.hash` and
     // `spec.action_hash` collide four times and are separated once, by "Solar
     // Array Mounting Rig", so that query is now demonstrably answerable.
-    const separating =
-      [...va].filter((v) => !vb.has(v)).length + [...vb].filter((v) => !va.has(v)).length;
-    collisions.push({ pair: [ra, rb].sort().join('|'), values: shared, separating });
+    const sepValues = [...va].filter((v) => !vb.has(v)).concat([...vb].filter((v) => !va.has(v)));
+    const reachable = sepValues.filter(isReachable).length;
+    collisions.push({
+      pair: [ra, rb].sort().join('|'),
+      values: shared,
+      separating: sepValues.length,
+      reachable
+    });
   }
 }
 
@@ -204,12 +235,14 @@ console.log('');
 
 for (const c of answerable) {
   console.log(
-    `  separated   ${c.pair}  (${c.values.length} colliding, ${c.separating} separating)`
+    `  separated   ${c.pair}  (${c.values.length} colliding, ${c.separating} separating, ${c.reachable} reachable)`
   );
 }
 if (answerable.length) {
-  console.log('      Undeclared, but at least one value distinguishes the two roles, so a query');
-  console.log('      keyed on either is falsifiable against this fixture.');
+  console.log('      Undeclared, but at least one value distinguishes the two roles. Separation is');
+  console.log('      a fact about the fixture; falsifiability also needs a rendered screen to read');
+  console.log('      that value. A pair separated only on an unreachable NDO reports separated');
+  console.log('      while the swap stays invisible, so the reachable count is the one to read.');
   console.log('');
 }
 
