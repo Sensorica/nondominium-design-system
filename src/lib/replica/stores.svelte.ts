@@ -615,6 +615,32 @@ export const resourceService = {
 export const governanceService = {
   getEventsByResource(resourceHash: string): VfEconomicEvent[] {
     return data.events[resourceHash] ?? [];
+  },
+
+  /**
+   * Every economic event on the cell, unfiltered. Mirrors `getAllEconomicEvents`.
+   *
+   * `ActivityTab` needs this as a SECOND pass, not as a replacement for the
+   * specification walk. The app does both: it walks the NDO's specifications and
+   * each specification's resources collecting their events, and then, under its
+   * own comment "Also include any agent-wide events that carry this ndo hash",
+   * reads every event on the cell and merges the ones whose `ndo_identity_hash`
+   * matches and that the walk did not already produce, deduping on the triple
+   * `(event_time, action, resource_quantity)`.
+   *
+   * The case that needs it is an event tagged to this NDO whose resource hangs
+   * off a specification the walk never visits. The walk cannot reach it by
+   * construction, so a prototype with only the walk renders an activity feed
+   * that is silently short, and short in a way no fixture will show you unless
+   * someone seeds exactly that shape.
+   *
+   * I argued this half was not divergent, on a grep window that ended four lines
+   * above the second query. It was wrong, and it was wrong in the direction that
+   * would have closed the gap while leaving it open.
+   */
+  getAllEconomicEvents(_cellId?: CellId): VfEconomicEvent[] {
+    if (EMPTY_STATES.has(ds())) return [];
+    return Object.values(data.events).flat();
   }
 };
 
