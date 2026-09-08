@@ -75,7 +75,17 @@ export const paths = {
   ndoDetail: (hash: string) => app(`/ndo/${encodeURIComponent(hash)}`),
   ndoTab: (hash: string, tab: 'governance' | 'composition' | 'activity') =>
     app(`/ndo/${encodeURIComponent(hash)}?tab=${tab}`),
-  ndoModal: (hash: string, modal: 'fork' | 'associate' | 'lifecycle') =>
+  ndoModal: (
+    hash: string,
+    modal:
+      | 'fork'
+      | 'associate'
+      | 'lifecycle'
+      | 'rule-edit'
+      | 'spec-create'
+      | 'commitment'
+      | 'event'
+  ) =>
     app(`/ndo/${encodeURIComponent(hash)}?modal=${modal}`),
   ndoJoin: (hash: string) => app(`/ndo/${encodeURIComponent(hash)}?join=1`),
   ndoState: (hash: string, state: NdoState) =>
