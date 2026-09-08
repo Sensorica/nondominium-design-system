@@ -1,6 +1,7 @@
 <script lang="ts">
   import { page } from '$app/state';
   import { base } from '$app/paths';
+  import { paths } from '$lib/paths';
 
   let { children } = $props();
 
@@ -20,6 +21,23 @@
     { path: '/playbook/forms', label: 'Forms' }
   ];
 </script>
+
+<!-- The ndo-* custom-element bundle, loaded HERE and only here.
+     `app.html` deliberately does not load it, because it carries its own copy of
+     the Svelte runtime and the prototype has no use for it: /app renders the
+     app's components, not the custom elements. The comment in app.html has said
+     since 2026-08-11 that "the playbook, which does demo them, loads it from its
+     own layout". It did not. Nothing in this layout ever pulled the bundle, so
+     every `<ndo-badge>`, `<ndo-button>`, `<ndo-card>` and `<ndo-status-dot>` on
+     the four component sheets was an unknown element: no shadow root, no styles,
+     not even the `label` attribute rendered as text. The sheets showed their
+     `variant="..."` captions and nothing above them.
+     Found by rendering the page, 2026-09-08. A build, a typecheck and the class
+     fidelity check all pass on a page that displays none of its components,
+     because none of them reads a browser. -->
+<svelte:head>
+  <script type="module" src={paths.registryBundle()}></script>
+</svelte:head>
 
 <div class="playbook-layout">
   <aside class="playbook-sidebar">

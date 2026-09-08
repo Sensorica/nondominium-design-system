@@ -174,17 +174,35 @@
   /* Cyan — Commons */
   --ndo-cyan-50:  236 254 255;
   --ndo-cyan-100: 207 250 254;
+  --ndo-cyan-300: 103 232 249;
   --ndo-cyan-700:  14 116 144;
 
   /* Violet — Collective */
   --ndo-violet-50:  245 243 255;
   --ndo-violet-100: 237 233 254;
+  --ndo-violet-300: 196 181 253;
   --ndo-violet-700: 109  40 217;
 
   /* Rose — CommonPool */
   --ndo-rose-50:  255 241 242;
   --ndo-rose-100: 255 228 230;
+  --ndo-rose-300: 253 164 175;
   --ndo-rose-700: 190  18  60;
+
+  /* Sky — Public, the seventh regime. Added 2026-09-08 with #132: the app's own
+     NdoBrowser paints Public with sky, and the registry had no such family. */
+  --ndo-sky-300: 125 211 252;
+
+  /* The 300 shades below existed only as references until 2026-09-08. Five of the
+     six regime filter chips named a `-300` border colour that tokens.css never
+     defined, so `rgb(var(--ndo-cyan-300))` resolved to an invalid value, the whole
+     border-color declaration was dropped, and the chips fell back to the base
+     `1px solid transparent`. Only `regime-private-filter` had a visible border,
+     because gray-300 happened to exist. Nothing caught it: the fidelity check
+     compares class tokens in markup and never resolves a custom property, and a
+     missing border looks like a design choice rather than a defect. */
+  --ndo-emerald-300: 110 231 183;
+  --ndo-teal-300:    94 234 212;
 
   /* Gray — Private, Pool (fall back to the canvas scale) */
 
