@@ -45,6 +45,8 @@
   }
 </script>
 
+<!-- Native <dialog> carries an implicit role="dialog"; adding it explicitly is
+     flagged as redundant by svelte-check. -->
 <dialog
   {...dialog.content}
   aria-modal="true"
