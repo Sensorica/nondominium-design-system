@@ -9,3 +9,6 @@ static/registry/bundle.js
 .env
 .env.*
 !.env.example
+
+# Dogfooding artifacts: runs, screenshots, reports.
+.local/
