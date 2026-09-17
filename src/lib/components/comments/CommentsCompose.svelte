@@ -3,6 +3,7 @@
   // reply. The discussion is created on first post, never on first view, so
   // browsing a surface leaves no trace in the review repo.
   import { comments } from '$lib/comments/comments.svelte';
+  import { viewContext } from '$lib/comments/view-context';
   import { addComment, addReply, ensureDiscussion } from '$lib/comments/github-client';
   import type { Comment } from '$lib/comments/comments-types';
 
@@ -32,9 +33,13 @@
     try {
       const disc = await ensureDiscussion(surfaceKey, label, token);
       if (!disc.ok) throw new Error('message' in disc.error ? disc.error.message : disc.error.kind);
+      // Every comment carries the conditions it was written under. A report about
+      // legibility is unactionable without them, and the body is the only place
+      // GitHub Discussions lets this live. See src/lib/comments/view-context.ts.
+      const withContext = text + viewContext();
       const result = parentId
-        ? await addReply(disc.value.id, parentId, text, token)
-        : await addComment(disc.value.id, text, token);
+        ? await addReply(disc.value.id, parentId, withContext, token)
+        : await addComment(disc.value.id, withContext, token);
       if (!comments.thread) comments.thread = { ...disc.value, comments: [] };
       if (!result.ok) throw new Error('message' in result.error ? result.error.message : result.error.kind);
       onPosted(result.value);
