@@ -51,13 +51,46 @@
     });
   });
 
+  // Copied from the app: the first-visit gate on the group member profile
+  // (REQ-UI-ID-02). Production opens this modal by itself the first time an
+  // agent enters a group; the prototype dropped it and only ever opened it from
+  // a URL flag, which hid the whole Level 2 identity prompt from anyone
+  // designing here. The URL flag stays, because a linkable surface is the one
+  // divergence this repo is allowed; the gate is restored beside it.
+  const VISITED_KEY = 'ndo_visited_groups_v1';
+
+  function hasVisited(id: string): boolean {
+    try {
+      const raw = localStorage.getItem(VISITED_KEY);
+      const visited: string[] = raw ? JSON.parse(raw) : [];
+      return visited.includes(id);
+    } catch {
+      return false;
+    }
+  }
+
+  function markVisited(id: string): void {
+    try {
+      const raw = localStorage.getItem(VISITED_KEY);
+      const visited: string[] = raw ? JSON.parse(raw) : [];
+      if (!visited.includes(id)) {
+        localStorage.setItem(VISITED_KEY, JSON.stringify([...visited, id]));
+      }
+    } catch {
+      // localStorage unavailable
+    }
+  }
+
+  let firstVisitProfile = $state(false);
+
   const showCreateModal = $derived(autoOpenCreateModal || urlFlag('createNdo'));
-  const showProfileModal = $derived(urlFlag('groupProfile'));
+  const showProfileModal = $derived(firstVisitProfile || urlFlag('groupProfile'));
 
   const setParam = (key: string, on: boolean) => setUrlFlag(key, on);
 
   function saveGroupProfile(profile: GroupMemberProfile): void {
     void lobbyStore.saveGroupMemberProfile(groupId, profile);
+    markVisited(groupId);
   }
 
   async function copyInviteLink() {
@@ -78,6 +111,9 @@
     appContext.currentView = 'group';
     appContext.selectedGroupId = groupId;
     void groupStore.loadGroupData(groupId);
+    if (!hasVisited(groupId)) {
+      firstVisitProfile = true;
+    }
   });
 
   // Pull-based reactivity for shared-group items, kept from the app. Against
@@ -124,10 +160,13 @@
   <GroupProfileModal
     {groupId}
     onclose={() => {
+      firstVisitProfile = false;
+      markVisited(groupId);
       setParam('groupProfile', false);
     }}
     onsave={(profile) => {
       saveGroupProfile(profile);
+      firstVisitProfile = false;
       setParam('groupProfile', false);
     }}
   />

@@ -146,6 +146,52 @@ const EXCEPTIONS: Record<string, { reason: string; replica?: string }> = {
   }
 };
 
+/**
+ * The per-file reading of the script-block divergence.
+ *
+ * The divergence list below ranks files by unmatched lines and then says, in its
+ * own words, that it cannot tell a rerouted import from a dropped behaviour. That
+ * is the honest limit of a line-count, and it is also an invitation nobody had
+ * taken: on 2026-09-17 a read of `group/GroupView.svelte` found the app opens the
+ * group member profile modal by itself on first entry (`hasVisited` gate,
+ * REQ-UI-ID-02) and the replica only ever opened it from a URL flag. Same classes,
+ * same markup apart from wiring, whole prompt invisible.
+ *
+ * So a verdict is a record of a read, and a file with no verdict is a file nobody
+ * has read yet. `wiring` means the divergence is entirely the two allowances this
+ * repo makes: hrefs through `paths.ts` because the site deploys under a sub-path,
+ * and modal / tab / panel state in the query string so every surface is linkable
+ * and commentable. `behaviour` means something the app does and the replica did
+ * not, and it names it.
+ */
+const VERDICTS: Record<string, { verdict: 'wiring' | 'behaviour'; read_on: string; note: string }> = {
+  'group/GroupView.svelte': {
+    verdict: 'behaviour',
+    read_on: '2026-09-17',
+    note: "Dropped the first-visit gate on the group member profile modal (REQ-UI-ID-02): the app carries VISITED_KEY, hasVisited and markVisited, opens the modal from its mount effect when the group has not been visited, and records the visit on close. The replica had none of the three symbols. Restored; the URL flag is kept beside the gate. The rest is wiring."
+  },
+  'group/MemberList.svelte': {
+    verdict: 'wiring',
+    read_on: '2026-09-17',
+    note: 'One line, an import path. Markup closed the same day: the replica had dropped data-testid="member-row", which no class-token check can see because a data attribute emits no utility class.'
+  },
+  'lobby/LobbyView.svelte': {
+    verdict: 'wiring',
+    read_on: '2026-09-17',
+    note: 'Entirely the two allowances: the profile modal is opened through the query string instead of local state, and the create/join group links go through paths.appHome(). No behaviour differs.'
+  },
+  'lobby/NdoCard.svelte': {
+    verdict: 'wiring',
+    read_on: '2026-09-17',
+    note: 'One href, built by paths.ndoDetail() instead of interpolated. Markup cannot close while the site deploys under a sub-path.'
+  },
+  'lobby/ProfileSetupModal.svelte': {
+    verdict: 'wiring',
+    read_on: '2026-09-17',
+    note: 'Store and dialog wiring. Markup closed the same day by restoring the comment the app carries above <dialog>.'
+  }
+};
+
 /** Everything after the script block: the part that renders. */
 function markup(source: string): string {
   const i = source.indexOf('</script>');
@@ -348,7 +394,18 @@ if (behaviouralDelta.length) {
   console.log('never fails the check; it is the list of files whose BEHAVIOUR to go read, because');
   console.log('a dropped behaviour hides in exactly the same diff as a rerouted import.');
   for (const [file, n] of behaviouralDelta.sort((x, y) => y[1] - x[1])) {
-    console.log(`  ±${String(n).padStart(4)}  ${file}`);
+    const v = VERDICTS[file];
+    const tag = v ? (v.verdict === 'wiring' ? 'wiring  ' : 'BEHAVIOUR') : 'unread  ';
+    console.log(`  ±${String(n).padStart(4)}  ${tag}  ${file}`);
+  }
+
+  const read = behaviouralDelta.filter(([f]) => VERDICTS[f]).length;
+  console.log('');
+  console.log(`${read}/${behaviouralDelta.length} of those files have been read. A verdict is a record of a read;`);
+  console.log('`unread` means nobody has separated wiring from dropped behaviour there yet.');
+  for (const [file, v] of Object.entries(VERDICTS)) {
+    console.log(`  ${v.verdict === 'wiring' ? 'wiring   ' : 'BEHAVIOUR'}  ${file}  (read ${v.read_on})`);
+    console.log(`      ${v.note}`);
   }
 }
 
