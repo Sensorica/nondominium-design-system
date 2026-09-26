@@ -39,7 +39,7 @@
   {#if rules.length}
     <section>
       <p class="pu-sec">Rules of {ndo.name}</p>
-      {#each rules as [k, v] (k)}
+      {#each rules as [k, v], i (i)}
         <div class="rule"><span>{plain(k)}</span><span class="pu-muted">{plain(v)}</span></div>
       {/each}
     </section>

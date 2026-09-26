@@ -4,16 +4,18 @@
   // src/lib/prototypes/README.md.
   //
   // Where you are lives in the URL, so every level is linkable:
-  //   lobby                     all your groups
+  //   (bare)                    where the handoff opens: the CNC machine's
+  //                             rings (EXAMPLE_NDO in EXAMPLE_GROUP)
+  //   ?group=G&ndo=N            one NDO as concentric rings (the default view)
   //   ?view=group&group=G       one group; &ndo=N marks the inspected NDO
-  //   ?view=ndo&group=G&ndo=N   one NDO as concentric rings
+  //   ?view=lobby               all your groups
   // A record that no longer exists (after "Start over", say) falls back one
   // level, and the URL is corrected to match.
   import { proto } from '$lib/prototypes/store/store.svelte';
   import { FlowMenu, ModalHost, Toasts, Onboarding, modals } from '$lib/prototypes/ui';
   import { paths } from '$lib/paths';
   import { currentView, currentRecord, goView } from '$lib/prototypes/url.svelte';
-  import type { ViewOf } from '$lib/prototypes/directions';
+  import { EXAMPLE_GROUP, EXAMPLE_NDO, type ViewOf } from '$lib/prototypes/directions';
   import LobbyLevel from './LobbyLevel.svelte';
   import GroupLevel from './GroupLevel.svelte';
   import NdoLevel from './NdoLevel.svelte';
@@ -33,13 +35,17 @@
   const loc = $derived.by((): Loc => {
     const lobby: Loc = { view: 'lobby', at: {}, sel: null };
     if (view === 'lobby') return lobby;
-    const g = proto.q.group(rec.group)?.id;
     if (view === 'ndo') {
-      const n = proto.q.ndo(rec.ndo);
+      // The bare URL opens where the handoff's HolarchyApp opens, and falls
+      // back the same way: to the group, then the Lobby.
+      const bare = !rec.group && !rec.ndo;
+      const n = proto.q.ndo(bare ? EXAMPLE_NDO : rec.ndo);
       if (n && proto.q.group(n.group))
         return { view: 'ndo', at: { group: n.group, ndo: n.id }, sel: null };
+      const g = proto.q.group(bare ? EXAMPLE_GROUP : rec.group)?.id;
       return g ? { view: 'group', at: { group: g }, sel: null } : lobby;
     }
+    const g = proto.q.group(rec.group)?.id;
     if (!g) return lobby;
     const s = proto.q.ndo(rec.ndo);
     return { view: 'group', at: { group: g }, sel: s && s.group === g ? s.id : null };
@@ -82,16 +88,22 @@
     else if (loc.at.group) toLobby();
   }
 
-  // Scrolling down on the canvas goes up a level. One level per gesture: a
-  // trackpad fires many wheel events, so the next one waits out the zoom.
-  let lastUp = 0;
+  // Scrolling down on the canvas goes up a level, one level per gesture. A
+  // trackpad gesture is a stream of wheel events whose inertia can outlast any
+  // fixed delay, so the first strong event climbs and the rest of the stream
+  // is swallowed: the gesture only ends after GESTURE_GAP ms with no wheel
+  // event at all, and only then can the next one climb.
+  const GESTURE_GAP = 250;
+  let inGesture = false;
+  let gestureEnd: ReturnType<typeof setTimeout> | undefined;
   function onwheel(e: WheelEvent) {
-    if (modals.current || e.deltaY <= 30) return;
-    const now = Date.now();
-    if (now - lastUp < 500) return;
-    lastUp = now;
+    clearTimeout(gestureEnd);
+    gestureEnd = setTimeout(() => (inGesture = false), GESTURE_GAP);
+    if (inGesture || modals.current || e.deltaY <= 30) return;
+    inGesture = true;
     up();
   }
+  $effect(() => () => clearTimeout(gestureEnd));
 
   // The legend sits in the bottom-left corner, where the layout's exit chip
   // lives: lift the chip above it.

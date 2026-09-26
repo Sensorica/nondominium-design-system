@@ -1,6 +1,9 @@
 <script lang="ts">
-  // Add a rule. zome_resource::create_governance_rule with typed RuleData
-  // (AccessRequirement, UsageLimit, TransferCondition, MaintenanceSchedule).
+  // Add a rule, or change one. zome_resource::create_governance_rule with typed
+  // RuleData (AccessRequirement, UsageLimit, TransferCondition,
+  // MaintenanceSchedule) always adds a new rule, whoever you are;
+  // update_governance_rule changes an existing one and only its author may, so
+  // picking someone else's rule to change shows the zome's NotAuthor refusal.
   import Modal from './Modal.svelte';
   import Field from './Field.svelte';
   import Choice from './Choice.svelte';
@@ -22,6 +25,17 @@
   let validated = $state('true');
   let interval = $state('90');
   let error = $state<string | null>(null);
+  /** '' adds a new rule; otherwise the index of the rule to change. */
+  let target = $state('');
+
+  const existing = $derived(proto.s.rules[ndo.id] ?? []);
+
+  /** Changing a rule starts from its type. */
+  function pick(v: string) {
+    target = v;
+    error = null;
+    if (v !== '' && existing[+v]) type = existing[+v][0];
+  }
 
   const summary = $derived(
     {
@@ -39,14 +53,26 @@
       error = 'MaintenanceSchedule.interval_days must be > 0';
       return;
     }
-    const r = proto.actions.addRule(ndo.id, type, summary);
+    const r = target === '' ? proto.actions.addRule(ndo.id, type, summary) : proto.actions.updateRule(ndo.id, +target, type, summary);
     if (!r.ok) error = r.error;
     else onclose();
   }
 </script>
 
-<Modal title="Add a rule" sub={'Rules travel with ' + ndo.name + ' across groups.'} {onclose}>
-  <Call c="zome_resource::create_governance_rule (RuleData)" />
+<Modal title={target === '' ? 'Add a rule' : 'Change a rule'} sub={'Rules travel with ' + ndo.name + ' across groups.'} {onclose}>
+  <Call c={target === '' ? 'zome_resource::create_governance_rule (RuleData)' : 'zome_resource::update_governance_rule (author only)'} />
+  {#if existing.length}
+    <Field label="Save as" hint="Anyone can add a rule. Only the person who added a rule can change it.">
+      <select class="pu-select" value={target} onchange={(e) => pick(e.currentTarget.value)}>
+        <option value="">A new rule</option>
+        {#each existing as [t, sum, author], i (i)}
+          <option value={String(i)}
+            >Change: {$developer ? t + ' · ' + sum : plain(t) + ' · ' + plain(sum)} (added by {proto.q.agent(author)})</option
+          >
+        {/each}
+      </select>
+    </Field>
+  {/if}
   <Field label={label('RuleData')}>
     <Choice options={ENUM.rule} value={type} onchange={(v) => (type = v as RuleType)} />
   </Field>
@@ -89,7 +115,7 @@
   {/if}
   <p class="pu-muted pu-mono">{$developer ? type + ' · ' + summary : plain(type) + ' · ' + plain(summary)}</p>
   <ErrorNote {error} />
-  <ModalActions {onclose} onok={submit} label="Add rule" />
+  <ModalActions {onclose} onok={submit} label={target === '' ? 'Add rule' : 'Change rule'} />
 </Modal>
 
 <style>

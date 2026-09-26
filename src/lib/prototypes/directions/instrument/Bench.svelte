@@ -30,11 +30,11 @@
     ...proto.s.groups
       .filter((g) => g.id === n.group)
       .map((g) => ({ id: 'g-' + g.id, type: dev ? 'NdoAnchor' : 'Group', label: g.name, by: n.initiator, entry: 'zome_group::create_ndo_anchor' })),
-    ...(proto.s.rules[id] ?? []).map(([k, v], i) => ({
+    ...(proto.s.rules[id] ?? []).map(([k, v, author], i) => ({
       id: 'r-' + i,
       type: dev ? k : 'Rule · ' + plain(k),
       label: plain(v),
-      by: n.initiator,
+      by: author || n.initiator,
       entry: 'create_governance_rule'
     })),
     ...(proto.s.instances[id] ?? []).map(([k, v, c], i) => ({

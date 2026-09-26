@@ -153,6 +153,54 @@ export const ACTION_PHRASE: Readonly<Record<string, string>> = {
   Transfer: 'transfer'
 };
 
+/** Past-tense phrases for what happened ("Sarah handed over the CNC
+ *  machine"), from F's title() for an EconomicEvent. Actions it has no phrase
+ *  for fall back to ACTION_PHRASE. */
+export const ACTION_PAST: Readonly<Record<string, string>> = {
+  TransferCustody: 'handed over',
+  AccessForUse: 'lent',
+  Use: 'used',
+  Work: 'worked on',
+  Move: 'moved',
+  Modify: 'modified',
+  Cite: 'cited'
+};
+
+/** A governance rule's typed payload (RuleData, as F stores it) as the
+ *  sentence F's rule badge shows without Developer details: "Needs role:
+ *  Trusted member", "Max 336 h per 30 days". F's badges(), verbatim. */
+export function ruleSentence(r: {
+  type: string;
+  accessibility?: string | null;
+  required_role?: string | null;
+  max_duration_hours?: number | null;
+  period_days?: number | null;
+  requires_validation?: boolean | null;
+  interval_days?: number | null;
+}): string {
+  const role = (x: string) => PLAIN[x] ?? x;
+  switch (r.type) {
+    case 'AccessRequirement':
+      return (
+        { Free: 'Open to all', Credentialed: 'Needs role: ' + role(r.required_role || 'a role'), Gated: 'Needs approval' }[
+          r.accessibility ?? ''
+        ] ?? plain(r.type)
+      );
+    case 'UsageLimit':
+      return (
+        [r.max_duration_hours ? 'Max ' + r.max_duration_hours + ' h' : null, r.period_days ? 'per ' + r.period_days + ' days' : null]
+          .filter(Boolean)
+          .join(' ') || 'Limited use'
+      );
+    case 'TransferCondition':
+      return r.requires_validation ? 'Hand-over needs approval' : 'Free hand-over';
+    case 'MaintenanceSchedule':
+      return 'Every ' + r.interval_days + ' days' + (r.required_role ? ' · ' + role(r.required_role) : '');
+    default:
+      return plain(r.type);
+  }
+}
+
 /** Zome input field name to form label (F_FIELD). No conflict with PLAIN. */
 export const FIELD_WORD: Readonly<Record<string, string>> = {
   name: 'Name',
@@ -195,14 +243,25 @@ export const FIELD_WORD: Readonly<Record<string, string>> = {
  *  case-sensitive; ui.jsx's are case-insensitive and cover them. */
 export const ERROR_WORDS: ReadonlyArray<readonly [RegExp, string]> = [
   [/NotCustodian|only the current custodian/i, 'Only the person currently holding this item can do that.'],
+  // Before the lifecycle NotAuthor below: a rule has its own author.
+  [/only the rule's author/i, 'Only the person who added this rule can change it. You can add a new rule instead.'],
   [/NotAuthor|only the initiator/i, 'Only the person who created this resource can change its stage.'],
+  [/ownership_transfer_not_permitted_by_regime|does not permit ownership-transfer/i, "An uncapturable resource can't have a rule that hands over ownership. Choose custody, use rights or benefit instead."],
+  [/Cannot activate Layer 1 while the NDO is/i, "Kinds of item can't be added yet. Move the resource past the idea stage first."],
+  [/nondominium_no_unilateral_capture|not permitted on a Nondominium resource/i, "Nobody can take, use up or reduce an uncapturable resource that way."],
   [/requires successor/i, 'Pick the resource that replaces this one first.'],
   [/cannot validate their own/i, "You can't approve your own item. Ask someone else."],
   [/already validated/i, 'You have already approved this.'],
   [/already claimed/i, 'This has already been done.'],
   [/already a member/i, 'You are already in this group.'],
   [/Invalid invite/i, "That invite link doesn't work. Check you copied all of it."],
-  [/cannot be empty/i, 'Please fill in the name.'],
+  // Field by field: the zome says which field is empty, and so do we.
+  [/WorkLog description cannot be empty/i, 'Please describe the work you did.'],
+  [/description cannot be empty/i, 'Please fill in the description.'],
+  [/^Label cannot be empty/i, 'Please give the item a name.'],
+  [/^Unit cannot be empty/i, 'Please fill in the unit.'],
+  [/name cannot be empty/i, 'Please fill in the name.'],
+  [/cannot be empty/i, 'Please fill in every required field.'],
   [/hours must be/i, 'Enter how many hours you worked.'],
   [/neither provider nor receiver/i, 'Only the two people in this agreement can complete it.'],
   [/must start with https/i, 'The picture link must start with https://'],

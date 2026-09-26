@@ -11,7 +11,7 @@
   //
   // A direction fills `.stage` with `height: 100%`, never `100vh`: the status
   // banner, when there is one, takes its own row above it.
-  import type { Snippet } from 'svelte';
+  import { onDestroy, type Snippet } from 'svelte';
   import { afterNavigate } from '$app/navigation';
   import { page } from '$app/state';
   import { paths } from '$lib/paths';
@@ -20,6 +20,7 @@
   import { DIRECTION_LIST, type DirectionSlug } from '$lib/prototypes/directions';
   import { proto } from '$lib/prototypes/store/store.svelte';
   import { dropParams } from '$lib/prototypes/url.svelte';
+  import { modals } from '$lib/prototypes/ui';
 
   let { children }: { children: Snippet } = $props();
 
@@ -32,12 +33,21 @@
   // site as well as on a cold load, and dropping them from the URL cannot hit
   // a router that does not exist yet.
   let mounted = $state(false);
-  afterNavigate(({ to }) => {
+  afterNavigate(({ from, to }) => {
     mounted = true;
+    // A shared modal belongs to the direction that opened it (its `after`
+    // callback navigates within that direction), so moving to another
+    // direction closes it. The exit chip stays clickable above an open modal
+    // on purpose: leaving is always one click away, and leaving closes it.
+    if (from?.url.pathname !== to?.url.pathname) modals.close();
     if (!to || !direction || direction.store !== 'shared') return;
     const { consumed } = proto.load(to.url.searchParams);
     if (consumed.length) dropParams(consumed);
   });
+
+  // Leaving the directions altogether (the index, /app, the screen map)
+  // unmounts this layout: close any modal so it cannot reappear later.
+  onDestroy(() => modals.close());
 
   const live = $derived(mounted && (direction?.store !== 'shared' || proto.ready));
 </script>

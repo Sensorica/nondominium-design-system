@@ -4,6 +4,7 @@
   // over the fade window the slider sets.
   import { proto } from '../../store/store.svelte';
   import { plain } from '../../plain';
+  import { linkKey, uniqLinks } from '../../store/logic';
   import { fieldPositions, fieldViewBox, nodeRadius, trailPath, MODES, type Mode } from './field';
 
   interface Props {
@@ -27,16 +28,22 @@
   const viewBox = $derived(fieldViewBox(nodes));
   const kinds = $derived<readonly string[]>(MODES[mode]);
 
+  // One trail per (from, to, kind): the store keeps links unique on that
+  // triple, and uniqLinks here means a repeat that slipped in anyway draws
+  // once instead of breaking the keyed list.
   const trails = $derived(
-    proto.s.links
+    uniqLinks(proto.s.links)
       .filter(([a, b, k]) => byId.has(a) && byId.has(b) && kinds.includes(k))
-      .map(([a, b, k]) => ({
-        key: a + '>' + b + ':' + k,
-        kind: k,
-        d: trailPath(byId.get(a)!, byId.get(b)!),
-        width: 1 + Math.min(5, (proto.q.heatOf(a, decay) + proto.q.heatOf(b, decay)) / 2.2),
-        on: sel === a || sel === b
-      }))
+      .map((l) => {
+        const [a, b, k] = l;
+        return {
+          key: linkKey(l),
+          kind: k,
+          d: trailPath(byId.get(a)!, byId.get(b)!),
+          width: 1 + Math.min(5, (proto.q.heatOf(a, decay) + proto.q.heatOf(b, decay)) / 2.2),
+          on: sel === a || sel === b
+        };
+      })
   );
 
   // A node pulses when it has a brand-new trace, or one of yours still on its

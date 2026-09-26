@@ -137,13 +137,28 @@ export interface Ndo {
   successor?: string;
 }
 
-/** [type, summary] */
-export type Rule = [RuleType, string];
+/** [type, summary, author]. The author is whoever created the rule
+ *  (create_governance_rule); only they may change it (update_governance_rule). */
+export type Rule = [RuleType, string, string];
 /** [label, OperationalState, custodian] */
 export type Instance = [string, OperationalState, string];
 export type LinkKind = 'use' | 'cite' | 'hard';
-/** [from, to, kind] */
+/** [from, to, kind]. A set on that triple: the field (A) keys trails on it. */
 export type Link = [string, string, LinkKind];
+
+/** The identity of a link: two links with the same key are the same trail. */
+export const linkKey = ([a, b, k]: Link): string => a + '>' + b + ':' + k;
+
+/** Drops repeated (from, to, kind) links, keeping the first. */
+export function uniqLinks(links: readonly Link[]): Link[] {
+  const seen = new Set<string>();
+  return links.filter((l) => {
+    const key = linkKey(l);
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
+}
 
 export type TraceKind = 'commit' | 'work' | 'custody' | 'cite' | 'use' | 'note' | 'lifecycle' | 'rule';
 export type TraceStatus = 'queued' | 'signed' | 'gossip' | 'validated';
@@ -246,7 +261,7 @@ export const SEED: ProtoState = {
           desc: "Maria Garcia's weekly harvest, consolidated at the hub by James Chen. Food safety and temperature tracking rules.", hash: 'uhC0hH5jK6lm', x: 320, y: 650
         }
       ],
-      rules: { seed: [['AccessRequirement', 'Credentialed · Storage'], ['MaintenanceSchedule', '7 d · Repair · cold chain']] },
+      rules: { seed: [['AccessRequirement', 'Credentialed · Storage', 'mg'], ['MaintenanceSchedule', '7 d · Repair · cold chain', 'mg']] },
       instances: { seed: [['Harvest baskets · 40', 'Available', 'mg'], ['Refrigerated van', 'InMaintenance', 'jc']] },
       links: [['seed', 'sol', 'use']]
     }
@@ -281,10 +296,11 @@ export const SEED: ProtoState = {
   hardLinks: [{ from: 'fw', to: 'sol', type: 'Component' }, { from: 'sns', to: 'las', type: 'DerivedFrom' }],
   validations: {},
   rules: {
-    sol: [['AccessRequirement', 'Credentialed · Transport'], ['TransferCondition', 'Custody · validated'], ['UsageLimit', '336 h / 30 d']],
-    las: [['AccessRequirement', 'Gated · AccountableAgent'], ['UsageLimit', '80 h / 14 d'], ['MaintenanceSchedule', '30 d · Repair']],
-    cnc: [['AccessRequirement', 'Credentialed · AccountableAgent'], ['UsageLimit', 'no hour limit / 90 d'], ['TransferCondition', 'Custody · validated']],
-    fw: [['MaintenanceSchedule', '14 d · Repair']]
+    // Each rule's author is its NDO's initiator.
+    sol: [['AccessRequirement', 'Credentialed · Transport', 'sar'], ['TransferCondition', 'Custody · validated', 'sar'], ['UsageLimit', '336 h / 30 d', 'sar']],
+    las: [['AccessRequirement', 'Gated · AccountableAgent', 'che'], ['UsageLimit', '80 h / 14 d', 'che'], ['MaintenanceSchedule', '30 d · Repair', 'che']],
+    cnc: [['AccessRequirement', 'Credentialed · AccountableAgent', 'may'], ['UsageLimit', 'no hour limit / 90 d', 'may'], ['TransferCondition', 'Custody · validated', 'may']],
+    fw: [['MaintenanceSchedule', '14 d · Repair', 'vas']]
   },
   instances: {
     sol: [['Proxxon MF70 #1', 'Reserved', 'sar']],
@@ -306,9 +322,9 @@ export const SEED: ProtoState = {
   offline: false
 };
 
-/** Seed records the screen map links to when a view needs one. */
-export const EXAMPLE_GROUP = 'sen';
-export const EXAMPLE_NDO = 'sol';
+/** Seed records the screen map links to when a view needs one. Defined in
+ *  the registry, so pages that only need the ids do not import the seed. */
+export { EXAMPLE_GROUP, EXAMPLE_NDO } from '../directions';
 
 const clone = <T>(v: T): T => JSON.parse(JSON.stringify(v)) as T;
 
@@ -366,9 +382,13 @@ export function freshState(): ProtoState {
   };
 }
 
-/** Accept a persisted state if it has the shape this store writes, and make
- *  ids unique again (a crash between two writes could duplicate one).
- *  Returns null for anything unusable, so the caller falls back to the seed. */
+/** Accept a persisted state if it has the shape this store writes, and heal
+ *  what older builds could save: ids made unique again (a crash between two
+ *  writes could duplicate one), repeated (from, to, kind) links dropped (an
+ *  older hardLink appended a 'hard' link beside an existing one, which crashed
+ *  A's field), and rules saved before they carried an author given their NDO's
+ *  initiator. Returns null for anything unusable, so the caller falls back to
+ *  the seed. */
 export function normalizeLoaded(v: unknown, id: (prefix: string) => string): ProtoState | null {
   if (!v || typeof v !== 'object') return null;
   const s = v as Partial<ProtoState>;
@@ -382,6 +402,20 @@ export function normalizeLoaded(v: unknown, id: (prefix: string) => string): Pro
       return y;
     }) as never;
   }
+  const bundles = Object.values(out.invites ?? {});
+  const initiators = new Map([...out.ndos, ...bundles.flatMap((b) => b.ndos ?? [])].map((n) => [n.id, n.initiator]));
+  const withAuthors = (rules: Record<string, Rule[]> | undefined): Record<string, Rule[]> =>
+    Object.fromEntries(
+      Object.entries(rules ?? {}).map(([ndo, list]) => [
+        ndo,
+        list.map((r): Rule => (r[2] ? r : [r[0], r[1], initiators.get(ndo) ?? '']))
+      ])
+    );
+  out.links = uniqLinks(out.links ?? []);
+  out.rules = withAuthors(out.rules);
+  out.invites = Object.fromEntries(
+    Object.entries(out.invites ?? {}).map(([code, b]) => [code, { ...b, links: uniqLinks(b.links ?? []), rules: withAuthors(b.rules) }])
+  );
   return out;
 }
 
@@ -686,7 +720,7 @@ export function hardLink(s: ProtoState, ctx: Ctx, from: string, to: string, type
   if (s.hardLinks.some((h) => h.from === from && h.to === to && h.type === type)) return fail('This hard link already exists.');
   const target = s.ndos.find((n) => n.id === to);
   const d = leave(s, ctx, from, 'cite', 'linked: this ' + (PLAIN[type] ?? type) + ' ' + (target ? target.name : to), null,
-    (x) => ({ hardLinks: [...x.hardLinks, { from, to, type: type as NdoLinkType }], links: [...x.links, [from, to, 'hard']] }));
+    (x) => ({ hardLinks: [...x.hardLinks, { from, to, type: type as NdoLinkType }], links: uniqLinks([...x.links, [from, to, 'hard']]) }));
   return plainDone(d, undefined);
 }
 
@@ -778,7 +812,7 @@ export function joinGroup(s: ProtoState, _ctx: Ctx, code: string): Outcome<{ id:
     ndos: all,
     rules: { ...s.rules, ...inv.rules },
     instances: { ...s.instances, ...inv.instances },
-    links: [...s.links, ...inv.links].filter(([a, b]) => exists(a) && exists(b)),
+    links: uniqLinks([...s.links, ...inv.links].filter(([a, b]) => exists(a) && exists(b))),
     traces: [...s.traces, ...(inv.traces ?? [])],
     commitments: [...s.commitments, ...(inv.commitments ?? [])],
     hardLinks: [...s.hardLinks, ...(inv.hardLinks ?? [])]
@@ -801,11 +835,52 @@ export function joinDemo(s: ProtoState, ctx: Ctx): Outcome {
   return { ok: true, state: cur, writes, value: undefined };
 }
 
-/** zome_resource::create_governance_rule (typed RuleData) */
+/** check_rule_data_permitted in crates/shared/src/constraints.rs at 3cbebf0,
+ *  Hard violations only: validate_create_governance_rule (and the update,
+ *  which runs the same check) rejects them in the integrity zome. The message
+ *  is the zome's hard_violation_message. An ownership-transfer rule is Hard
+ *  only on Nondominium; on the other regimes that do not permit it (Commons,
+ *  Pool, CommonPool, Public) it is Soft, an advisory the zome accepts, and so
+ *  is Gated access on Nondominium. */
+export function hardRuleViolation(regime: PropertyRegime, type: string, summary: string): string | null {
+  const transferType = summary.split(' · ')[0].trim();
+  if (type === 'TransferCondition' && transferType === 'Ownership' && regime === 'Nondominium') {
+    return '[ownership_transfer_not_permitted_by_regime] Nondominium does not permit ownership-transfer rules.';
+  }
+  return null;
+}
+
+/** zome_resource::create_governance_rule (typed RuleData). Creating always adds
+ *  a new rule, as the zome does, even beside one of the same type; the caller
+ *  becomes its author. Changing a rule is updateRule. */
 export function addRule(s: ProtoState, ctx: Ctx, ndo: string, type: string, summary: string): Outcome {
   if (!(ENUM.rule as readonly string[]).includes(type)) return fail('Invalid RuleData variant.');
+  const n = s.ndos.find((x) => x.id === ndo);
+  if (!n) return fail('NDO not found.');
+  const bad = hardRuleViolation(n.regime, type, summary);
+  if (bad) return fail(bad);
   const d = leave(s, ctx, ndo, 'rule', 'added rule ' + type, null, (x) => ({
-    rules: { ...x.rules, [ndo]: [...(x.rules[ndo] ?? []).filter((r) => r[0] !== type), [type as RuleType, summary || 'none']] }
+    rules: { ...x.rules, [ndo]: [...(x.rules[ndo] ?? []), [type as RuleType, summary || 'none', ctx.me]] }
+  }));
+  return plainDone(d, undefined);
+}
+
+/** zome_resource::update_governance_rule: author only (the coordinator returns
+ *  ResourceError::NotAuthor otherwise), and the same Hard constraints as
+ *  create. `i` is the rule's index on its NDO. */
+export function updateRule(s: ProtoState, ctx: Ctx, ndo: string, i: number, type: string, summary: string): Outcome {
+  const n = s.ndos.find((x) => x.id === ndo);
+  if (!n) return fail('NDO not found.');
+  const r = (s.rules[ndo] ?? [])[i];
+  if (!r) return fail('Governance rule not found.');
+  if (r[2] !== ctx.me) {
+    return fail("NotAuthor: only the rule's author (" + agentName(s, r[2]) + ') can change this rule.');
+  }
+  if (!(ENUM.rule as readonly string[]).includes(type)) return fail('Invalid RuleData variant.');
+  const bad = hardRuleViolation(n.regime, type, summary);
+  if (bad) return fail(bad);
+  const d = leave(s, ctx, ndo, 'rule', 'changed rule ' + type, null, (x) => ({
+    rules: { ...x.rules, [ndo]: x.rules[ndo].map((q, j): Rule => (j === i ? [type as RuleType, summary || 'none', q[2]] : q)) }
   }));
   return plainDone(d, undefined);
 }

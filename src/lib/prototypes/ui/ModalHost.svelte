@@ -1,6 +1,9 @@
 <script lang="ts">
   // Renders whichever shared modal is open (see modals.svelte.ts). Mount one
   // per direction, inside the direction's root so the --proto-* theme applies.
+  // Only a modal opened on this route renders: one left over from another
+  // direction carries that direction's callbacks.
+  import { page } from '$app/state';
   import { modals } from './modals.svelte';
   import { proto } from '../store/store.svelte';
   import CreateNdoModal from './CreateNdoModal.svelte';
@@ -19,7 +22,7 @@
   import HelpModal from './HelpModal.svelte';
   import WhyModal from './WhyModal.svelte';
 
-  const m = $derived(modals.current);
+  const m = $derived(modals.current && modals.owner === page.url.pathname ? modals.current : null);
   const ndo = $derived(m && 'ndo' in m ? proto.q.ndo(m.ndo) : undefined);
   const close = () => modals.close();
 </script>

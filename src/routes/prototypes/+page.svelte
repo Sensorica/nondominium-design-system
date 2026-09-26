@@ -27,6 +27,7 @@
     </header>
     <p class="dcard__pitch">{d.pitch}</p>
     <p class="ndo-small">{d.tries}</p>
+    <p class="ndo-small dcard__type">{d.typeNote}</p>
     <p class="ndo-small dcard__views">
       Views: {d.views.map((v) => v.label).join(' · ')}{d.store === 'own' ? ' · runs on its own mock backend' : ''}
     </p>
@@ -48,8 +49,16 @@
     </p>
     <p class="ndo-small mt-2" style="max-width:68ch">
       A to E run on one shared mock store, so what you do in one shows up in the others: pick up a suggestion in D Signal
-      Board, then find its trace in A Mycelium. F runs on its own mock of the real zome calls. Every direction has the same
-      menu (Ctrl+K) with "Start over as a new person", "Reload the example" and "Developer details".
+      Board, then find its trace in A Mycelium. F runs on its own mock of the real zome calls. A to E share one menu
+      (Ctrl+K) with "Start over as a new person", "Reload the example" and "Developer details". F has no such menu: its
+      header carries a scenario picker (with "Start from nothing" for a new person), a Reset button and its own
+      Developer details switch.
+    </p>
+    <p class="ndo-small mt-2" style="max-width:68ch">
+      One trade-off to keep in mind when comparing: the handoff gave each direction its own typefaces (a serif notebook for
+      B, a different sans and mono for each of A, C, D and E). The ports use design-system tokens only, so all six are set
+      in the design-system sans and mono. Judge layout, flow and interaction; the lettering is not the handoff's. Each card
+      below names what it lost.
     </p>
   </header>
 
@@ -203,8 +212,12 @@
     font-weight: var(--ndo-weight-medium);
     color: var(--ndo-color-text-primary);
   }
-  .dcard__views {
+  .dcard__views,
+  .dcard__type {
     color: var(--ndo-color-text-muted);
+  }
+  .dcard__type {
+    font-style: italic;
   }
   .dcard__actions {
     margin-top: auto;

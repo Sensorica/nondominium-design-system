@@ -20,7 +20,7 @@ You must not touch:
 | B | `field-notes` | `directions/field-notes/` | shared | `trail` (default), `rules`, `requests`, `linked` |
 | C | `instrument` | `directions/instrument/` | shared | `bench` (default) |
 | D | `signal-board` | `directions/signal-board/` | shared | `board` (default), `drawer` (+ `ndo`) |
-| E | `holarchy` | `directions/holarchy/` | shared | `lobby` (default), `group` (+ `group`), `ndo` (+ `group`, `ndo`) |
+| E | `holarchy` | `directions/holarchy/` | shared | `ndo` (default, + `group`, `ndo`; bare opens the CNC machine, as the handoff does), `group` (+ `group`), `lobby` |
 | F | `flow-graph` | `directions/flow-graph/` | own | `network` (default), `conductor-a`, `conductor-b` |
 
 ## How a direction mounts
@@ -71,20 +71,25 @@ Never write a route segment or a query string yourself: every URL comes from `pa
 
 `import { proto } from '$lib/prototypes/store/store.svelte'`. A module-level singleton equivalent to the handoff's `useProto()`. All five shared-store directions persist under one localStorage key (`ndo-proto-shared-v1`), so an action taken in D shows up in A.
 
-- `proto.s`: the state, read-only (`profile`, `roles`, `groups`, `invites`, `ndos`, `links`, `traces`, `hardLinks`, `validations`, `rules`, `instances`, `commitments`, `receipts`, `offline`). Shapes are in `store/logic.ts` (`ProtoState` and friends) and follow the handoff's "State management" section. Rules are `[type, summary]`, items are `[label, OperationalState, custodian]`, links are `[from, to, 'use' | 'cite' | 'hard']`.
+- `proto.s`: the state, read-only (`profile`, `roles`, `groups`, `invites`, `ndos`, `links`, `traces`, `hardLinks`, `validations`, `rules`, `instances`, `commitments`, `receipts`, `offline`). Shapes are in `store/logic.ts` (`ProtoState` and friends) and follow the handoff's "State management" section. Rules are `[type, summary, author]`, items are `[label, OperationalState, custodian]`, links are `[from, to, 'use' | 'cite' | 'hard']`.
 - `proto.signals`: derived, never stored (`deriveSignals`). Each has `kind`, `lane` (`hands`, `eyes`, `avail`), `title`, `sub`, `strength`, `verb`, `why[]` and sometimes `progress`.
 - `proto.toasts`, `proto.dropToast(id)`: the write lifecycle (render `<Toasts />` instead of reading these).
 - `proto.me`: `{ id, name, roles, avatar }`. `proto.dev`: Developer details, reactive.
 - `proto.q`: `ndo(id)`, `group(id)`, `tracesOf(id)`, `signalsOf(id)`, `hardLinksOf(id)`, `commitmentsOf(id)`, `openCommitments()`, `heatOf(id, decayDays?)`, `agent(id)` (display name), `reputation()`, `allowedStages(id)`.
-- `proto.actions`: `pickUp(sig)`, `validate(ref, ndo)`, `logEvent(ndo, i, action, note?)`, `logWork(ndo, description, hours)`, `hardLink(from, to, type)`, `advance(ndo, to, successor?)`, `createNdo(form)`, `updateProfile(form)`, `createGroup({ name, desc })`, `joinGroup(code)`, `addRule(ndo, type, summary)`, `addInstance(ndo, label)`, `setOpState(ndo, i, state)`, `transferCustody(ndo, i, to)`, `propose({ ndo, action, provider, inst?, note? })`, `fulfil(commitmentId)`, `joinDemo()`, `toggleOffline()`, `reset()`, `startFresh()`.
+- `proto.actions`: `pickUp(sig)`, `validate(ref, ndo)`, `logEvent(ndo, i, action, note?)`, `logWork(ndo, description, hours)`, `hardLink(from, to, type)`, `advance(ndo, to, successor?)`, `createNdo(form)`, `updateProfile(form)`, `createGroup({ name, desc })`, `joinGroup(code)`, `addRule(ndo, type, summary)` (always adds, as `create_governance_rule` does), `updateRule(ndo, i, type, summary)` (the rule's author only), `addInstance(ndo, label)`, `setOpState(ndo, i, state)`, `transferCustody(ndo, i, to)`, `propose({ ndo, action, provider, inst?, note? })`, `fulfil(commitmentId)`, `joinDemo()`, `toggleOffline()`, `reset()`, `startFresh()`.
 
 Every write action returns `{ ok: true, value }` or `{ ok: false, error }`. The error is the backend's exact text; show it through `<ErrorNote error={...} />`, which maps it to friendly words. `createNdo` returns the new id as `value`; `createGroup` returns `{ id, invite }`; `joinGroup` returns `{ id }`. Each action's comment in `store/logic.ts` names the zome call it stands for (see `docs/prototypes/BACKEND.md`).
 
-The rules the store enforces are the hApp's: initiator-only lifecycle, custodian-only custody transfer and operational state, a successor for Deprecated, no self-validation, one claim per commitment, and the integrity zome's lifecycle table at 3cbebf0. `bun run check:prototypes` proves it. Pure helpers for your own rendering are exported from `store/logic.ts`: `fmtAgo`, `freshness`, `heat`, `allowedStages`, `STAGES`, `ENUM`, `LINK_TYPES`, `AGENTS`.
+The store enforces two kinds of rule, and `bun run check:prototypes` proves both and names which is which:
+
+- **The hApp's, at 3cbebf0:** the integrity zome's lifecycle table, initiator-only lifecycle, custodian-only custody transfer and operational state, a successor for Deprecated, rules only their author may change (`update_governance_rule` returns NotAuthor), no items at Ideation, and the Hard constraints of `crates/shared/src/constraints.rs` that apply to what the store accepts (no ownership-transfer rule on a Nondominium NDO).
+- **Prototype rules the hApp does not enforce yet:** no self-validation (`create_validation_receipt` has no validator check) and one claim per commitment (`claim_commitment` leaves it as a Phase 2 TODO). They are the handoff's; keep them, but do not cite them as zome behaviour.
+
+Pure helpers for your own rendering are exported from `store/logic.ts`: `fmtAgo`, `freshness`, `heat`, `allowedStages`, `STAGES`, `ENUM`, `LINK_TYPES`, `AGENTS`.
 
 ## Words: `plain.ts`
 
-Every direction, F included, takes its words from `$lib/prototypes/plain`. Never write a local enum-to-word map.
+Every direction, F included, takes its words from `$lib/prototypes/plain`. Never write a local enum-to-word map. F's past-tense event phrases (`ACTION_PAST`) and rule sentences (`ruleSentence`) live there too.
 
 - `plain(value)`: the everyday word for an enum value or a " · "-joined rule summary. Always shown.
 - `word(value, dev)`: F's convention, the raw enum with Developer details on.
@@ -121,7 +126,7 @@ Svelte ports of everything `ui.jsx` provides, styled on design-system tokens.
 | `Toasts` | none | The write lifecycle. |
 | `ModalHost` | none | Renders whichever modal is open. |
 
-Open a modal from anywhere with `modals.open({ type, ... })`; the request types are in `ui/modals.svelte.ts` and mirror the handoff's `setM({ type })`: `create`, `attach`, `note`, `advance`, `rule`, `resources`, `commit`, `commitments`, `profile`, `receipts`, `help`, `group`, `join`, `browse`, `why`. Also exported: `avatarColor`, `initials`, `AVATAR_HUES`, `focusOnMount` (an attachment: `{@attach focusOnMount}`).
+Open a modal from anywhere with `modals.open({ type, ... })`. A modal belongs to the route it was opened on: `ModalHost` renders it only there, and the direction layout closes it when you move to another direction or leave, so an `after` callback never runs in a direction that did not set it; the request types are in `ui/modals.svelte.ts` and mirror the handoff's `setM({ type })`: `create`, `attach`, `note`, `advance`, `rule`, `resources`, `commit`, `commitments`, `profile`, `receipts`, `help`, `group`, `join`, `browse`, `why`. Also exported: `avatarColor`, `initials`, `AVATAR_HUES`, `focusOnMount` (an attachment: `{@attach focusOnMount}`).
 
 ## Theming
 
@@ -152,7 +157,7 @@ The kit reads `--proto-*` custom properties; each defaults to a design-system to
 
 The exit chip lives in the layout, outside your root. If your own UI sits in the bottom-left corner, move it by setting `--proto-exit-left` and `--proto-exit-bottom` on `document.documentElement` in an effect, and clear them in the effect's cleanup.
 
-Style on tokens (`rgb(var(--ndo-*))`). The handoff asked for A to E to be restyled onto the design system: keep each direction's layout, flow and interaction, not its palette. No hex literals; the eight avatar hues in `ui/avatar.ts` are the only exception. For badges and buttons, `@nondominium/ndo-ui` exports `NdoBadge` (`kind`, `value`, `mode`) and `NdoButton`. Glyphs, not icons: `+ → ← ⎘ ✓ ⚠ · ▾ ‹ ›`. No em dashes in copy.
+Style on tokens (`rgb(var(--ndo-*))`). Tokens only includes type: the handoff's per-direction webfonts are not loaded, and each registry entry's `typeNote` says what its direction lost. The handoff asked for A to E to be restyled onto the design system: keep each direction's layout, flow and interaction, not its palette. No hex literals; the eight avatar hues in `ui/avatar.ts` are the only exception. For badges and buttons, `@nondominium/ndo-ui` exports `NdoBadge` (`kind`, `value`, `mode`) and `NdoButton`. Glyphs, not icons: `+ → ← ⎘ ✓ ⚠ · ▾ ‹ ›`. No em dashes in copy.
 
 ## F: Flow Graph
 

@@ -170,6 +170,9 @@ export const actions = {
   joinGroup: (code: string) => run(L.joinGroup(state, ctx(), code)),
   /** zome_resource::create_governance_rule */
   addRule: (ndo: string, type: string, summary: string) => run(L.addRule(state, ctx(), ndo, type, summary)),
+  /** zome_resource::update_governance_rule (the rule's author only). `i` is the rule's index on the NDO. */
+  updateRule: (ndo: string, i: number, type: string, summary: string) =>
+    run(L.updateRule(state, ctx(), ndo, i, type, summary)),
   /** zome_resource::create_economic_resource */
   addInstance: (ndo: string, label: string) => run(L.addInstance(state, ctx(), ndo, label)),
   /** zome_resource::update_operational_state (custodian only) */

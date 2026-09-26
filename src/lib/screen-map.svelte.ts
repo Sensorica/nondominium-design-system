@@ -17,8 +17,9 @@ import {
   TERMINAL_NDO
 } from './records';
 import { labelForKey, protoKey, screenKeyForUrl } from './surface-keys';
-import { DIRECTION_LIST, type DirectionSlug, type ViewOf } from './prototypes/directions';
-import { EXAMPLE_GROUP, EXAMPLE_NDO } from './prototypes/store/logic';
+// The registry only: importing the store's logic here would pull its seed
+// into every page that shows the map, the /app replica included.
+import { DIRECTION_LIST, EXAMPLE_GROUP, EXAMPLE_NDO, type DirectionSlug, type ViewOf } from './prototypes/directions';
 
 /** Representative URLs for the direction surfaces: the index, each direction's
  *  default view, and each other view pinned to an example record when it

@@ -36,7 +36,20 @@ export interface Direction {
   store: StoreKind;
   views: readonly DirectionView[];
   status: DirectionStatus;
+  /** What the port lost from the handoff's look. The handoff asked for A to E
+   *  to be restyled onto the design system ("tokens only"), so each direction's
+   *  own webfonts were replaced by the design-system sans and mono. Shown on
+   *  the index, so a reviewer comparing directions knows the type is not the
+   *  handoff's. */
+  typeNote: string;
 }
+
+/** Seed records the screen map links to when a view needs one, and where E
+ *  opens (the handoff's HolarchyApp starts inside the CNC machine). Kept here,
+ *  not in the store, so a page that only needs the ids does not import the
+ *  store and its seed. */
+export const EXAMPLE_GROUP = 'sen';
+export const EXAMPLE_NDO = 'sol';
 
 export const DIRECTIONS = [
   {
@@ -54,6 +67,8 @@ export const DIRECTIONS = [
       { id: 'traces', label: 'Traces' },
       { id: 'you', label: 'You' }
     ],
+    typeNote:
+      'Handoff type: Instrument Sans and JetBrains Mono. Here: the design-system sans and mono (tokens only), so the lettering is not the handoff\'s.',
     status: 'candidate'
   },
   {
@@ -71,6 +86,8 @@ export const DIRECTIONS = [
       { id: 'requests', label: 'Requests' },
       { id: 'linked', label: 'Linked' }
     ],
+    typeNote:
+      'Handoff type: a Newsreader serif for the notebook pages, with IBM Plex Sans and Mono. Here: the design-system sans and mono (tokens only), so the serif notebook look is gone; judge the layout and flow, not the paper feel.',
     status: 'candidate'
   },
   {
@@ -83,6 +100,8 @@ export const DIRECTIONS = [
       'Every NDO in a scrolling top bar plus Browse. A spec sheet on the left (stage, ownership, type, use, rules, items with holders, needs attention, requests) and a bench diagram of everything attached to the NDO, with a 30-day activity chart below it.',
     store: 'shared',
     views: [{ id: 'bench', label: 'Bench and spec sheet' }],
+    typeNote:
+      'Handoff type: Space Grotesk and Space Mono. Here: the design-system sans and mono (tokens only), so the lettering is not the handoff\'s.',
     status: 'candidate'
   },
   {
@@ -98,6 +117,8 @@ export const DIRECTIONS = [
       { id: 'board', label: 'Board' },
       { id: 'drawer', label: 'Resource drawer', needs: ['ndo'] }
     ],
+    typeNote:
+      'Handoff type: Bricolage Grotesque and DM Mono. Here: the design-system sans and mono (tokens only), so the lettering is not the handoff\'s.',
     status: 'candidate'
   },
   {
@@ -107,13 +128,19 @@ export const DIRECTIONS = [
     pitch: 'Zoom from the lobby into a group and into a resource, as nested rings.',
     fidelity: 'mid',
     tries:
-      'Zoomable Lobby, Group and NDO rings. Groups are laid out on a grid for any number; a group with more than 12 NDOs uses two rings; scrolling down goes up a level. The NDO view shows concentric rings for identity, rules, items and linked resources, with a summary card for each ring.',
+      'Zoomable Lobby, Group and NDO rings. Groups are laid out on a grid for any number; a group with more than 12 NDOs uses two rings; scrolling down goes up a level. The NDO view shows concentric rings for identity, rules, items and linked resources, with a summary card for each ring. It opens inside the CNC machine, as the handoff does; the breadcrumbs lead up to the group and the Lobby.',
     store: 'shared',
+    // The resource level comes first because it is where the handoff opens
+    // (HolarchyApp starts inside the CNC machine's rings): the bare URL shows
+    // EXAMPLE_NDO in EXAMPLE_GROUP, falling back to the group, then the Lobby,
+    // when those records are gone. The Lobby is `?view=lobby`.
     views: [
-      { id: 'lobby', label: 'Lobby level' },
+      { id: 'ndo', label: 'Resource level', needs: ['group', 'ndo'] },
       { id: 'group', label: 'Group level', needs: ['group'] },
-      { id: 'ndo', label: 'Resource level', needs: ['group', 'ndo'] }
+      { id: 'lobby', label: 'Lobby level' }
     ],
+    typeNote:
+      'Handoff type: Manrope and Fira Code. Here: the design-system sans and mono (tokens only), so the lettering is not the handoff\'s.',
     status: 'candidate'
   },
   {
@@ -130,6 +157,8 @@ export const DIRECTIONS = [
       { id: 'conductor-a', label: 'Conductor a' },
       { id: 'conductor-b', label: 'Conductor b' }
     ],
+    typeNote:
+      'No change: the handoff already set F in the design-system sans and mono.',
     status: 'candidate'
   }
 ] as const satisfies readonly Direction[];

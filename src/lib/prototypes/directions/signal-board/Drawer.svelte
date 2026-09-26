@@ -18,11 +18,13 @@
   const trail = $derived(proto.q.tracesOf(id));
   const links = $derived(proto.q.hardLinksOf(id));
 
-  let error = $state<string | null>(null);
+  // An error belongs to the NDO it was raised on: switching NDO drops it.
+  let failed = $state<{ id: string; error: string } | null>(null);
+  const error = $derived(failed && failed.id === id ? failed.error : null);
 
   function pickUp(sig: Signal) {
     const r = proto.actions.pickUp(sig);
-    error = r.ok ? null : r.error;
+    failed = r.ok ? null : { id, error: r.error };
   }
 
   const open = (req: ModalRequest) => () => modals.open(req);

@@ -4,7 +4,7 @@
 //
 // Every word comes from $lib/prototypes/plain: the handoff's F_WORD, F_TYPE,
 // F_LANE, F_ACT and F_FIELD maps were merged there, so this file keeps none.
-import { ACTION_PHRASE, ENTRY_TYPE_WORD, FIELD_WORD, LANE_WORD, plain, word } from '$lib/prototypes/plain';
+import { ACTION_PAST, ACTION_PHRASE, ENTRY_TYPE_WORD, FIELD_WORD, LANE_WORD, plain, ruleSentence, word } from '$lib/prototypes/plain';
 import {
   CONDUCTORS,
   ENUMS,
@@ -109,9 +109,10 @@ function itemName(B: Backend, h: string | null | undefined): string {
   return (e.data.label as string) || TYPES[e.type].title(e.data);
 }
 
-/** The person a sentence about a promise or event starts with. "Borrow" is
- *  something the receiver does, so an AccessForUse sentence starts with the
- *  receiver; every other action with the provider. */
+/** The person a sentence about a promise starts with. "Borrow" is something
+ *  the receiver does, so an AccessForUse promise starts with the receiver;
+ *  every other action with the provider. What happened is told from the
+ *  provider in the past tense, as the handoff does ("Sarah lent X"). */
 const subjectOf = (d: Data) => (d.action === 'AccessForUse' ? d.receiver : d.provider);
 const phrase = (action: string) => ACTION_PHRASE[action] ?? action;
 
@@ -123,7 +124,8 @@ export function title(ctx: Ctx, e: Entry): string {
       case 'Commitment':
         return aname(B, subjectOf(d)) + ' will ' + phrase(d.action) + ' ' + itemName(B, d.resource_inventoried_as);
       case 'EconomicEvent':
-        return aname(B, subjectOf(d)) + ' · ' + phrase(d.action) + ' ' + itemName(B, d.resource_inventoried_as);
+        // The handoff's past tense, from the provider: "Sarah handed over X".
+        return aname(B, d.provider) + ' ' + (ACTION_PAST[d.action] ?? phrase(d.action)) + ' ' + itemName(B, d.resource_inventoried_as);
       case 'GovernanceRule':
         return plain(d.rule_type as string);
       case 'ValidationReceipt':
@@ -148,8 +150,8 @@ export interface BadgeSpec {
 }
 
 /** A governance rule's typed payload in one line, e.g. "Credentialed ·
- *  Transport". The plain view runs the same line through plain(), which
- *  translates it part by part. */
+ *  Transport": the Developer details badge. The plain badge is the handoff's
+ *  sentence, ruleSentence() in plain.ts. */
 export function ruleSummary(r: Data): string {
   switch (r.type) {
     case 'AccessRequirement':
@@ -181,8 +183,8 @@ export function badges(ctx: Ctx, e: Entry): BadgeSpec[] {
     case 'NdoAnchor':
       return [{ variant: 'lifecycle-' + kebab(d.lifecycle_stage), label: w(d.lifecycle_stage) }];
     case 'GovernanceRule': {
-      const sum = ruleSummary(d.rule_data);
-      return [{ variant: 'rule-' + kebab(d.rule_data.type), label: dev ? sum : plain(sum) }];
+      // Plain view: the handoff's sentence ("Needs role: Trusted member").
+      return [{ variant: 'rule-' + kebab(d.rule_data.type), label: dev ? ruleSummary(d.rule_data) : ruleSentence(d.rule_data) }];
     }
     case 'EconomicResource':
       return [{ variant: 'op-' + kebab(d.operational_state), label: w(d.operational_state) }];

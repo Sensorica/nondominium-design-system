@@ -4,7 +4,7 @@
   // entered (NDO level) it summarises each ring, what needs attention, the
   // recent activity, and the actions for it.
   import { proto } from '$lib/prototypes/store/store.svelte';
-  import { plain } from '$lib/prototypes/plain';
+  import { plain, stageLabel } from '$lib/prototypes/plain';
   import { fmtAgo } from '$lib/prototypes/store/logic';
   import { modals, AgentAvatar, ErrorNote } from '$lib/prototypes/ui';
   import { RING_COLOR, type Ring } from './geometry';
@@ -26,7 +26,9 @@
   const group = $derived(proto.q.group(at.group));
   const n = $derived(proto.q.ndo(id));
 
-  let error = $state<string | null>(null);
+  // An error belongs to the NDO it was raised on: switching NDO drops it.
+  let failed = $state<{ id: string | null | undefined; error: string } | null>(null);
+  const error = $derived(failed && failed.id === id ? failed.error : null);
   let copied = $state(false);
 
   const sg = $derived(id ? proto.q.signalsOf(id) : []);
@@ -97,7 +99,7 @@
 
   function pickUp(sig: (typeof sg)[number]) {
     const r = proto.actions.pickUp(sig);
-    error = r.ok ? null : r.error;
+    failed = r.ok ? null : { id, error: r.error };
   }
 </script>
 
@@ -204,7 +206,7 @@
             <AgentAvatar id={t.agent} size={16} />
             <span><b>{proto.q.agent(t.agent)}</b> {t.text}</span>
           </span>
-          <small>{t.status === 'validated' ? fmtAgo(t.ago) : t.status}</small>
+          <small>{t.status === 'validated' ? fmtAgo(t.ago) : stageLabel(t.status, proto.dev)}</small>
         </div>
       {:else}
         <p class="p small">Nothing has happened here yet.</p>

@@ -27,6 +27,13 @@
     return proto.s.ndos[0]?.id ?? null;
   });
 
+  // A stale or bogus `?ndo=` (after "Start over", say) must not show another
+  // entry under its URL: rewrite the URL to the entry actually shown, as D
+  // does for its drawer. A bare URL stays bare.
+  $effect(() => {
+    if (record.ndo && record.ndo !== sel) goView('field-notes', view, sel ? { ndo: sel } : undefined, { replace: true });
+  });
+
   // Opening an entry starts on its trail, as in the handoff.
   function select(id: string) {
     goView('field-notes', 'trail', { ndo: id });

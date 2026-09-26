@@ -38,7 +38,10 @@ export function goView<S extends DirectionSlug>(
   if (!browser) return;
   const url = paths.protoView(slug, view, record);
   if (page.url.pathname + page.url.search === url) return;
-  goto(url, { noScroll: true, keepFocus: true, replaceState: opts.replace ?? false });
+  // A navigation superseded by a newer one (two quick clicks, an effect that
+  // corrects the URL) rejects; nothing is lost, so the rejection is dropped
+  // rather than left unhandled.
+  goto(url, { noScroll: true, keepFocus: true, replaceState: opts.replace ?? false }).catch(() => {});
 }
 
 /** Remove query params without navigating, e.g. `fresh` once it has been

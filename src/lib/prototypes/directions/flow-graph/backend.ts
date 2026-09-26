@@ -158,7 +158,10 @@ export function allowedTransitions(d: Data): string[] {
   return [ALLOWED_NEXT[from], 'Hibernating', 'Deprecated', 'EndOfLife'].filter(Boolean);
 }
 
-let seq = 0;
+// Seeded from the clock, not 0: activity rows are keyed on 'c' + seq and the
+// log is persisted, so a counter that restarted at 0 on every page load reused
+// ids already saved and crashed the Activity dock's keyed list.
+let seq = Date.now();
 const hash = (p = 'uhCkk') =>
   p + Math.random().toString(36).slice(2, 8) + (seq++).toString(36) + Math.random().toString(36).slice(2, 6);
 
@@ -302,6 +305,7 @@ export const SCENARIOS: Record<string, Scenario> = {
       'Profile · + New entry → Create person, as conductor a (create_person).',
       'Group · + New entry → Create group. Then, as conductor b, create a profile and pick the group card → Join group.',
       'First NDO · + New entry → Create a shared resource, listed in your group (create_ndo → create_ndo_anchor).',
+      'Stage · pick the shared resource card → Change stage to Specification (update_lifecycle_stage). While it is an idea, no kind of item can be added: the zome refuses Layer 1 at Ideation.',
       'Next · pick the shared resource card → Add a kind of item, then Add an item, and watch conductor b receive it.'
     ],
     seed() {}
@@ -414,6 +418,13 @@ export function createBackend({ gossipMs = 1400 }: { gossipMs?: number } = {}): 
   const claimsOf = (c: string) => all().filter((e) => e.type === 'Claim' && e.data.fulfills === c);
   const validationsOf = (h: string) => all().filter((e) => e.type === 'ValidationReceipt' && e.data.validated_item === h);
   const inEnum = (list: readonly string[], v: unknown) => list.includes(v as string);
+  // Hard violation of check_capture_resistance (crates/shared/src/constraints.rs),
+  // enforced on Commitment and EconomicEvent by the zome_gouvernance integrity zome.
+  const captureCheck = (ndoHash: string | null | undefined, action: string) => {
+    const n = ndoHash ? st().entries[ndoHash] : undefined;
+    if (n?.data.property_regime === 'Nondominium' && ['Transfer', 'Consume', 'Lower'].includes(action))
+      err('[nondominium_no_unilateral_capture] ' + action + ' is not permitted on a Nondominium resource (REQ-RES-03).');
+  };
 
   const H: Record<string, (i: Data, a: string) => string | string[]> = {
     // ─── zome_person ───
@@ -485,7 +496,10 @@ export function createBackend({ gossipMs = 1400 }: { gossipMs?: number } = {}): 
     'zome_resource.create_resource_specification'(i, a) {
       needPerson(a);
       if (!i.name || !String(i.name).trim()) err('Specification name cannot be empty');
-      get(i.ndo_identity_hash, 'NondominiumIdentity');
+      const n = get(i.ndo_identity_hash, 'NondominiumIdentity');
+      // Lifecycle gate from validate_create_resource_spec (integrity zome_resource).
+      if (['Ideation', 'Hibernating', 'Deprecated', 'EndOfLife'].includes(n.data.lifecycle_stage))
+        err('Cannot activate Layer 1 while the NDO is ' + n.data.lifecycle_stage + '.');
       return commit('ResourceSpecification', { name: String(i.name).trim(), description: i.description || '', category: i.category || 'equipment', tags: [], ndo_identity_hash: i.ndo_identity_hash }, a, 'zome_resource', 'create_resource_specification');
     },
     'zome_resource.create_governance_rule'(i, a) {
@@ -493,6 +507,10 @@ export function createBackend({ gossipMs = 1400 }: { gossipMs?: number } = {}): 
       const rd: Data = i.rule_data || {};
       if (!inEnum(ENUMS.GovernanceRuleType, rd.type)) err('Invalid RuleData variant');
       if (rd.type === 'MaintenanceSchedule' && !(rd.interval_days > 0)) err('MaintenanceSchedule.interval_days must be > 0');
+      // Hard violation of check_rule_data_permitted (crates/shared/src/constraints.rs):
+      // an ownership-transfer rule on an uncapturable NDO. Soft elsewhere, so accepted.
+      if (rd.type === 'TransferCondition' && rd.transfer_type === 'Ownership' && n.data.property_regime === 'Nondominium')
+        err('[ownership_transfer_not_permitted_by_regime] Nondominium does not permit ownership-transfer rules.');
       if (i.specification_hash) get(i.specification_hash, 'ResourceSpecification');
       return commit('GovernanceRule', { rule_type: rd.type, rule_data: rd, enforced_by: i.enforced_by || null, ndo_identity_hash: n.hash, specification_hash: i.specification_hash || null, property_regime: n.data.property_regime, resource_nature: n.data.resource_nature }, a, 'zome_resource', 'create_governance_rule');
     },
@@ -523,6 +541,7 @@ export function createBackend({ gossipMs = 1400 }: { gossipMs?: number } = {}): 
       needPerson(i.provider);
       if (!inEnum(ENUMS.VfAction, i.action)) err('Invalid VfAction');
       get(i.ndo_identity_hash, 'NondominiumIdentity');
+      captureCheck(i.ndo_identity_hash, i.action);
       if (i.resource_hash) get(i.resource_hash, 'EconomicResource');
       return commit('Commitment', { action: i.action, provider: i.provider, receiver: a, provider_person: personOf(i.provider), receiver_person: personOf(a), resource_inventoried_as: i.resource_hash || null, resource_conforms_to: i.resource_spec_hash || null, due_date: i.due_date || Date.now() + 864e5, note: i.note || null, ndo_identity_hash: i.ndo_identity_hash }, a, 'zome_gouvernance', 'propose_commitment');
     },
@@ -531,6 +550,7 @@ export function createBackend({ gossipMs = 1400 }: { gossipMs?: number } = {}): 
       needPerson(i.receiver);
       if (!inEnum(ENUMS.VfAction, i.action)) err('Invalid VfAction');
       const r = get(i.resource_inventoried_as, 'EconomicResource');
+      captureCheck(r.data.ndo_identity_hash, i.action);
       return commit('EconomicEvent', { action: i.action, provider: i.provider, receiver: i.receiver, provider_person: personOf(i.provider), receiver_person: personOf(i.receiver), resource_inventoried_as: r.hash, affects: r.hash, resource_quantity: +i.resource_quantity || r.data.quantity, event_time: Date.now(), note: i.note || null, ndo_identity_hash: r.data.ndo_identity_hash }, a, 'zome_gouvernance', 'log_economic_event');
     },
     'zome_gouvernance.claim_commitment'(i, a) {
@@ -557,7 +577,9 @@ export function createBackend({ gossipMs = 1400 }: { gossipMs?: number } = {}): 
 
   function call<T = unknown>(zome: string, fn: string, input: Data, as: AgentKey): CallResult<T> {
     const key = zome + '.' + fn;
-    const row: LogRow = { id: 'c' + seq++, ts: Date.now(), as, zome, fn, input };
+    let id = 'c' + seq++;
+    while (st().log.some((r) => r.id === id)) id = 'c' + seq++;
+    const row: LogRow = { id, ts: Date.now(), as, zome, fn, input };
     try {
       if (!H[key]) err('Unknown zome function ' + key);
       if (!st().online[as] && !instant) row.queued = true; // source chain commit still succeeds offline; gossip waits
@@ -614,6 +636,21 @@ export function createBackend({ gossipMs = 1400 }: { gossipMs?: number } = {}): 
 
   if (!s || !s.entries || !s.scenario || !SCENARIOS[s.scenario]) seed('equipment');
   else {
+    // Heal a log saved by an older build, whose ids restarted at c0 on every
+    // page load: rename repeats so the Activity dock's keys are unique again.
+    const log = s.log ?? [];
+    const taken = new Set(log.map((row) => row.id));
+    const seen = new Set<string>();
+    s.log = log.map((row) => {
+      let id = row.id;
+      if (seen.has(id)) {
+        do id = 'c' + seq++;
+        while (taken.has(id));
+        taken.add(id);
+      }
+      seen.add(id);
+      return id === row.id ? row : { ...row, id };
+    });
     setConductors(SCENARIOS[s.scenario]);
     // An entry that was still gossiping when the page closed has no timer any
     // more: resume it, as a conductor would on start-up.
