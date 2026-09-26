@@ -16,6 +16,7 @@
 // `openCreateGroup`, `openJoinGroup`, `group`).
 
 import { base } from '$app/paths';
+import { defaultView, type DirectionSlug, type ViewOf } from './prototypes/directions';
 
 /** Which data state a screen asks the mock layer for. The union per surface is
  *  narrowed to the variants that surface actually renders differently, so a
@@ -34,6 +35,18 @@ type NdoState = 'loading' | 'error' | 'anonymous';
 const app = (suffix = '') => `${base}/app${suffix}`;
 const scenarios = (suffix = '') => `${base}/scenarios${suffix}`;
 const patterns = (suffix = '') => `${base}/patterns${suffix}`;
+const prototypes = (suffix = '') => `${base}/prototypes${suffix}`;
+
+/** Query string for a direction view: `view` first (omitted for the default
+ *  view, which is the bare direction URL), then the record it shows. */
+function viewQuery(slug: DirectionSlug, view: string, record: { group?: string; ndo?: string } = {}): string {
+  const q = new URLSearchParams();
+  if (view !== defaultView(slug)) q.set('view', view);
+  if (record.group) q.set('group', record.group);
+  if (record.ndo) q.set('ndo', record.ndo);
+  const s = q.toString();
+  return s ? `?${s}` : '';
+}
 
 export const paths = {
   // ── Design-system surfaces ──
@@ -102,6 +115,23 @@ export const paths = {
   scenarioGroupCollaboration: () => scenarios('/group-collaboration'),
   scenarioAgentIdentity: () => scenarios('/agent-identity'),
   scenarioGovernanceReview: () => scenarios('/governance-review'),
+
+  // ── Prototype directions (the v0.1 UI handoff; registry in prototypes/directions.ts) ──
+  /** The index of the six directions, inside the design-system chrome. */
+  prototypes: () => prototypes(),
+  /** A direction, full-bleed, on its default view. */
+  protoDirection: (slug: DirectionSlug) => prototypes(`/${slug}`),
+  /** A named view of a direction, optionally pinned to a record. Views are
+   *  query-param states of the direction route, so each is a linkable,
+   *  commentable surface. The default view has no `view` param. */
+  protoView: <S extends DirectionSlug>(slug: S, view: ViewOf<S>, record?: { group?: string; ndo?: string }) =>
+    prototypes(`/${slug}${viewQuery(slug, view, record)}`),
+  /** Start the direction as a new person: no profile, no groups. */
+  protoFresh: (slug: DirectionSlug) => prototypes(`/${slug}?fresh=1`),
+  /** Reload the example network, then open the direction. */
+  protoExample: (slug: DirectionSlug) => prototypes(`/${slug}?example=1`),
+  /** The handoff documents, copied verbatim, on GitHub. */
+  protoHandoffDocs: () => 'https://github.com/Sensorica/nondominium-design-system/tree/master/docs/prototypes',
 
   // ── @nondominium/ndo-ui (Tibi's component library, on master) ──
   uiKit: () => `${base}/ui-kit`,

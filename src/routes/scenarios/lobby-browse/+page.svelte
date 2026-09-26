@@ -61,6 +61,6 @@
   </section>
 
   <p class="mt-4 text-sm text-gray-500">
-    Live: <a class="text-blue-600 hover:underline" href={paths.appHome()}>the lobby in the prototype</a>.
+    Live: <a class="text-blue-600 hover:underline" href={paths.appHome()}>the lobby in the current app</a>.
   </p>
 </div>
