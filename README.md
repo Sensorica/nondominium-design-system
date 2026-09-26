@@ -119,7 +119,7 @@ Inside `/app`, press **`m`**: every keyed state, grouped, one click away — inc
 - Words come from one module, `src/lib/prototypes/plain.ts`. Shared modals, the menu, onboarding and toasts are in `src/lib/prototypes/ui/`. The contract for whoever builds a direction is `src/lib/prototypes/README.md`.
 - Every direction and each of its views is a keyed surface: `m` for the screen map, `c` to comment. `?fresh=1` starts a direction as a new person; `?example=1` reloads the example network.
 
-**Choosing and archiving.** Leave a comment on the direction you want (press `c` on it). The choice is then recorded by editing one field, `status`, in `src/lib/prototypes/directions.ts`: `'target'` for the chosen direction, `'archived'` for the ones set aside, `'candidate'` for the rest. The index, the rail and the banner on each direction follow that field; nothing else changes. Once a target exists, the index shows it beside the replica under "Actual versus target".
+**Choosing and archiving.** Leave a comment on the direction you want (press `c` on it). The choice is then recorded by editing one field, `status`, in `src/lib/prototypes/directions.ts`: `'target'` for the chosen direction, `'archived'` for the ones set aside, `'candidate'` for the rest. The index, the rail and the banner on each direction follow that field; nothing else changes. Once a target exists, the index shows it beside the current app (the replica at `/app`) under "Current app versus target".
 
 The handoff's standalone builds (about 10 MB of bundled React) are not committed; its notes, backend map and seven user stories are in `docs/prototypes/`.
 

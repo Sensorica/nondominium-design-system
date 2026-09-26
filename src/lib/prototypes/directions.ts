@@ -3,7 +3,7 @@
 // CHOOSING A DIRECTION IS EDITING ONE FIELD. To pick the direction Tibi
 // implements against the real hApp, set its `status` to 'target'. To shelve
 // one, set it to 'archived'. Change nothing else: the index page, the route
-// banners and the "Actual versus target" section all read this field. At most
+// banners and the "Current app versus target" section all read this field. At most
 // one direction should be 'target' at a time.
 //
 // Everything else here is descriptive and comes from the handoff README
