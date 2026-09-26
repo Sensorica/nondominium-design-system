@@ -1,19 +1,19 @@
 <script lang="ts">
-  // Copy of ui/src/lib/components/ndo/NdoView.svelte.
-  //
-  // Markup is the app's, unchanged. Two prototype-only additions, both outside
-  // the markup:
-  //   1. local tab / modal / join-panel state is mirrored into the query string,
-  //      so every one of those states is a deep-linkable, commentable surface.
+  // Copy of ui/src/lib/components/ndo/NdoView.svelte. Three differences, all
+  // allowances, and none reaches the markup beyond event handlers:
+  //   1. tab, modal and join-panel state is mirrored into the query string, so
+  //      every one of those states is a deep-linkable, commentable surface.
   //      Production keeps them purely local, which is right for the app and
   //      useless for a review tool.
-  //   2. the Effect service calls resolve synchronously against mock state.
-  import { page } from '$app/state';
-  import { replaceState } from '$app/navigation';
-  import { paths } from '$lib/paths';
-  import type { NdoDescriptor } from '../types';
-  import { urlFlag, urlParam } from '../url-state.svelte';
-  import { appContext, ndoService } from '../stores.svelte';
+  //   2. the Effect service calls become awaited calls on the mock layer, which
+  //      serves the slow and failed reads from `?state=` (see stores.svelte.ts).
+  //      Hash types alias to base64 strings here, so decodeHashFromBase64 is
+  //      identity; it is shimmed so the parse step stays the app's.
+  //   3. ndoDescriptor starts from a synchronous mock read instead of null, so
+  //      the prerendered page carries the record (see the comment at its $state).
+  import type { ActionHash, CellId, NdoDescriptor } from '../types';
+  import { currentUrl, replaceUrl, urlFlag, urlParam } from '../url-state.svelte';
+  import { appContext, ndoService, ndoDescriptorCache } from '../stores.svelte';
   import MemberList from '../group/MemberList.svelte';
   import ResourcesTab from './ResourcesTab.svelte';
   import GovernanceTab from './GovernanceTab.svelte';
@@ -22,6 +22,12 @@
   import NdoIdentityLayer from './NdoIdentityLayer.svelte';
   import ForkNdoModal from './ForkNdoModal.svelte';
   import AssociateNdoModal from './AssociateNdoModal.svelte';
+
+  const decodeHashFromBase64 = (s: string): string => s;
+
+  function seedDescriptor(): NdoDescriptor | null {
+    return ndoService.getDescriptor(decodeURIComponent(specHashB64));
+  }
 
   interface Props {
     specHashB64: string;
@@ -39,35 +45,49 @@
   const paramModal = $derived(urlParam('modal'));
   const paramJoin = $derived(urlFlag('join'));
 
-  // Production decodes the base64 hash into an ActionHash here and reports a
-  // parse error when that fails. The prototype routes on the base64 string, so
-  // the only failure mode left is "no such NDO".
-  // Production decodes the base64 hash in an $effect and stores it; here the
-  // hash IS the route param, so it derives. Keeping it as effect-written state
-  // would leave the first paint with a null hash and render nothing.
-  const specActionHash = $derived(specHashB64 || null);
-  const parseError = $derived(specHashB64 ? null : 'No NDO hash in the URL.');
+  // The app decodes the hash in an $effect and writes it to $state. Here the
+  // same decode derives, because an effect does not run while this route is
+  // prerendered and the first paint would carry a null hash and render nothing.
+  // decodeURIComponent is the step that can throw, as in the app.
+  const parsed = $derived.by((): { hash: ActionHash | null; error: string | null } => {
+    try {
+      return {
+        hash: decodeHashFromBase64(decodeURIComponent(specHashB64)) as ActionHash,
+        error: null
+      };
+    } catch {
+      return { hash: null, error: 'Could not decode resource specification hash from the URL.' };
+    }
+  });
+  const specActionHash = $derived(parsed.hash);
+  const parseError = $derived(parsed.error);
   let tab = $state<TabId>('resources');
-  // Production loads the descriptor asynchronously into $state and shows a
-  // spinner while it is in flight. Against mock state the lookup is
-  // synchronous, so it derives — which also means a lifecycle transition is
-  // reflected here the moment it is written, with no refresh call.
-  const ndoDescriptor = $derived<NdoDescriptor | null>(ndoService.getDescriptor(specHashB64));
-  // Production writes these two in the async load; nothing in a mock lookup can
-  // be slow or fail, so the mock layer serves them from `?state=` instead. Both
-  // screens are the app's — see stores.svelte.ts.
-  const isLoading = $derived(ndoService.isLoading);
-  const loadError = $derived(ndoService.loadError);
+  // The app starts this at null and fills it from an $effect. Every page here is
+  // prerendered, and effects do not run during prerender, so a null start ships
+  // HTML with no name, no detail card and a null lifecycleStage, which leaves
+  // '+ New specification' enabled on an Ideation NDO until hydration. Seeding from
+  // the mock is the first paint the app reaches once its read lands. The seed is
+  // withheld under ?state=loading|error, whose screens are a first visit.
+  let ndoDescriptor = $state<NdoDescriptor | null>(seedDescriptor());
+  let isLoading = $state(false);
+  let loadError = $state<string | null>(null);
   let showForkModal = $state(false);
   let showAssociateModal = $state(false);
   let showTransitionModal = $state(false);
   let showJoinPanel = $state(false);
   let joinMessage = $state<string | null>(null);
+  let joinError = $state<string | null>(null);
   let joinLoading = $state(false);
   let ndoMembers = $state<{ id: string; name: string; role?: string }[]>([]);
   let membersLoading = $state(false);
   let membersError = $state<string | null>(null);
-  let joinError = $state<string | null>(null);
+  /**
+   * The app resolves the cloned `ndo` cell holding this NDO's Layer 0 identity
+   * through NdoService.resolveCellIdForNdo and addresses every Layer 1 and
+   * Layer 2 call to it. The mock layer has one store and no cells, so this is
+   * always the value the app uses for a legacy NDO in the shared cell: null.
+   */
+  const ndoCellId: CellId | null = null;
 
   // Each of the four creation modals lives inside a tab, so a key that names the
   // modal has to select its tab too. Without this, ?modal=rule-edit resolves to
@@ -80,7 +100,7 @@
     event: 'activity'
   };
 
-  // URL → state (deep links and the screen map land here).
+  // URL to state (deep links and the screen map land here).
   $effect(() => {
     tab = (paramModal && MODAL_TAB[paramModal]) || paramTab;
     showForkModal = paramModal === 'fork';
@@ -90,7 +110,8 @@
   });
 
   function syncUrl(next: { tab?: TabId; modal?: string | null; join?: boolean }) {
-    const url = new URL(page.url);
+    const current = currentUrl();
+    const url = currentUrl();
     const t = next.tab ?? tab;
     if (t === 'resources') url.searchParams.delete('tab');
     else url.searchParams.set('tab', t);
@@ -101,39 +122,61 @@
     if (join) url.searchParams.set('join', '1');
     else url.searchParams.delete('join');
     // Idempotent: a handler that fires spuriously must not start a
-    // write → param → state → write cycle. See url-state.svelte.ts.
-    if (url.search === page.url.search) return;
-    replaceState(url, {});
+    // write, param, state, write cycle. See url-state.svelte.ts.
+    if (url.search === current.search) return;
+    replaceUrl(url);
   }
 
   $effect(() => {
-    appContext.currentView = 'ndo';
-    appContext.selectedNdoId = specHashB64;
+    if (specActionHash) {
+      appContext.currentView = 'ndo';
+      appContext.selectedNdoId = specActionHash;
+    } else if (parseError) {
+      appContext.selectedNdoId = null;
+    }
+    // Seed immediately from the in-memory cache (populated by NdoCard click).
+    const cached = ndoDescriptorCache.get(specHashB64);
+    if (cached) ndoDescriptor = cached;
   });
 
-  // Kept because the markup binds it to the error banner's Retry button. With a
-  // derived descriptor there is nothing to re-fetch.
-  function handleRefresh() {}
+  async function loadDescriptor(hash: ActionHash) {
+    // Only show spinner if we don't already have cached data to display.
+    if (!ndoDescriptor) isLoading = true;
+    loadError = null;
+    // Never settles under `?state=loading`; null is the failed read, from
+    // `?state=error` or a hash with no record.
+    const descriptor = await ndoService.fetchDescriptor(hash);
+    isLoading = false;
+    if (descriptor) {
+      ndoDescriptor = descriptor;
+      // Keep cache up to date with the latest on-chain version.
+      ndoDescriptorCache.set(specHashB64, descriptor);
+    } else if (!ndoDescriptor) {
+      // Only show the error banner if we have nothing else to display.
+      loadError = 'Could not refresh NDO details from the chain. Data shown may be cached.';
+    }
+  }
 
-  // NDO membership. This block rendered "not yet implemented on the DHT" until
-  // 2026-09-08, citing a planned-section of the zome docs. That was true before
-  // app PR #129 and false after it: #129 shipped join, list and is-member on the
-  // per-NDO cell. A stub that says a shipped feature does not exist is worse than
-  // no stub, because it answers the question instead of leaving it open.
-  //
-  // Mirrors `ui/src/lib/components/ndo/NdoView.svelte` at 20adb11, including its
-  // two failure strings. The load failure is worth keeping reachable: members
-  // reaching a node late is the normal case on a gossiping DHT, not an edge one.
-  function loadNdoMembers() {
+  $effect(() => {
+    if (!specActionHash) return;
+    const hash = specActionHash;
+    void loadDescriptor(hash);
+  });
+
+  function handleRefresh() {
+    if (specActionHash) void loadDescriptor(specActionHash);
+  }
+
+  async function loadNdoMembers() {
     membersLoading = true;
     membersError = null;
-    const members = ndoService.getNdoMembers(specHashB64);
+    const members = await ndoService.fetchNdoMembers(specHashB64);
     membersLoading = false;
-    if (ndoService.loadError) {
+    if (members === null) {
       membersError = 'Could not load members. They may not have reached this node yet.';
       ndoMembers = [];
     } else {
-      ndoMembers = members;
+      ndoMembers = members.map((m) => ({ ...m, role: 'Member' }));
     }
   }
 
@@ -147,7 +190,7 @@
       joinError = 'Could not join this NDO. Please try again.';
     } else {
       joinMessage = 'You have joined this NDO.';
-      loadNdoMembers();
+      void loadNdoMembers();
     }
     showJoinPanel = true;
     syncUrl({ join: true });
@@ -155,7 +198,7 @@
 
   $effect(() => {
     if (showJoinPanel && ndoMembers.length === 0 && !membersLoading && !membersError) {
-      loadNdoMembers();
+      void loadNdoMembers();
     }
   });
 
@@ -212,14 +255,14 @@
           onclick={() => {
             const next = !showJoinPanel;
             syncUrl({ join: next });
-            if (next) loadNdoMembers();
+            if (next) void loadNdoMembers();
           }}
           class="rounded border border-gray-300 px-3 py-1.5 text-xs font-medium text-gray-600 hover:bg-gray-50 disabled:opacity-50"
         >
           {joinLoading ? 'Joining…' : 'Join NDO'}
         </button>
 
-        <!-- Associate with group: writes SoftLink on group DHT -->
+        <!-- Associate with group: writes an NdoAnchor (clone coordinates) on the target group DHT -->
         <button
           type="button"
           onclick={() => {
@@ -295,7 +338,7 @@
         </div>
         <div>
           <p class="text-xs font-semibold uppercase tracking-wide text-gray-400">Lifecycle stage</p>
-          <p class="mt-1 text-sm font-medium text-gray-800">
+          <p data-testid="ndo-lifecycle-stage" class="mt-1 text-sm font-medium text-gray-800">
             {ndoDescriptor.lifecycle_stage ?? '—'}
           </p>
         </div>
@@ -328,10 +371,11 @@
           {joinLoading ? 'Joining…' : 'Join this NDO'}
         </button>
       </div>
+      {#if joinMessage}
+        <p class="mt-2 text-xs text-gray-600">{joinMessage}</p>
+      {/if}
       {#if joinError}
         <p class="mt-2 text-xs text-amber-700">{joinError}</p>
-      {:else if joinMessage}
-        <p class="mt-2 text-xs text-gray-600">{joinMessage}</p>
       {/if}
       <div class="mt-4">
         <MemberList members={ndoMembers} />
@@ -353,19 +397,16 @@
 
   <div class="p-6">
     {#if tab === 'resources'}
-      <!-- ndoCellId is app-only state: the app resolves a clone cell per NDO and
-           the prototype has no conductor, so null is the honest value rather
-           than a stand-in. lifecycleStage is what drives the Layer 1 gate. -->
       <ResourcesTab
-        specActionHash={specActionHash!}
-        ndoCellId={null}
+        {specActionHash}
+        {ndoCellId}
         lifecycleStage={ndoDescriptor?.lifecycle_stage ?? null}
         propertyRegime={ndoDescriptor?.property_regime ?? null}
       />
     {:else if tab === 'governance'}
       <GovernanceTab
-        specActionHash={specActionHash!}
-        ndoCellId={null}
+        {specActionHash}
+        {ndoCellId}
         propertyRegime={ndoDescriptor?.property_regime ?? null}
         resourceNature={ndoDescriptor?.resource_nature ?? null}
         rivalryOverride={ndoDescriptor?.rivalry_override ?? null}
@@ -374,8 +415,8 @@
       <CompositionTab />
     {:else}
       <ActivityTab
-        specActionHash={specActionHash!}
-        ndoCellId={null}
+        {specActionHash}
+        {ndoCellId}
         propertyRegime={ndoDescriptor?.property_regime ?? null}
         resourceNature={ndoDescriptor?.resource_nature ?? null}
         rivalryOverride={ndoDescriptor?.rivalry_override ?? null}

@@ -1,13 +1,12 @@
 <script lang="ts">
   // Copy of ui/src/lib/components/ndo/SpecificationCreateModal.svelte from the
-  // app at 20adb117219de3e7a1a45b53d8a02fc0602feb7e. Markup is the app's; the
-  // Effect store call becomes a call against the mock singleton, and the
-  // ActionHash props become the base64 strings the prototype routes on.
-  import type { CellId, LifecycleStage, PropertyRegime, ResourceScope } from '../types';
+  // app at 3cbebf0fb08ecc9070bc22d290ca23b250b56da9. Script and markup are the
+  // app's; only the imports are repointed to the types and the mock store.
+  import type { ActionHash, CellId, LifecycleStage, PropertyRegime, ResourceScope } from '../types';
   import { resourceStore } from '../stores.svelte';
 
   interface Props {
-    ndoActionHash: string;
+    ndoActionHash: ActionHash;
     /** The NDO's own clone cell; null for legacy NDOs in the shared cell. */
     ndoCellId?: CellId | null;
     lifecycleStage: LifecycleStage | string | null;

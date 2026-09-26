@@ -369,3 +369,44 @@ Phases 1 to 5 built the replica and proved it against the app on 2026-08-11. Sin
 #### Why this phase stopped where it did
 
 The run was coordinated as a two-peer covenant, and the covenant's ledger stopped being trustworthy. Both handles were driven by more than one session; `chains/ds-shell.jsonl` acquired a hard defect this session did not author, accusing the hold owner of intruding on its own held files, and one acknowledged append is missing from the chain entirely. An append-only log with two writers under one identity loses records, and `convene replay` cannot see the hole because the survivors still chain correctly. The code work is unaffected and is committed with only its author's paths staged (`78e7054`, `4d65d7a`). The coordination substrate is what needs Soushi's ruling, because he spawned the sessions and no peer can settle it from inside.
+
+
+---
+
+## Phase 7: every divergence read, at 3cbebf0 (2026-09-26)
+
+Phase 6 made the fidelity check honest about what it could not see: 24 of the 29 script-divergent files were marked `unread`, meaning nobody had separated legitimate wiring from dropped behaviour. This phase read all 24 against the app at `origin/dev` `3cbebf0` and folded in the Claude Design handoff (`Nondominium Design System.zip`).
+
+### Criteria
+
+| # | Claim | Falsifier |
+|---|---|---|
+| 24 | Every script-divergent replica file carries a verdict | `check:fidelity` prints fewer than N/N read |
+| 25 | Every `behaviour` verdict is restored, or its note argues why it cannot be | A dropped behaviour with no restoration and no argument |
+| 26 | `check:fidelity` passes with 30/30 identical class sets | Non-zero exit or a `CLASS DRIFT` row |
+| 27 | The eight `-300` shades the app uses are tokens and render on `/tokens` | A missing token, or the panel absent |
+| 28 | Every state in the handoff navigator maps to a key or a stated reason | A navigator state with neither |
+
+### What the phase found
+
+**Six components had dropped behaviour, all restored.** `ActivityTab`, `GovernanceTab` and `ResourcesTab` had swapped the app's `$effect` (keyed on the NDO hash) for `onMount`, so none reloaded when the NDO changed. `NdoView` showed invented error copy instead of the app's cached-descriptor banner. `AssociateNdoModal` never loaded existing associations, so it offered groups that already anchor the NDO, and its confirm wrote nothing. `Sidebar` carried an "Invalid invite code." branch the app does not have. Eighteen files are wiring only.
+
+**Measured:** 29/29 divergent files read, 22/30 byte-identical markup (from 18), 30/30 identical class sets, `svelte-check` 0 errors.
+
+**The handoff was stale in four places, corrected before recording.** It was generated from the pre-rewrite layout. Its navigator holds 34 states, not 38. Its first discrepancy (Nondominium regime blue-700 dashed in the registry) was fixed by `d6df158`. Its fourth described the kit's group view wrongly; the real difference is the missing invite button. One new key, `lobby-first-profile`, was added for the first-launch profile modal; the review follow-up below removed it again.
+
+**App-side finding, recorded not changed.** The integrity zome lets any non-terminal stage enter Hibernating; the app's modal and `specifications.md` §7.5 offer only Active to Hibernating.
+
+**Open for the team.** `--ndo-purple-50/100/700` hold the violet triplets, while the new `--ndo-purple-300` is Tailwind purple, so the family mixes two hues. `packages/ndo-ui/styles/tokens.css` is a separate, older sheet and did not receive the new shades.
+
+### Review follow-up (2026-09-26)
+
+An independent review of PR #6 listed defects in keyed states. Walking the replica afterwards found a wider one underneath several of them: every click that wrote the query string did nothing.
+
+**Shallow routing never reached the replica.** SvelteKit's `replaceState` rewrites the address bar and deliberately leaves `page.url` alone, and every replica reader took its params from `page.url`. Tab clicks, modal closes and the profile bar changed the URL and nothing else. `src/lib/replica/url-state.svelte.ts` now records each shallow write against the `page.url` it was written over, reads through that record, and drops it after every navigation. Its per-param deriveds are created at module load, because Svelte does not track a `$derived` created inside the reaction that first reads it.
+
+**Every listed finding is closed.** `ndo-loading` and `ndo-error` render after a visit to the same NDO (the mock cache answers empty under those states and the route remounts `NdoView` on a `?state=` change). Prerendered NDO pages carry the record. The mock clears errors where the app's stores do. `?profile=1` opens on a hard load and on client navigation: clearing the flag from Melt's init-time `onOpenChange(false)` called `replaceState` during hydration, which threw and aborted the effect flush. The (app) layout now mounts the first-launch profile modal as the app's root layout does, so `lobby-no-profile` is that modal and `lobby-first-profile` was removed as its duplicate. Mock reads await a task before touching state, so the replica's effects track what the app's track.
+
+**Verdicts.** Phase 7 wrote 24 verdicts: 6 behaviour, 18 wiring. This follow-up re-read `LobbyView` (now behaviour: it had dropped the app's `onMount(loadNdos)`) and extended the notes of `NdoView`, the three tabs and `Sidebar`.
+
+**App-side, recorded in the README and not changed.** `NdoView`'s descriptor effect most likely re-triggers itself (by reading, not runtime-tested); its member load re-fires on an NDO with no members; a hash change keeps the previous NDO's descriptor on screen when the new read fails; a failed association is never shown to the agent.

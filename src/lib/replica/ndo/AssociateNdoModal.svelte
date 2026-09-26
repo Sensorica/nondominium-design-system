@@ -1,34 +1,52 @@
 <script lang="ts">
-  // Copy of ui/src/lib/components/ndo/AssociateNdoModal.svelte.
-  import { lobbyStore } from '../stores.svelte';
+  // Copy of ui/src/lib/components/ndo/AssociateNdoModal.svelte. Only the data
+  // source changes: the Effect service calls become lookups against the mock
+  // stores, which keep the app's order (groups, then the NDO's existing
+  // anchors). A failed association lands on groupStore.errorMessage, as in the
+  // app, with `?state=error` standing in for the broken conductor.
+  import { onMount } from 'svelte';
+  import { lobbyStore, groupStore, ndoService } from '../stores.svelte';
 
-  interface Props {
+  type Props = {
     ndoHashB64: string;
     ndoName: string;
     onclose: () => void;
-  }
+  };
 
   let { ndoHashB64, ndoName, onclose }: Props = $props();
 
-  let selected = $state(new Set<string>());
+  let selected = $state<Set<string>>(new Set());
   let saved = $state(false);
-  let loadingAssociations = $state(false);
-  let alreadyAssociated = $state<string[]>([]);
+  let associatedIds = $state<Set<string>>(new Set());
+  let loadingAssociations = $state(true);
 
-  const availableGroups = $derived(
-    lobbyStore.groups.filter((g) => !alreadyAssociated.includes(g.id))
-  );
+  const availableGroups = $derived(lobbyStore.groups.filter((g) => !associatedIds.has(g.id)));
+
+  onMount(() => {
+    void (async () => {
+      await lobbyStore.loadGroups();
+      associatedIds = new Set(ndoService.getAssociatedGroupIds(ndoHashB64));
+      loadingAssociations = false;
+    })();
+  });
 
   function toggle(id: string) {
     const next = new Set(selected);
-    if (next.has(id)) next.delete(id);
-    else next.add(id);
+    if (next.has(id)) {
+      next.delete(id);
+    } else {
+      next.add(id);
+    }
     selected = next;
   }
 
-  function handleConfirm() {
+  async function handleConfirm() {
+    for (const gid of selected) {
+      await groupStore.associateNdoWithGroup(ndoHashB64, gid);
+    }
+    await lobbyStore.loadNdos();
     saved = true;
-    setTimeout(onclose, 900);
+    setTimeout(onclose, 600);
   }
 
   function handleKeydown(e: KeyboardEvent) {

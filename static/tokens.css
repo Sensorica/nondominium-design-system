@@ -100,11 +100,13 @@
   /* Indigo — Specification, Development */
   --ndo-indigo-50:  238 242 255;
   --ndo-indigo-100: 224 231 255;
+  --ndo-indigo-300: 165 180 252;
   --ndo-indigo-700:  67  56 202;
 
   /* Amber — Prototype */
   --ndo-amber-50:  255 251 235;
   --ndo-amber-100: 254 243 199;
+  --ndo-amber-300: 252 211  77;
   --ndo-amber-600: 217 119   6;
   --ndo-amber-700: 180  83   9;
   --ndo-amber-800: 146  64  14;
@@ -112,6 +114,7 @@
   /* Green — Stable */
   --ndo-green-50:  240 253 244;
   --ndo-green-100: 220 252 231;
+  --ndo-green-300: 134 239 172;
   --ndo-green-600:  22 163  74;
   --ndo-green-700:  21 128  61;
 
@@ -129,11 +132,13 @@
   /* Yellow — Hibernating */
   --ndo-yellow-50:  254 252 232;
   --ndo-yellow-100: 254 249 195;
+  --ndo-yellow-300: 253 224  71;
   --ndo-yellow-700: 161  98   7;
 
   /* Orange — Deprecated */
   --ndo-orange-50:  255 247 237;
   --ndo-orange-100: 255 237 213;
+  --ndo-orange-300: 253 186 116;
   --ndo-orange-600: 234  88  12;
   --ndo-orange-700: 194  65  12;
 
@@ -141,6 +146,7 @@
   --ndo-red-50:  254 242 242;
   --ndo-red-100: 254 226 226;
   --ndo-red-200: 254 202 202;
+  --ndo-red-300: 252 165 165;
   --ndo-red-600: 220  38  38;
   --ndo-red-700: 185  28  28;
 
@@ -150,6 +156,7 @@
   /* Blue — Physical (shares the primary scale's hue family) */
   --ndo-blue-50:  239 246 255;
   --ndo-blue-100: 219 234 254;
+  --ndo-blue-300: 147 197 253;
   --ndo-blue-600:  37  99 235;
   --ndo-blue-700:  29  78 216;
   --ndo-blue-800:  30  64 175;
@@ -157,6 +164,7 @@
   /* Purple — Digital */
   --ndo-purple-50:  245 243 255;
   --ndo-purple-100: 237 233 254;
+  --ndo-purple-300: 216 180 254;
   --ndo-purple-700: 109  40 217;
 
   /* Sky — Service */

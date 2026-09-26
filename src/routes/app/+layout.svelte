@@ -8,11 +8,17 @@
   // one-way door — the design-system rail is hidden here, and the app has no
   // link to a design system.
   import type { Snippet } from 'svelte';
+  import { afterNavigate } from '$app/navigation';
   import { paths } from '$lib/paths';
+  import { resetShallowUrl } from '$lib/replica/url-state.svelte';
   import ScreenMapHost from '$lib/components/shared/ScreenMapHost.svelte';
   import { screenMap } from '$lib/screen-map.svelte';
 
   let { children }: { children: Snippet } = $props();
+
+  // The replica keeps modal and tab state in shallow URL writes; a navigation
+  // makes page.url the truth again (see url-state.svelte.ts).
+  afterNavigate(() => resetShallowUrl());
 </script>
 
 {@render children()}

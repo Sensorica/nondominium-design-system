@@ -99,6 +99,25 @@ export type DataState =
 /** The variant the URL asks for. Reactive: `page` is, and `urlParam` reads it. */
 const ds = (): DataState => (urlParam('state') as DataState | null) ?? 'default';
 
+/**
+ * Resolves on a later task, the way a conductor round trip does. The app's store
+ * and service reads all await the conductor before they touch any state, so an
+ * $effect that calls one tracks only what it read before that await. A mock that
+ * answered synchronously would make the same effect also track `?state=` and the
+ * mock collections, and re-run it on every replaceState (a tab click, a modal).
+ * Every async mock read below awaits this first, so the replica's effects track
+ * what the app's track and nothing else.
+ *
+ * A task rather than a microtask: where the app has an effect that re-fires on
+ * its own completion (NdoView's member load on an NDO with no members, see the
+ * README caveats), the app pays one conductor call per turn, and a microtask
+ * here would turn that same loop into a frozen tab.
+ */
+const conductor = (): Promise<void> => new Promise((resolve) => setTimeout(resolve, 0));
+
+/** A read the conductor never answers: `?state=loading`. */
+const never = <T>(): Promise<T> => new Promise<T>(() => {});
+
 /** Preset filters for the two filtered variants, so the reviewer sees the
  *  "(N results)" count and the Clear filters affordance without clicking. */
 const FILTER_PRESET: Record<string, ActiveFilters> = {
@@ -206,6 +225,9 @@ function matchesFilters(d: NdoDescriptor, f: ActiveFilters): boolean {
 
 const lobbyState = $state({
   activeFilters: { stages: [], natures: [], regimes: [] } as ActiveFilters,
+  /** Set once the agent touches a chip under a preset, so the chips stay live
+   *  on the filtered keys instead of snapping back to the preset. */
+  presetTouched: false,
   isLoading: false,
   errorMessage: null as string | null
 });
@@ -222,7 +244,10 @@ export const lobbyStore = {
     if (EMPTY_STATES.has(ds())) return [];
     return data.ndos.filter((d) => matchesFilters(d, this.activeFilters));
   },
-  get activeFilters() { return FILTER_PRESET[ds()] ?? lobbyState.activeFilters; },
+  get activeFilters() {
+    const preset = FILTER_PRESET[ds()];
+    return preset && !lobbyState.presetTouched ? preset : lobbyState.activeFilters;
+  },
   get isLoading() { return ds() === 'loading' || lobbyState.isLoading; },
   get errorMessage() {
     return ds() === 'error'
@@ -231,17 +256,58 @@ export const lobbyStore = {
   },
   get myPerson() { return appContext.myPerson; },
 
-  loadLobby() { return Promise.resolve(); },
-  loadNdos() { return Promise.resolve(); },
+  /**
+   * The app's layout calls this once after connecting, before it decides whether
+   * to open the first-launch profile modal. Like the app's it raises isLoading and
+   * clears the error first. Module state is already current, so nothing is fetched.
+   */
+  async loadLobby() {
+    lobbyState.isLoading = true;
+    lobbyState.errorMessage = null;
+    try {
+      await conductor();
+    } finally {
+      lobbyState.isLoading = false;
+    }
+  },
+  /**
+   * The app runs loadNdos and loadGroups through withLoadingState, which clears
+   * errorMessage before every read. That is what makes the lobby's Retry, and a
+   * return to the lobby after a failed join, drop the 'Join group failed' banner.
+   */
+  async loadNdos() {
+    lobbyState.isLoading = true;
+    lobbyState.errorMessage = null;
+    await conductor();
+    lobbyState.isLoading = false;
+  },
+  /** AssociateNdoModal awaits this before listing groups. Module state is already current. */
+  async loadGroups() {
+    lobbyState.isLoading = true;
+    lobbyState.errorMessage = null;
+    await conductor();
+    lobbyState.isLoading = false;
+  },
 
   setFilters(partial: Partial<ActiveFilters>) {
-    lobbyState.activeFilters = { ...lobbyState.activeFilters, ...partial };
+    lobbyState.activeFilters = { ...this.activeFilters, ...partial };
+    lobbyState.presetTouched = true;
   },
   clearFilters() {
     lobbyState.activeFilters = { stages: [], natures: [], regimes: [] };
+    lobbyState.presetTouched = true;
+  },
+
+  /** Mock only, not an app method: a change of `?state=` is a different agent
+   *  launching, so the (app) layout calls this to drop filter state the previous
+   *  one left behind and let a filtered key show its preset again. */
+  resetForNewState() {
+    lobbyState.activeFilters = { stages: [], natures: [], regimes: [] };
+    lobbyState.presetTouched = false;
   },
 
   createGroup(name: string, createdBy?: string): Promise<GroupDescriptor> {
+    lobbyState.errorMessage = null;
     const id = `${name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')}-${(1000 + ++seq).toString(16)}`;
     const group: GroupDescriptor = { id, name, createdBy, createdAt: Date.now() * 1000 };
     data.groups = [...data.groups, group];
@@ -251,8 +317,14 @@ export const lobbyStore = {
   },
 
   joinGroup(code: string): Promise<GroupDescriptor | null> {
+    lobbyState.errorMessage = null;
     const id = code.replace(/^.*[?&]group=/, '').trim();
     const group = data.groups.find((g) => g.id === id) ?? null;
+    // The app's store resolves null on a failed join and records the failure on
+    // errorMessage, prefixed exactly like this; the tail stands in for the
+    // Cause.pretty() text a conductor would produce. Sidebar closes the form
+    // either way and shows no inline error of its own.
+    if (!group) lobbyState.errorMessage = `Join group failed: no group matches invite ${id}`;
     if (group) {
       const members = data.groupMembers[group.id] ?? [];
       if (!members.some((m) => m.id === 'me')) {
@@ -301,13 +373,38 @@ export const groupStore = {
       : groupState.errorMessage;
   },
 
+  /** Clears errorMessage on every load, as the app's store does, so a failed
+   *  associate does not follow the agent onto every group view afterwards. */
   loadGroupData(groupId: string) {
     groupState.groupId = groupId;
+    groupState.errorMessage = null;
     return Promise.resolve();
   },
   refreshCurrentGroup() { return Promise.resolve(); },
 
+  /**
+   * Anchors an existing NDO in a second group, as the app's store does through
+   * `NdoService.associateNdoWithGroup`. The service copies clone coordinates from
+   * an anchor the NDO already has, so an NDO anchored nowhere fails with
+   * NdoNotFound; one already anchored in the target is a no-op. On failure the
+   * app's store records its own fixed message; `?state=error` is the broken
+   * conductor here.
+   */
+  associateNdoWithGroup(ndoHashB64: string, targetGroupId: string): Promise<void> {
+    const anchored = Object.values(data.groupNdoHashes).some((hs) => hs.includes(ndoHashB64));
+    if (ds() === 'error' || !anchored) {
+      groupState.errorMessage = 'Failed to associate NDO with group.';
+      return Promise.resolve();
+    }
+    const current = data.groupNdoHashes[targetGroupId] ?? [];
+    if (!current.includes(ndoHashB64)) {
+      data.groupNdoHashes[targetGroupId] = [...current, ndoHashB64];
+    }
+    return Promise.resolve();
+  },
+
   createNdo(input: NdoInput): Promise<string | null> {
+    groupState.errorMessage = null;
     const hash = mockHash('uhC0k');
     const descriptor: NdoDescriptor = {
       hash,
@@ -345,7 +442,12 @@ const storeError = (verb: string) => (ds() === 'error' ? `Failed to ${verb}: the
 
 export const resourceStore = {
   get resourceSpecificationListings(): ResourceSpecificationListing[] { return data.specListings; },
-  fetchAllResourceSpecifications() { return Promise.resolve(); },
+  async fetchAllResourceSpecifications() { await conductor(); },
+  /** The per-NDO read ResourcesTab, GovernanceTab and ActivityTab all call in the app. */
+  async fetchSpecificationsForNdo(ndoHash: ActionHash, _cellId?: CellId): Promise<ResourceSpecificationListing[]> {
+    await conductor();
+    return data.specListings.filter((l) => l.specification.ndo_identity_hash === ndoHash);
+  },
   get errorMessage() { return storeError('create'); },
 
   /** Layer 1 activation. Refuses on a Hard scope violation, the way the zome does. */
@@ -455,9 +557,10 @@ export const governanceStore = {
    * The `data.commitments` map is keyed by NDO hash purely for cheap writes, so
    * flattening here is an implementation detail rather than a second source.
    */
-  fetchAllCommitments(_cellId?: CellId): Promise<VfCommitment[]> {
-    if (EMPTY_STATES.has(ds())) return Promise.resolve([]);
-    return Promise.resolve(Object.values(data.commitments).flat());
+  async fetchAllCommitments(_cellId?: CellId): Promise<VfCommitment[]> {
+    await conductor();
+    if (EMPTY_STATES.has(ds())) return [];
+    return Object.values(data.commitments).flat();
   },
 
   proposeCommitment(
@@ -528,15 +631,24 @@ export const governanceStore = {
 // ── service-shaped lookups (what the Effect services return) ────────────────
 
 export const ndoService = {
-  /** Production holds these in NdoView's own `$state`, written by an async load.
-   *  Here they come from `?state=`, because a lookup against module state can
-   *  neither be slow nor fail, and both screens exist in the app. */
-  get isLoading() { return ds() === 'loading'; },
-  get loadError() {
-    return ds() === 'error' ? 'Failed to load this NDO: no such record on the DHT.' : null;
-  },
+  /**
+   * The synchronous read NdoView seeds its first paint from, so a prerendered
+   * NDO page carries the record (see NdoView). Withheld under `?state=loading`
+   * and `?state=error`, which stand for a first visit whose read has not landed.
+   */
   getDescriptor(hash: string): NdoDescriptor | null {
     if (ds() === 'loading' || ds() === 'error') return null;
+    return data.ndos.find((n) => n.hash === hash) ?? null;
+  },
+  /**
+   * `NdoService.getNdoDescriptorForSpecActionHash`: awaits the conductor, then
+   * answers. Never settles under `?state=loading`; resolves null, the failed read,
+   * under `?state=error` or when no record has the hash.
+   */
+  async fetchDescriptor(hash: string): Promise<NdoDescriptor | null> {
+    await conductor();
+    if (ds() === 'loading') return never();
+    if (ds() === 'error') return null;
     return data.ndos.find((n) => n.hash === hash) ?? null;
   },
   getTransitionHistory(hash: string): NdoTransitionHistoryEvent[] {
@@ -575,6 +687,13 @@ export const ndoService = {
   // `joinNdo` is idempotent behind an `is_ndo_member` guard, so joining twice
   // is a no-op rather than a duplicate row, and that is mirrored here.
 
+  /** Groups whose anchors carry this NDO identity, as `NdoService.getAssociatedGroupIds`. */
+  getAssociatedGroupIds(ndoHashB64: string): string[] {
+    return Object.entries(data.groupNdoHashes)
+      .filter(([, hashes]) => hashes.includes(ndoHashB64))
+      .map(([groupId]) => groupId);
+  },
+
   isNdoMember(hash: string): boolean {
     return (data.ndoMembers[hash] ?? []).some((m) => m.id === 'me');
   },
@@ -584,7 +703,18 @@ export const ndoService = {
     return data.ndoMembers[hash] ?? [];
   },
 
+  /** `NdoService.getNdoMembers`, async like the app's. null is the failed read,
+   *  which `?state=error` stands for. */
+  async fetchNdoMembers(hash: string): Promise<Member[] | null> {
+    await conductor();
+    if (ds() === 'error') return null;
+    return this.getNdoMembers(hash);
+  },
+
   joinNdo(hash: string): Promise<boolean> {
+    // The app's NdoView renders its own join-failure copy when this call fails.
+    // Module state cannot fail, so `?state=error` is the broken conductor.
+    if (ds() === 'error') return Promise.resolve(false);
     if (this.isNdoMember(hash)) return Promise.resolve(true);
     data.ndoMembers[hash] = [
       ...(data.ndoMembers[hash] ?? []),
@@ -601,6 +731,16 @@ export const ndoService = {
 export const personService = {
   getAllPersons(): Person[] { return persons; },
   getPersonRoles(): PersonRole[] { return INITIAL_MY_ROLES; }
+};
+
+/** The app reads its own key from the conductor's app info and throws when there
+ *  is none. `?state=anonymous` is that case here, so the call sites keep the
+ *  app's try/catch and its empty-field fallback. */
+export const holochainClientService = {
+  getMyAgentPubKey(): Promise<AgentPubKey> {
+    const me = appContext.myAgentPubKey;
+    return me ? Promise.resolve(me) : Promise.reject(new Error('App info not available'));
+  }
 };
 
 export const resourceService = {
@@ -646,8 +786,15 @@ export const governanceService = {
 
 // ── ndoDescriptorCache (production has the same module) ─────────────────────
 
+// The app's cache is filled by an NdoCard click and by every successful load, and
+// NdoView seeds from it, hiding its skeleton and its error banner whenever it
+// holds the record. `?state=loading` and `?state=error` stand for a FIRST visit
+// whose read has not landed, which is the only time the app shows either screen,
+// so under those states the mock cache answers as an empty one would. Without
+// that, visiting an NDO once would make both keyed screens unrenderable for the
+// rest of the session.
 const cache = new Map<string, NdoDescriptor>();
 export const ndoDescriptorCache = {
-  get: (k: string) => cache.get(k),
+  get: (k: string) => (ds() === 'loading' || ds() === 'error' ? undefined : cache.get(k)),
   set: (k: string, v: NdoDescriptor) => cache.set(k, v)
 };

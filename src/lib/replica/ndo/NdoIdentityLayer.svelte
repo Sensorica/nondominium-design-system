@@ -4,14 +4,21 @@
   // Production resolves the initiator's display name by fetching every Person
   // entry and matching on the encoded key; the replica does the same match
   // against mock persons, so an initiator with no Person entry still falls
-  // through to the truncated-key branch — which is a real state and one of the
+  // through to the truncated-key branch, which is a real state and one of the
   // reasons this screen is worth reviewing.
+  //
+  // Hash types alias to base64 strings here, so the two Holochain codecs are
+  // identity. They are shimmed rather than deleted so the derivations below
+  // stay line for line the app's.
   import { paths } from '$lib/paths';
-  import type { NdoDescriptor, ResourceNature } from '../types';
+  import type { ActionHash, NdoDescriptor, ResourceNature } from '../types';
   import { appContext, personService } from '../stores.svelte';
   import { effectiveRivalryLabel } from '../rivalry';
   import LifecycleTransitionModal from './LifecycleTransitionModal.svelte';
   import TransitionHistoryPanel from './TransitionHistoryPanel.svelte';
+
+  const encodeHashToBase64 = (h: string): string => h;
+  const decodeHashFromBase64 = (s: string): string => s;
 
   interface Props {
     descriptor: NdoDescriptor | null;
@@ -87,14 +94,16 @@
   const isInitiator = $derived(
     descriptor?.initiator != null &&
       appContext.myAgentPubKey != null &&
-      descriptor.initiator === appContext.myAgentPubKey
+      descriptor.initiator === encodeHashToBase64(appContext.myAgentPubKey)
   );
 
   const canTransition = $derived(
     isInitiator && descriptor?.lifecycle_stage != null && descriptor.lifecycle_stage !== 'EndOfLife'
   );
 
-  const ndoActionHash = $derived(descriptor?.hash ?? null);
+  const ndoActionHash = $derived(
+    descriptor?.hash ? (decodeHashFromBase64(descriptor.hash) as ActionHash) : null
+  );
 
   $effect(() => {
     if (!descriptor?.initiator) {
@@ -102,7 +111,7 @@
       return;
     }
     const initiatorB64 = descriptor.initiator;
-    const match = personService.getAllPersons().find((p) => p.agent_pub_key === initiatorB64);
+    const match = personService.getAllPersons().find((p) => encodeHashToBase64(p.agent_pub_key) === initiatorB64);
     initiatorName = match?.name ?? null;
   });
 </script>

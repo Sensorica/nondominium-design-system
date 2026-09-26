@@ -1,15 +1,17 @@
 <script lang="ts">
   // Copy of ui/src/lib/components/shell/Sidebar.svelte.
   //
-  // Two deviations, both forced by hosting rather than chosen:
+  // Three deviations, all forced by hosting rather than chosen:
   //   1. hrefs go through `paths`, because this site deploys under a GitHub
   //      Pages sub-path and the prototype is mounted at /app.
   //   2. the async store calls resolve immediately against mock state.
-  // Everything else — markup, class strings, copy, interaction — is the app's.
+  //   3. `?editProfile=1` opens the profile modal, so that state has a URL, and
+  //      URL-opened forms and modals close when a navigation drops their param.
+  // Everything else (markup, class strings, copy, interaction) is the app's.
   import { page } from '$app/state';
   import { goto } from '$app/navigation';
   import { paths } from '$lib/paths';
-  import { urlParam } from '../url-state.svelte';
+  import { bindUrlModal, urlParam } from '../url-state.svelte';
   import { lobbyStore, appContext } from '../stores.svelte';
   import UserProfileForm from '../lobby/UserProfileForm.svelte';
 
@@ -27,12 +29,18 @@
   let showProfileModal = $state(false);
   let copiedGroupId = $state<string | null>(null);
 
+  // The sidebar outlives every route, so a form or modal a key opened from the
+  // URL has to close again when a client navigation moves to a key without its
+  // param, or it lingers over the next screen. Only URL-opened ones are closed.
+  let formsFromUrl = false;
   $effect(() => {
-    if (urlParam('openCreateGroup') === '1') {
+    const openCreate = urlParam('openCreateGroup') === '1';
+    const openJoin = urlParam('openJoinGroup') === '1';
+    if (openCreate) {
       showCreateForm = true;
       showJoinForm = false;
     }
-    if (urlParam('openJoinGroup') === '1') {
+    if (openJoin) {
       showJoinForm = true;
       showCreateForm = false;
     }
@@ -42,9 +50,17 @@
       showJoinForm = true;
       showCreateForm = false;
     }
-    if (urlParam('editProfile') === '1') {
-      showProfileModal = true;
+    if (openCreate || openJoin || groupInvite) {
+      formsFromUrl = true;
+    } else if (formsFromUrl) {
+      formsFromUrl = false;
+      showCreateForm = false;
+      showJoinForm = false;
     }
+  });
+  bindUrlModal('editProfile', '1', {
+    get: () => showProfileModal,
+    set: (open) => (showProfileModal = open)
   });
 
   async function copyInviteLink(groupId: string, e: MouseEvent) {
@@ -97,7 +113,6 @@
       joinCode = '';
       showJoinForm = false;
       if (group) await goto(paths.groupDetail(group.id));
-      else joinError = 'Invalid invite code.';
     } catch {
       joinError = 'Invalid invite code.';
     } finally {
@@ -125,9 +140,7 @@
   <!-- Browse NDOs -->
   <a
     href={paths.appHome()}
-    class="mb-3 block rounded px-2 py-1.5 text-sm font-medium transition-colors {isActive(
-      paths.appHome()
-    )
+    class="mb-3 block rounded px-2 py-1.5 text-sm font-medium transition-colors {isActive(paths.appHome())
       ? 'bg-white text-gray-900 shadow-sm'
       : 'text-gray-600 hover:bg-white hover:text-gray-900'}"
   >
