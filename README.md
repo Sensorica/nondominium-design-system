@@ -110,6 +110,20 @@ You need a fine-grained GitHub token from a member of the `Sensorica` organisati
 
 Inside `/app`, press **`m`**: every keyed state, grouped, one click away — including the three connection states nobody can reach in a running app.
 
+## Prototype directions
+
+`/prototypes` holds six working UI directions for the v0.1 release, from the prototype handoff (`docs/prototypes/HANDOFF.md`). Each covers the whole journey: profile, group (create, join by invite link, or the example network), declaring a shared resource, and managing it. The audience is people new to resource sharing, so the default UI uses everyday words; a **Developer details** switch adds zome calls, hashes and rule chains. A to E carry it in their shared menu (Ctrl/Cmd+K); F has no such menu and carries it, a scenario picker and a Reset button in its header.
+
+- **A to E** are mid-fidelity explorations restyled onto this system's tokens, as the handoff asked. Tokens only means the handoff's own typefaces are gone (B's serif notebook, the distinct sans and mono of A, C, D and E): all six are set in the design-system sans and mono, which the index and each registry entry say. They run on one shared mock store (`src/lib/prototypes/store/`), so what you do in one shows up in the others.
+- **F Flow Graph** is high fidelity, already built on this system, and runs on its own mock of the real zome calls.
+- **What the mocks enforce.** Both enforce the hApp's rules at `nondominium@3cbebf0`: the integrity zome's lifecycle table, initiator-only lifecycle, custodian-only custody transfer and operational state, a successor for Deprecated, rules only their author may change (the shared store; F has no rule update), and the Hard constraints of `crates/shared/src/constraints.rs` (no ownership-transfer rule on a Nondominium NDO; in F also no Layer 1 at Ideation and no Transfer, Consume or Lower on a Nondominium NDO). They also enforce two **prototype rules the hApp does not enforce yet**: no self-validation (`create_validation_receipt` has no validator check) and one claim per commitment (`claim_commitment` leaves it as a Phase 2 TODO). `bun run check:prototypes` fails if any of these drift, and says which are which.
+- Words come from one module, `src/lib/prototypes/plain.ts`. Shared modals, the menu, onboarding and toasts are in `src/lib/prototypes/ui/`. The contract for whoever builds a direction is `src/lib/prototypes/README.md`.
+- Every direction and each of its views is a keyed surface: `m` for the screen map, `c` to comment. `?fresh=1` starts a direction as a new person; `?example=1` reloads the example network.
+
+**Choosing and archiving.** Leave a comment on the direction you want (press `c` on it). The choice is then recorded by editing one field, `status`, in `src/lib/prototypes/directions.ts`: `'target'` for the chosen direction, `'archived'` for the ones set aside, `'candidate'` for the rest. The index, the rail and the banner on each direction follow that field; nothing else changes. Once a target exists, the index shows it beside the current app (the replica at `/app`) under "Current app versus target".
+
+The handoff's standalone builds (about 10 MB of bundled React) are not committed; its notes, backend map and seven user stories are in `docs/prototypes/`.
+
 ---
 
 ## Commands
@@ -122,6 +136,7 @@ bun run build:registry    # Just the ndo-* custom-element bundle
 bun run preview           # Preview the production build
 bun run check             # svelte-check + the fidelity check
 bun run check:fidelity    # Compare the replica against ../nondominium/ui
+bun run check:prototypes  # The prototype mocks' rules against the zome, plus the prototype-only rules
 ```
 
 ---

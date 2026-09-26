@@ -15,11 +15,17 @@
   import { page } from '$app/state';
   import { paths } from '$lib/paths';
   import CommentsHost from '$lib/components/comments/CommentsHost.svelte';
+  import { DIRECTION_LIST, type DirectionSlug } from '$lib/prototypes/directions';
 
   let { children } = $props();
 
   const current = $derived(page.url.pathname);
-  const isApp = $derived(current.startsWith(paths.appHome()));
+  // Full-bleed: the replica at /app, and each prototype direction. The
+  // direction index at /prototypes keeps the chrome.
+  const isApp = $derived(
+    current.startsWith(paths.appHome()) ||
+      DIRECTION_LIST.some((d) => current === paths.protoDirection(d.slug as DirectionSlug))
+  );
 
   // No icons in the lists. The app has no icon set, and inventing one for the
   // documentation would be the design system asserting something the product
@@ -72,7 +78,7 @@
         </span>
       </a>
 
-      <a class="appmode" href={paths.appHome()}>Open the prototype →</a>
+      <a class="appmode" href={paths.appHome()}>Open the current app →</a>
 
       <nav class="nav">
         <div class="group">
@@ -98,6 +104,17 @@
           </a>
           {#each ndoUiLinks as link (link.href)}
             <a class="item" href={link.href} class:item--on={current.startsWith(link.href)}>{link.label}</a>
+          {/each}
+        </div>
+
+        <div class="group">
+          <a class="grouphead" href={paths.prototypes()} class:on={current === paths.prototypes()}>
+            Prototype directions
+          </a>
+          {#each DIRECTION_LIST as d (d.slug)}
+            <a class="item" href={paths.protoDirection(d.slug as DirectionSlug)}>
+              {d.id} {d.name}{d.status === 'target' ? ' · target' : d.status === 'archived' ? ' · archived' : ''}
+            </a>
           {/each}
         </div>
 

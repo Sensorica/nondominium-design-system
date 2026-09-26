@@ -24,6 +24,7 @@ designsystem:
     static-deploy: { target: gh-pages, base: /nondominium-design-system }
     registry:      { format: .svelte, status: active }
     parity:        { source: ../nondominium/ui, isa: ISA.md }
+    prototypes:    { routes: [/prototypes, '/prototypes/{slug}'], directions: 6, registry: src/lib/prototypes/directions.ts, contract: src/lib/prototypes/README.md, store: src/lib/prototypes/store/store.svelte.ts, words: src/lib/prototypes/plain.ts, ui: src/lib/prototypes/ui, check: 'bun run check:prototypes', docs: docs/prototypes, source: 'handoff v0.1 against nondominium@3cbebf0' }
 ---
 
 Read `README.md` in this repo first — it is the brand brief as well as the getting-started guide — then explore the referenced files.
@@ -48,4 +49,5 @@ Key facts:
 - **`lobby/GroupSidebar.svelte` is dead code in the app** (nothing imports it; `shell/Sidebar.svelte` replaced it) and is deliberately not replicated.
 - **Every commentable or navigable surface has a key** in `src/lib/surface-keys.ts`, resolved from the whole URL because modal and tab states are query params.
 - **The lifecycle transition table lives verbatim in `src/lib/replica/ndo/LifecycleTransitionModal.svelte`** and mirrors the Rust integrity zome. Check `documentation/specifications/specifications.md` §7.5 before touching it.
+- **Six v0.1 UI directions live at `/prototypes`** (A Mycelium, B Field Notes, C Instrument, D Signal Board, E Holarchy, F Flow Graph), from the prototype handoff in `docs/prototypes/`. `src/lib/prototypes/directions.ts` is their registry; choosing one is setting its `status` to `'target'` and nothing else. They are explorations of where the app could go, not descriptions of the app: the replica at `/app` stays the record of what exists. Their words come from one module, `src/lib/prototypes/plain.ts`, and A to E share one store whose rules `bun run check:prototypes` holds to the integrity zome.
 - Voice is plain and technical. Name constraints and say why; show nulls rather than inventing values.
