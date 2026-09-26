@@ -5,6 +5,7 @@
 // catalogue and the representative URL for each key, so the comments pack and
 // the screen map never depend on each other.
 import { paths } from './paths';
+import * as RECORDS from './records';
 import {
   AGENT,
   BARE_NDO,
@@ -16,10 +17,17 @@ import {
   NDO,
   TERMINAL_NDO
 } from './records';
-import { labelForKey, protoKey, screenKeyForUrl } from './surface-keys';
+import { labelForKey, protoKey, SCREEN_SHAPE, screenKeyForUrl } from './surface-keys';
 // The registry only: importing the store's logic here would pull its seed
 // into every page that shows the map, the /app replica included.
-import { DIRECTION_LIST, EXAMPLE_GROUP, EXAMPLE_NDO, type DirectionSlug, type ViewOf } from './prototypes/directions';
+import {
+  DIRECTION_LIST,
+  EXAMPLE_GROUP,
+  EXAMPLE_NDO,
+  type Direction,
+  type DirectionSlug,
+  type ViewOf
+} from './prototypes/directions';
 
 /** Representative URLs for the direction surfaces: the index, each direction's
  *  default view, and each other view pinned to an example record when it
@@ -98,14 +106,30 @@ export const SCREEN_KEY_TO_URL: Record<string, string> = {
   ...PROTOTYPE_KEY_TO_URL
 };
 
-export type ScreenMapGroup = { title: string; keys: string[] };
+/** The two halves of the catalogue: the replica of the running app at /app,
+ *  and the six v0.1 UI directions under /prototypes. */
+export type ScreenMapSection = 'app' | 'prototypes';
 
-/** Grouped the way the app itself is grouped. Every key here must exist in
- *  SCREEN_KEY_TO_URL. */
+export const SECTION_TITLE: Record<ScreenMapSection, string> = {
+  app: 'Current app',
+  prototypes: 'Prototype directions'
+};
+
+export type ScreenMapGroup = {
+  title: string;
+  section: ScreenMapSection;
+  keys: string[];
+  /** Set on the prototype groups that are one direction each. */
+  direction?: Direction;
+};
+
+/** Grouped the way the app itself is grouped, then the direction index and one
+ *  group per direction. Every key here must exist in SCREEN_KEY_TO_URL. */
 export const SCREEN_MAP_GROUPS: ScreenMapGroup[] = [
-  { title: 'Connection', keys: ['connecting', 'connection-error', 'disconnected'] },
+  { title: 'Connection', section: 'app', keys: ['connecting', 'connection-error', 'disconnected'] },
   {
     title: 'Lobby',
+    section: 'app',
     keys: [
       'lobby',
       'lobby-profile-setup',
@@ -116,7 +140,8 @@ export const SCREEN_MAP_GROUPS: ScreenMapGroup[] = [
     ]
   },
   {
-    title: 'Lobby — data states',
+    title: 'Lobby · data states',
+    section: 'app',
     keys: [
       'lobby-loading',
       'lobby-error',
@@ -129,6 +154,7 @@ export const SCREEN_MAP_GROUPS: ScreenMapGroup[] = [
   },
   {
     title: 'Groups',
+    section: 'app',
     keys: [
       'group-detail',
       'group-create-ndo',
@@ -140,6 +166,7 @@ export const SCREEN_MAP_GROUPS: ScreenMapGroup[] = [
   },
   {
     title: 'NDO',
+    section: 'app',
     keys: [
       'ndo-new',
       'ndo-resources',
@@ -157,7 +184,8 @@ export const SCREEN_MAP_GROUPS: ScreenMapGroup[] = [
     ]
   },
   {
-    title: 'NDO — lifecycle and data states',
+    title: 'NDO · lifecycle and data states',
+    section: 'app',
     keys: [
       'ndo-hibernating',
       'ndo-deprecated',
@@ -169,15 +197,69 @@ export const SCREEN_MAP_GROUPS: ScreenMapGroup[] = [
       'ndo-anonymous'
     ]
   },
-  { title: 'Agents', keys: ['agent-profile'] },
-  {
-    title: 'Prototypes',
-    keys: [
-      'prototypes',
-      ...DIRECTION_LIST.flatMap((d) => [protoKey(d.slug), ...d.views.slice(1).map((v) => protoKey(d.slug, v.id))])
-    ]
-  }
+  { title: 'Agents', section: 'app', keys: ['agent-profile'] },
+  { title: 'Index', section: 'prototypes', keys: ['prototypes'] },
+  ...DIRECTION_LIST.map(
+    (d): ScreenMapGroup => ({
+      title: `${d.id} ${d.name}`,
+      section: 'prototypes',
+      direction: d,
+      keys: [protoKey(d.slug), ...d.views.slice(1).map((v) => protoKey(d.slug, v.id))]
+    })
+  )
 ];
+
+export function sectionForKey(key: string): ScreenMapSection {
+  return key === 'prototypes' || key.startsWith('proto:') ? 'prototypes' : 'app';
+}
+
+/** What kind of surface a key is, read off its URL so a new key is tagged for
+ *  free. Not a list of keys: a list of the app's query params, and what each
+ *  one opens. */
+export type ScreenKind = 'page' | 'tab' | 'modal' | 'panel' | 'state' | 'record' | 'view';
+
+export const KIND_LABEL: Record<ScreenKind, string> = {
+  page: 'page',
+  tab: 'tab',
+  modal: 'modal',
+  panel: 'panel',
+  state: 'data state',
+  record: 'record',
+  view: 'view'
+};
+
+/** Checked in this order, so `?state=` wins over anything it is combined with. */
+const PARAM_KIND: [param: string, kind: ScreenKind][] = [
+  ['state', 'state'],
+  ['modal', 'modal'],
+  ['profile', 'modal'],
+  ['editProfile', 'modal'],
+  ['createNdo', 'modal'],
+  ['groupProfile', 'modal'],
+  // The sidebar's inline forms and the NDO membership panel open in place,
+  // not over the page.
+  ['openCreateGroup', 'panel'],
+  ['openJoinGroup', 'panel'],
+  ['group', 'panel'],
+  ['join', 'panel'],
+  ['tab', 'tab']
+];
+
+const RECORD_IDS = new Set<string>(Object.values(RECORDS));
+
+/** True when the key's shape names one record rather than matching any id:
+ *  the lifecycle screens, whose markup is a property of the record. */
+const pinsRecord = (key: string): boolean =>
+  SCREEN_SHAPE[key]?.path.split('/').some((seg) => RECORD_IDS.has(decodeURIComponent(seg))) ?? false;
+
+export function kindForKey(key: string): ScreenKind {
+  if (sectionForKey(key) === 'prototypes') return key === 'prototypes' ? 'page' : 'view';
+  const url = SCREEN_KEY_TO_URL[key];
+  if (!url) return 'page';
+  const search = new URLSearchParams(url.split('?')[1] ?? '');
+  for (const [param, kind] of PARAM_KIND) if (search.has(param)) return kind;
+  return pinsRecord(key) ? 'record' : 'page';
+}
 
 export function urlForKey(key: string): string | undefined {
   return SCREEN_KEY_TO_URL[key];
