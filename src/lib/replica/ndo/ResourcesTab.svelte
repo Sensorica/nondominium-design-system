@@ -1,24 +1,26 @@
 <script lang="ts">
-  // Copy of ui/src/lib/components/ndo/ResourcesTab.svelte.
-  // Markup below is byte-identical; the Effect service calls become synchronous
-  // lookups, and the ActionHash prop becomes the base64 string the prototype
-  // routes on.
-  import { onMount } from 'svelte';
+  // Copy of ui/src/lib/components/ndo/ResourcesTab.svelte from the app at
+  // 3cbebf0fb08ecc9070bc22d290ca23b250b56da9. Script and markup are the app's.
+  //
+  // Wiring only: imports are repointed, the Effect program becomes a call on the
+  // mock resource service, and the create modal also opens from ?modal= so the
+  // screen map can address it.
   import type {
+    ActionHash,
     CellId,
     EconomicResourceRow,
     LifecycleStage,
     PropertyRegime,
     ResourceSpecificationListing
   } from '../types';
+  import { operationalStateLabel } from '../operational-state-labels';
   import { resourceService, resourceStore } from '../stores.svelte';
   import { urlParam } from '../url-state.svelte';
-  import { operationalStateLabel } from '../operational-state-labels';
   import SpecificationCreateModal from './SpecificationCreateModal.svelte';
 
   interface Props {
     /** NDO Layer 0 action hash (prop name kept for NdoView compatibility). */
-    specActionHash: string;
+    specActionHash: ActionHash;
     /** The NDO's own clone cell; null for legacy NDOs in the shared cell. */
     ndoCellId?: CellId | null;
     lifecycleStage?: LifecycleStage | string | null;
@@ -33,44 +35,42 @@
     propertyRegime = null
   }: Props = $props();
 
-  // The app's shape: a listing per Layer 1 specification, each with its own
-  // inventoried instances, keyed by spec hash. The replica held a flat row list
-  // and a global table, which could not express "this NDO has three specs and
-  // only one of them has resources" — the state the Resources tab exists to show.
   let listings = $state<ResourceSpecificationListing[]>([]);
   let instancesBySpec = $state<Map<string, EconomicResourceRow[]>>(new Map());
   let loadError = $state<string | null>(null);
   let showCreateModal = $state(false);
 
-  // The app's gate, copied unchanged. Layer 1 activation is refused at the four
-  // stages where an NDO has no form worth specifying yet or has left service.
-  // These are the same four the screen map already pins as ndo-bare (Ideation),
-  // ndo-hibernating, ndo-deprecated and ndo-terminal, which is why the blocked
-  // notice needs no key of its own.
   const ineligibleStages = new Set(['Ideation', 'Hibernating', 'Deprecated', 'EndOfLife']);
   const canCreateSpec = $derived(!lifecycleStage || !ineligibleStages.has(lifecycleStage));
 
-  function load() {
-    loadError = null;
-    listings = resourceStore.resourceSpecificationListings.filter(
-      (l) => l.specification.ndo_identity_hash === specActionHash
+  async function load() {
+    const specs = await resourceStore.fetchSpecificationsForNdo(
+      specActionHash,
+      ndoCellId ?? undefined
     );
+    listings = specs;
     const next = new Map<string, EconomicResourceRow[]>();
-    for (const listing of listings) {
-      next.set(listing.action_hash.toString(), resourceService.getResourcesBySpecification(listing.action_hash));
+    for (const listing of specs) {
+      next.set(
+        listing.action_hash.toString(),
+        resourceService.getResourcesBySpecification(listing.action_hash)
+      );
     }
     instancesBySpec = next;
+    loadError = null;
   }
 
-  // The screen map addresses this modal by key, so it must open from the URL as
-  // well as from the button. Without this the key resolves to a page that
-  // renders the tab with the modal shut, and the screen would be listed as
-  // covered while showing nothing.
+  // Wiring: the screen map addresses the create modal by key, so it also opens
+  // from the URL. The app holds it in local state only.
   $effect(() => {
     if (urlParam('modal') === 'spec-create') showCreateModal = true;
   });
 
-  onMount(load);
+  $effect(() => {
+    void specActionHash;
+    void ndoCellId;
+    void load();
+  });
 </script>
 
 {#if showCreateModal}
@@ -83,7 +83,7 @@
       showCreateModal = false;
     }}
     oncreated={() => {
-      load();
+      void load();
     }}
   />
 {/if}

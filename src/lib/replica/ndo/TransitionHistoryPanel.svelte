@@ -1,21 +1,19 @@
 <script lang="ts">
   // Copy of ui/src/lib/components/ndo/TransitionHistoryPanel.svelte.
-  // The markup is the app's; only the data source changes: the Effect service
-  // call becomes a synchronous lookup against mock state, and the read failure
-  // the app recovers from arrives through `?state=error` instead of an Exit.
-  //
-  // The empty state and the failed state must stay distinguishable. The app's
-  // own comment records why: rendering both as "0 transitions" is what hid the
-  // missing zome function (F4). A prototype that collapses them reinstates the
-  // exact bug the app was fixed for.
+  // Only the data source changes: the Effect service call becomes a lookup
+  // against mock state, and the read failure the app recovers from arrives
+  // through `?state=error` instead of an Exit. Hash types alias to base64
+  // strings here, so encodeHashToBase64 is identity; it is shimmed rather than
+  // deleted so the markup stays byte-identical to the app's.
   import { onMount } from 'svelte';
-  import type { NdoTransitionHistoryEvent } from '../types';
+  import type { ActionHash, NdoTransitionHistoryEvent } from '../types';
   import { ndoService } from '../stores.svelte';
   import { urlParam } from '../url-state.svelte';
 
+  const encodeHashToBase64 = (h: string): string => h;
+
   interface Props {
-    /** Base64 NDO hash. Production passes a decoded ActionHash. */
-    ndoHash: string;
+    ndoHash: ActionHash;
   }
 
   let { ndoHash }: Props = $props();
@@ -25,10 +23,12 @@
   let loadError = $state<string | null>(null);
 
   onMount(() => {
-    if (urlParam('state') === 'error') {
-      loadError = 'Could not load lifecycle history from the chain.';
-    } else {
+    if (urlParam('state') !== 'error') {
       history = ndoService.getTransitionHistory(ndoHash);
+    } else {
+      // An empty list and a failed read are different facts. Rendering both as
+      // "0 transitions" is what hid the missing zome function (F4).
+      loadError = 'Could not load lifecycle history from the chain.';
     }
     isLoading = false;
   });
@@ -68,14 +68,16 @@
               <span class="font-medium text-gray-700">{event.to_stage}</span>
             </div>
             <div class="mt-1 text-gray-500">
-              By <span class="font-mono">{event.agent.slice(0, 10)}…</span>
+              By <span class="font-mono">{encodeHashToBase64(event.agent).slice(0, 10)}…</span>
               · {new Date(event.timestamp / 1000).toLocaleString()}
             </div>
             <div class="mt-0.5 flex items-center gap-1">
-              <span class="font-mono text-gray-400">{event.event_hash.slice(0, 12)}…</span>
+              <span class="font-mono text-gray-400"
+                >{encodeHashToBase64(event.event_hash).slice(0, 12)}…</span
+              >
               <button
                 type="button"
-                onclick={() => copyToClipboard(event.event_hash)}
+                onclick={() => copyToClipboard(encodeHashToBase64(event.event_hash))}
                 class="text-gray-400 hover:text-gray-700"
                 title="Copy event hash"
               >

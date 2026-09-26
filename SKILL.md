@@ -17,7 +17,7 @@ designsystem:
     scenarios:     { routes: /scenarios, count: 6 }
     surface-keys:  { module: src/lib/surface-keys.ts, namespaces: [screen, scenario] }
     mock-state:    { module: src/lib/replica/stores.svelte.ts }
-    prototype-app: { routes: /app, screens: 39, groups: [app, connection], mode: replica, data-states: 'src/lib/replica/stores.svelte.ts' }
+    prototype-app: { routes: /app, screens: 40, groups: [app, connection], mode: replica, data-states: 'src/lib/replica/stores.svelte.ts' }
     replica:       { source: ../nondominium/ui/src/lib/components, components: 24, check: 'bun run check:fidelity' }
     screen-map:    { shortcut: m, overlay: svelte }
     review:        { backend: github-discussions, repo: Sensorica/nondominium-design-review, category_id: DIC_kwDOT06gls4DDH2j }

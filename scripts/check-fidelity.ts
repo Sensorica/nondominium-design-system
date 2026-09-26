@@ -189,6 +189,126 @@ const VERDICTS: Record<string, { verdict: 'wiring' | 'behaviour'; read_on: strin
     verdict: 'wiring',
     read_on: '2026-09-17',
     note: 'Store and dialog wiring. Markup closed the same day by restoring the comment the app carries above <dialog>.'
+  },
+  'group/GroupProfileModal.svelte': {
+    verdict: 'wiring',
+    read_on: '2026-09-26',
+    note: "Two import paths plus a provenance comment. Markup is byte-identical."
+  },
+  'group/NdoCreateModal.svelte': {
+    verdict: 'wiring',
+    read_on: '2026-09-26',
+    note: "Import paths (types, mock stores, the rivalry helper) and the post-create goto through paths.groupDetail(), which applies the same encodeURIComponent. Validation, the duplicate-name warning, input assembly and the error fallback are the app's. The 'Failed to create NDO.' branch exists, but the mock groupStore.createNdo never returns null, so the branch cannot be reached."
+  },
+  'group/SoftLinkList.svelte': {
+    verdict: 'wiring',
+    read_on: '2026-09-26',
+    note: "The only difference is a one-line provenance comment. Markup is byte-identical. Nothing in the app's ui/src at 3cbebf0 imports this component."
+  },
+  'group/WorkLogFeed.svelte': {
+    verdict: 'wiring',
+    read_on: '2026-09-26',
+    note: "The only difference is a one-line provenance comment. Markup is byte-identical. Nothing in the app's ui/src at 3cbebf0 imports this component."
+  },
+  'lobby/GroupSidebar.svelte': {
+    verdict: 'wiring',
+    read_on: '2026-09-26',
+    note: "Props-driven, so no store is involved. Differences are the type import path, page from $app/state instead of $app/stores, and paths.groupDetail() in isGroupActive, both gotos and the href. Handlers, validation copy and catch branches match the app line for line."
+  },
+  'lobby/LobbyProfileBar.svelte': {
+    verdict: 'wiring',
+    read_on: '2026-09-26',
+    note: "One import path for appContext plus a provenance comment. Markup is byte-identical."
+  },
+  'lobby/NdoBrowser.svelte': {
+    verdict: 'wiring',
+    read_on: '2026-09-26',
+    note: "Type imports only: NdoDescriptor and friends plus ActiveFilters come from ../types instead of shared-types and the lobby store. The shape is identical to the app's lobby.store ActiveFilters. Markup is byte-identical."
+  },
+  'lobby/UserProfileForm.svelte': {
+    verdict: 'wiring',
+    read_on: '2026-09-26',
+    note: "Import paths only (type and the appContext mock). The component reads and writes appContext.lobbyUserProfile exactly as the app does; persisting to localStorage is the store's job in both. Markup is byte-identical."
+  },
+  'ndo/ActivityTab.svelte': {
+    verdict: 'behaviour',
+    read_on: '2026-09-26',
+    note: "The replica had dropped the app's try/catch, so the 'Failed to load activity for this NDO' error path, which resets events and commitments, was gone. It had also swapped the $effect keyed on specActionHash for onMount, so it stopped reloading when the NDO changed, and it read the spec listings directly instead of calling fetchSpecificationsForNdo. All three are restored. What remains is wiring: the Effect programs are now mock service calls, encodeHashToBase64 is an identity shim, and ?modal=commitment|event opens the forms. The markup is now byte-identical."
+  },
+  'ndo/AssociateNdoModal.svelte': {
+    verdict: 'behaviour',
+    read_on: '2026-09-26',
+    note: "The replica never loaded existing associations (loadingAssociations started false and the list stayed empty), so it offered groups that already anchor the NDO. Its confirm button wrote nothing and closed after 900 ms instead of 600. Restored the app's onMount (loadGroups, then getAssociatedGroupIds), the per-group associateNdoWithGroup loop, loadNdos and the 600 ms close, backed by new mock methods that fail as the app's store does."
+  },
+  'ndo/CommitmentCreateForm.svelte': {
+    verdict: 'wiring',
+    read_on: '2026-09-26',
+    note: "The markup and the logic already matched the app. The only differences were the conductor key read, done synchronously through appContext, and the import paths. The script is now the app's verbatim: ensureProvider is async with its try/catch again, and it calls a mock holochainClientService that rejects under ?state=anonymous. Beyond that, only the imports and the identity hash shims differ."
+  },
+  'ndo/CompositionTab.svelte': {
+    verdict: 'wiring',
+    read_on: '2026-09-26',
+    note: "The app's file is markup-only. The replica adds an empty script block holding only a comment, so its importer gets a type declaration. Markup is byte-identical."
+  },
+  'ndo/EconomicEventCreateForm.svelte': {
+    verdict: 'wiring',
+    read_on: '2026-09-26',
+    note: "Same as CommitmentCreateForm. seedAgents only replaced the conductor key read with appContext. It is now the app's async try/catch again, over the mock holochainClientService. The only other differences are the import paths and the identity hash shims. The markup is byte-identical."
+  },
+  'ndo/ForkNdoModal.svelte': {
+    verdict: 'wiring',
+    read_on: '2026-09-26',
+    note: "One line: the type import is repointed at the replica's types. Script and markup are otherwise the app's."
+  },
+  'ndo/GovernanceTab.svelte': {
+    verdict: 'behaviour',
+    read_on: '2026-09-26',
+    note: "Four behaviours had drifted. The app re-runs loadRules and the agent/roles load from an $effect keyed on specActionHash, and the replica used onMount. canCreateRule had lost the app's truthiness terms, so an empty-string regime or nature enabled the button. The 'No Layer 1 specifications yet' load copy had lost the app's em dash. The New rule click was synchronous. All four are restored; the async fetchSpecificationsForNdo click is now the app's, and the agent key goes through a mock holochainClientService that rejects under ?state=anonymous. The rest is wiring: mock services and ?modal=rule-edit. The markup is byte-identical again, which fixes the reflowed 'AccountableAgent (governance-gated)' button."
+  },
+  'ndo/LifecycleTransitionModal.svelte': {
+    verdict: 'wiring',
+    read_on: '2026-09-26',
+    note: "The Effect call to updateLifecycleStage is replaced by the mock service, and its failure branch is reachable through ?state=error with the app's 'Failed to advance stage:' prefix. The conductor's cause text is replaced by a fixed tail. The transition table and guards are the app's. Formatting, the async signature and the decode step were brought back in line with the app."
+  },
+  'ndo/NdoIdentityLayer.svelte': {
+    verdict: 'wiring',
+    read_on: '2026-09-26',
+    note: "The lifecycle modal is opened through the query string via two prototype props, the initiator and successor hrefs go through paths.ts, and persons come from the mock. Identity shims for encodeHashToBase64 and decodeHashFromBase64 now keep isInitiator, ndoActionHash and the initiator match line for line the app's. No behaviour differs."
+  },
+  'ndo/NdoView.svelte': {
+    verdict: 'behaviour',
+    read_on: '2026-09-26',
+    note: "The replica derived the descriptor straight from the mock and showed invented error copy. The app loads it into state, seeds it from ndoDescriptorCache, shows no banner when cached data exists, and uses 'Could not refresh NDO details from the chain. Data shown may be cached.' The app's parse-error copy, Retry re-fetch, role mapping on members and three markup items (data-testid=\"ndo-lifecycle-stage\", independent joinMessage and joinError blocks, the NdoAnchor comment) were also missing. All restored, with {specActionHash} and {ndoCellId} passed as the app does; ndoCellId is null because the mock has no cells. What remains is tab, modal and join state in the query string."
+  },
+  'ndo/ResourcesTab.svelte': {
+    verdict: 'behaviour',
+    read_on: '2026-09-26',
+    note: "The replica used onMount where the app uses an $effect that tracks specActionHash and ndoCellId, so it never reloaded when either prop changed. It also filtered the listings inline instead of awaiting fetchSpecificationsForNdo. Both are restored, and loadError is reset at the end of load as in the app. What remains is wiring: one mock resourceService call and ?modal=spec-create. The markup is byte-identical."
+  },
+  'ndo/RuleEditorModal.svelte': {
+    verdict: 'wiring',
+    read_on: '2026-09-26',
+    note: "Import paths only. The ActionHash props had been typed as string; they now use the replica's ActionHash alias, so everything below the imports is byte-identical to the app."
+  },
+  'ndo/SpecificationCreateModal.svelte': {
+    verdict: 'wiring',
+    read_on: '2026-09-26',
+    note: "Import paths only. The ActionHash prop type now comes from the replica types, so everything below the imports is byte-identical to the app."
+  },
+  'ndo/TransitionHistoryPanel.svelte': {
+    verdict: 'wiring',
+    read_on: '2026-09-26',
+    note: "The Effect read is replaced by the mock service, with the failed read driven by ?state=error and the app's copy and F4 comment kept. An identity encodeHashToBase64 shim and the ActionHash prop type restore byte-identical markup; before this the markup had been rewritten to slice raw strings."
+  },
+  'shell/AppShell.svelte': {
+    verdict: 'wiring',
+    read_on: '2026-09-26',
+    note: "The only difference is a one-line provenance comment in the script block. Markup is byte-identical."
+  },
+  'shell/Sidebar.svelte': {
+    verdict: 'behaviour',
+    read_on: '2026-09-26',
+    note: "The replica added `else joinError = 'Invalid invite code.'` after a null join. The app has no such branch: its lobbyStore.joinGroup returns null and records 'Join group failed: ...' on lobbyStore.errorMessage, and Sidebar just closes the form. Removed the branch, and the mock joinGroup, createGroup and loadLobby now clear or set lobbyState.errorMessage the way the app's store does. Everything else is wiring: paths.ts hrefs and goto targets, urlParam instead of $page.url.searchParams, the `?editProfile=1` modal flag, and import paths."
   }
 };
 

@@ -1,7 +1,14 @@
 <script lang="ts">
-  // Copy of ui/src/lib/components/ndo/GovernanceTab.svelte.
-  import { onMount } from 'svelte';
+  // Copy of ui/src/lib/components/ndo/GovernanceTab.svelte from the app at
+  // 3cbebf0fb08ecc9070bc22d290ca23b250b56da9. Script and markup are the app's.
+  //
+  // Wiring only: imports are repointed, the Effect programs become calls on the
+  // mock resource and person services, holochainClientService is the mock one
+  // (it rejects under ?state=anonymous, as the app's does without app info), and
+  // the rule editor also opens from ?modal= so the screen map can address it.
   import type {
+    ActionHash,
+    AgentPubKey,
     CellId,
     GovernanceRule,
     PersonRole,
@@ -10,13 +17,18 @@
     Rivalry,
     RuleData
   } from '../types';
-  import { appContext, personService, resourceService, resourceStore } from '../stores.svelte';
+  import {
+    holochainClientService,
+    personService,
+    resourceService,
+    resourceStore
+  } from '../stores.svelte';
   import { urlParam } from '../url-state.svelte';
   import RuleEditorModal from './RuleEditorModal.svelte';
 
   interface Props {
     /** NDO Layer 0 action hash. */
-    specActionHash: string;
+    specActionHash: ActionHash;
     /** The NDO's own clone cell; null for legacy NDOs in the shared cell. */
     ndoCellId?: CellId | null;
     propertyRegime?: string | null;
@@ -32,13 +44,15 @@
     rivalryOverride = null
   }: Props = $props();
 
-  type RuleWithSpec = { rule: GovernanceRule; specName: string; specHash: string };
+  type RuleWithSpec = { rule: GovernanceRule; specName: string; specHash: ActionHash };
 
-  // Both helpers are the app's, copied unchanged from
-  // ui/src/lib/components/ndo/GovernanceTab.svelte at 20adb11. RuleData is a
-  // tagged union whose discriminant is its single key, so the label is that key
-  // and the payload is the value under it. The replica previously rendered
-  // `rule.rule_type` beside a JSON blob; #132 replaced both with this shape.
+  let rules = $state<RuleWithSpec[]>([]);
+  let roles = $state<PersonRole[]>([]);
+  let myAgent = $state<AgentPubKey | null>(null);
+  let loadMessage = $state<string | null>(null);
+  let showRuleEditor = $state(false);
+  let editorSpecHash = $state<ActionHash | undefined>(undefined);
+
   function ruleTypeLabel(ruleData: RuleData): string {
     return Object.keys(ruleData)[0] ?? 'Unknown';
   }
@@ -53,30 +67,14 @@
     return {};
   }
 
-  let rules = $state<RuleWithSpec[]>([]);
-  let roles = $state<PersonRole[]>([]);
-  let myAgent = $state<string | null>(null);
-  let loadMessage = $state<string | null>(null);
-  let showRuleEditor = $state(false);
-  let editorSpecHash = $state<string | undefined>(undefined);
-
-  // The app calls resourceStore.fetchSpecificationsForNdo, then asks the
-  // resource service for each listing's rules and pairs them with the spec name.
-  // Both halves are available here already: ResourceSpecification carries
-  // ndo_identity_hash, so the filter IS the fetch, and no new store method is
-  // needed. Same shape, one less seam.
-  function specsForNdo() {
-    return resourceStore.resourceSpecificationListings.filter(
-      (l) => l.specification.ndo_identity_hash === specActionHash
+  async function loadRules() {
+    const listings = await resourceStore.fetchSpecificationsForNdo(
+      specActionHash,
+      ndoCellId ?? undefined
     );
-  }
-
-  function loadRules() {
-    const listings = specsForNdo();
     if (listings.length === 0) {
       rules = [];
-      loadMessage =
-        'No Layer 1 specifications yet - create one on the Resources tab before adding rules.';
+      loadMessage = 'No Layer 1 specifications yet — create one on the Resources tab before adding rules.';
       return;
     }
     const collected: RuleWithSpec[] = [];
@@ -90,27 +88,41 @@
       }
     }
     rules = collected;
-    loadMessage =
-      collected.length === 0 ? 'No governance rules linked to this NDO\u2019s specifications.' : null;
+    loadMessage = collected.length === 0 ? 'No governance rules linked to this NDO’s specifications.' : null;
   }
 
-  // The screen map addresses this modal by key, so it must open from the URL as
-  // well as from the button. Without this the key resolves to a page that
-  // renders the tab with the modal shut, and the screen would be listed as
-  // covered while showing nothing.
+  // Wiring: the screen map addresses the rule editor by key, so it also opens
+  // from the URL. The app holds it in local state only.
   $effect(() => {
     if (urlParam('modal') === 'rule-edit') showRuleEditor = true;
   });
 
-  onMount(() => {
-    loadRules();
-    myAgent = appContext.myAgentPubKey;
-    roles = myAgent ? personService.getPersonRoles() : [];
+  $effect(() => {
+    void specActionHash;
+    void (async () => {
+      await loadRules();
+
+      try {
+        myAgent = await holochainClientService.getMyAgentPubKey();
+      } catch {
+        myAgent = null;
+      }
+
+      if (!myAgent) {
+        roles = [];
+        return;
+      }
+
+      roles = personService.getPersonRoles();
+    })();
   });
 
-  // A rule is written against a classification pair, so both must be known
-  // before the editor can build one. The app gates on exactly this.
-  const canCreateRule = $derived(propertyRegime != null && resourceNature != null);
+  const canCreateRule = $derived(
+    propertyRegime != null &&
+      resourceNature != null &&
+      (propertyRegime as PropertyRegime) &&
+      (resourceNature as ResourceNature)
+  );
 </script>
 
 {#if showRuleEditor && canCreateRule}
@@ -126,7 +138,7 @@
       editorSpecHash = undefined;
     }}
     oncreated={() => {
-      loadRules();
+      void loadRules();
     }}
   />
 {/if}
@@ -138,8 +150,11 @@
       <button
         type="button"
         disabled={!canCreateRule}
-        onclick={() => {
-          const listings = specsForNdo();
+        onclick={async () => {
+          const listings = await resourceStore.fetchSpecificationsForNdo(
+            specActionHash,
+            ndoCellId ?? undefined
+          );
           // A rule with no specification_hash is written but never linked, so no
           // read path can surface it again. Refuse rather than orphan it.
           if (listings.length === 0) {
@@ -201,9 +216,11 @@
           </li>
         {/each}
       </ul>
-      <button type="button" class="mt-3 rounded bg-amber-100 px-3 py-1.5 text-xs text-amber-800" disabled>
-        AccountableAgent (governance-gated)
-      </button>
+      <button
+        type="button"
+        class="mt-3 rounded bg-amber-100 px-3 py-1.5 text-xs text-amber-800"
+        disabled>AccountableAgent (governance-gated)</button
+      >
     {/if}
   </section>
 </div>

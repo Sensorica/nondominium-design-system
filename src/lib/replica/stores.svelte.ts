@@ -231,8 +231,13 @@ export const lobbyStore = {
   },
   get myPerson() { return appContext.myPerson; },
 
-  loadLobby() { return Promise.resolve(); },
+  loadLobby() {
+    lobbyState.errorMessage = null;
+    return Promise.resolve();
+  },
   loadNdos() { return Promise.resolve(); },
+  /** AssociateNdoModal awaits this before listing groups. Module state is already current. */
+  loadGroups() { return Promise.resolve(); },
 
   setFilters(partial: Partial<ActiveFilters>) {
     lobbyState.activeFilters = { ...lobbyState.activeFilters, ...partial };
@@ -242,6 +247,7 @@ export const lobbyStore = {
   },
 
   createGroup(name: string, createdBy?: string): Promise<GroupDescriptor> {
+    lobbyState.errorMessage = null;
     const id = `${name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')}-${(1000 + ++seq).toString(16)}`;
     const group: GroupDescriptor = { id, name, createdBy, createdAt: Date.now() * 1000 };
     data.groups = [...data.groups, group];
@@ -251,8 +257,14 @@ export const lobbyStore = {
   },
 
   joinGroup(code: string): Promise<GroupDescriptor | null> {
+    lobbyState.errorMessage = null;
     const id = code.replace(/^.*[?&]group=/, '').trim();
     const group = data.groups.find((g) => g.id === id) ?? null;
+    // The app's store resolves null on a failed join and records the failure on
+    // errorMessage, prefixed exactly like this; the tail stands in for the
+    // Cause.pretty() text a conductor would produce. Sidebar closes the form
+    // either way and shows no inline error of its own.
+    if (!group) lobbyState.errorMessage = `Join group failed: no group matches invite ${id}`;
     if (group) {
       const members = data.groupMembers[group.id] ?? [];
       if (!members.some((m) => m.id === 'me')) {
@@ -307,6 +319,27 @@ export const groupStore = {
   },
   refreshCurrentGroup() { return Promise.resolve(); },
 
+  /**
+   * Anchors an existing NDO in a second group, as the app's store does through
+   * `NdoService.associateNdoWithGroup`. The service copies clone coordinates from
+   * an anchor the NDO already has, so an NDO anchored nowhere fails with
+   * NdoNotFound; one already anchored in the target is a no-op. On failure the
+   * app's store records its own fixed message; `?state=error` is the broken
+   * conductor here.
+   */
+  associateNdoWithGroup(ndoHashB64: string, targetGroupId: string): Promise<void> {
+    const anchored = Object.values(data.groupNdoHashes).some((hs) => hs.includes(ndoHashB64));
+    if (ds() === 'error' || !anchored) {
+      groupState.errorMessage = 'Failed to associate NDO with group.';
+      return Promise.resolve();
+    }
+    const current = data.groupNdoHashes[targetGroupId] ?? [];
+    if (!current.includes(ndoHashB64)) {
+      data.groupNdoHashes[targetGroupId] = [...current, ndoHashB64];
+    }
+    return Promise.resolve();
+  },
+
   createNdo(input: NdoInput): Promise<string | null> {
     const hash = mockHash('uhC0k');
     const descriptor: NdoDescriptor = {
@@ -346,6 +379,10 @@ const storeError = (verb: string) => (ds() === 'error' ? `Failed to ${verb}: the
 export const resourceStore = {
   get resourceSpecificationListings(): ResourceSpecificationListing[] { return data.specListings; },
   fetchAllResourceSpecifications() { return Promise.resolve(); },
+  /** The per-NDO read ResourcesTab, GovernanceTab and ActivityTab all call in the app. */
+  fetchSpecificationsForNdo(ndoHash: ActionHash, _cellId?: CellId): Promise<ResourceSpecificationListing[]> {
+    return Promise.resolve(data.specListings.filter((l) => l.specification.ndo_identity_hash === ndoHash));
+  },
   get errorMessage() { return storeError('create'); },
 
   /** Layer 1 activation. Refuses on a Hard scope violation, the way the zome does. */
@@ -575,6 +612,13 @@ export const ndoService = {
   // `joinNdo` is idempotent behind an `is_ndo_member` guard, so joining twice
   // is a no-op rather than a duplicate row, and that is mirrored here.
 
+  /** Groups whose anchors carry this NDO identity, as `NdoService.getAssociatedGroupIds`. */
+  getAssociatedGroupIds(ndoHashB64: string): string[] {
+    return Object.entries(data.groupNdoHashes)
+      .filter(([, hashes]) => hashes.includes(ndoHashB64))
+      .map(([groupId]) => groupId);
+  },
+
   isNdoMember(hash: string): boolean {
     return (data.ndoMembers[hash] ?? []).some((m) => m.id === 'me');
   },
@@ -585,6 +629,9 @@ export const ndoService = {
   },
 
   joinNdo(hash: string): Promise<boolean> {
+    // The app's NdoView renders its own join-failure copy when this call fails.
+    // Module state cannot fail, so `?state=error` is the broken conductor.
+    if (ds() === 'error') return Promise.resolve(false);
     if (this.isNdoMember(hash)) return Promise.resolve(true);
     data.ndoMembers[hash] = [
       ...(data.ndoMembers[hash] ?? []),
@@ -601,6 +648,16 @@ export const ndoService = {
 export const personService = {
   getAllPersons(): Person[] { return persons; },
   getPersonRoles(): PersonRole[] { return INITIAL_MY_ROLES; }
+};
+
+/** The app reads its own key from the conductor's app info and throws when there
+ *  is none. `?state=anonymous` is that case here, so the call sites keep the
+ *  app's try/catch and its empty-field fallback. */
+export const holochainClientService = {
+  getMyAgentPubKey(): Promise<AgentPubKey> {
+    const me = appContext.myAgentPubKey;
+    return me ? Promise.resolve(me) : Promise.reject(new Error('App info not available'));
+  }
 };
 
 export const resourceService = {

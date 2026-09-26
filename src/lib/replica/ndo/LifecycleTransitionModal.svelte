@@ -5,9 +5,14 @@
   // this prototype that must not be "improved": it mirrors the Rust integrity
   // zome, and offering a transition the zome rejects would let a reviewer sign
   // off on a flow that cannot ship.
-  import type { LifecycleStage, NdoDescriptor } from '../types';
+  //
+  // Hash types alias to base64 strings here, so decodeHashFromBase64 is
+  // identity; it is shimmed so the hash handling reads as the app's does.
+  import type { ActionHash, LifecycleStage, NdoDescriptor } from '../types';
   import { lobbyStore, ndoService } from '../stores.svelte';
   import { urlParam } from '../url-state.svelte';
+
+  const decodeHashFromBase64 = (s: string): string => s;
 
   interface Props {
     descriptor: NdoDescriptor;
@@ -30,13 +35,12 @@
   };
 
   const currentStage = descriptor.lifecycle_stage ?? '';
-  const allowed: LifecycleStage[] = transitions[currentStage] ?? [];
+  const allowed: LifecycleStage[] = (transitions[currentStage] ?? []);
 
   // Add "return from hibernation" if Hibernating
-  const allOptions: LifecycleStage[] =
-    descriptor.lifecycle_stage === 'Hibernating' && descriptor.hibernation_origin
-      ? ([descriptor.hibernation_origin as LifecycleStage, ...allowed] as LifecycleStage[])
-      : allowed;
+  const allOptions: LifecycleStage[] = descriptor.lifecycle_stage === 'Hibernating' && descriptor.hibernation_origin
+    ? ([descriptor.hibernation_origin as LifecycleStage, ...allowed] as LifecycleStage[])
+    : allowed;
 
   let selectedStage = $state<LifecycleStage | ''>('');
   let successorSearch = $state('');
@@ -57,7 +61,7 @@
       : []
   );
 
-  function handleConfirm() {
+  async function handleConfirm() {
     if (!selectedStage) {
       errorMessage = 'Please select a target stage.';
       return;
@@ -68,6 +72,11 @@
     }
     isSubmitting = true;
     errorMessage = '';
+
+    const originalHash = decodeHashFromBase64(descriptor.hash) as ActionHash;
+    const successorHash = selectedSuccessorHash
+      ? (decodeHashFromBase64(selectedSuccessorHash) as ActionHash)
+      : undefined;
 
     // The app awaits an Effect and branches on Exit: on failure it sets
     // errorMessage and does NOT call onadvanced, so the modal stays open with
@@ -82,11 +91,7 @@
       return;
     }
 
-    ndoService.updateLifecycleStage(
-      descriptor.hash,
-      selectedStage as LifecycleStage,
-      selectedSuccessorHash || undefined
-    );
+    ndoService.updateLifecycleStage(originalHash, selectedStage as LifecycleStage, successorHash);
     isSubmitting = false;
     onadvanced();
     onclose();

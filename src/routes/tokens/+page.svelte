@@ -12,6 +12,14 @@
     { name: 'Regime', families: ['gray', 'cyan', 'violet', 'rose', 'emerald'] },
   ];
 
+  // The 300 step of every domain family. The app reaches for it as a border:
+  // every lobby filter chip (NdoBrowser) is outlined with its family's 300,
+  // and a family without one draws no border at all.
+  const borderFamilies = [
+    'gray', 'indigo', 'amber', 'green', 'teal', 'emerald', 'yellow', 'orange', 'red',
+    'blue', 'purple', 'sky', 'cyan', 'violet', 'rose',
+  ];
+
   const semantic = [
     '--ndo-color-bg-app',
     '--ndo-color-surface',
@@ -79,6 +87,20 @@
           </div>
         </div>
       {/each}
+    </div>
+  </section>
+
+  <section class="ndo-panel">
+    <div class="ndo-panel__head"><h2 class="ndo-h3">Domain families at 300</h2></div>
+    <div class="ndo-panel__body">
+      <div class="ramp">
+        {#each borderFamilies as family (family)}
+          <div class="swatch">
+            <div class="chip" style="background:rgb(var(--ndo-{family}-300))"></div>
+            <span class="ndo-mono">{family}-300</span>
+          </div>
+        {/each}
+      </div>
     </div>
   </section>
 

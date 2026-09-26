@@ -1,14 +1,12 @@
 <script lang="ts">
   // Copy of ui/src/lib/components/ndo/EconomicEventCreateForm.svelte from the app at
-  // 20adb117219de3e7a1a45b53d8a02fc0602feb7e. Markup and logic are the app's.
+  // 3cbebf0fb08ecc9070bc22d290ca23b250b56da9. Script and markup are the app's.
   //
-  // Two documented substitutions, both forced by the replica's type surface and
-  // neither changing behaviour. Holochain's hash types alias to base64 strings
-  // here, so encodeHashToBase64 and decodeHashFromBase64 are identity: they are
-  // shimmed rather than deleted so every call site below stays byte-identical to
-  // the app, which is what makes a later diff meaningful. And the app reads its
-  // own key through holochainClientService, which the prototype has no conductor
-  // for, so appContext.myAgentPubKey stands in.
+  // Wiring only: imports are repointed, and holochainClientService is the mock
+  // one, which rejects under ?state=anonymous as the app's does without app info.
+  // Holochain's hash types alias to base64 strings here, so encodeHashToBase64
+  // and decodeHashFromBase64 are identity; they are shimmed rather than deleted
+  // so every call site stays byte-identical to the app's.
   import type {
     ActionHash,
     AgentPubKey,
@@ -20,7 +18,7 @@
     VfAction,
     VfCommitment
   } from '../types';
-  import { appContext, governanceStore } from '../stores.svelte';
+  import { governanceStore, holochainClientService } from '../stores.svelte';
 
   const encodeHashToBase64 = (h: string): string => h;
   const decodeHashFromBase64 = (s: string): string => s;
@@ -88,22 +86,19 @@
     )
   );
 
-  function seedAgents() {
-      // The app throws here when it cannot reach a conductor and deliberately
-      // leaves the field empty. In the replica the same fact arrives as null,
-      // because appContext.myAgentPubKey is null under ?state=anonymous, which
-      // is the keyed ndo-anonymous screen. So the null branch IS that screen,
-      // not a typecheck nuisance, and the field must stay empty exactly as the
-      // app leaves it.
-    const me = appContext.myAgentPubKey;
-    if (!me) return;
-    const b64 = encodeHashToBase64(me);
-    if (!providerB64) providerB64 = b64;
-    if (!receiverB64) receiverB64 = b64;
+  async function seedAgents() {
+    try {
+      const me = await holochainClientService.getMyAgentPubKey();
+      const b64 = encodeHashToBase64(me);
+      if (!providerB64) providerB64 = b64;
+      if (!receiverB64) receiverB64 = b64;
+    } catch {
+      /* ignore */
+    }
   }
 
   $effect(() => {
-    seedAgents();
+    void seedAgents();
   });
 
   $effect(() => {

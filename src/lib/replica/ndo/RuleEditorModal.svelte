@@ -1,32 +1,31 @@
 <script lang="ts">
   // Copy of ui/src/lib/components/ndo/RuleEditorModal.svelte from the app at
-  // 20adb117219de3e7a1a45b53d8a02fc0602feb7e. Markup and logic are the app's;
-  // only the imports are repointed and the ActionHash props become the base64
-  // strings the prototype routes on. The debounced dry-run and the Hard-blocks-
-  // submit rule are kept exactly: they are the component's whole point, and a
-  // prototype that let a Hard violation through would show reviewers a flow the
-  // integrity zome refuses.
+  // 3cbebf0fb08ecc9070bc22d290ca23b250b56da9. Script and markup are the app's;
+  // only the imports are repointed. The debounced dry-run and the Hard-blocks-
+  // submit rule run against the mock store, which applies the same constraint
+  // table the integrity zome does.
   import type {
     Accessibility,
+    ActionHash,
     CellId,
-    ConstraintViolation,
     GovernanceRuleType,
     PropertyRegime,
     ResourceNature,
     Rivalry,
     RuleData,
-    TransferType
+    TransferType,
+    ConstraintViolation
   } from '../types';
   import { resourceStore } from '../stores.svelte';
 
   interface Props {
-    ndoIdentityHash: string;
+    ndoIdentityHash: ActionHash;
     /** The NDO's own clone cell; null for legacy NDOs in the shared cell. */
     ndoCellId?: CellId | null;
     propertyRegime: PropertyRegime;
     resourceNature: ResourceNature;
     rivalryOverride?: Rivalry;
-    specActionHash?: string;
+    specActionHash?: ActionHash;
     onclose: () => void;
     oncreated?: () => void;
   }

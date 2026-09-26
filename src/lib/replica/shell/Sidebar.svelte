@@ -1,11 +1,12 @@
 <script lang="ts">
   // Copy of ui/src/lib/components/shell/Sidebar.svelte.
   //
-  // Two deviations, both forced by hosting rather than chosen:
+  // Three deviations, all forced by hosting rather than chosen:
   //   1. hrefs go through `paths`, because this site deploys under a GitHub
   //      Pages sub-path and the prototype is mounted at /app.
   //   2. the async store calls resolve immediately against mock state.
-  // Everything else — markup, class strings, copy, interaction — is the app's.
+  //   3. `?editProfile=1` opens the profile modal, so that state has a URL.
+  // Everything else (markup, class strings, copy, interaction) is the app's.
   import { page } from '$app/state';
   import { goto } from '$app/navigation';
   import { paths } from '$lib/paths';
@@ -97,7 +98,6 @@
       joinCode = '';
       showJoinForm = false;
       if (group) await goto(paths.groupDetail(group.id));
-      else joinError = 'Invalid invite code.';
     } catch {
       joinError = 'Invalid invite code.';
     } finally {
@@ -125,9 +125,7 @@
   <!-- Browse NDOs -->
   <a
     href={paths.appHome()}
-    class="mb-3 block rounded px-2 py-1.5 text-sm font-medium transition-colors {isActive(
-      paths.appHome()
-    )
+    class="mb-3 block rounded px-2 py-1.5 text-sm font-medium transition-colors {isActive(paths.appHome())
       ? 'bg-white text-gray-900 shadow-sm'
       : 'text-gray-600 hover:bg-white hover:text-gray-900'}"
   >

@@ -65,6 +65,7 @@ export const SCREEN_SHAPE: Record<string, Shape> = {
   'lobby-filtered': shapeOf(paths.lobbyState('filtered')),
   'lobby-filtered-empty': shapeOf(paths.lobbyState('filtered-empty')),
   'lobby-no-profile': shapeOf(paths.lobbyState('no-profile')),
+  'lobby-first-profile': shapeOf(paths.lobbyFirstProfile()),
 
   // Groups
   'group-detail': withId(paths.groupDetail(ID), ID),
@@ -136,6 +137,7 @@ export const KEY_LABEL: Record<string, string> = {
   'lobby-filtered': 'Lobby — filters applied',
   'lobby-filtered-empty': 'Lobby — filters match nothing',
   'lobby-no-profile': 'Lobby — no Level 1 profile',
+  'lobby-first-profile': 'Lobby profile setup, no profile yet',
   'group-detail': 'Group view',
   'group-create-ndo': 'Create NDO',
   'group-profile': 'Group disclosure choice',
