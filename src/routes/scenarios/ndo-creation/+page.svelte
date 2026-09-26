@@ -30,7 +30,7 @@
       <p>
         So <code class="font-mono text-xs">/ndo/new</code> exists only to redirect: if a group is
         selected it bounces there, and otherwise it explains. In production the explanation is
-        almost never seen, which is why the prototype always renders it.
+        almost never seen, which is why the current app replica always renders it.
       </p>
     </div>
   </section>

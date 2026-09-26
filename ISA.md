@@ -410,3 +410,32 @@ An independent review of PR #6 listed defects in keyed states. Walking the repli
 **Verdicts.** Phase 7 wrote 24 verdicts: 6 behaviour, 18 wiring. This follow-up re-read `LobbyView` (now behaviour: it had dropped the app's `onMount(loadNdos)`) and extended the notes of `NdoView`, the three tabs and `Sidebar`.
 
 **App-side, recorded in the README and not changed.** `NdoView`'s descriptor effect most likely re-triggers itself (by reading, not runtime-tested); its member load re-fires on an NDO with no members; a hash change keeps the previous NDO's descriptor on screen when the new read fails; a failed association is never shown to the agent.
+
+
+---
+
+## Phase 8: the v0.1 prototype directions, published for choosing (2026-09-26)
+
+The Claude Design handoff (`Prototype export options.zip`) holds six UI directions for v0.1: A Mycelium, B Field Notes, C Instrument, D Signal Board, E Holarchy, F Flow Graph. This phase ports them into the design system so Tibi can compare them, choose one to implement against the hApp, and archive the rest, while `/app` stays the record of the app as it is (the current app).
+
+### Criteria
+
+| # | Claim | Falsifier |
+|---|---|---|
+| 29 | One registry (`src/lib/prototypes/directions.ts`); choosing is editing only `status` | The index, rail or banners read status from anywhere else |
+| 30 | One plain-language module (`src/lib/prototypes/plain.ts`) | A direction defines its own word map |
+| 31 | The A to E store's lifecycle table equals the integrity zome at `3cbebf0` | `check:prototypes` finds a (from, to) pair the zome disagrees on |
+| 32 | The stores enforce what the zome enforces (initiator-only lifecycle, custodian-only custody and state, author-only rule change, the `constraints.rs` Hard rules, the Layer 1 gate), and label the handoff's extra rules as prototype-only | A wrong-agent action succeeds, or a prototype-only rule is presented as the hApp's |
+| 33 | A to E use design-system tokens only | A handoff hex value or webfont in a direction |
+| 34 | Every direction starts as a new person under `?fresh=1` and onboarding reaches a declared resource | A fresh start shows seeded data, or onboarding dead-ends |
+| 35 | Nothing under `src/lib/replica/` changes | Any diff there |
+
+### What the phase learned
+
+**The instrument lied before the code did.** `interceptor screenshot` defaults to a DOM re-render that cannot paint SVG styled through CSS variables. It showed A, C and E as black blobs, D's lanes as empty and B's spec box as broken, while the computed styles were correct. Only `--pixel` frames count as evidence of appearance here, and every direction passes in them.
+
+**The review found what the builders could not.** An independent review found one crash that survived reloads (A's field keyed trails on a string that a second hard link duplicated, and the bad state was saved), a second in F's activity feed, modals that followed the reviewer into another direction, and three places where the stores had drifted from the zome: a non-author could overwrite a rule, an ownership-transfer rule was accepted on a Nondominium NDO, and F let Layer 1 open at Ideation. All are fixed, and `check:prototypes` now fails when any of them is reintroduced.
+
+**Two handoff rules are not the hApp's yet.** "No self-validation" and "one claim per commitment" are TODOs in `zome_gouvernance` at `3cbebf0`. The prototypes keep them and say so.
+
+**What the ports gave up.** The handoff gave each direction its own typeface; the tokens-only rule sets all six in the design-system sans and mono. Each direction's card on `/prototypes` names what it lost.

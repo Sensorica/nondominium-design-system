@@ -114,6 +114,6 @@
     Every other modal is a fixed div with a <code class="font-mono text-xs">bg-black/40</code>
     overlay. They look nearly identical and behave differently: only the dialog traps focus and
     closes on Escape.
-    <a class="underline" href={paths.appHome() + '?profile=1'}>Compare them in the prototype.</a>
+    <a class="underline" href={paths.appHome() + '?profile=1'}>Compare them in the current app.</a>
   </p>
 </section>
