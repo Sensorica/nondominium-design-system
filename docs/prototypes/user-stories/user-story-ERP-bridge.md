@@ -1,0 +1,513 @@
+# User Story: Resource Sharing / Mutualization
+
+## Scenario: Two Organizations Sharing Equipment via an open source ERP
+
+**Context**: Sensorica (a maker space) and FabLab (a fabrication lab) want to share a CNC machine through their traditional open source ERP platform integration with Nondominium. **This scenario represents Nondominium's core strength - bilateral resource sharing between organizations - with potential enhancement for broader equipment network optimization.**
+
+See also *erp_holochain_bridge.md*
+
+> **How to read this story (grounding note).** The CNC machine is an **NDO**: a permanent
+> Layer 0 `NondominiumIdentity`, a Layer 1 `ResourceSpecification` with access
+> `GovernanceRule`s (certified operators, insurance), and a Layer 2 `EconomicResource`
+> instance whose `custodian` moves Sarah → Marco → Sarah and whose `OperationalState`
+> cycles `Available → Reserved → InTransit → InUse` (lifecycle maturity stays on Layer 0).
+> Custody handoffs use `transfer_custody`, which records a `TransferCustody` economic event
+> and issues bilateral **PPRs** from the 16-category set: `CustodyTransfer` /
+> `CustodyAcceptance` for the handoff, `TransportCommitmentAccepted` /
+> `TransportFulfillmentCompleted` for Marco's transport service, and `GoodFaithTransfer`
+> for the trust-based lend. Narrative labels like `UseService`, `ServiceValidation`,
+> and `CommitmentFulfillment` are shorthand for these real `ParticipationClaimType`
+> values. The ERP, mobile app, and REST API are the **Web2 host platform** (the
+> Node.js bridge); steps against `ND` are the ValueFlows/governance zome calls.
+> Organizational-agent delegation (org owns, employee holds custody) is **post-MVP**
+> (see `specifications.md §6`); the MVP treats each participant as an individual agent.
+
+---
+
+## 🏗️ System Architecture Context
+
+### **Perfect Nondominium Use Case (Equipment Sharing)**
+
+```mermaid
+graph TB
+    subgraph "Nondominium - Equipment Sharing Excellence"
+        Person[Person Zome - Organization Reps]
+        Resource[Resource Zome - Equipment Registry]
+        Governance[Governance Zome - Access Rules]
+        PPR[PPR Reputation System]
+    end
+
+    subgraph "Equipment Sharing Capabilities"
+        Discovery[Equipment Discovery]
+        Access[Secure Access Control]
+        Validation[Operator Certification]
+        Reputation[Custodial Reputation]
+    end
+
+    Person --> Discovery
+    Resource --> Access
+    Governance --> Validation
+    PPR --> Reputation
+```
+
+**Nondominium Perfectly Supports**:
+- Equipment discovery and availability management
+- Access governance with certification requirements
+- Reputation tracking for equipment care and responsible usage
+- Secure transaction logging and audit trails
+
+### **Enhancement Option (Equipment Network Optimization)**
+
+```mermaid
+graph TB
+    subgraph "Network Resource Planning (NRP)"
+        NRP[Equipment Network Planning]
+        Utilization[Utilization Optimization]
+        Maintenance[Shared Maintenance Planning]
+        Costing[Usage-Based Costing]
+    end
+
+    subgraph "Enhanced Equipment Management"
+        Scheduling[Network-wide Scheduling]
+        Capacity[Capacity Planning]
+        Maintenance[Preventive Maintenance]
+        CostAllocation[Fair Cost Allocation]
+    end
+```
+
+**Post MVP Would Add**:
+- Multi-equipment network optimization
+- Predictive maintenance scheduling
+- Utilization analytics and bottleneck identification
+- Fair cost allocation across network participants
+
+## 🎯 The Players
+
+### **Sarah** - Sensorica Resource Coordinator
+
+- **Role**: Primary Accountable Agent (Custodian)
+- **Goal**: Make expensive equipment available to partner organizations
+- **Reputation**: High PPR scores in ResourceValidation and CustodyTransfer
+
+### **Marco** - FabLab Technical Manager
+
+- **Role**: Accountable Agent with Transport & Repair specializations
+- **Goal**: Access CNC machine for prototype production
+- **Reputation**: Strong performance in TransportFulfillmentCompleted and MaintenanceFulfillmentCompleted
+
+### **The Resource**
+
+- **CNC Machine Model**: Proxxon MF70 (modified)
+- **Current Location**: Sensorica Workshop, Montreal
+- **Governance Rules**: Requires certified operators, insurance validation
+
+---
+
+## 🔄 Transaction Journey
+
+### **Phase 1: Discovery & Intent (Day 1)**
+
+```mermaid
+sequenceDiagram
+    participant Marco as Marco (FabLab)
+    participant ERP as ERP
+    participant ND as Nondominium
+    participant Res as Resource Zome
+    participant Gov as Governance Zome
+
+    Marco->>ERP: Search for CNC equipment
+    ERP->>ND: get_all_economic_resources()
+    ND->>Res: Query available resources
+    Res-->>ND: Return CNC machine specs
+    ND-->>ERP: Resource with governance rules
+    ERP-->>Marco: Display CNC machine details
+
+    Marco->>ERP: Review governance rules
+    ERP->>ND: get_resource_specification_with_rules()
+    ND->>Gov: Return rules (certification, insurance)
+    Marco->>ERP: Submit AccessForUse commitment
+    ERP->>ND: propose_commitment()
+    ND->>Gov: Create commitment
+```
+
+**Sarah's Actions**:
+
+1. **Resource Discovery**: Marco searches the ERP for available fabrication equipment
+2. **Governance Review**: Marco reviews CNC machine's embedded governance rules:
+   - Requires Transport certification ✅
+   - Proof of facility insurance required
+   - Minimum 48-hour notice for transport
+3. **Intent Signaling**: Marco submits `AccessForUse` commitment through ERP interface
+
+### **Phase 2: Validation & Trust Building (Day 2)**
+
+```mermaid
+sequenceDiagram
+    participant Sarah as Sarah (Sensorica)
+    participant ERP as ERP
+    participant ND as Nondominium
+    participant PPR as PPR System
+
+    ND->>Sarah: Notify of new commitment
+    Sarah->>ERP: Review Marco's credentials
+    ERP->>ND: derive_reputation_summary(Marco)
+    ND->>PPR: Calculate reputation scores
+    PPR-->>ND: Return reputation data (98% on-time, 4.8/5 quality)
+    ND-->>ERP: Display Marco's reputation
+    Sarah->>ND: validate_agent_for_custodianship()
+    ND->>Gov: Create validation receipt
+    Gov-->>ERP: Commitment approved
+```
+
+**Multi-Party Validation**:
+
+1. **Identity Verification**: Sarah validates Marco's credentials and insurance
+2. **Capability Check**: System validates Marco's Transport certification
+3. **Reputation Assessment**: Sarah reviews Marco's PPR summary:
+   - 98% on-time delivery rate
+   - 4.8/5 quality score
+   - 12 successful transport completions
+
+### **Phase 3: Resource Preparation (Day 3)**
+
+```mermaid
+stateDiagram-v2
+    [*] --> Available: CNC Machine Available
+    Available --> Reserved: Sarah prepares for transport
+    Reserved --> InTransit: Documentation complete, handoff begins
+
+    note right of Reserved
+        OperationalState: Available → Reserved → InTransit
+        (LifecycleStage stays Active on Layer 0)
+        Transport protocols linked
+        Insurance certificate uploaded
+    end note
+```
+
+**Sarah's Preparation**:
+
+1. **Resource State Update**: Changes CNC `OperationalState` from `Available` to `Reserved` (Layer 0 `LifecycleStage` stays `Active`)
+2. **Transport Documentation**: Creates transport checklist and safety protocols
+3. **Insurance Coordination**: Uploads facility insurance certificate
+
+### **Phase 4: Transport Process (Day 4)**
+
+```mermaid
+sequenceDiagram
+    participant Marco as Marco (FabLab)
+    participant Sarah as Sarah (Sensorica)
+    participant ERP as ERP 
+    participant ND as Nondominium
+    participant Res as Resource Zome
+    participant PPR as PPR System
+
+    Marco->>ERP: Arrive for transport
+    ERP->>ND: update_operational_state(InTransit)
+    ND->>Gov: Validate Marco's Transport role (validate_specialized_role)
+    Sarah->>ERP: Scan QR code on CNC machine
+    Marco->>ERP: Scan QR code confirmation
+    ERP->>ND: transfer_custody()
+    ND->>Res: Update custodian: Sarah → Marco
+    Note over ND,Gov: transfer_custody logs the TransferCustody economic event
+    Gov->>PPR: issue_participation_receipts()
+    PPR-->>ND: Generate bilateral PPRs for both agents
+    ND-->>ERP: Update transport status
+```
+
+**The Physical Transfer**:
+
+1. **Transport Initiation**: Marco arrives with certified transport equipment
+2. **Custody Transfer Ceremony**: Both agents scan QR codes on CNC machine
+3. **Multi-Signature Process**: Bilateral cryptographic signatures executed
+4. **Real-time Updates**: ERP shows live transport status
+
+### **Phase 5: Usage & Monitoring (Week 1-2)**
+
+```mermaid
+graph LR
+    subgraph "Usage Process"
+        A[Start Use] --> B[Log Daily Usage]
+        B --> C[Performance Metrics]
+        C --> D[PPR Generation]
+        D --> E[Quality Monitoring]
+    end
+
+    subgraph "PPR Categories (16-category set)"
+        F[RuleCompliance]
+        G[ValidationActivity]
+        H[TransportFulfillmentCompleted]
+    end
+
+    D --> F
+    D --> G
+    D --> H
+```
+
+**Resource Utilization**:
+
+1. **Use Process Activation**: Marco initiates CNC machine for prototype production
+2. **Quality Monitoring**: System tracks usage hours and maintenance needs
+3. **Progress Reporting**: Daily usage logs through ERP interface
+4. **Performance Metrics**: Automatic PPR generation for each use session
+
+### **Phase 6: Return & Completion (Day 15)**
+
+```mermaid
+sequenceDiagram
+    participant Marco as Marco (FabLab)
+    participant Sarah as Sarah (Sensorica)
+    participant ERP as ERP
+    participant ND as Nondominium
+    participant PPR as PPR System
+
+    Marco->>ERP: Complete maintenance checklist
+    ERP->>ND: claim_commitment()
+    Marco->>ERP: Initiate return transport
+    ERP->>ND: update_operational_state(InTransit)
+    Sarah->>ERP: Scan return QR code
+    ERP->>ND: transfer_custody()
+    ND->>Res: Update custodian: Marco → Sarah
+    Sarah->>ERP: Inspect and approve return
+    ERP->>ND: validate_specialized_role()
+    ND->>Gov: Create validation receipts
+    Gov->>PPR: issue_participation_receipts()
+    PPR-->>ND: Update reputation scores
+    ND-->>ERP: Transaction complete
+```
+
+**Return Process**:
+
+1. **Maintenance Check**: Marco performs routine maintenance and documents condition
+2. **Return Transport**: Reverse transport with same validation process
+3. **Final Assessment**: Sarah inspects returned equipment
+4. **Bilateral PPR Issuance**: Both agents receive participation receipts
+
+---
+
+## 🏆 Transaction Outcomes
+
+### **Immediate Benefits**
+
+- ✅ **Cost Savings**: FabLab saves $15,000 on equipment purchase
+- ✅ **Revenue**: Sensorica earns $800 usage fee
+- ✅ **Capacity Building**: Both organizations expand fabrication capabilities
+- ✅ **Trust Enhancement**: PPR scores improved for both agents
+
+### **Reputation Impact**
+
+```mermaid
+graph LR
+    subgraph "Before Transaction"
+        Sarah_Before[Sarah: 4.7/5<br/>12 PPRs]
+        Marco_Before[Marco: 4.6/5<br/>8 PPRs]
+    end
+
+    subgraph "Transaction Process"
+        Phase1[Discovery & Validation]
+        Phase2[Transport Process]
+        Phase3[Usage Period]
+        Phase4[Return Process]
+
+        Phase1 --> Phase2
+        Phase2 --> Phase3
+        Phase3 --> Phase4
+    end
+
+    subgraph "After Transaction"
+        Sarah_After[Sarah: 4.9/5<br/>15 PPRs<br/>+1 CustodyTransfer<br/>+1 GoodFaithTransfer]
+        Marco_After[Marco: 4.8/5<br/>11 PPRs<br/>+1 CustodyAcceptance<br/>+1 TransportFulfillmentCompleted]
+    end
+
+    Sarah_Before --> Phase1
+    Marco_Before --> Phase1
+    Phase4 --> Sarah_After
+    Phase4 --> Marco_After
+```
+
+**Sarah's PPR Updates**:
+
+- +1 CustodyTransfer (outgoing)
+- +1 GoodFaithTransfer
+- Performance: 5.0/5 reliability score
+
+**Marco's PPR Updates**:
+
+- +1 CustodyAcceptance (incoming)
+- +1 TransportFulfillmentCompleted
+- Performance: 4.9/5 overall satisfaction
+
+### **Network Effects**
+
+- **New Resource Discovery**: Two other organizations express interest in similar sharing
+- **Process Optimization**: Transport protocol refined for future transactions
+- **Community Building**: Sensorica and FabLab plan collaborative training workshop
+
+---
+
+## 🔗 Web2 Integration Features
+
+### **System Architecture Integration**
+
+```mermaid
+graph TB
+    subgraph "Web2 Platform Layer"
+        ERP[ERP Platform]
+        Mobile[Mobile App]
+        API[REST API]
+    end
+
+    subgraph "Nondominium Core"
+        Person[Person Zome]
+        Resource[Resource Zome]
+        Governance[Governance Zome]
+    end
+
+    subgraph "PPR System"
+        Claims[Private Participation Claims]
+        Reputation[Reputation Summary]
+        Crypto[Cryptographic Signatures]
+    end
+
+    subgraph "External Systems"
+        Inventory[Inventory Management]
+        Insurance[Insurance Systems]
+        Finance[Financial Reporting]
+    end
+
+    ERP --> API
+    Mobile --> API
+    API --> Person
+    API --> Resource
+    API --> Governance
+
+    Governance --> Claims
+    Claims --> Reputation
+    Reputation --> Crypto
+
+    Resource --> Inventory
+    Governance --> Insurance
+    API --> Finance
+
+    Person -.-> |Identity Management| Resource
+    Resource -.-> |Resource Lifecycle| Governance
+    Governance -.-> |Validation & PPR| Person
+```
+
+### **ERP Interface**
+
+- **Resource Gallery**: Visual catalog with availability calendars
+- **Agent Profiles**: Public reputation summaries with privacy controls
+- **Workflow Dashboard**: Step-by-step transaction tracking
+- **Notification System**: Real-time updates via email and ERP messages
+
+### **Enterprise Integration**
+
+- **Synchronization**: Resource status synced with inventory management systems
+- **Reporting**: Usage analytics and financial reconciliation
+- **Compliance**: Automatic audit trail for insurance and regulatory requirements
+- **API Access**: RESTful endpoints for custom workflow integrations
+
+### **User Experience**
+
+- **Mobile App**: Field operations with QR code scanning
+- **Document Management**: Secure storage of certificates and agreements
+- **Communication Hub**: Integrated messaging for coordination
+- **Analytics Dashboard**: Usage patterns and cost optimization insights
+
+---
+
+## 💡 Key Innovation Highlights
+
+### **Trust Without Platforms**
+
+- No central authority controlling the resource
+- Direct peer-to-peer governance through embedded rules
+- Cryptographic reputation that travels with agents
+
+### **Privacy-Preserving Transparency**
+
+- Economic events publicly visible for accountability
+- Private operational details protected through capability access
+- Selective disclosure of sensitive information
+
+### **Progressive Trust Building**
+
+- Start with basic resource sharing
+- Build reputation through successful transactions
+- Unlock more complex collaborative opportunities
+
+### **Composable Workflows**
+
+- Transport → Use → Maintenance → Return processes
+- Multi-agent coordination for complex projects
+- Automated governance enforcement at each step
+
+---
+
+## 🎯 Business Value Proposition
+
+### **Web2 Integration Benefits**
+
+```mermaid
+mindmap
+  root((Nondominium + Web2))
+    Platform Enhancement
+      New Revenue Streams
+        Transaction fees
+        Premium features
+      User Engagement
+        Reputation system
+        Gamified participation
+      Network Effects
+        Growing ecosystem
+        Resource discovery
+    Business Value
+      Cost Reduction
+        Shared access to equipment
+        Reduced capital investment
+      Risk Management
+        Insured transactions
+        Clear accountability
+      Innovation Enablement
+        Democratized access
+        Collaborative opportunities
+    Technical Features
+      Familiar Interface
+        ERP integration
+        Mobile accessibility
+      Enterprise Ready
+        API integration
+        Reporting dashboard
+      Trust Layer
+        Cryptographic reputation
+        Privacy-preserving transparency
+```
+
+### **For Web2 Platforms**
+
+- **New Revenue Streams**: Transaction fees and premium features
+- **User Engagement**: Increased platform stickiness through reputation
+- **Network Effects**: Growing ecosystem of shared resources
+- **Competitive Advantage**: Differentiation through decentralized trust
+
+### **For Organizations**
+
+- **Resource Optimization**: Better utilization of expensive equipment
+- **Cost Reduction**: Shared access to specialized tools and facilities
+- **Risk Management**: Insured transactions with clear accountability
+- **Innovation Enablement**: Access to resources without capital investment
+
+### **For the Community**
+
+- **Sustainability**: Reduced waste through resource sharing
+- **Accessibility**: Democratized access to expensive equipment
+- **Skill Development**: Knowledge sharing through collaboration
+- **Economic Resilience**: Distributed resource ownership
+
+---
+
+**This user story demonstrates how Nondominium enables Web2 platforms to transform from simple content management systems into powerful engines for decentralized resource sharing, combining the familiarity of existing platforms with the trust and transparency of blockchain-based governance.**
+
+---
+
+_Transaction completed successfully in 15 days with both organizations reporting high satisfaction and expressing interest in expanding their sharing partnership._

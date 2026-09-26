@@ -46,7 +46,7 @@
       <header class="ndo-modal__head">
         <div>
           <h2 class="ndo-h3">🗺️ Screen map</h2>
-          <p class="ndo-small">Every keyed screen in the prototype. Press <kbd>m</kbd> to toggle.</p>
+          <p class="ndo-small">Every keyed screen in the current app. Press <kbd>m</kbd> to toggle.</p>
         </div>
         <button class="ndo-btn ndo-btn--ghost ndo-btn--sm" onclick={() => (screenMap.open = false)}>Close</button>
       </header>

@@ -70,7 +70,7 @@
       Open the disclosure modal
     </button>
     <a class="text-sm text-blue-600 hover:underline" href={paths.groupDetail('sensorica-lab-7f3a')}>
-      Open the group in the prototype
+      Open the group in the current app
     </a>
   </div>
 </div>

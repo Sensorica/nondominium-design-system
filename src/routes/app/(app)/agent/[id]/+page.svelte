@@ -22,7 +22,7 @@
       <code class="font-mono">NdoIdentityLayer.svelte</code> links an initiator's name to
       <code class="font-mono">/agent/&lt;key&gt;</code>, but
       <code class="font-mono">ui/src/routes</code> has no <code class="font-mono">agent</code>
-      directory. The link 404s today. The prototype keeps it so the gap stays visible.
+      directory. The link 404s today. The current app keeps it so the gap stays visible.
     </p>
     <a
       href={paths.appHome()}

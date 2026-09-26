@@ -1,0 +1,199 @@
+/* The shared look of the prototype UI kit (modals, menu, onboarding, toasts).
+ *
+ * Theming contract. A direction themes this kit by setting --proto-* custom
+ * properties on its own root element; every shared component carries the
+ * `.pu` class, which resolves each one to a design-system token by default.
+ * The handoff's ui.jsx used --pb, --pi, --pm, --pl, --pa, --pac, --pr, --prb
+ * and --pmono for the same job; the mapping is in src/lib/prototypes/README.md.
+ *
+ * No hex literals here: colours come from tokens (rgb(var(--ndo-*))).
+ */
+
+.pu {
+  --_bg: var(--proto-bg, rgb(var(--ndo-color-card-bg)));
+  --_ink: var(--proto-ink, var(--ndo-color-text-primary));
+  --_muted: var(--proto-muted, var(--ndo-color-text-secondary));
+  --_line: var(--proto-line, var(--ndo-color-border));
+  --_accent: var(--proto-accent, rgb(var(--ndo-blue-600)));
+  --_accent-hover: var(--proto-accent-hover, rgb(var(--ndo-blue-700)));
+  --_accent-ink: var(--proto-accent-ink, rgb(255 255 255));
+  --_radius: var(--proto-radius, var(--ndo-radius-xl));
+  --_control-radius: var(--proto-control-radius, var(--ndo-radius-md));
+  --_field-radius: var(--proto-field-radius, var(--ndo-radius-md));
+  --_font: var(--proto-font, var(--ndo-font-sans));
+  --_mono: var(--proto-mono, var(--ndo-font-mono));
+  --_overlay: var(--proto-overlay, var(--ndo-color-overlay));
+  --_shadow: var(--proto-shadow, var(--ndo-shadow-xl));
+  --_danger: var(--proto-danger, rgb(var(--ndo-red-600)));
+  --_hover: var(--proto-hover, rgb(var(--ndo-gray-500) / 0.12));
+  --_focus: var(--proto-focus, var(--ndo-focus-ring));
+  font-family: var(--_font);
+}
+
+/* ── Buttons ──
+ * Doubled class: the Tailwind reset styles `[type='button']` at the same
+ * specificity as one class, and stylesheet order is not guaranteed across
+ * chunks. */
+.pu-btn.pu-btn {
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.2;
+  padding: 8px 14px;
+  border-radius: var(--_control-radius);
+  border: 1px solid var(--_accent);
+  background: var(--_accent);
+  color: var(--_accent-ink);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: var(--ndo-transition-colors);
+}
+.pu-btn.pu-btn:hover:not(:disabled) {
+  background: var(--_accent-hover);
+  border-color: var(--_accent-hover);
+}
+.pu-btn.pu-btn:focus-visible {
+  outline: none;
+  box-shadow: var(--_focus);
+}
+.pu-btn.pu-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+.pu-btn.pu-btn--ghost {
+  background: transparent;
+  color: var(--_ink);
+  border-color: var(--_line);
+}
+.pu-btn.pu-btn--ghost:hover:not(:disabled) {
+  background: var(--_hover);
+  border-color: var(--_line);
+}
+.pu-btn.pu-btn--ghost.is-on,
+.pu-btn.pu-btn--ghost.is-on:hover:not(:disabled) {
+  background: var(--_accent);
+  color: var(--_accent-ink);
+  border-color: var(--_accent);
+}
+.pu-btn.pu-btn--sm {
+  font-size: 12px;
+  font-weight: 500;
+  padding: 5px 10px;
+}
+.pu-link.pu-link {
+  font: inherit;
+  font-size: 13px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--_accent);
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+/* ── Fields ── */
+.pu-input,
+.pu-select,
+.pu-textarea {
+  font: inherit;
+  font-size: 14px;
+  padding: 9px 11px;
+  border-radius: var(--_field-radius);
+  border: 1px solid var(--_line);
+  background: transparent;
+  color: var(--_ink);
+  width: 100%;
+  box-sizing: border-box;
+  outline: none;
+}
+.pu-input:focus,
+.pu-select:focus,
+.pu-textarea:focus {
+  border-color: var(--_accent);
+  box-shadow: var(--_focus);
+}
+.pu-select {
+  appearance: auto;
+}
+.pu-select--inline {
+  width: auto;
+  font-size: 12px;
+  padding: 5px 8px;
+}
+.pu-textarea {
+  min-height: 72px;
+  resize: vertical;
+}
+.pu-mono {
+  font-family: var(--_mono);
+}
+.pu-label {
+  display: block;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--_muted);
+  margin-bottom: 5px;
+}
+.pu-hint {
+  display: block;
+  font-size: 12px;
+  color: var(--_muted);
+  margin-top: 4px;
+}
+
+/* ── Text and layout ── */
+.pu-muted {
+  font-size: 13px;
+  color: var(--_muted);
+  line-height: 1.5;
+  margin: 0;
+}
+.pu-sec {
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--_muted);
+  margin: 0;
+}
+.pu-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+.pu-row--end {
+  justify-content: flex-end;
+}
+.pu-row--between {
+  justify-content: space-between;
+}
+.pu-grid {
+  display: grid;
+  gap: 10px;
+}
+.pu-card {
+  border: 1px solid var(--_line);
+  border-radius: var(--_field-radius);
+  padding: 10px 12px;
+}
+.pu-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  max-height: 340px;
+  overflow: auto;
+}
+
+/* ── Error ── */
+.pu-err {
+  font-family: var(--_mono);
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--_danger);
+  background: color-mix(in srgb, var(--_danger) 8%, transparent);
+  border: 1px solid color-mix(in srgb, var(--_danger) 30%, transparent);
+  border-radius: var(--_field-radius);
+  padding: 8px 10px;
+  margin: 0;
+}

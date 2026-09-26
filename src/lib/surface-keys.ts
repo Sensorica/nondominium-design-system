@@ -4,15 +4,17 @@
 // URL: the screen-map catalogue, a comment thread, the parity inventory. URLs
 // change; keys must not.
 //
-// Two namespaces, one resolver:
+// Three namespaces, one resolver:
 //   screen keys     'ndo-governance'          (prototype app states)
 //   scenario keys   'scenario:lobby-browse'   (composed showcase pages)
+//   direction keys  'proto:holarchy:group'    (the v0.1 UI directions)
 //
 // Resolution is URL-aware, not pathname-aware, because in this prototype a
 // modal, a tab and a panel are query-param states of the same route. Keeping
 // them out of the path is what lets the replica components stay byte-identical
 // to the app's, which is the whole point.
 import { paths } from './paths';
+import { DIRECTION_LIST, type DirectionSlug } from './prototypes/directions';
 import {
   BARE_NDO,
   DEPRECATED_NDO,
@@ -108,6 +110,25 @@ export const SCREEN_SHAPE: Record<string, Shape> = {
   'agent-profile': withId(paths.agentProfile(ID), ID)
 };
 
+/** Direction keys. `prototypes` is the index. Each direction's default view
+ *  is `proto:{slug}` (the bare route); every other view is
+ *  `proto:{slug}:{view}`, matched on the `view` param alone, so the record a
+ *  view is pinned to (`ndo`, `group`) never splits a comment thread. */
+export const protoKey = (slug: string, view?: string): string =>
+  view ? `proto:${slug}:${view}` : `proto:${slug}`;
+
+export const PROTOTYPE_SHAPE: Record<string, Shape> = {
+  prototypes: shapeOf(paths.prototypes()),
+  ...Object.fromEntries(
+    DIRECTION_LIST.flatMap((d) => [
+      [protoKey(d.slug), shapeOf(paths.protoDirection(d.slug as DirectionSlug))] as const,
+      ...d.views.slice(1).map(
+        (v) => [protoKey(d.slug, v.id), { path: shapeOf(paths.protoDirection(d.slug as DirectionSlug)).path, params: { view: v.id } }] as const
+      )
+    ])
+  )
+};
+
 /** Scenario route → scenario key. Exact path match. */
 export const SCENARIO_KEY: Record<string, string> = {
   [paths.scenarioLobbyBrowse()]: 'scenario:lobby-browse',
@@ -169,7 +190,14 @@ export const KEY_LABEL: Record<string, string> = {
   'scenario:ndo-lifecycle': 'NDO lifecycle scenario',
   'scenario:group-collaboration': 'Group collaboration scenario',
   'scenario:agent-identity': 'Agent identity scenario',
-  'scenario:governance-review': 'Governance review scenario'
+  'scenario:governance-review': 'Governance review scenario',
+  prototypes: 'Prototype directions: index',
+  ...Object.fromEntries(
+    DIRECTION_LIST.flatMap((d) => [
+      [protoKey(d.slug), `${d.id} ${d.name}: ${d.views[0].label}`],
+      ...d.views.slice(1).map((v) => [protoKey(d.slug, v.id), `${d.id} ${d.name}: ${v.label}`])
+    ])
+  )
 };
 
 function pathMatches(pathname: string, pattern: string): boolean {
@@ -195,7 +223,7 @@ function paramsMatch(search: URLSearchParams, want: Record<string, string> | und
 export function screenKeyForUrl(url: URL): string {
   let bestKey = '';
   let bestScore = -1;
-  for (const [key, shape] of Object.entries(SCREEN_SHAPE)) {
+  for (const [key, shape] of [...Object.entries(SCREEN_SHAPE), ...Object.entries(PROTOTYPE_SHAPE)]) {
     if (!pathMatches(url.pathname, shape.path)) continue;
     if (!paramsMatch(url.searchParams, shape.params)) continue;
     const concrete = shape.path.split('/').filter((s) => s !== ':id').length;

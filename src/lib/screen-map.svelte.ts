@@ -16,7 +16,31 @@ import {
   NDO,
   TERMINAL_NDO
 } from './records';
-import { labelForKey, screenKeyForUrl } from './surface-keys';
+import { labelForKey, protoKey, screenKeyForUrl } from './surface-keys';
+import { DIRECTION_LIST, type DirectionSlug, type ViewOf } from './prototypes/directions';
+import { EXAMPLE_GROUP, EXAMPLE_NDO } from './prototypes/store/logic';
+
+/** Representative URLs for the direction surfaces: the index, each direction's
+ *  default view, and each other view pinned to an example record when it
+ *  needs one. */
+const PROTOTYPE_KEY_TO_URL: Record<string, string> = {
+  prototypes: paths.prototypes(),
+  ...Object.fromEntries(
+    DIRECTION_LIST.flatMap((d) => {
+      const slug = d.slug as DirectionSlug;
+      return [
+        [protoKey(slug), paths.protoDirection(slug)],
+        ...d.views.slice(1).map((v) => [
+          protoKey(slug, v.id),
+          paths.protoView(slug, v.id as ViewOf<DirectionSlug>, {
+            group: v.needs?.includes('group') ? EXAMPLE_GROUP : undefined,
+            ndo: v.needs?.includes('ndo') ? EXAMPLE_NDO : undefined
+          })
+        ])
+      ];
+    })
+  )
+};
 
 export const screenMap = $state({ open: false });
 
@@ -68,7 +92,9 @@ export const SCREEN_KEY_TO_URL: Record<string, string> = {
   'ndo-error': paths.ndoState(NDO, 'error'),
   'ndo-anonymous': paths.ndoState(NDO, 'anonymous'),
 
-  'agent-profile': paths.agentProfile(AGENT)
+  'agent-profile': paths.agentProfile(AGENT),
+
+  ...PROTOTYPE_KEY_TO_URL
 };
 
 export type ScreenMapGroup = { title: string; keys: string[] };
@@ -142,7 +168,14 @@ export const SCREEN_MAP_GROUPS: ScreenMapGroup[] = [
       'ndo-anonymous'
     ]
   },
-  { title: 'Agents', keys: ['agent-profile'] }
+  { title: 'Agents', keys: ['agent-profile'] },
+  {
+    title: 'Prototypes',
+    keys: [
+      'prototypes',
+      ...DIRECTION_LIST.flatMap((d) => [protoKey(d.slug), ...d.views.slice(1).map((v) => protoKey(d.slug, v.id))])
+    ]
+  }
 ];
 
 export function urlForKey(key: string): string | undefined {

@@ -27,8 +27,13 @@
     },
     {
       href: paths.appHome(),
-      title: 'Prototype',
+      title: 'Current app',
       body: 'A replica of the app: thirty-nine states, the same markup and classes, on mock data.',
+    },
+    {
+      href: paths.prototypes(),
+      title: 'Prototype directions',
+      body: 'Six UI directions for v0.1, from the prototype handoff, side by side. One gets chosen and implemented against the hApp.',
     },
   ];
 </script>
@@ -41,7 +46,7 @@
       The visual language of
       <a href="https://github.com/Sensorica/nondominium">Nondominium</a>, a Holochain application
       for resource governance without ownership. This documents the app as it is today, not an
-      aspiration: the prototype is a replica of its components, and a check fails the build if the
+      aspiration: the current app is a replica of its components, and a check fails the build if the
       two drift apart.
     </p>
   </header>
@@ -61,12 +66,12 @@
     </div>
     <div class="ndo-panel__body flex flex-col gap-3">
       <p class="ndo-small">
-        Every prototype state and every scenario carries a comment thread. Press <kbd>c</kbd> or
+        Every state of the current app and every scenario carries a comment thread. Press <kbd>c</kbd> or
         use the floating button to open the drawer; threads live as GitHub Discussions in a private
         Sensorica repository, so the site stays static and the review history stays with the org.
       </p>
       <p class="ndo-small">
-        Inside the prototype, press <kbd>m</kbd> for the screen map, and use the chip at the bottom
+        Inside the current app, press <kbd>m</kbd> for the screen map, and use the chip at the bottom
         left to come back here.
       </p>
     </div>

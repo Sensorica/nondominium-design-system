@@ -110,6 +110,19 @@ You need a fine-grained GitHub token from a member of the `Sensorica` organisati
 
 Inside `/app`, press **`m`**: every keyed state, grouped, one click away — including the three connection states nobody can reach in a running app.
 
+## Prototype directions
+
+`/prototypes` holds six working UI directions for the v0.1 release, from the prototype handoff (`docs/prototypes/HANDOFF.md`). Each covers the whole journey: profile, group (create, join by invite link, or the example network), declaring a shared resource, and managing it. The audience is people new to resource sharing, so the default UI uses everyday words; a **Developer details** switch in every direction's menu (Ctrl/Cmd+K) adds zome calls, hashes and rule chains.
+
+- **A to E** are mid-fidelity explorations restyled onto this system's tokens, as the handoff asked. They run on one shared mock store (`src/lib/prototypes/store/`), so what you do in one shows up in the others. The store enforces the hApp's rules, and `bun run check:prototypes` fails if its lifecycle table or its authorization rules drift from the integrity zome at `nondominium@3cbebf0`.
+- **F Flow Graph** is high fidelity, already built on this system, and runs on its own mock of the real zome calls.
+- Words come from one module, `src/lib/prototypes/plain.ts`. Shared modals, the menu, onboarding and toasts are in `src/lib/prototypes/ui/`. The contract for whoever builds a direction is `src/lib/prototypes/README.md`.
+- Every direction and each of its views is a keyed surface: `m` for the screen map, `c` to comment. `?fresh=1` starts a direction as a new person; `?example=1` reloads the example network.
+
+**Choosing and archiving.** Leave a comment on the direction you want (press `c` on it). The choice is then recorded by editing one field, `status`, in `src/lib/prototypes/directions.ts`: `'target'` for the chosen direction, `'archived'` for the ones set aside, `'candidate'` for the rest. The index, the rail and the banner on each direction follow that field; nothing else changes. Once a target exists, the index shows it beside the replica under "Actual versus target".
+
+The handoff's standalone builds (about 10 MB of bundled React) are not committed; its notes, backend map and seven user stories are in `docs/prototypes/`.
+
 ---
 
 ## Commands
@@ -122,6 +135,7 @@ bun run build:registry    # Just the ndo-* custom-element bundle
 bun run preview           # Preview the production build
 bun run check             # svelte-check + the fidelity check
 bun run check:fidelity    # Compare the replica against ../nondominium/ui
+bun run check:prototypes  # The prototype store's rules against the integrity zome
 ```
 
 ---
