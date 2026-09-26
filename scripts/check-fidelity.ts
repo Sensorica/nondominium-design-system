@@ -176,9 +176,9 @@ const VERDICTS: Record<string, { verdict: 'wiring' | 'behaviour'; read_on: strin
     note: 'One line, an import path. Markup closed the same day: the replica had dropped data-testid="member-row", which no class-token check can see because a data attribute emits no utility class.'
   },
   'lobby/LobbyView.svelte': {
-    verdict: 'wiring',
-    read_on: '2026-09-17',
-    note: 'Entirely the two allowances: the profile modal is opened through the query string instead of local state, and the create/join group links go through paths.appHome(). No behaviour differs.'
+    verdict: 'behaviour',
+    read_on: '2026-09-26',
+    note: "The replica had dropped the app's onMount(() => lobbyStore.loadNdos()), so a return to the lobby never cleared a 'Join group failed' banner the way the app's store does; restored. The rest is the two allowances: the profile modal opens from ?profile=1 instead of local state, and the create/join group links go through paths.appHome(). The modal's onclose clears ?profile=1 only while the flag is set: Melt's Dialog calls onOpenChange(false) from its first effect, and clearing the URL there called replaceState during hydration, which threw and aborted the effect flush, so a hard-loaded ?profile=1 never opened."
   },
   'lobby/NdoCard.svelte': {
     verdict: 'wiring',
@@ -233,7 +233,7 @@ const VERDICTS: Record<string, { verdict: 'wiring' | 'behaviour'; read_on: strin
   'ndo/ActivityTab.svelte': {
     verdict: 'behaviour',
     read_on: '2026-09-26',
-    note: "The replica had dropped the app's try/catch, so the 'Failed to load activity for this NDO' error path, which resets events and commitments, was gone. It had also swapped the $effect keyed on specActionHash for onMount, so it stopped reloading when the NDO changed, and it read the spec listings directly instead of calling fetchSpecificationsForNdo. All three are restored. What remains is wiring: the Effect programs are now mock service calls, encodeHashToBase64 is an identity shim, and ?modal=commitment|event opens the forms. The markup is now byte-identical."
+    note: "The replica had dropped the app's try/catch, so the 'Failed to load activity for this NDO' error path, which resets events and commitments, was gone. It had also swapped the $effect keyed on specActionHash for onMount, so it stopped reloading when the NDO changed, and it read the spec listings directly instead of calling fetchSpecificationsForNdo. All three are restored. What remains is wiring: the Effect programs are now mock service calls, encodeHashToBase64 is an identity shim, and ?modal=commitment|event opens the forms through bindUrlModal, which also closes a URL-opened form when the param moves on (the commitment form had stayed open under the event form) and clears the param on close. The markup is now byte-identical."
   },
   'ndo/AssociateNdoModal.svelte': {
     verdict: 'behaviour',
@@ -263,7 +263,7 @@ const VERDICTS: Record<string, { verdict: 'wiring' | 'behaviour'; read_on: strin
   'ndo/GovernanceTab.svelte': {
     verdict: 'behaviour',
     read_on: '2026-09-26',
-    note: "Four behaviours had drifted. The app re-runs loadRules and the agent/roles load from an $effect keyed on specActionHash, and the replica used onMount. canCreateRule had lost the app's truthiness terms, so an empty-string regime or nature enabled the button. The 'No Layer 1 specifications yet' load copy had lost the app's em dash. The New rule click was synchronous. All four are restored; the async fetchSpecificationsForNdo click is now the app's, and the agent key goes through a mock holochainClientService that rejects under ?state=anonymous. The rest is wiring: mock services and ?modal=rule-edit. The markup is byte-identical again, which fixes the reflowed 'AccountableAgent (governance-gated)' button."
+    note: "Four behaviours had drifted. The app re-runs loadRules and the agent/roles load from an $effect keyed on specActionHash, and the replica used onMount. canCreateRule had lost the app's truthiness terms, so an empty-string regime or nature enabled the button. The 'No Layer 1 specifications yet' load copy had lost the app's em dash. The New rule click was synchronous. All four are restored; the async fetchSpecificationsForNdo click is now the app's, and the agent key goes through a mock holochainClientService that rejects under ?state=anonymous. The rest is wiring: mock services and ?modal=rule-edit, which goes through bindUrlModal so closing the editor clears the param and keeps the Governance tab. The markup is byte-identical again, which fixes the reflowed 'AccountableAgent (governance-gated)' button."
   },
   'ndo/LifecycleTransitionModal.svelte': {
     verdict: 'wiring',
@@ -278,12 +278,12 @@ const VERDICTS: Record<string, { verdict: 'wiring' | 'behaviour'; read_on: strin
   'ndo/NdoView.svelte': {
     verdict: 'behaviour',
     read_on: '2026-09-26',
-    note: "The replica derived the descriptor straight from the mock and showed invented error copy. The app loads it into state, seeds it from ndoDescriptorCache, shows no banner when cached data exists, and uses 'Could not refresh NDO details from the chain. Data shown may be cached.' The app's parse-error copy, Retry re-fetch, role mapping on members and three markup items (data-testid=\"ndo-lifecycle-stage\", independent joinMessage and joinError blocks, the NdoAnchor comment) were also missing. All restored, with {specActionHash} and {ndoCellId} passed as the app does; ndoCellId is null because the mock has no cells. What remains is tab, modal and join state in the query string."
+    note: "The replica derived the descriptor straight from the mock and showed invented error copy. The app loads it into state, seeds it from ndoDescriptorCache, shows no banner when cached data exists, and uses 'Could not refresh NDO details from the chain. Data shown may be cached.' The app's parse-error copy, Retry re-fetch, role mapping on members and three markup items (data-testid=\"ndo-lifecycle-stage\", independent joinMessage and joinError blocks, the NdoAnchor comment) were also missing. All restored, with {specActionHash} and {ndoCellId} passed as the app does; ndoCellId is null because the mock has no cells. What remains is tab, modal and join state in the query string. Re-read after review: loadDescriptor and loadNdoMembers now await the mock the way the app awaits the conductor, so the load effect tracks specActionHash and ndoDescriptor only, as the app's does, instead of ?state= through a synchronous mock read. One more allowance: ndoDescriptor starts from a synchronous mock read rather than null, because effects do not run during prerender and a null start shipped pages with no name and an enabled '+ New specification' on Ideation NDOs; the read is withheld under ?state=loading|error. The route remounts NdoView when ?state= changes. App-side, recorded and not changed: the app's load effect reads ndoDescriptor before its first await and writes a fresh object after it, so by reading it re-runs itself after every successful load (not runtime-tested); the replica does not loop only because the mock hands back the same object. The member-load effect likewise re-fires on its own completion for an NDO with no members, and a hash change keeps the previous NDO's descriptor, so a failed read under the new hash shows the old NDO with no banner."
   },
   'ndo/ResourcesTab.svelte': {
     verdict: 'behaviour',
     read_on: '2026-09-26',
-    note: "The replica used onMount where the app uses an $effect that tracks specActionHash and ndoCellId, so it never reloaded when either prop changed. It also filtered the listings inline instead of awaiting fetchSpecificationsForNdo. Both are restored, and loadError is reset at the end of load as in the app. What remains is wiring: one mock resourceService call and ?modal=spec-create. The markup is byte-identical."
+    note: "The replica used onMount where the app uses an $effect that tracks specActionHash and ndoCellId, so it never reloaded when either prop changed. It also filtered the listings inline instead of awaiting fetchSpecificationsForNdo. Both are restored, and loadError is reset at the end of load as in the app. What remains is wiring: one mock resourceService call and ?modal=spec-create. The markup is byte-identical. The ?modal=spec-create wiring goes through bindUrlModal: it closes when a navigation drops the param and clears the param when the modal closes, so a later tab click no longer reopens it."
   },
   'ndo/RuleEditorModal.svelte': {
     verdict: 'wiring',
@@ -308,7 +308,7 @@ const VERDICTS: Record<string, { verdict: 'wiring' | 'behaviour'; read_on: strin
   'shell/Sidebar.svelte': {
     verdict: 'behaviour',
     read_on: '2026-09-26',
-    note: "The replica added `else joinError = 'Invalid invite code.'` after a null join. The app has no such branch: its lobbyStore.joinGroup returns null and records 'Join group failed: ...' on lobbyStore.errorMessage, and Sidebar just closes the form. Removed the branch, and the mock joinGroup, createGroup and loadLobby now clear or set lobbyState.errorMessage the way the app's store does. Everything else is wiring: paths.ts hrefs and goto targets, urlParam instead of $page.url.searchParams, the `?editProfile=1` modal flag, and import paths."
+    note: "The replica added `else joinError = 'Invalid invite code.'` after a null join. The app has no such branch: its lobbyStore.joinGroup returns null and records 'Join group failed: ...' on lobbyStore.errorMessage, and Sidebar just closes the form. Removed the branch, and the mock joinGroup, createGroup and loadLobby now clear or set lobbyState.errorMessage the way the app's store does. Everything else is wiring: paths.ts hrefs and goto targets, urlParam instead of $page.url.searchParams, the `?editProfile=1` modal flag, and import paths. Because the sidebar outlives every route, forms and the profile modal opened from the URL now close when a navigation drops their param, and closing the modal clears ?editProfile=1."
   }
 };
 

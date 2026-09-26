@@ -1,18 +1,18 @@
 <script lang="ts">
-  // Copy of ui/src/lib/components/ndo/NdoView.svelte. Two differences, both
-  // allowances, and neither reaches the markup beyond event handlers:
+  // Copy of ui/src/lib/components/ndo/NdoView.svelte. Three differences, all
+  // allowances, and none reaches the markup beyond event handlers:
   //   1. tab, modal and join-panel state is mirrored into the query string, so
   //      every one of those states is a deep-linkable, commentable surface.
   //      Production keeps them purely local, which is right for the app and
   //      useless for a review tool.
-  //   2. the Effect service calls become lookups against the mock layer, which
+  //   2. the Effect service calls become awaited calls on the mock layer, which
   //      serves the slow and failed reads from `?state=` (see stores.svelte.ts).
   //      Hash types alias to base64 strings here, so decodeHashFromBase64 is
   //      identity; it is shimmed so the parse step stays the app's.
-  import { page } from '$app/state';
-  import { replaceState } from '$app/navigation';
+  //   3. ndoDescriptor starts from a synchronous mock read instead of null, so
+  //      the prerendered page carries the record (see the comment at its $state).
   import type { ActionHash, CellId, NdoDescriptor } from '../types';
-  import { urlFlag, urlParam } from '../url-state.svelte';
+  import { currentUrl, replaceUrl, urlFlag, urlParam } from '../url-state.svelte';
   import { appContext, ndoService, ndoDescriptorCache } from '../stores.svelte';
   import MemberList from '../group/MemberList.svelte';
   import ResourcesTab from './ResourcesTab.svelte';
@@ -24,6 +24,10 @@
   import AssociateNdoModal from './AssociateNdoModal.svelte';
 
   const decodeHashFromBase64 = (s: string): string => s;
+
+  function seedDescriptor(): NdoDescriptor | null {
+    return ndoService.getDescriptor(decodeURIComponent(specHashB64));
+  }
 
   interface Props {
     specHashB64: string;
@@ -58,7 +62,13 @@
   const specActionHash = $derived(parsed.hash);
   const parseError = $derived(parsed.error);
   let tab = $state<TabId>('resources');
-  let ndoDescriptor = $state<NdoDescriptor | null>(null);
+  // The app starts this at null and fills it from an $effect. Every page here is
+  // prerendered, and effects do not run during prerender, so a null start ships
+  // HTML with no name, no detail card and a null lifecycleStage, which leaves
+  // '+ New specification' enabled on an Ideation NDO until hydration. Seeding from
+  // the mock is the first paint the app reaches once its read lands. The seed is
+  // withheld under ?state=loading|error, whose screens are a first visit.
+  let ndoDescriptor = $state<NdoDescriptor | null>(seedDescriptor());
   let isLoading = $state(false);
   let loadError = $state<string | null>(null);
   let showForkModal = $state(false);
@@ -100,7 +110,8 @@
   });
 
   function syncUrl(next: { tab?: TabId; modal?: string | null; join?: boolean }) {
-    const url = new URL(page.url);
+    const current = currentUrl();
+    const url = currentUrl();
     const t = next.tab ?? tab;
     if (t === 'resources') url.searchParams.delete('tab');
     else url.searchParams.set('tab', t);
@@ -112,8 +123,8 @@
     else url.searchParams.delete('join');
     // Idempotent: a handler that fires spuriously must not start a
     // write, param, state, write cycle. See url-state.svelte.ts.
-    if (url.search === page.url.search) return;
-    replaceState(url, {});
+    if (url.search === current.search) return;
+    replaceUrl(url);
   }
 
   $effect(() => {
@@ -132,10 +143,9 @@
     // Only show spinner if we don't already have cached data to display.
     if (!ndoDescriptor) isLoading = true;
     loadError = null;
-    // `?state=loading`: the conductor has not answered, and nothing resolves.
-    if (ndoService.isLoading) return;
-    // null is the failed read: `?state=error`, or no such record.
-    const descriptor = ndoService.getDescriptor(hash);
+    // Never settles under `?state=loading`; null is the failed read, from
+    // `?state=error` or a hash with no record.
+    const descriptor = await ndoService.fetchDescriptor(hash);
     isLoading = false;
     if (descriptor) {
       ndoDescriptor = descriptor;
@@ -160,9 +170,9 @@
   async function loadNdoMembers() {
     membersLoading = true;
     membersError = null;
-    const members = ndoService.getNdoMembers(specHashB64);
+    const members = await ndoService.fetchNdoMembers(specHashB64);
     membersLoading = false;
-    if (ndoService.loadError) {
+    if (members === null) {
       membersError = 'Could not load members. They may not have reached this node yet.';
       ndoMembers = [];
     } else {

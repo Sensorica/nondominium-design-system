@@ -3,7 +3,9 @@
   // Mounted ONCE at the true root so it covers the prototype app, the
   // scenarios, and the playbook alike. Scenarios carry no uniform chrome, so
   // the floating button is the single entry point; there is no per-page wiring.
+  import { browser } from '$app/environment';
   import { page } from '$app/state';
+  import { currentUrl } from '$lib/replica/url-state.svelte';
   import { comments, clearToken } from '$lib/comments/comments.svelte';
   import { findDiscussion, validateToken } from '$lib/comments/github-client';
   import { surfaceKeyForUrl, labelForKey } from '$lib/surface-keys';
@@ -12,7 +14,10 @@
   import CommentsCompose from './CommentsCompose.svelte';
   import type { Comment } from '$lib/comments/comments-types';
 
-  const currentKey = $derived(surfaceKeyForUrl(page.url));
+  // currentUrl, not page.url: the prototype's tab and modal clicks are shallow
+  // replaceState writes, which SvelteKit keeps out of page.url, and a thread
+  // must follow the surface on screen.
+  const currentKey = $derived(surfaceKeyForUrl(browser ? currentUrl() : page.url));
   const label = $derived(currentKey ? labelForKey(currentKey) : '');
   const count = $derived(comments.thread?.comments.length ?? 0);
 

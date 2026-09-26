@@ -65,7 +65,6 @@ export const SCREEN_SHAPE: Record<string, Shape> = {
   'lobby-filtered': shapeOf(paths.lobbyState('filtered')),
   'lobby-filtered-empty': shapeOf(paths.lobbyState('filtered-empty')),
   'lobby-no-profile': shapeOf(paths.lobbyState('no-profile')),
-  'lobby-first-profile': shapeOf(paths.lobbyFirstProfile()),
 
   // Groups
   'group-detail': withId(paths.groupDetail(ID), ID),
@@ -125,7 +124,7 @@ export const KEY_LABEL: Record<string, string> = {
   'connection-error': 'Connection failed',
   disconnected: 'Not connected',
   lobby: 'Lobby — Browse NDOs',
-  'lobby-profile-setup': 'Lobby profile setup (first launch)',
+  'lobby-profile-setup': 'Lobby profile modal, from the profile bar',
   'lobby-edit-profile': 'Edit Lobby profile',
   'lobby-create-group': 'Create group (sidebar)',
   'lobby-join-group': 'Join group (sidebar)',
@@ -136,8 +135,7 @@ export const KEY_LABEL: Record<string, string> = {
   'lobby-onboarding': 'Lobby — first run, no groups',
   'lobby-filtered': 'Lobby — filters applied',
   'lobby-filtered-empty': 'Lobby — filters match nothing',
-  'lobby-no-profile': 'Lobby — no Level 1 profile',
-  'lobby-first-profile': 'Lobby profile setup, no profile yet',
+  'lobby-no-profile': 'Lobby with no Level 1 profile: the first-launch profile modal',
   'group-detail': 'Group view',
   'group-create-ndo': 'Create NDO',
   'group-profile': 'Group disclosure choice',

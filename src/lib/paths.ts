@@ -55,9 +55,6 @@ export const paths = {
   // ── Prototype: lobby ──
   appHome: () => app(),
   lobbyProfileSetup: () => app('?profile=1'),
-  /** The profile modal as a brand-new agent meets it: no Level 1 profile yet,
-   *  so the form opens empty and offers no way to close it unsaved. */
-  lobbyFirstProfile: () => app('?state=no-profile&profile=1'),
   lobbyCreateGroup: () => app('?openCreateGroup=1'),
   lobbyJoinGroup: () => app('?openJoinGroup=1'),
   lobbyEditProfile: () => app('?editProfile=1'),

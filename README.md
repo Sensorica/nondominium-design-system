@@ -36,7 +36,7 @@ bun run dev
 | `/patterns` | Seven categories of pattern the app writes today, each citing its source file |
 | `/playbook`, `/ui-kit` | `@nondominium/ndo-ui`: component sheets, and screens composed from them |
 | `/scenarios` | Six composed pages, each arguing one design question |
-| `/app` | **The replica** — 39 keyed states of the real app, on mock data |
+| `/app` | **The replica**: 44 keyed states of the real app, on mock data |
 
 ---
 
@@ -79,7 +79,7 @@ Roughly half the screens the app implements are ones nobody can open on demand. 
 | `empty` | nothing in it yet: no NDOs, no members, no soft links, no work log |
 | `onboarding` | first run, no groups — the dashed Create-or-join panel |
 | `filtered` / `filtered-empty` | filters applied, with and without matches |
-| `no-profile` | no Level 1 profile: the Set-up-profile call to action |
+| `no-profile` | no Level 1 profile: the first-launch profile modal opens over the lobby, as the app's root layout opens it |
 | `anonymous` | no agent key: which write actions survive, and which do not |
 
 Four more are properties of a record rather than a route, so they are keyed to a hash: hibernating, deprecated with a successor, end of life, and every tab empty. `src/lib/records.ts` names them and says why each earns a key.
@@ -278,10 +278,20 @@ Everything below is a statement about the app, not about this repo.
 - **`presetIcons` is configured and unused.**
 - **Transition event hashes are real in the app and mocked here.** The prototype seeds plausible hashes so the history panel renders; the app shows whatever the zome returns.
 - **The token file is this repo's invention.** The app has no design tokens. `static/tokens.css` exists to serve the custom elements and to give the values a name; it declares no `body` styles precisely so that including it cannot change how a page renders.
+- **The integrity zome accepts more hibernation than the UI offers.** `dnas/nondominium/zomes/integrity/zome_resource/src/lib.rs` (`validate_update_nondominium_identity`, the "Suspend (any non-terminal → Hibernating)" rule) lets any stage other than Hibernating, Deprecated and EndOfLife enter Hibernating. The app's `ui/src/lib/components/ndo/LifecycleTransitionModal.svelte` offers Hibernating from Active only, and `documentation/specifications/specifications.md` §7.5 says the modal and the zome enforce that same table. They do not. The replica copies the modal, so it inherits the stricter UI. This is an app-side finding for the team; nothing here changes it.
+- **NdoView's descriptor load most likely re-triggers itself.** In `ui/src/lib/components/ndo/NdoView.svelte`, the effect that calls `loadDescriptor` reads `ndoDescriptor` synchronously (`if (!ndoDescriptor) isLoading = true;`, before the first `await`), so the effect depends on it, and after the await it assigns the fresh object the service returns. Each successful load should therefore schedule the next. This is a reading of the code, not a runtime observation. The replica has the same shape and does not loop only because its mock returns the same object each time.
+- **The NDO member list polls itself on an NDO with no members.** The same file's effect `if (showJoinPanel && ndoMembers.length === 0 && !membersLoading && !membersError) void loadNdoMembers();` is re-armed by `loadNdoMembers` itself, which clears `membersLoading` and assigns a new empty array, so with the join panel open on an NDO nobody has joined it calls `getNdoMembers` again after every answer. The replica reproduces it (open `?join=1` on a bare NDO): its mock answers on a later task, so the loop costs a render per turn instead of freezing the tab.
+- **A second NDO opened in the same view can show the first one.** SvelteKit keeps `NdoView` mounted across `/ndo/A` to `/ndo/B` (a successor link does this). `loadDescriptor(B)` only raises the skeleton, and only shows the error banner, when `ndoDescriptor` is empty, and it still holds A. If B's read fails, the header, detail card and tabs keep showing A under B's hash, with no banner.
+- **A failed association is never shown.** `AssociateNdoModal` flips to "Saved!" whatever `groupStore.associateNdoWithGroup` did. The failure is written to `groupStore.errorMessage`, which only `GroupView` renders, and `GroupView` clears it by calling `loadGroupData` on mount.
+
+### Where this repo's kit departs from the app
+
+These three are statements about `registry/` and `packages/ndo-ui` rather than about the app.
+
 - **The registry card does not colour stages the way the app's card does.** `registry/ndo-card.svelte` renders each badge through `registry/ndo-badge.svelte`, whose `lifecycle-*` variants give every stage its own family (Active emerald, Prototype amber, Hibernating yellow). The app's `ui/src/lib/components/lobby/NdoCard.svelte` paints Active, Stable, Distributed, Development and Prototype `bg-green-100 text-green-700` and every other stage gray. The regime chip agrees on both sides (gray-400 dashed), and `packages/ndo-ui/src/components/primitives/NdoCard.svelte` follows the app, so only the custom element diverges.
 - **Create NDO is a single form in the app and a wizard in the kit.** The app's `ui/src/lib/components/group/NdoCreateModal.svelte` is one modal: name, regime, nature, stage, rivalry and description, with hints from its own `regimeTooltips` and `natureTooltips`. `/ui-kit/ndo-create` mounts `packages/ndo-ui/src/components/patterns/group/NdoCreateModal.svelte`, a three- or four-step wizard (intent, identity, optional governance, review) with a live preview panel and its own question copy in `packages/ndo-ui/src/domain/wizard-questions.ts` ("Tools, equipment, spaces, materials..." where the app says "A tangible, material resource.").
 - **The kit's group view has no invite button.** The app's `ui/src/lib/components/group/GroupView.svelte` puts a "Copy invite link" button beside "Create NDO" in the header and wraps the member list in `mt-6`. `packages/ndo-ui/src/components/patterns/group/GroupView.svelte`, which `/ui-kit/group` renders, has the header, error banner, `NdoBrowser` and `MemberList` in the same order, but neither the invite button nor the wrapper.
-- **The integrity zome accepts more hibernation than the UI offers.** `dnas/nondominium/zomes/integrity/zome_resource/src/lib.rs` (`validate_update_nondominium_identity`, the "Suspend (any non-terminal → Hibernating)" rule) lets any stage other than Hibernating, Deprecated and EndOfLife enter Hibernating. The app's `ui/src/lib/components/ndo/LifecycleTransitionModal.svelte` offers Hibernating from Active only, and `documentation/specifications/specifications.md` §7.5 says the modal and the zome enforce that same table. They do not. The replica copies the modal, so it inherits the stricter UI. This is an app-side finding for the team; nothing here changes it.
+
 ---
 
 ## Two component vocabularies, and why

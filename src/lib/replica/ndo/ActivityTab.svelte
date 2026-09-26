@@ -22,7 +22,7 @@
     resourceService,
     resourceStore
   } from '../stores.svelte';
-  import { urlParam } from '../url-state.svelte';
+  import { bindUrlModal } from '../url-state.svelte';
   import CommitmentCreateForm from './CommitmentCreateForm.svelte';
   import EconomicEventCreateForm from './EconomicEventCreateForm.svelte';
 
@@ -105,12 +105,20 @@
   }
 
   // Wiring: the screen map addresses both forms by key, so they also open from
-  // the URL. The app holds them in local state only.
-  $effect(() => {
-    const m = urlParam('modal');
-    if (m === 'commitment') showCommitment = true;
-    if (m === 'event') showEvent = true;
-  });
+  // the URL, and closing one clears that param again. The app holds them in
+  // local state only.
+  bindUrlModal(
+    'modal',
+    'commitment',
+    { get: () => showCommitment, set: (open) => (showCommitment = open) },
+    { tab: 'activity' }
+  );
+  bindUrlModal(
+    'modal',
+    'event',
+    { get: () => showEvent, set: (open) => (showEvent = open) },
+    { tab: 'activity' }
+  );
 
   $effect(() => {
     void specActionHash;

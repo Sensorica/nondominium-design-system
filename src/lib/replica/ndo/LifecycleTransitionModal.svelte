@@ -84,7 +84,7 @@
     // never fail, so without this the error paragraph below is markup nothing
     // can reach, and a reviewer would sign off on a flow whose failure path has
     // never been rendered. `?state=error` is the repo's existing idiom for the
-    // same problem, already used by ndoService.loadError.
+    // same problem, already used by ndoService.fetchDescriptor.
     if (urlParam('state') === 'error') {
       isSubmitting = false;
       errorMessage = 'Failed to advance stage: the chain rejected the transition.';

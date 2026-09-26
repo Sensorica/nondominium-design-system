@@ -23,7 +23,7 @@
     resourceService,
     resourceStore
   } from '../stores.svelte';
-  import { urlParam } from '../url-state.svelte';
+  import { bindUrlModal } from '../url-state.svelte';
   import RuleEditorModal from './RuleEditorModal.svelte';
 
   interface Props {
@@ -92,10 +92,14 @@
   }
 
   // Wiring: the screen map addresses the rule editor by key, so it also opens
-  // from the URL. The app holds it in local state only.
-  $effect(() => {
-    if (urlParam('modal') === 'rule-edit') showRuleEditor = true;
-  });
+  // from the URL, and closing it clears that param again. The app holds it in
+  // local state only.
+  bindUrlModal(
+    'modal',
+    'rule-edit',
+    { get: () => showRuleEditor, set: (open) => (showRuleEditor = open) },
+    { tab: 'governance' }
+  );
 
   $effect(() => {
     void specActionHash;

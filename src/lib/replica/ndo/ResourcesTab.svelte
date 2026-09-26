@@ -15,7 +15,7 @@
   } from '../types';
   import { operationalStateLabel } from '../operational-state-labels';
   import { resourceService, resourceStore } from '../stores.svelte';
-  import { urlParam } from '../url-state.svelte';
+  import { bindUrlModal } from '../url-state.svelte';
   import SpecificationCreateModal from './SpecificationCreateModal.svelte';
 
   interface Props {
@@ -61,9 +61,11 @@
   }
 
   // Wiring: the screen map addresses the create modal by key, so it also opens
-  // from the URL. The app holds it in local state only.
-  $effect(() => {
-    if (urlParam('modal') === 'spec-create') showCreateModal = true;
+  // from the URL, and closing it clears that param again. The app holds it in
+  // local state only.
+  bindUrlModal('modal', 'spec-create', {
+    get: () => showCreateModal,
+    set: (open) => (showCreateModal = open)
   });
 
   $effect(() => {

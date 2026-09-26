@@ -13,8 +13,10 @@
   ];
 
   // The 300 step of every domain family. The app reaches for it as a border:
-  // every lobby filter chip (NdoBrowser) is outlined with its family's 300,
-  // and a family without one draws no border at all.
+  // every lobby filter chip (NdoBrowser) is outlined with its family's 300. It
+  // writes those as UnoCSS utilities (border-indigo-300 and the rest), which
+  // carry the preset's values and never read these tokens; the tokens give the
+  // same values a name, and nothing in the app depends on them.
   const borderFamilies = [
     'gray', 'indigo', 'amber', 'green', 'teal', 'emerald', 'yellow', 'orange', 'red',
     'blue', 'purple', 'sky', 'cyan', 'violet', 'rose',

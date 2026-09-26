@@ -38,7 +38,6 @@ export const SCREEN_KEY_TO_URL: Record<string, string> = {
   'lobby-filtered': paths.lobbyState('filtered'),
   'lobby-filtered-empty': paths.lobbyState('filtered-empty'),
   'lobby-no-profile': paths.lobbyState('no-profile'),
-  'lobby-first-profile': paths.lobbyFirstProfile(),
 
   'group-detail': paths.groupDetail(GROUP),
   'group-create-ndo': paths.groupCreateNdo(GROUP),
@@ -98,8 +97,7 @@ export const SCREEN_MAP_GROUPS: ScreenMapGroup[] = [
       'lobby-onboarding',
       'lobby-filtered',
       'lobby-filtered-empty',
-      'lobby-no-profile',
-      'lobby-first-profile'
+      'lobby-no-profile'
     ]
   },
   {

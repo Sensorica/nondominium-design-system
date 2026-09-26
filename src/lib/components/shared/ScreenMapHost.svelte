@@ -7,11 +7,15 @@
   // implementation's overlay predates its own registry conventions): the
   // catalogue needs the router, and a CE would have to re-emit navigation
   // events to reach it.
+  import { browser } from '$app/environment';
   import { page } from '$app/state';
+  import { currentUrl } from '$lib/replica/url-state.svelte';
   import { goto } from '$app/navigation';
   import { screenMap, SCREEN_MAP_GROUPS, urlForKey, labelForKey, screenKeyForUrl } from '$lib/screen-map.svelte';
 
-  const currentKey = $derived(screenKeyForUrl(page.url));
+  // currentUrl, not page.url: the prototype's tab and modal clicks are shallow
+  // replaceState writes, which SvelteKit keeps out of page.url.
+  const currentKey = $derived(screenKeyForUrl(browser ? currentUrl() : page.url));
 
   function onKeydown(e: KeyboardEvent) {
     const tag = (e.target as HTMLElement)?.tagName;
