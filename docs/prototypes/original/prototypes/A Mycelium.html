@@ -1,0 +1,66 @@
+<!-- @startingPoint section="Stigmergic v0.1" subtitle="Dark trace field with fading trails, signals and offline mode" viewport="1280x800" -->
+<!DOCTYPE html>
+<html><head><meta charset="utf-8"><title>A · Mycelium — prototype</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0B1113;--bg2:#111a1d;--line:#1f2c30;--ink:#E6EFEE;--mute:#8CA3A2;--dim:#56706f;--teal:#2EC4B6;--pb:#111a1d;--pi:#E6EFEE;--pm:#8CA3A2;--pl:#2a3a3e;--pa:#2EC4B6;--pac:#0B1113;--pr:14px;--pmono:'JetBrains Mono'}
+*{box-sizing:border-box}html,body{margin:0;height:100%}body{background:var(--bg);color:var(--ink);font-family:'Instrument Sans',sans-serif;overflow:hidden}
+a{color:var(--teal);text-decoration:none}a:hover{text-decoration:underline;color:var(--ink)}
+.mono{font-family:'JetBrains Mono',monospace}
+.app{display:grid;grid-template-columns:64px minmax(0,1fr) 380px;grid-template-rows:minmax(0,1fr) 36px;height:100vh}
+.rail{grid-row:1/3;border-right:1px solid var(--line);display:flex;flex-direction:column;align-items:center;padding:14px 0;gap:6px}
+.logo{width:40px;height:40px;border-radius:10px;background:#F4F5F5 url(assets/nondominium_logo.png) no-repeat;background-size:92px;background-position:-26px -22px;margin-bottom:14px}
+.ri{position:relative;width:48px;padding:8px 0;border-radius:8px;text-align:center;font-size:10px;color:var(--dim);cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:4px}
+.ri .g{width:18px;height:18px;border-radius:50%;border:1.5px solid currentColor}
+.ri.on{color:var(--teal);background:#12262a}.ri:hover{color:var(--ink)}
+.cnt{position:absolute;top:2px;right:4px;font-style:normal;background:#F2B84B;color:#0B1113;font-size:9px;font-weight:700;border-radius:999px;padding:1px 5px}
+.field{position:relative;overflow:hidden}
+.top{position:absolute;left:24px;top:18px;right:24px;display:flex;align-items:center;gap:12px;z-index:2;flex-wrap:wrap}
+.seg{display:flex;background:var(--bg2);border:1px solid var(--line);border-radius:999px;padding:3px}
+.seg>span{font-size:12px;padding:5px 12px;border-radius:999px;color:var(--mute);cursor:pointer;white-space:nowrap}.seg>span.on{background:#1b3236;color:var(--teal)}.seg>span:hover{color:var(--ink)}
+.new{font:600 12px 'Instrument Sans';background:var(--teal);color:#0B1113;border:0;border-radius:999px;padding:8px 14px;cursor:pointer;white-space:nowrap}.new:hover{background:#5ad6ca}
+.foot2{position:absolute;left:24px;right:24px;bottom:14px;z-index:2;display:flex;flex-wrap:wrap;align-items:center;gap:10px 24px}.legend{display:flex;gap:18px;font-size:11px;color:var(--mute);z-index:2;flex-wrap:wrap}
+.legend>span{white-space:nowrap}.legend i{display:inline-block;width:22px;height:3px;border-radius:2px;margin-right:6px;vertical-align:middle}
+.decay{margin-left:auto;display:flex;align-items:center;gap:10px;font-size:11px;color:var(--mute);white-space:nowrap}
+.decay input{accent-color:var(--teal);width:140px}
+svg text{font-family:'Instrument Sans'}
+.panel{border-left:1px solid var(--line);background:var(--bg2);overflow:auto;padding:22px}
+.empty-panel{display:grid;place-items:center}
+.x{margin-left:auto;background:none;border:0;color:var(--dim);cursor:pointer;font-size:14px}.x:hover{color:var(--ink)}
+.kick{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--dim)}
+.panel h1{font-size:24px;line-height:1.15;margin:6px 0 10px;font-weight:600;letter-spacing:-.01em}
+.tags{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px}
+.tag{font-size:11px;padding:3px 8px;border-radius:999px;border:1px solid var(--line);color:var(--mute);white-space:nowrap}
+.tag.l{color:var(--teal);border-color:#1f4a47;background:#0f2826}.tag.r{border-style:dashed;color:#8fb0ff;border-color:#35508a}
+.strength{display:flex;align-items:flex-end;gap:3px;height:36px;margin:6px 0 4px}
+.strength span{flex:1;background:var(--teal);border-radius:2px 2px 0 0;transition:height 500ms}
+.row{display:flex;justify-content:space-between;font-size:11px;color:var(--dim)}
+.acts{display:flex;gap:8px;margin-top:16px;flex-wrap:wrap}
+.acts button,.sig button{background:transparent;border:1px solid #2a4a4a;color:var(--teal);border-radius:999px;font:500 12px 'Instrument Sans';padding:6px 12px;cursor:pointer;white-space:nowrap}
+.acts button:hover,.sig button:hover{background:#12302e}
+.sec{margin-top:20px}.sec h3{font-size:12px;font-weight:600;margin:0 0 10px;color:var(--mute);display:flex;justify-content:space-between}
+.sig{display:flex;gap:10px;padding:10px;border:1px solid var(--line);border-radius:10px;margin-bottom:8px;background:#0e1618;align-items:flex-start}
+.sig .pulse{width:10px;height:10px;border-radius:50%;margin-top:4px;flex-shrink:0}
+.sig b{font-size:13px;font-weight:600;display:block}.sig small{font-size:11px;color:var(--mute)}
+.sig button{margin-left:auto;align-self:center}
+.trace{display:grid;grid-template-columns:10px 1fr auto;gap:10px;font-size:12px;padding:6px 0;transition:opacity 400ms}
+.trace .d{width:6px;height:6px;border-radius:50%;margin-top:5px}
+.trace .t{color:var(--dim);font-size:11px;white-space:nowrap}
+.slots{display:flex;flex-wrap:wrap;gap:6px}
+.slot{font-size:11px;padding:5px 9px;border-radius:6px;background:#0e1618;border:1px solid var(--line);color:var(--mute)}
+.slot.filtered{opacity:.45;text-decoration:line-through}.slot.conditional{border-style:dashed}
+.slot.add{border-style:dashed;color:var(--dim);cursor:pointer}.slot.add:hover{color:var(--teal);border-color:var(--teal)}
+.empty{font-size:12px;color:var(--dim);padding:10px 0}
+.list{position:absolute;inset:0;overflow:auto;padding:28px 36px;max-width:760px}
+.list h2{font-size:26px;margin:0 0 6px;font-weight:600;letter-spacing:-.01em}.lede{color:var(--mute);font-size:14px;margin:0 0 18px}
+.status{grid-column:2/4;border-top:1px solid var(--line);display:flex;align-items:center;gap:22px;padding:0 20px;font-size:11px;color:var(--mute);white-space:nowrap;overflow:hidden}
+.status .ok{width:7px;height:7px;border-radius:50%;display:inline-block;margin-right:6px}
+</style></head><body><template id="__bundler_thumbnail"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" fill="#0B1113"/><text x="50" y="64" font-family="sans-serif" font-size="40" font-weight="700" fill="#2EC4B6" text-anchor="middle">A</text></svg></template><div id="root"></div>
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script type="text/babel" src="core.jsx"></script>
+<script type="text/babel" src="ui.jsx"></script>
+<script type="text/babel" src="A.jsx"></script>
+</body></html>

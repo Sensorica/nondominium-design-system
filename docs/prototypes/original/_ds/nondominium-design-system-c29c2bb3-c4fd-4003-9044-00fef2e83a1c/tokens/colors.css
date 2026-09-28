@@ -1,0 +1,88 @@
+/* Nondominium — color tokens. RGB triplets for alpha composability: rgb(var(--ndo-*) / 0.5)
+   Source: nondominium-design-system/static/tokens.css (verbatim values) */
+:root{
+--ndo-gray-50:249 250 251;/* @kind color */
+--ndo-gray-100:243 244 246;/* @kind color */
+--ndo-gray-200:229 231 235;/* @kind color */
+--ndo-gray-300:209 213 219;/* @kind color */
+--ndo-gray-400:156 163 175;/* @kind color */
+--ndo-gray-500:107 114 128;/* @kind color */
+--ndo-gray-600:75 85 99;/* @kind color */
+--ndo-gray-700:55 65 81;/* @kind color */
+--ndo-gray-800:31 41 55;/* @kind color */
+--ndo-gray-900:17 24 39;/* @kind color */
+
+/* Lifecycle / status */
+--ndo-green-50:240 253 244;/* @kind color */
+--ndo-green-100:220 252 231;/* @kind color */
+--ndo-green-700:21 128 61;/* @kind color */
+
+--ndo-emerald-100:209 250 229;/* @kind color */
+--ndo-emerald-700:4 120 87;/* @kind color */
+
+--ndo-red-50:254 242 242;/* @kind color */
+--ndo-red-100:254 226 226;/* @kind color */
+--ndo-red-200:254 202 202;/* @kind color */
+--ndo-red-700:185 28 28;/* @kind color */
+
+--ndo-amber-50:255 251 235;/* @kind color */
+--ndo-amber-100:254 243 199;/* @kind color */
+--ndo-amber-600:217 119 6;/* @kind color */
+--ndo-amber-700:180 83 9;/* @kind color */
+--ndo-amber-800:146 64 14;/* @kind color */
+
+--ndo-yellow-100:254 249 195;/* @kind color */
+--ndo-yellow-700:161 98 7;/* @kind color */
+
+--ndo-orange-50:255 247 237;/* @kind color */
+--ndo-orange-100:255 237 213;/* @kind color */
+--ndo-orange-700:194 65 12;/* @kind color */
+
+/* Resource nature */
+--ndo-blue-50:239 246 255;/* @kind color */
+--ndo-blue-100:219 234 254;/* @kind color */
+--ndo-blue-600:37 99 235;/* @kind color */
+--ndo-blue-700:29 78 216;/* @kind color */
+--ndo-blue-800:30 64 175;/* @kind color */
+
+--ndo-purple-100:237 233 254;/* @kind color */
+--ndo-purple-700:109 40 217;/* @kind color */
+
+--ndo-teal-100:204 251 241;/* @kind color */
+--ndo-teal-700:15 118 110;/* @kind color */
+
+--ndo-indigo-100:224 231 255;/* @kind color */
+--ndo-indigo-700:67 56 202;/* @kind color */
+
+/* Property regime */
+--ndo-cyan-100:207 250 254;/* @kind color */
+--ndo-cyan-700:14 116 144;/* @kind color */
+
+--ndo-violet-100:237 233 254;/* @kind color */
+--ndo-violet-700:109 40 217;/* @kind color */
+
+--ndo-rose-100:255 228 230;/* @kind color */
+--ndo-rose-700:190 18 60;/* @kind color */
+
+/* Semantic surfaces */
+--ndo-color-bg-app:rgb(var(--ndo-gray-100));/* @kind color */
+
+--ndo-color-surface:rgb(var(--ndo-gray-50));/* @kind color */
+
+--ndo-color-card-bg:255 255 255;/* @kind color */
+
+--ndo-color-border:rgb(var(--ndo-gray-200));/* @kind color */
+
+--ndo-color-border-subtle:rgb(var(--ndo-gray-100));/* @kind color */
+
+--ndo-color-text-primary:rgb(var(--ndo-gray-900));/* @kind color */
+
+--ndo-color-text-secondary:rgb(var(--ndo-gray-600));/* @kind color */
+
+--ndo-color-text-muted:rgb(var(--ndo-gray-500));/* @kind color */
+
+--ndo-color-text-mono:rgb(var(--ndo-gray-400));/* @kind color */
+
+--ndo-color-link:rgb(var(--ndo-blue-600));/* @kind color */
+
+}

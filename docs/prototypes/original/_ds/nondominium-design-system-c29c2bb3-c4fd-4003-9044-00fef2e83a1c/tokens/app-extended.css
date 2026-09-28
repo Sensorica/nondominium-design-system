@@ -1,0 +1,26 @@
+/* Shades used by the live nondominium UI (UnoCSS utilities in NdoBrowser / NdoIdentityLayer)
+   but absent from static/tokens.css. Tailwind default values. Filter-chip borders + Public regime. */
+:root{
+--ndo-sky-100:224 242 254;/* @kind color */
+--ndo-sky-300:125 211 252;/* @kind color */
+--ndo-sky-700:3 105 161;/* @kind color */
+
+--ndo-blue-300:147 197 253;/* @kind color */
+--ndo-indigo-300:165 180 252;/* @kind color */
+--ndo-amber-300:252 211 77;/* @kind color */
+--ndo-green-300:134 239 172;/* @kind color */
+--ndo-teal-300:94 234 212;/* @kind color */
+--ndo-emerald-300:110 231 183;/* @kind color */
+--ndo-yellow-300:253 224 71;/* @kind color */
+--ndo-orange-300:253 186 116;/* @kind color */
+--ndo-red-300:252 165 165;/* @kind color */
+--ndo-purple-300:216 180 254;/* @kind color */
+--ndo-cyan-300:103 232 249;/* @kind color */
+--ndo-violet-300:196 181 253;/* @kind color */
+--ndo-rose-300:253 164 175;/* @kind color */
+
+--ndo-red-600:220 38 38;/* @kind color */
+--ndo-yellow-50:254 252 232;/* @kind color */
+--ndo-emerald-50:236 253 245;/* @kind color */
+
+}

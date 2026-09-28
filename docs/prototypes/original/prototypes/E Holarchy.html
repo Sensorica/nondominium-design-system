@@ -1,0 +1,48 @@
+<!-- @startingPoint section="Stigmergic v0.1" subtitle="Zoomable Lobby → Group → NDO rings" viewport="1280x800" -->
+<!DOCTYPE html>
+<html><head><meta charset="utf-8"><title>E · Holarchy — prototype</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#F3F6F8;--ink:#0F1A2A;--ink2:#48566A;--mute:#8592A3;--line:#DDE4EB;--pb:#fff;--pi:#0F1A2A;--pm:#8592A3;--pl:#DDE4EB;--pa:#0F1A2A;--pac:#fff;--pr:20px;--prb:12px;--pmono:'Fira Code'}
+*{box-sizing:border-box}html,body{margin:0;height:100%}body{background:var(--bg);color:var(--ink);font-family:'Manrope',sans-serif;overflow:hidden}
+a{color:#3F6FDB}a:hover{color:var(--ink)}
+.top{position:absolute;left:28px;top:22px;right:28px;display:flex;align-items:center;gap:14px;z-index:2;flex-wrap:wrap}
+.mark{width:40px;height:40px;background:url(assets/nondominium_logo.png) no-repeat;background-size:96px;background-position:-28px -23px;mix-blend-mode:multiply}
+.crumbs{display:flex;align-items:center;gap:6px;font-size:14px;font-weight:600;flex-wrap:wrap}
+.crumbs>span{padding:6px 12px;border-radius:999px;background:#fff;border:1px solid var(--line);color:var(--ink2);cursor:pointer;white-space:nowrap}.crumbs>span:hover{border-color:var(--ink)}
+.crumbs>span.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+.crumbs em{color:var(--mute);font-style:normal}
+.zoom{margin-left:auto;font-size:12px;color:var(--mute);white-space:nowrap}.zoom b{font-family:'Fira Code';font-weight:400;color:var(--ink2)}
+.stage{position:absolute;left:0;top:0;width:calc(100% - 380px);height:100%}
+.stage text{font-family:'Manrope'}
+.zoomIn{animation:zi 450ms cubic-bezier(.2,.8,.2,1);transform-box:fill-box;transform-origin:center}
+@keyframes zi{from{opacity:0;transform:scale(.85)}}
+.card{position:absolute;right:28px;top:86px;width:340px;max-height:calc(100% - 170px);overflow:auto;background:#fff;border:1px solid var(--line);border-radius:20px;padding:22px;box-shadow:0 20px 40px -24px rgba(15,26,42,.25)}
+.k{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--mute)}
+.card h2{font-size:24px;font-weight:800;letter-spacing:-.02em;margin:6px 0 12px;line-height:1.1}
+.p{font-size:14px;color:var(--ink2);line-height:1.5}
+.ring{display:grid;grid-template-columns:14px 1fr auto;gap:10px;align-items:center;padding:10px 6px;border-top:1px solid var(--line);font-size:13px;cursor:pointer;border-radius:8px}
+.ring:hover,.ring.on{background:var(--bg)}
+.ring i{width:14px;height:14px;border-radius:50%;border:3px solid}
+.ring small{color:var(--mute);font-size:12px}.ring b{font-weight:700}
+.detail{background:var(--bg);border-radius:10px;padding:8px 10px;margin:4px 0 6px;font-size:12px}
+.detail div{display:flex;justify-content:space-between;gap:8px;padding:4px 0}.detail small{color:var(--mute)}
+.sgr{display:flex;gap:8px;align-items:center;font-size:13px;padding:6px 0;border-bottom:1px solid var(--line)}.sgr span:first-child{flex:1}.sgr small{color:var(--mute);font-size:11px;white-space:nowrap}
+.mini{font-size:12px;font-weight:700;background:#FBEFD5;color:#8a5d00;padding:4px 9px;border-radius:999px;cursor:pointer;white-space:nowrap}.mini:hover{background:#F5DDA6}
+.mini.g{background:var(--bg);color:var(--ink2)}
+.cta{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap}
+.cta span{flex:1;text-align:center;font-size:13px;font-weight:700;padding:10px;border-radius:12px;cursor:pointer;white-space:nowrap}
+.pbtn{background:var(--ink);color:#fff}.pbtn:hover{background:#3F6FDB}
+.gbtn{background:var(--bg);color:var(--ink)}.gbtn:hover{background:var(--line)}
+.legend{position:absolute;left:28px;bottom:22px;background:#fff;border:1px solid var(--line);border-radius:14px;padding:12px 16px;font-size:12px;color:var(--ink2);display:flex;gap:18px;flex-wrap:wrap}
+.legend>span{white-space:nowrap}.legend i{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:6px;vertical-align:-1px}
+.peers{position:absolute;right:28px;bottom:22px;font:12px 'Fira Code';color:var(--mute);white-space:nowrap}
+</style></head><body><template id="__bundler_thumbnail"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" fill="#0B1113"/><text x="50" y="64" font-family="sans-serif" font-size="40" font-weight="700" fill="#2EC4B6" text-anchor="middle">E</text></svg></template><div id="root"></div>
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script type="text/babel" src="core.jsx"></script>
+<script type="text/babel" src="ui.jsx"></script>
+<script type="text/babel" src="E.jsx"></script>
+</body></html>
