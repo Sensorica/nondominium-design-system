@@ -14,6 +14,15 @@
 // port is read from DS_URL (default http://localhost:5180, a `bun run dev`
 // server); when nothing answers there, a dev server is started for the run.
 //
+// NETWORK DEPENDENCY: the reference/original side is not hermetic. The
+// original HTML files under docs/prototypes/original load real Google Fonts
+// (fonts.googleapis.com/fonts.gstatic.com) and the React/ReactDOM/Babel
+// standalone builds (unpkg.com) over the network at runtime — nothing in this
+// repo serves or vendors them. A compare run therefore needs working internet
+// access to the original side; offline or when either host is unreachable,
+// the original frame renders in fallback fonts (or not at all), and a pair
+// can fail or drift for a reason that has nothing to do with the port.
+//
 // This is the builders' iteration instrument. Appearance claims in the ISA still
 // close on pixel frames from the real browser (ISA Phase 9, D10).
 
@@ -23,6 +32,7 @@ import { join, resolve } from 'node:path';
 import pixelmatch from 'pixelmatch';
 import { PNG } from 'pngjs';
 import { chromium, type Browser, type Page } from 'playwright-core';
+import { DIRECTION_LIST } from '../src/lib/prototypes/directions';
 import { PAIRS, type Pair, type Side, type Step } from './compare/pairs';
 
 const ROOT = resolve(import.meta.dir, '..');
@@ -153,6 +163,7 @@ function sideBySide(images: PNG[]): PNG {
 
 interface Result {
   id: string;
+  slug: string;
   ratio: number;
   threshold: number;
   pass: boolean;
@@ -160,7 +171,46 @@ interface Result {
   note?: string;
 }
 
+/**
+ * Claim 37: a view registered in `src/lib/prototypes/directions.ts` must have
+ * at least one pair that actually visits it, in every direction's own
+ * `pairs/*.ts` file (each owned by that direction's builder, never this
+ * script). A pair's `name` is not reliable ground truth here — the six
+ * pairs/*.ts files pick their own names for the same view (`ndo`, `default`,
+ * `bench`...) — so this checks the actual port URL instead, against the one
+ * convention every one of those files already follows: a direction's FIRST
+ * view is reached at the bare port path (no `?view=` at all), and every other
+ * view at `?view=<id>` (optionally followed by more query params). That is
+ * the same URL shape `paths.ts` and each direction's own route produce, so a
+ * missing or renamed view shows up here as a real hole, not a naming quibble.
+ */
+function missingViewCoverage(pairs: readonly Pair[]): string[] {
+  const missing: string[] = [];
+  for (const direction of DIRECTION_LIST) {
+    const slugPairs = pairs.filter((p) => p.slug === direction.slug);
+    direction.views.forEach((view, i) => {
+      const covered =
+        i === 0
+          ? slugPairs.some((p) => !/[?&]view=/.test(p.port.path))
+          : slugPairs.some((p) => new RegExp(`[?&]view=${view.id}(&|$)`).test(p.port.path));
+      if (!covered) missing.push(`${direction.slug}:${view.id} ("${view.label}")`);
+    });
+  }
+  return missing;
+}
+
 async function main() {
+  // Claim 37 holds against the whole registry, not just what this run was
+  // filtered to, and needs no browser: fail fast, before anything is served
+  // or launched.
+  const missing = missingViewCoverage(PAIRS);
+  if (missing.length) {
+    console.error('compare:prototypes failed: these registered views have no pair at all:');
+    for (const m of missing) console.error(`  ${m}`);
+    console.error('Add a pair for each in that direction\'s own pairs/*.ts file.');
+    process.exit(1);
+  }
+
   const filters = process.argv.slice(2);
   const pairs = PAIRS.filter(
     (p) => !filters.length || filters.some((f) => f === p.slug || f === `${p.slug}:${p.name}`)
@@ -184,7 +234,14 @@ async function main() {
         orig = (await frame(browser, origUrl, pair.original, [])).png;
         ({ png: port, errors } = await frame(browser, portUrl, pair.port, PORT_CHROME));
       } catch (e) {
-        results.push({ id, ratio: 1, threshold: 0, pass: false, errors: [`capture failed: ${e}`] });
+        results.push({
+          id,
+          slug: pair.slug,
+          ratio: 1,
+          threshold: 0,
+          pass: false,
+          errors: [`capture failed: ${e}`]
+        });
         console.log(`✗ ${id}  capture failed: ${e}`);
         continue;
       }
@@ -204,7 +261,7 @@ async function main() {
       ] as const) {
         writeFileSync(join(dir, `${pair.name}.${suffix}.png`), PNG.sync.write(img));
       }
-      results.push({ id, ratio, threshold, pass, errors, note: pair.note });
+      results.push({ id, slug: pair.slug, ratio, threshold, pass, errors, note: pair.note });
       console.log(
         `${pass ? '✓' : '✗'} ${id}  ${(ratio * 100).toFixed(2)}% (max ${(threshold * 100).toFixed(1)}%)` +
           (errors.length ? `  ${errors.length} console error(s)` : '')
@@ -217,23 +274,44 @@ async function main() {
   }
 
   mkdirSync(OUT, { recursive: true });
-  writeFileSync(join(OUT, 'report.json'), JSON.stringify(results, null, 2));
-  const rows = results.map(
-    (r) =>
-      `| ${r.pass ? '✓' : '✗'} | \`${r.id}\` | ${(r.ratio * 100).toFixed(2)}% | ${(r.threshold * 100).toFixed(1)}% | ${r.errors.length ? r.errors.map((e) => e.replaceAll('|', '/')).join('<br>') : ''} | ${r.note ?? ''} |`
-  );
-  writeFileSync(
-    join(OUT, 'report.md'),
-    [
-      '| | Pair | Mismatch | Max | Port console errors | Why the max is not the default |',
-      '|---|---|---|---|---|---|',
-      ...rows
-    ].join('\n') + '\n'
-  );
+
+  // A filtered run (e.g. `compare:prototypes ds`) only ever sees a slice of
+  // PAIRS. Overwriting the top-level report.json/report.md with just that
+  // slice would erase every other slug's last-known results. Each run always
+  // writes its own slice's per-slug report, `.local/compare/<slug>/report.json`
+  // (every slug in `results` this run touched); the combined, top-level report
+  // is only rewritten on an unfiltered run, where `results` really is
+  // everything.
+  const bySlug = new Map<string, Result[]>();
+  for (const r of results) {
+    if (!bySlug.has(r.slug)) bySlug.set(r.slug, []);
+    bySlug.get(r.slug)!.push(r);
+  }
+  for (const [slug, slugResults] of bySlug) {
+    writeFileSync(join(OUT, slug, 'report.json'), JSON.stringify(slugResults, null, 2));
+  }
+
+  if (!filters.length) {
+    writeFileSync(join(OUT, 'report.json'), JSON.stringify(results, null, 2));
+    const rows = results.map(
+      (r) =>
+        `| ${r.pass ? '✓' : '✗'} | \`${r.id}\` | ${(r.ratio * 100).toFixed(2)}% | ${(r.threshold * 100).toFixed(1)}% | ${r.errors.length ? r.errors.map((e) => e.replaceAll('|', '/')).join('<br>') : ''} | ${r.note ?? ''} |`
+    );
+    writeFileSync(
+      join(OUT, 'report.md'),
+      [
+        '| | Pair | Mismatch | Max | Port console errors | Why the max is not the default |',
+        '|---|---|---|---|---|---|',
+        ...rows
+      ].join('\n') + '\n'
+    );
+  }
+
   const failed = results.filter((r) => !r.pass);
-  console.log(
-    `\n${results.length - failed.length}/${results.length} pairs within threshold. Report: .local/compare/report.md`
-  );
+  const reportPath = filters.length
+    ? `.local/compare/${[...bySlug.keys()].join(', ')}/report.json`
+    : '.local/compare/report.md';
+  console.log(`\n${results.length - failed.length}/${results.length} pairs within threshold. Report: ${reportPath}`);
   process.exit(failed.length ? 1 : 0);
 }
 
