@@ -439,3 +439,37 @@ The Claude Design handoff (`Prototype export options.zip`) holds six UI directio
 **Two handoff rules are not the hApp's yet.** "No self-validation" and "one claim per commitment" are TODOs in `zome_gouvernance` at `3cbebf0`. The prototypes keep them and say so.
 
 **What the ports gave up.** The handoff gave each direction its own typeface; the tokens-only rule sets all six in the design-system sans and mono. Each direction's card on `/prototypes` names what it lost.
+
+---
+
+## Phase 9: total fidelity to Claude Design, and prototypes that fully work (2026-09-27)
+
+**principal_stated_goal:** "Ensure the Design System replicate with hight fidelity the Claude design one." Then, as the run's stop condition: "work on it untill total hight fidelity and fully functional prototypes. You can merge once done". Direction ratified by Soushi the same evening: Claude Design is the source, this repo follows it.
+
+**Sources, measured rather than assumed.** The live Claude Design project `Nondominium Design System` (`c29c2bb3`) was read through DesignSync on 2026-09-27. Its bundle header carries a sha256 prefix per source file, and every component and UI-kit source hashes identical to the handoff Phase 7 was built from (`Badge`, `Button`, `Card`, `StatusDot`, all 16 `ui_kits/app/*.jsx`). The project's `explorations/revamp/proto/*` is an older copy of A to E (no fresh start, no F), superseded by the prototype export `Prototype export options.zip` of 2026-09-27, whose `prototypes/` sources are byte-identical to the handoff Phase 8 ported. So the sources are not the gap. The ports are.
+
+**The gap, seen in pixels.** Original and port side by side at 1680 wide, `--pixel` frames: A to E keep layout and data but lose each direction's typefaces and palette (Phase 8 claim 33 restyled them onto design-system tokens, as the handoff's README asked). F, the handoff's high-fidelity direction, drifted in copy (the plain-language layer renamed rules: "Access requirement" became "Who can access"), in the Layer 1 rule chip tints, avatars and card spacing. B's port clips its Flows button and scrolls its sidebar horizontally.
+
+### Criteria
+
+| # | Claim | Falsifier |
+|---|---|---|
+| 36 | The original prototypes are committed as the reference under `docs/prototypes/original/` and served locally by one command | The comparison cannot load an original |
+| 37 | `bun run compare:prototypes` captures every (direction, view) pair original versus port in its own headless browser, writes both frames and a diff image, reports a mismatch ratio per pair, and exits non-zero above threshold | A view registered in `directions.ts` with no pair; a deliberately broken port colour not turning the report red |
+| 38 | Each of A to E renders in its original typefaces and palette: the theme variables and font families declared in its original HTML, fonts self-hosted | Computed `font-family` or a theme colour on the direction root differs from the original's declaration; a font request leaves the origin |
+| 39 | Every view of every direction matches its original in layout, copy and colour: each pair under its threshold, and every remaining diff region attributed to a named cause (clock-relative text, animation phase, the design-system chrome additions of claim 41) | A pair over threshold, or a diff region nobody can name |
+| 40 | Every interactive control in each original has a working counterpart in the port, recorded as a per-direction inventory, with the same effect on state | A control in the original's inventory absent from the port, or producing a different state change |
+| 41 | Additions over the originals are only the design-system chrome (exit chip, `m` screen map, `c` comments) and the fresh-start entry Phase 8 required; each is listed | An unlisted control or view that the original does not have |
+| 42 | Every view of every direction renders with zero console errors in a real browser | Any console error at any view |
+| 43 | `bun run check` (svelte-check, fidelity, prototype rules) and `bun run build` pass | Non-zero exit |
+| 44 | Each Claude Design card (16 guidelines, 4 components) has a surface in this repo that renders the same content | A card with no counterpart surface |
+
+**Anti-claims.** Nothing under `src/lib/replica/` changes (claim 35 carries over). The stores still enforce exactly what the zome enforces: `check:prototypes` stays green and claims 31 and 32 still hold, because fidelity to a mock never outranks fidelity to the hApp. No font or script is fetched from a CDN at runtime by the design system's own pages. Nothing is merged to `master` until every claim above closes on evidence.
+
+### Decisions
+
+| # | Decision | Why |
+|---|---|---|
+| D8 | Claim 33 is reversed: A to E carry their original palettes and webfonts, scoped to each direction's root | Soushi asked for total fidelity to Claude Design. The directions exist to be compared by their look, and the design-system restyle had removed exactly what differs between them. The design system's own pages keep tokens only |
+| D9 | Webfonts are self-hosted through `@fontsource` packages, not linked from Google Fonts | The static site must not phone a third party for its own pages, and the offline standalone exports the originals shipped prove the look works without a CDN |
+| D10 | Builders iterate in a headless browser from the committed comparison script; appearance claims close only on `--pixel` frames from the real browser | One real browser cannot be shared by parallel builders, and Phase 8 showed a DOM re-render lying about SVG |
