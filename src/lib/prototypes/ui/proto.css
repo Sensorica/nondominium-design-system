@@ -86,7 +86,8 @@
   font: inherit;
   font-size: 13px;
   font-weight: 600;
-  line-height: 1.2;
+  /* ui.jsx's pBtn/pBtnGhost set no line-height at all: normal, inherited
+   * from .pu, matches it (a fixed 1.2 here would not). */
   padding: 8px 14px;
   border-radius: var(--_control-radius);
   border: 1px solid var(--_accent);
@@ -124,9 +125,16 @@
   border-color: var(--_accent);
 }
 .pu-btn.pu-btn--sm {
+  /* ui.jsx's per-item ResourcesModal/CommitmentsModal buttons: fontSize 12,
+   * padding '5px 10px', fontWeight inherited (600) from pBtn/pBtnGhost. */
   font-size: 12px;
-  font-weight: 500;
   padding: 5px 10px;
+}
+/* ui.jsx PChoice and ProfileModal's role toggles: fontWeight 500, fontSize
+ * 12, padding '6px 10px' (explicit overrides, unlike pu-btn--sm above). */
+.pu-btn.pu-btn--choice {
+  font-weight: 500;
+  padding: 6px 10px;
 }
 .pu-link.pu-link {
   font: inherit;
@@ -191,11 +199,20 @@
 }
 
 /* ── Text and layout ── */
+/* ui.jsx's muted texts split almost evenly between fontSize 13 (this
+ * default) and fontSize 12 (.pu-muted--12 below), and almost never set a
+ * line-height (normal, inherited from .pu); the few that do (Onboarding's
+ * avatar hint and card copy, WhyModal's footer note) add .pu-muted--relaxed. */
 .pu-muted {
   font-size: 13px;
   color: var(--_muted);
-  line-height: 1.5;
   margin: 0;
+}
+.pu-muted--12 {
+  font-size: 12px;
+}
+.pu-muted--relaxed {
+  line-height: 1.5;
 }
 .pu-sec {
   font-size: 11px;
@@ -215,6 +232,11 @@
 }
 .pu-row--between {
   justify-content: space-between;
+}
+/* ui.jsx PChoice, ProfileModal's role-toggle row and BrowseModal's filter
+ * row all use gap: 6, not the default 8. */
+.pu-row--tight {
+  gap: 6px;
 }
 .pu-grid {
   display: grid;

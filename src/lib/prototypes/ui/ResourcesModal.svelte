@@ -38,11 +38,11 @@
       <div class="pu-row">
         <AgentAvatar id={holder} size={22} />
         <strong>{itemLabel}</strong>
-        <span class="pu-muted">
+        <span class="pu-muted pu-muted--12">
           {plain(state)} · held by {proto.q.agent(holder)}{holder === proto.me.id ? ' (you)' : ''}
         </span>
       </div>
-      <div class="pu-row">
+      <div class="pu-row pu-row--tight">
         <select class="pu-select pu-select--inline" bind:value={newState[i]} aria-label="New status">
           <option value="">New status…</option>
           {#each ENUM.opstate.filter((x) => x !== state) as x (x)}<option value={x}>{plain(x)}</option>{/each}

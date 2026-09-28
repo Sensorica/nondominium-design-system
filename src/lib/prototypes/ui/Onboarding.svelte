@@ -106,7 +106,7 @@
         <Call c="zome_person::create_person → lobby::upsert_lobby_agent_profile" />
         <div class="pu-row preview">
           <Avatar id={pName || 'new'} name={pName || '?'} url={isHttpsUrl(pAvatar) ? pAvatar : null} size={72} ring={isHttpsUrl(pAvatar)} />
-          <p class="pu-muted">Default avatar: your initials on a colour derived from your agent key.<br />Paste an https:// image URL below to use your own.</p>
+          <p class="pu-muted pu-muted--12 pu-muted--relaxed">Default avatar: your initials on a colour derived from your agent key.<br />Paste an https:// image URL below to use your own.</p>
         </div>
         <div class="pu-grid two">
           <Field label="Name *"><input class="pu-input" bind:value={pName} placeholder="e.g. Marco" {@attach focusOnMount} /></Field>
@@ -114,7 +114,7 @@
         </div>
         <Field label="Bio"><input class="pu-input" bind:value={pBio} placeholder="What you do, where" /></Field>
         <Field label="Avatar URL (optional)"><input class="pu-input" bind:value={pAvatar} placeholder="https://…" /></Field>
-        <p class="pu-muted">You start as a SimpleAgent. Accountable roles come later, through peer validation.</p>
+        <p class="pu-muted pu-muted--12">You start as a SimpleAgent. Accountable roles come later, through peer validation.</p>
         <ErrorNote {error} />
         <div class="pu-row pu-row--between">
           <button type="button" class="pu-link" onclick={() => proto.actions.reset()}>Skip, open the example network</button>
@@ -128,7 +128,7 @@
         <div class="cards">
           <div class="pu-card card">
             <strong>Example network</strong>
-            <p class="pu-muted grow">
+            <p class="pu-muted grow pu-muted--relaxed">
               Join Sensorica and the Open Value Network: a shared CNC machine, a cryo-EM, an artwork on tour, a light sculpture and a
               sensor design, from the documented user stories.
             </p>
@@ -137,7 +137,7 @@
           </div>
           <div class="pu-card card">
             <strong>Blank canvas</strong>
-            <p class="pu-muted">Create a new, empty group in the prototype network. You'll declare its first NDO next.</p>
+            <p class="pu-muted pu-muted--relaxed">Create a new, empty group in the prototype network. You'll declare its first NDO next.</p>
             <input class="pu-input" bind:value={gName} placeholder="Group name *" aria-label="Group name" />
             <input class="pu-input" bind:value={gDesc} placeholder="Description" aria-label="Group description" />
             <Call c="zome_group::create_group" />
@@ -145,7 +145,7 @@
           </div>
           <div class="pu-card card">
             <strong>Invite link</strong>
-            <p class="pu-muted grow">
+            <p class="pu-muted grow pu-muted--relaxed">
               Paste a link someone shared with you. Try the food basket network: <span class="pu-mono">ndo-invite:food-7k2p</span>
             </p>
             <input class="pu-input pu-mono" bind:value={code} placeholder="ndo-invite:…" aria-label="Invite link" />
@@ -227,6 +227,10 @@
     margin: 0 0 4px;
     font-size: 26px;
     font-weight: 700;
+  }
+  /* ui.jsx's three step subtitles are fontSize 14, not .pu-muted's 13. */
+  header p {
+    font-size: 14px;
   }
   .preview {
     gap: 16px;

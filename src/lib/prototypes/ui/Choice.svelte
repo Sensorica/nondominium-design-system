@@ -15,14 +15,14 @@
   let { options, value, onchange, format = (o) => plain(o) }: Props = $props();
 </script>
 
-<div class="pu pu-row" role="radiogroup">
+<div class="pu pu-row pu-row--tight" role="radiogroup">
   {#each options as o (o)}
     <button
       type="button"
       role="radio"
       aria-checked={o === value}
       title={o}
-      class="pu-btn pu-btn--ghost pu-btn--sm"
+      class="pu-btn pu-btn--ghost pu-btn--sm pu-btn--choice"
       class:is-on={o === value}
       onclick={() => onchange(o)}>{format(o)}</button
     >

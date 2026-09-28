@@ -30,7 +30,7 @@
   <Call c="zome_group::log_work" />
   <Field label="description *">
     <textarea
-      class="pu-textarea"
+      class="pu-textarea desc"
       bind:value={description}
       placeholder="What did you do? What should the next agent know?"
       {@attach focusOnMount}
@@ -42,3 +42,12 @@
   <ErrorNote {error} />
   <ModalActions {onclose} onok={submit} label="Sign & log" disabled={!description.trim()} />
 </Modal>
+
+<style>
+  /* ui.jsx's work-log description textarea has minHeight: 80, not
+   * .pu-textarea's shared default of 72 (which matches neither this nor
+   * CreateNdoModal's "What is it?" textarea, which needs 64). */
+  .desc {
+    min-height: 80px;
+  }
+</style>

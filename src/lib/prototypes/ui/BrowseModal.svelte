@@ -36,7 +36,7 @@
 <Modal title="Find resources" sub="Everything shared in your groups." {onclose} width={620}>
   <Call c="get_all_ndos · get_ndos_by_lifecycle_stage / _nature / _property_regime" />
   <input class="pu-input" bind:value={query} placeholder="Search by name or description" aria-label="Search" {@attach focusOnMount} />
-  <div class="pu-row">
+  <div class="pu-row pu-row--tight">
     <select class="pu-select pu-select--inline" bind:value={group} aria-label="Group">
       <option value="">All groups</option>
       {#each proto.s.groups as g (g.id)}<option value={g.id}>{g.name}</option>{/each}
@@ -65,12 +65,12 @@
         }}
       >
         <strong>{n.name}</strong>
-        <span class="pu-muted">
+        <span class="pu-muted pu-muted--12">
           {proto.q.group(n.group)?.name} · {n.stage} · {n.regime} · {n.nature} · {openCount(n.id)} open commitments
         </span>
       </button>
     {:else}
-      <p class="pu-muted">No NDOs match. NDOs are scoped to groups: create or join one to see more.</p>
+      <p class="pu-muted empty">No NDOs match. NDOs are scoped to groups: create or join one to see more.</p>
     {/each}
   </div>
 </Modal>
@@ -94,5 +94,15 @@
   }
   .hit strong {
     font-size: 14px;
+  }
+  /* ui.jsx's "No NDOs match" text has padding: 8 (all sides); no other
+   * .pu-muted text in this modal does. */
+  .empty {
+    padding: 8px;
+  }
+  /* ui.jsx's filter selects use padding '6px 8px'; .pu-select--inline's 5px 8px
+   * matches ResourcesModal's per-item selects instead. */
+  select.pu-select--inline {
+    padding: 6px 8px;
   }
 </style>

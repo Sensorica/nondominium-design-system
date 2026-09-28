@@ -41,7 +41,7 @@
     <p class="pu-muted">EndOfLife is terminal. No further transitions.</p>
   {/if}
   {#if to === 'Hibernating'}
-    <p class="pu-muted">Suspends the NDO. Resuming returns it to {ndo.stage}.</p>
+    <p class="pu-muted pu-muted--12">Suspends the NDO. Resuming returns it to {ndo.stage}.</p>
   {/if}
   {#if to === 'Deprecated'}
     <Field label="Successor NDO (required)">

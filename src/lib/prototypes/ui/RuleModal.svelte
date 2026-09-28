@@ -117,7 +117,7 @@
       </select>
     </Field>
   {/if}
-  <p class="pu-muted pu-mono summary">{type} · {summary}</p>
+  <p class="pu-muted pu-mono rule-summary">{type} · {summary}</p>
   <ErrorNote {error} />
   <ModalActions {onclose} onok={submit} label={target === '' ? 'Add rule' : 'Change rule'} />
 </Modal>
@@ -126,8 +126,13 @@
   .pair {
     grid-template-columns: 1fr 1fr;
   }
-  /* ui.jsx: fontSize 12 and no line-height, where .pu-muted is 13px at 1.5. */
-  .summary {
+  /* ui.jsx: fontSize 12 and no line-height, where .pu-muted is 13px at 1.5.
+   * Named .rule-summary, not .summary: a class literally named .summary
+   * collides with the native <summary> element and Svelte's compiler
+   * silently drops the rule (verified via the compiled
+   * ?svelte&type=style&lang.css output, which held everything except this
+   * one rule) even though the paragraph carries the class correctly. */
+  .rule-summary {
     font-size: 12px;
     line-height: normal;
   }
