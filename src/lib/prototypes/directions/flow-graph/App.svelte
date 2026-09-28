@@ -108,7 +108,7 @@
       title: title(ctx, e),
       sub: sub(ctx, e),
       badges: badges(ctx, e).slice(0, 2),
-      author: { id: CONDUCTORS[e.author]?.pubkey ?? e.author, name: aname(ctx.B, e.author) }
+      author: { key: e.author, name: aname(ctx.B, e.author) }
     }))
   );
   const selActions: ActionDef[] = $derived(selEntry ? actionsFor(ctx, selEntry, writer) : []);
@@ -315,7 +315,11 @@
         {#each rootActions as a (a.id)}
           <button type="button" class="menu__item" role="menuitem" onclick={() => chooseAction(a.id, true)}>
             <span class="menu__l">{a.label}</span>
-            {#if ctx.dev}<span class="menu__c">{a.call}</span>{/if}
+            <!-- Always present, like the original's second span (line 55):
+                 empty and invisible when not `dev`, but this is a
+                 `gap:2px` flex column, same class of bug as the action-list
+                 and form-head spans elsewhere in this direction. -->
+            <span class="menu__c">{ctx.dev ? a.call : ''}</span>
           </button>
         {/each}
       </div>
@@ -391,6 +395,15 @@
     overscroll-behavior: none;
     background: rgb(var(--ndo-gray-100));
     font-family: var(--ndo-font-sans);
+    /* The original's base.css sets this on <body>, which every element
+       without its own line-height inherits (24px at 12px/14px text, not the
+       browser's ~1.2 default). This repo's shared src/app.css never applies
+       that rule to <body>, which drifts every unset-line-height element
+       throughout F (Panel guide text, Try items, Activity rows, card
+       metadata …) a few px shorter, compounding down the page. Scoped here
+       instead of fixed at the source, which is out of this direction's
+       ownership. */
+    line-height: var(--ndo-lh-base);
     color: rgb(var(--ndo-gray-900));
   }
 
@@ -445,7 +458,15 @@
     border: 0;
     border-radius: var(--ndo-radius-sm);
     padding: 5px 10px;
-    font: inherit;
+    /* The original never sets a button's font-family: a plain <button> here
+       renders in the browser's own UA button font (Arial-ish on Chromium),
+       not the design system's sans. `revert` undoes both the browser's own
+       button reset AND src/app.css's UnoCSS Tailwind preflight (which forces
+       `button { font-family: inherit; line-height: inherit }` globally,
+       outside this direction's ownership). Only the two real DS Button
+       instances (Reset, + New entry, below) get font-family: sans. */
+    font-family: revert;
+    line-height: revert;
     font-size: 12px;
     font-weight: var(--ndo-weight-medium);
     cursor: pointer;
@@ -485,7 +506,8 @@
     padding: 2px 8px;
     border: 0;
     border-radius: 4px;
-    font: inherit;
+    font-family: revert;
+    line-height: revert;
     font-size: 11px;
     font-weight: var(--ndo-weight-bold);
     cursor: pointer;
@@ -515,7 +537,8 @@
     color: rgb(var(--ndo-gray-600));
     border-radius: var(--ndo-radius-md);
     padding: 4px 10px;
-    font: inherit;
+    font-family: revert;
+    line-height: revert;
     font-size: 12px;
     cursor: pointer;
     white-space: nowrap;
@@ -531,10 +554,16 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    height: 32px;
-    padding: 0 14px;
+    /* This one is the real design-system Button (Reset, + New entry): its
+       own component (components/button/Button.jsx in the bound _ds_bundle)
+       sizes itself from padding and line-height, not a fixed box — it is not
+       actually pinned to the dc-runtime's hint-size="70px,32px", which is
+       only an editor-time placeholder. Font-family and line-height
+       (var(--ndo-lh-sm), not the page's inherited lh-base) are its own too. */
+    padding: var(--ndo-spacing-1-5) var(--ndo-spacing-4);
     border-radius: var(--ndo-radius-md);
-    font: inherit;
+    font-family: var(--ndo-font-sans);
+    line-height: var(--ndo-lh-sm);
     font-size: 14px;
     font-weight: var(--ndo-weight-medium);
     cursor: pointer;
@@ -598,7 +627,8 @@
     display: flex;
     flex-direction: column;
     gap: 2px;
-    font: inherit;
+    font-family: revert;
+    line-height: revert;
   }
   .menu__item.menu__item:hover {
     background: rgb(var(--ndo-gray-50));
@@ -638,6 +668,8 @@
     border-radius: var(--ndo-radius-md);
     cursor: pointer;
     color: rgb(var(--ndo-gray-600));
+    font-family: revert;
+    line-height: revert;
     font-size: 14px;
   }
   .rail__label.rail__label {

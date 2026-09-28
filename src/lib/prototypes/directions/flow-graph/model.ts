@@ -2,9 +2,10 @@
 // "F Flow Graph.dc.html": layout, card titles, badges, subtitles, the actions
 // each entry offers and the forms that map one to one onto zome inputs.
 //
-// Every word comes from $lib/prototypes/plain: the handoff's F_WORD, F_TYPE,
-// F_LANE, F_ACT and F_FIELD maps were merged there, so this file keeps none.
-import { ACTION_PAST, ACTION_PHRASE, ENTRY_TYPE_WORD, FIELD_WORD, LANE_WORD, plain, ruleSentence, word } from '$lib/prototypes/plain';
+// Every word comes from ./words: F's own verbatim port of the original's
+// F_WORD, F_TYPE, F_LANE, F_ACT and F_FIELD maps (see that file's header for
+// why this no longer routes through the shared $lib/prototypes/plain).
+import { ENTRY_TYPE_WORD, LANE_WORD, actionPast, actionPhrase, human, roleWord, ruleSentence, word } from './words';
 import {
   CONDUCTORS,
   ENUMS,
@@ -109,35 +110,32 @@ function itemName(B: Backend, h: string | null | undefined): string {
   return (e.data.label as string) || TYPES[e.type].title(e.data);
 }
 
-/** The person a sentence about a promise starts with. "Borrow" is something
- *  the receiver does, so an AccessForUse promise starts with the receiver;
- *  every other action with the provider. What happened is told from the
- *  provider in the past tense, as the handoff does ("Sarah lent X"). */
-const subjectOf = (d: Data) => (d.action === 'AccessForUse' ? d.receiver : d.provider);
-const phrase = (action: string) => ACTION_PHRASE[action] ?? action;
-
 export function title(ctx: Ctx, e: Entry): string {
   const { B, dev } = ctx;
   if (!dev) {
     const d = e.data;
     switch (e.type) {
       case 'Commitment':
-        return aname(B, subjectOf(d)) + ' will ' + phrase(d.action) + ' ' + itemName(B, d.resource_inventoried_as);
+        // The original always speaks from the provider, even for AccessForUse
+        // ("Sarah will lend for use X"): there is no receiver-as-subject case.
+        return aname(B, d.provider) + ' will ' + actionPhrase(d.action) + ' ' + itemName(B, d.resource_inventoried_as);
       case 'EconomicEvent':
-        // The handoff's past tense, from the provider: "Sarah handed over X".
-        return aname(B, d.provider) + ' ' + (ACTION_PAST[d.action] ?? phrase(d.action)) + ' ' + itemName(B, d.resource_inventoried_as);
+        // The original's past tense, from the provider: "Sarah handed over X".
+        return aname(B, d.provider) + ' ' + actionPast(d.action) + ' ' + itemName(B, d.resource_inventoried_as);
       case 'GovernanceRule':
-        return plain(d.rule_type as string);
+        // The original's title() humanizes the raw rule_type; the plain
+        // sentence (badges()'s ruleSentence) is a separate, richer view.
+        return human(d.rule_type as string);
       case 'ValidationReceipt':
         return (d.approved ? 'Approved by ' : 'Rejected by ') + aname(B, d.validator);
       case 'PrivateParticipationClaim':
-        return plain(d.claim_type as string);
+        return human(d.claim_type as string);
       case 'Claim':
         return ENTRY_TYPE_WORD.Claim;
       case 'NdoAnchor':
         return 'Listed: ' + d.name;
       case 'PersonRole':
-        return plain(d.role_name as string);
+        return roleWord(d.role_name as string);
     }
   }
   return TYPES[e.type].title(e.data) || e.type;
@@ -150,8 +148,8 @@ export interface BadgeSpec {
 }
 
 /** A governance rule's typed payload in one line, e.g. "Credentialed ·
- *  Transport": the Developer details badge. The plain badge is the handoff's
- *  sentence, ruleSentence() in plain.ts. */
+ *  Transport": the Developer details badge. The plain badge is the original's
+ *  sentence, ruleSentence() in ./words. */
 export function ruleSummary(r: Data): string {
   switch (r.type) {
     case 'AccessRequirement':
@@ -187,7 +185,9 @@ export function badges(ctx: Ctx, e: Entry): BadgeSpec[] {
       return [{ variant: 'rule-' + kebab(d.rule_data.type), label: dev ? ruleSummary(d.rule_data) : ruleSentence(d.rule_data) }];
     }
     case 'EconomicResource':
-      return [{ variant: 'op-' + kebab(d.operational_state), label: w(d.operational_state) }];
+      // The bound design system's Badge only knows this state family as
+      // "opstate-*" (see docs/prototypes/original/_ds/…/_ds_bundle.js).
+      return [{ variant: 'opstate-' + kebab(d.operational_state), label: w(d.operational_state) }];
     case 'ResourceSpecification':
       return [{ variant: 'neutral', label: d.category }];
     case 'Commitment': {
@@ -195,7 +195,7 @@ export function badges(ctx: Ctx, e: Entry): BadgeSpec[] {
       return [{ variant: kept ? 'lifecycle-active' : 'coming-soon', label: kept ? (dev ? 'claimed' : 'kept') : dev ? 'open' : 'waiting' }];
     }
     case 'ValidationReceipt':
-      return [{ variant: d.approved ? 'op-available' : 'lifecycle-end-of-life', label: d.approved ? 'approved' : 'rejected' }];
+      return [{ variant: d.approved ? 'opstate-available' : 'lifecycle-end-of-life', label: d.approved ? 'approved' : 'rejected' }];
     case 'PrivateParticipationClaim':
       return [{ variant: 'neutral', label: 'private' }];
     case 'PersonRole':
@@ -217,7 +217,7 @@ export function sub(ctx: Ctx, e: Entry): string {
     case 'NdoAnchor':
       return 'anchors ' + d.name;
     case 'Person':
-      return B.rolesOf(d.agent).map((r) => word(r, dev)).join(', ') || 'no roles';
+      return B.rolesOf(d.agent).map((r) => (dev ? r : roleWord(r))).join(', ') || 'no roles';
     case 'PersonRole':
       return '→ ' + aname(B, d.assigned_to);
     case 'NondominiumIdentity':
@@ -554,10 +554,7 @@ export function fieldsOf(a: ActionDef, vals: Record<string, string>) {
   return { fields: f2, v: { ...Object.fromEntries(f2.map((f) => [f[0], f[4] ?? ''])), ...vals } };
 }
 
-/** Form label: the zome input name with Developer details, a plain word otherwise. */
-export const fieldLabel = (l: string, dev: boolean) => (dev ? l : (FIELD_WORD[l] ?? l));
-/** Option label: an enum option shows its plain word unless Developer details is on. */
-export const optionLabel = (value: string, label: string, dev: boolean) => (dev || value !== label ? label : plain(label));
+export { fieldLabel, optionLabel } from './words';
 
 // ── Activity feed ──
 /** The entry type each zome function writes, so a plain activity row can say
@@ -602,7 +599,7 @@ export interface NodeView {
   title: string;
   sub: string;
   badges: BadgeSpec[];
-  author: { id: string; name: string };
+  author: { key: string; name: string };
 }
 
 export type { Data, Entry, EntryType };
