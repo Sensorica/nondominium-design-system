@@ -147,7 +147,7 @@ const pairs: Pair[] = [
       steps: [{ click: 'text=Lobby' }, { click: 'text=+ Add resource' }]
     },
     port: { path: `${port}?view=lobby`, steps: [{ click: 'text=+ Add resource' }] },
-    threshold: 0.03,
+    threshold: 0.016,
     note: SHARED_MODAL_NOTE
   },
   {
@@ -160,7 +160,7 @@ const pairs: Pair[] = [
       steps: [{ click: 'text=Lobby' }, { click: 'text=+ New group' }]
     },
     port: { path: `${port}?view=lobby`, steps: [{ click: 'text=+ New group' }] },
-    threshold: 0.02,
+    threshold: 0.016,
     note: SHARED_MODAL_NOTE
   },
   {
@@ -173,7 +173,7 @@ const pairs: Pair[] = [
       steps: [{ click: 'text=Lobby' }, { click: 'text=Join group' }]
     },
     port: { path: `${port}?view=lobby`, steps: [{ click: 'text=Join group' }] },
-    threshold: 0.02,
+    threshold: 0.016,
     note: SHARED_MODAL_NOTE
   },
   {

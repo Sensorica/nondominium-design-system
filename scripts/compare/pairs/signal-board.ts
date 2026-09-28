@@ -12,7 +12,8 @@ const solCard = 'text=CNC Machine · Proxxon MF70';
 
 // A specific board card's own dashed "why" footer, reached without opening
 // the drawer first: D.jsx's why link lives on the card, not on the drawer.
-const maintenanceWhy = 'article:has-text("Scheduled maintenance · CEM-3000") >> text=Why am I seeing this?';
+const maintenanceWhy =
+  'article:has-text("Scheduled maintenance · CEM-3000") >> text=Why am I seeing this?';
 
 // Remaining difference is glyph-level: the original's Google-Fonts-served
 // static "Bricolage Grotesque" and the self-hosted variable instance
@@ -22,7 +23,6 @@ const maintenanceWhy = 'article:has-text("Scheduled maintenance · CEM-3000") >>
 // point and piece of copy has been verified to match by hand (see the
 // builder's report).
 const FONT_HINTING = {
-  threshold: 0.03,
   note: 'Font hinting: different binaries for the same face (Google-served static vs. self-hosted variable) rasterize glyph edges a few pixels apart across a text-dense board.'
 };
 
@@ -30,6 +30,7 @@ const pairs: Pair[] = [
   {
     slug,
     name: 'default',
+    threshold: 0.03,
     original: { path: original },
     port: { path: '/prototypes/signal-board' },
     ...FONT_HINTING
@@ -37,6 +38,7 @@ const pairs: Pair[] = [
   {
     slug,
     name: 'drawer',
+    threshold: 0.034,
     original: { path: original, steps: [{ click: solCard }] },
     port: { path: '/prototypes/signal-board?view=drawer&ndo=sol' },
     ...FONT_HINTING
@@ -51,6 +53,7 @@ const pairs: Pair[] = [
   {
     slug,
     name: 'hover',
+    threshold: 0.03,
     original: { path: original, steps: [{ hover: solCard }] },
     port: { path: '/prototypes/signal-board', steps: [{ hover: solCard }] },
     ...FONT_HINTING

@@ -68,7 +68,7 @@ export const DIRECTIONS = [
       { id: 'you', label: 'You' }
     ],
     typeNote:
-      'Handoff type: Instrument Sans and JetBrains Mono. Here: the design-system sans and mono (tokens only), so the lettering is not the handoff\'s.',
+      'Handoff type: Instrument Sans and JetBrains Mono. Here: the same two families, self-hosted, and the handoff\'s own dark teal palette, scoped to this direction.',
     status: 'candidate'
   },
   {
@@ -87,7 +87,7 @@ export const DIRECTIONS = [
       { id: 'linked', label: 'Linked' }
     ],
     typeNote:
-      'Handoff type: a Newsreader serif for the notebook pages, with IBM Plex Sans and Mono. Here: the design-system sans and mono (tokens only), so the serif notebook look is gone; judge the layout and flow, not the paper feel.',
+      'Handoff type: a Newsreader serif for the notebook pages, with IBM Plex Sans and Mono. Here: the same three families, self-hosted, and the handoff\'s own cream paper palette, scoped to this direction.',
     status: 'candidate'
   },
   {
@@ -101,7 +101,7 @@ export const DIRECTIONS = [
     store: 'shared',
     views: [{ id: 'bench', label: 'Bench and spec sheet' }],
     typeNote:
-      'Handoff type: Space Grotesk and Space Mono. Here: the design-system sans and mono (tokens only), so the lettering is not the handoff\'s.',
+      'Handoff type: Space Grotesk and Space Mono. Here: the same two families, self-hosted, and the handoff\'s own light warm-grey palette, scoped to this direction.',
     status: 'candidate'
   },
   {
@@ -118,7 +118,7 @@ export const DIRECTIONS = [
       { id: 'drawer', label: 'Resource drawer', needs: ['ndo'] }
     ],
     typeNote:
-      'Handoff type: Bricolage Grotesque and DM Mono. Here: the design-system sans and mono (tokens only), so the lettering is not the handoff\'s.',
+      'Handoff type: Bricolage Grotesque and DM Mono. The port now carries both, self-hosted via @fontsource, plus the original\'s exact palette, scoped to this direction\'s root.',
     status: 'candidate'
   },
   {

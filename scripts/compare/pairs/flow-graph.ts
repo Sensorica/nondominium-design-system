@@ -82,8 +82,14 @@ const pairs: Pair[] = [
   {
     slug,
     name: 'form-create-person',
-    original: { path: original, steps: [{ click: 'text="+ New entry"' }, { click: 'text="Create person"' }] },
-    port: { path: '/prototypes/flow-graph', steps: [{ click: 'text="+ New entry"' }, { click: 'text="Create person"' }] }
+    original: {
+      path: original,
+      steps: [{ click: 'text="+ New entry"' }, { click: 'text="Create person"' }]
+    },
+    port: {
+      path: '/prototypes/flow-graph',
+      steps: [{ click: 'text="+ New entry"' }, { click: 'text="Create person"' }]
+    }
   },
 
   // A shared-resource card selected (Layer 0, its lifecycle/regime/nature badges).
@@ -98,8 +104,14 @@ const pairs: Pair[] = [
   {
     slug,
     name: 'form-change-stage',
-    original: { path: original, steps: [{ click: `text="${NDO_TITLE}"` }, { click: 'text="Change stage"' }] },
-    port: { path: '/prototypes/flow-graph', steps: [{ click: `text="${NDO_TITLE}"` }, { click: 'text="Change stage"' }] }
+    original: {
+      path: original,
+      steps: [{ click: `text="${NDO_TITLE}"` }, { click: 'text="Change stage"' }]
+    },
+    port: {
+      path: '/prototypes/flow-graph',
+      steps: [{ click: `text="${NDO_TITLE}"` }, { click: 'text="Change stage"' }]
+    }
   },
 
   // The three governance-rule colour families (Layer 1 badges).
@@ -179,8 +191,14 @@ const pairs: Pair[] = [
   {
     slug,
     name: 'reset',
-    original: { path: original, steps: [{ click: `text="${NDO_TITLE}"` }, { click: 'text="Reset"' }] },
-    port: { path: '/prototypes/flow-graph', steps: [{ click: `text="${NDO_TITLE}"` }, { click: 'text="Reset"' }] }
+    original: {
+      path: original,
+      steps: [{ click: `text="${NDO_TITLE}"` }, { click: 'text="Reset"' }]
+    },
+    port: {
+      path: '/prototypes/flow-graph',
+      steps: [{ click: `text="${NDO_TITLE}"` }, { click: 'text="Reset"' }]
+    }
   }
 ];
 

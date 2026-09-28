@@ -43,54 +43,153 @@ const viaMenu = (item: string) => [{ click: MENU }, { click: item }] as const;
 
 /** A modal/menu pair, thresholded and annotated with the font-rendering cause
  *  above; `extra` names anything ALSO different for that specific pair. */
-function modalPair(name: string, threshold: number, original: Pair['original'], port: Pair['port'], extra?: string): Pair {
-  return { slug, name, original, port, threshold, note: extra ? `${extra} Also: ${FONT_RENDERING_NOTE}` : FONT_RENDERING_NOTE };
+function modalPair(
+  name: string,
+  threshold: number,
+  original: Pair['original'],
+  port: Pair['port'],
+  extra?: string
+): Pair {
+  return {
+    slug,
+    name,
+    original,
+    port,
+    threshold,
+    note: extra ? `${extra} Also: ${FONT_RENDERING_NOTE}` : FONT_RENDERING_NOTE
+  };
 }
 
 const pairs: Pair[] = [
   // ── Flow menu itself, opened, in both palettes ──
   modalPair(
     'menu-mycelium',
-    0.07,
+    0.01,
     { path: myceliumOriginal, steps: [{ click: MENU }] },
     { path: myceliumPort, steps: [{ click: MENU }] },
-    "The dropdown's keyboard-shortcut tip reads \"Ctrl+K (⌘K on a Mac)\"; ui.jsx hardcodes the Mac-only \"⌘K\" regardless of platform. Deliberate cross-platform correction, not a fidelity gap."
+    'The dropdown\'s keyboard-shortcut tip reads "Ctrl+K (⌘K on a Mac)"; ui.jsx hardcodes the Mac-only "⌘K" regardless of platform. Deliberate cross-platform correction, not a fidelity gap.'
   ),
   modalPair(
     'menu-instrument',
-    0.12,
+    0.01,
     { path: instrumentOriginal, steps: [{ click: MENU }] },
     { path: instrumentPort, steps: [{ click: MENU }] },
     'Same keyboard-shortcut wording note as menu-mycelium.'
   ),
 
   // ── Modals reached from mycelium ──
-  modalPair('help', 0.09, { path: myceliumOriginal, steps: viaMenu('text=How this works') }, { path: myceliumPort, steps: viaMenu('text=How this works') }),
-  modalPair('profile', 0.11, { path: myceliumOriginal, steps: viaMenu('text=Your profile') }, { path: myceliumPort, steps: viaMenu('text=Your profile') }),
-  modalPair('group', 0.09, { path: myceliumOriginal, steps: viaMenu('text=+ Create a group') }, { path: myceliumPort, steps: viaMenu('text=+ Create a group') }),
-  modalPair('join', 0.08, { path: myceliumOriginal, steps: viaMenu('text=→ Join a group with a link') }, { path: myceliumPort, steps: viaMenu('text=→ Join a group with a link') }),
-  modalPair('create', 0.1, { path: myceliumOriginal, steps: viaMenu('text=+ Add a shared resource') }, { path: myceliumPort, steps: viaMenu('text=+ Add a shared resource') }),
-  modalPair('browse', 0.1, { path: myceliumOriginal, steps: viaMenu('text=Find resources') }, { path: myceliumPort, steps: viaMenu('text=Find resources') }),
-  modalPair('receipts', 0.09, { path: myceliumOriginal, steps: viaMenu('text=/^Your receipts ·/') }, { path: myceliumPort, steps: viaMenu('text=/^Your receipts ·/') }),
-  modalPair('advance', 0.09, { path: myceliumOriginal, steps: viaMenu('text=Change its stage') }, { path: myceliumPort, steps: viaMenu('text=Change its stage') }),
-  modalPair('rule', 0.12, { path: myceliumOriginal, steps: viaMenu('text=Add a rule') }, { path: myceliumPort, steps: viaMenu('text=Add a rule') }),
+  modalPair(
+    'help',
+    0.01,
+    { path: myceliumOriginal, steps: viaMenu('text=How this works') },
+    { path: myceliumPort, steps: viaMenu('text=How this works') }
+  ),
+  modalPair(
+    'profile',
+    0.01,
+    { path: myceliumOriginal, steps: viaMenu('text=Your profile') },
+    { path: myceliumPort, steps: viaMenu('text=Your profile') }
+  ),
+  modalPair(
+    'group',
+    0.01,
+    { path: myceliumOriginal, steps: viaMenu('text=+ Create a group') },
+    { path: myceliumPort, steps: viaMenu('text=+ Create a group') }
+  ),
+  modalPair(
+    'join',
+    0.01,
+    { path: myceliumOriginal, steps: viaMenu('text=→ Join a group with a link') },
+    { path: myceliumPort, steps: viaMenu('text=→ Join a group with a link') }
+  ),
+  modalPair(
+    'create',
+    0.01,
+    { path: myceliumOriginal, steps: viaMenu('text=+ Add a shared resource') },
+    { path: myceliumPort, steps: viaMenu('text=+ Add a shared resource') }
+  ),
+  modalPair(
+    'browse',
+    0.016,
+    { path: myceliumOriginal, steps: viaMenu('text=Find resources') },
+    { path: myceliumPort, steps: viaMenu('text=Find resources') }
+  ),
+  modalPair(
+    'receipts',
+    0.01,
+    { path: myceliumOriginal, steps: viaMenu('text=/^Your receipts ·/') },
+    { path: myceliumPort, steps: viaMenu('text=/^Your receipts ·/') }
+  ),
+  modalPair(
+    'advance',
+    0.01,
+    { path: myceliumOriginal, steps: viaMenu('text=Change its stage') },
+    { path: myceliumPort, steps: viaMenu('text=Change its stage') }
+  ),
+  modalPair(
+    'rule',
+    0.01,
+    { path: myceliumOriginal, steps: viaMenu('text=Add a rule') },
+    { path: myceliumPort, steps: viaMenu('text=Add a rule') }
+  ),
   modalPair(
     'why',
-    0.11,
-    { path: myceliumOriginal, steps: [{ click: 'text=/Signals/' }, { click: 'text=why am I seeing this?' }] },
-    { path: myceliumPort, steps: [{ click: 'text=/Signals/' }, { click: 'text=why am I seeing this?' }] }
+    0.01,
+    {
+      path: myceliumOriginal,
+      steps: [{ click: 'text=/Signals/' }, { click: 'text=why am I seeing this?' }]
+    },
+    {
+      path: myceliumPort,
+      steps: [{ click: 'text=/Signals/' }, { click: 'text=why am I seeing this?' }]
+    }
   ),
 
   // ── Modals reached from instrument ──
-  modalPair('resources', 0.09, { path: instrumentOriginal, steps: viaMenu('text=Items and who holds them') }, { path: instrumentPort, steps: viaMenu('text=Items and who holds them') }),
-  modalPair('commit', 0.09, { path: instrumentOriginal, steps: viaMenu('text=Ask to borrow or receive') }, { path: instrumentPort, steps: viaMenu('text=Ask to borrow or receive') }),
-  modalPair('commitments', 0.08, { path: instrumentOriginal, steps: viaMenu('text=Requests on this resource') }, { path: instrumentPort, steps: viaMenu('text=Requests on this resource') }),
-  modalPair('commitments-all', 0.13, { path: instrumentOriginal, steps: viaMenu('text=/^Requests ·/') }, { path: instrumentPort, steps: viaMenu('text=/^Requests ·/') }),
-  modalPair('attach', 0.08, { path: instrumentOriginal, steps: viaMenu('text=Link to another resource') }, { path: instrumentPort, steps: viaMenu('text=Link to another resource') }),
-  modalPair('note', 0.08, { path: instrumentOriginal, steps: viaMenu('text=Log work') }, { path: instrumentPort, steps: viaMenu('text=Log work') }),
+  modalPair(
+    'resources',
+    0.01,
+    { path: instrumentOriginal, steps: viaMenu('text=Items and who holds them') },
+    { path: instrumentPort, steps: viaMenu('text=Items and who holds them') }
+  ),
+  modalPair(
+    'commit',
+    0.01,
+    { path: instrumentOriginal, steps: viaMenu('text=Ask to borrow or receive') },
+    { path: instrumentPort, steps: viaMenu('text=Ask to borrow or receive') }
+  ),
+  modalPair(
+    'commitments',
+    0.01,
+    { path: instrumentOriginal, steps: viaMenu('text=Requests on this resource') },
+    { path: instrumentPort, steps: viaMenu('text=Requests on this resource') }
+  ),
+  modalPair(
+    'commitments-all',
+    0.01,
+    { path: instrumentOriginal, steps: viaMenu('text=/^Requests ·/') },
+    { path: instrumentPort, steps: viaMenu('text=/^Requests ·/') }
+  ),
+  modalPair(
+    'attach',
+    0.01,
+    { path: instrumentOriginal, steps: viaMenu('text=Link to another resource') },
+    { path: instrumentPort, steps: viaMenu('text=Link to another resource') }
+  ),
+  modalPair(
+    'note',
+    0.01,
+    { path: instrumentOriginal, steps: viaMenu('text=Log work') },
+    { path: instrumentPort, steps: viaMenu('text=Log work') }
+  ),
 
   // ── Onboarding, first step (?fresh=1: no profile, no groups) ──
-  modalPair('onboarding-profile', 0.05, { path: instrumentOriginal + '?fresh=1' }, { path: instrumentPort + '?fresh=1' }),
+  modalPair(
+    'onboarding-profile',
+    0.01,
+    { path: instrumentOriginal + '?fresh=1' },
+    { path: instrumentPort + '?fresh=1' }
+  ),
 
   // ── Toasts: the write lifecycle, caught mid-flight ──
   // Both sides run the same setTimeout schedule (signed at 0, gossip at 700ms,
@@ -99,9 +198,25 @@ const pairs: Pair[] = [
   // on both sides.
   modalPair(
     'toast-gossip',
-    0.07,
-    { path: instrumentOriginal, steps: [...viaMenu('text=Log work'), { fill: ['textarea', 'Recorded for the comparison harness.'] }, { click: 'text=Sign & log' }, { wait: 900 }] },
-    { path: instrumentPort, steps: [...viaMenu('text=Log work'), { fill: ['textarea', 'Recorded for the comparison harness.'] }, { click: 'text=Sign & log' }, { wait: 900 }] }
+    0.01,
+    {
+      path: instrumentOriginal,
+      steps: [
+        ...viaMenu('text=Log work'),
+        { fill: ['textarea', 'Recorded for the comparison harness.'] },
+        { click: 'text=Sign & log' },
+        { wait: 900 }
+      ]
+    },
+    {
+      path: instrumentPort,
+      steps: [
+        ...viaMenu('text=Log work'),
+        { fill: ['textarea', 'Recorded for the comparison harness.'] },
+        { click: 'text=Sign & log' },
+        { wait: 900 }
+      ]
+    }
   )
 ];
 
