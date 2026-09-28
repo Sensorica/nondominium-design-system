@@ -137,6 +137,13 @@ export const paths = {
   uiKit: () => `${base}/ui-kit`,
   ndoUiPlaybook: () => `${base}/playbook`,
 
+  // ── Guidelines: the Claude Design cards, replicated on this repo's own
+  //    tokens and its own ndo-* custom elements (ISA Phase 9, claim 44). ──
+  guidelines: () => `${base}/guidelines`,
+  /** A single card's isolated frame: the card body alone, no chrome, sized
+   *  and backgrounded exactly like the original's own `<body>`. */
+  guidelineCard: (id: string) => `${base}/guidelines/${id}`,
+
   // ── Patterns (this rewrite's playbook: the app's own classes) ──
   patterns: () => patterns(),
   patternsButtons: () => patterns('/buttons'),
