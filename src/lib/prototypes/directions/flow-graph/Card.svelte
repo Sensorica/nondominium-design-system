@@ -2,7 +2,7 @@
   // One source-chain entry on the canvas: 218 × 116, type row, title, up to
   // two badges, author and one line of context. Dashed while it has not
   // reached the conductor we look from.
-  import { Avatar } from '$lib/prototypes/ui';
+  import AgentAvatar from './AgentAvatar.svelte';
   import Badge from './Badge.svelte';
   import { LANE_COL, NH, NW, laneOf, tok, typeWord, type NodeView } from './model';
 
@@ -51,17 +51,24 @@
     {/each}
   </span>
   <span class="foot">
-    <Avatar id={node.author.id} name={node.author.name} size={18} />
+    <AgentAvatar agent={node.author.key} name={node.author.name} />
     <span class="sub">{node.sub}</span>
   </span>
 </button>
 
 <style>
+  /* Block, not flex: the original's node div (line 505 of the source) sets no
+     `display` at all, so children stack in normal flow at their own
+     line-height-based size and any overflow is clipped by `overflow:hidden`
+     below. A flex column here would flex-shrink every row proportionally
+     instead, which is what made every card (and so every pair) mismatch by
+     ~2%: measured via getBoundingClientRect on the "equipment" badge row,
+     14.9375px in a flex column versus the original's 17.85px in block flow
+     (both frames scaled ×0.85 by the canvas zoom; unscaled that is 21px, the
+     `.badges` row's own explicit height, landing exactly once shrinking stops). */
   .card.card {
     position: absolute;
-    display: flex;
-    flex-direction: column;
-    align-items: stretch;
+    display: block;
     overflow: hidden;
     box-sizing: border-box;
     padding: 10px 12px;

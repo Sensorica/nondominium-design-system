@@ -44,7 +44,7 @@
       {/each}
     </section>
   {/if}
-  <p class="pu-muted">
+  <p class="pu-muted pu-muted--relaxed">
     Nobody assigns tasks here. Suggestions come from the state of shared resources and their rules, not from a ranking or a
     central feed.
   </p>
@@ -85,6 +85,9 @@
     padding: 6px 0;
   }
   .rule span:last-child {
+    /* .rule sets fontSize 14 on itself in ui.jsx (inherited by both spans);
+     * .pu-muted's own fontSize:13 would otherwise win on this element. */
+    font-size: 14px;
     text-align: right;
   }
   .chain {

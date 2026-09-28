@@ -111,12 +111,12 @@
     type="button"
     class="trigger"
     onclick={toggle}
-    title="Everything you can do (Ctrl+K)"
+    title="Everything you can do (⌘K)"
     aria-haspopup="menu"
     aria-expanded={open}
   >
     <AgentAvatar id={proto.me.id} size={22} />
-    <span>{label}</span>
+    <span class="label">{label}</span>
     <span class="caret">▾</span>
   </button>
 
@@ -133,12 +133,18 @@
           {/each}
         </div>
       {/each}
-      <p class="tip">Tip: press Ctrl+K (⌘K on a Mac) to open this menu</p>
+      <p class="tip">Tip: press ⌘K to open this menu</p>
     </div>
   {/if}
 </div>
 
 <style>
+  /* ui.jsx's FlowMenu sets no font of its own: its items use font: inherit
+     from wherever a direction mounts it (C's monospace top bar, A's sans
+     header). The shared .pu class pins the direction's body font instead. */
+  .wrap {
+    font-family: inherit;
+  }
   .wrap {
     position: relative;
   }

@@ -1,7 +1,8 @@
 // Shared geometry and colour roles for E Holarchy.
 //
-// The handoff (E.jsx) drew with its own palette (HO_COL, HO_IC). Here each
-// role maps to a design-system token instead; the roles are the same.
+// ISA Phase 9, D8: A to E carry their original palettes, scoped to the
+// direction root. The handoff (E.jsx) drew with its own literal palette
+// (HO_COL, HO_IC); these are the same hex values, not design-system tokens.
 
 import type { OperationalState } from '$lib/prototypes/store/logic';
 
@@ -16,27 +17,27 @@ export function ringPts(n: number, r: number, off = -Math.PI / 2): [number, numb
 /** The four rings of an NDO, plus the attention colour. */
 export type Ring = 'id' | 'rules' | 'inst' | 'slots';
 
+/** E.jsx's HO_COL, verbatim. */
 export const RING_COLOR: Record<Ring | 'sig', string> = {
-  id: 'rgb(var(--ndo-brand-ink))',
-  rules: 'rgb(var(--ndo-teal-700))',
-  inst: 'rgb(var(--ndo-blue-600))',
-  slots: 'rgb(var(--ndo-violet-700))',
-  sig: 'rgb(var(--ndo-amber-600))'
+  id: '#0F1A2A',
+  rules: '#22B3A6',
+  inst: '#3F6FDB',
+  slots: '#7C55E6',
+  sig: '#E5A52A'
 };
 
-/** Operational state of an item to its dot colour. */
+/** E.jsx's HO_IC, verbatim: operational state to its dot colour. */
 export const ITEM_COLOR: Record<OperationalState, string> = {
-  InUse: 'rgb(var(--ndo-blue-600))',
-  Available: 'rgb(var(--ndo-teal-700))',
-  InMaintenance: 'rgb(var(--ndo-amber-600))',
-  InStorage: 'rgb(var(--ndo-gray-500))',
-  Reserved: 'rgb(var(--ndo-violet-700))',
-  InTransit: 'rgb(var(--ndo-amber-600))',
-  PendingValidation: 'rgb(var(--ndo-red-600))'
+  InUse: '#3F6FDB',
+  Available: '#22B3A6',
+  InMaintenance: '#E5A52A',
+  InStorage: '#8592A3',
+  Reserved: '#7C55E6',
+  InTransit: '#E5A52A',
+  PendingValidation: '#D8452F'
 };
 
-export const itemColor = (s: string): string =>
-  ITEM_COLOR[s as OperationalState] ?? 'rgb(var(--ndo-gray-500))';
+export const itemColor = (s: string): string => ITEM_COLOR[s as OperationalState] ?? '#8592A3';
 
 /** Stages drawn with a dashed outline: nothing is happening on them. */
 export const QUIET_STAGES: readonly string[] = [

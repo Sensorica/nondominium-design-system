@@ -107,7 +107,11 @@ export const SCREEN_SHAPE: Record<string, Shape> = {
   'ndo-join': withId(paths.ndoJoin(ID), ID),
 
   // Agents
-  'agent-profile': withId(paths.agentProfile(ID), ID)
+  'agent-profile': withId(paths.agentProfile(ID), ID),
+
+  // Guidelines: the Claude Design card replicas.
+  guidelines: shapeOf(paths.guidelines()),
+  'guidelines-card': withId(paths.guidelineCard(ID), ID)
 };
 
 /** Direction keys. `prototypes` is the index. Each direction's default view
@@ -185,6 +189,8 @@ export const KEY_LABEL: Record<string, string> = {
   'ndo-associate': 'Associate with a group',
   'ndo-join': 'NDO membership panel',
   'agent-profile': 'Agent profile (not implemented in the app)',
+  guidelines: 'Guidelines: Claude Design card replicas',
+  'guidelines-card': 'Guidelines: a single card, isolated frame',
   'scenario:lobby-browse': 'Lobby browse scenario',
   'scenario:ndo-creation': 'NDO creation scenario',
   'scenario:ndo-lifecycle': 'NDO lifecycle scenario',

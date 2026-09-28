@@ -115,7 +115,7 @@
         </text>
       {/each}
       {#if !inst.length}
-        <text class="none" y="-162" text-anchor="middle">no items</text>
+        <text class="none" y="-162" text-anchor="middle">no instances</text>
       {/if}
     </g>
 
@@ -193,7 +193,7 @@
     stroke-opacity: 0.4;
   }
   .slot {
-    fill: rgb(var(--ndo-color-card-bg));
+    fill: #fff;
     stroke-width: 2;
   }
   .slot-label,
@@ -209,21 +209,21 @@
     font-size: 10px;
   }
   .add circle {
-    fill: rgb(var(--ndo-color-card-bg));
-    stroke: var(--ndo-color-text-muted);
+    fill: #fff;
+    stroke: #8592a3;
     stroke-dasharray: 3 3;
     stroke-width: 2;
   }
   .add text {
-    fill: var(--ndo-color-text-muted);
+    fill: #8592a3;
     font-size: 15px;
   }
   .add:hover circle,
   .add:focus-visible circle {
-    stroke: var(--ndo-color-text-primary);
+    stroke: #0f1a2a;
   }
   .none {
-    fill: var(--ndo-color-text-muted);
+    fill: #8592a3;
     font-size: 11px;
   }
   .signal {
@@ -237,19 +237,19 @@
     }
   }
   .core {
-    fill: rgb(var(--ndo-brand-ink));
+    fill: #0f1a2a;
   }
   .hit:focus-visible .core {
     stroke: rgb(var(--ndo-brand-teal-300));
     stroke-width: 3;
   }
   .core-name {
-    fill: rgb(var(--ndo-gray-50));
+    fill: #fff;
     font-size: 12px;
     font-weight: var(--ndo-weight-bold);
   }
   .core-sub {
-    fill: rgb(var(--ndo-gray-300));
+    fill: #9fb3c8;
     font-size: 10px;
   }
   @media (prefers-reduced-motion: reduce) {

@@ -1,0 +1,53 @@
+<!-- @startingPoint section="Stigmergic v0.1" subtitle="Lab-bench NDO with capability sockets and a trace scope" viewport="1280x800" -->
+<!DOCTYPE html>
+<html><head><meta charset="utf-8"><title>C · Instrument — prototype</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#EEF1F0;--ink:#141A1C;--mute:#7C8886;--grid:#D6DDDB;--teal:#119C8F;--pb:#fff;--pi:#141A1C;--pm:#7C8886;--pl:#D6DDDB;--pa:#141A1C;--pac:#fff;--pr:8px;--prb:4px;--pmono:'Space Mono'}
+*{box-sizing:border-box}html,body{margin:0;height:100%}body{background:var(--bg);color:var(--ink);font-family:'Space Grotesk',sans-serif;overflow:hidden}
+a{color:#2E5FD1}a:hover{color:var(--ink)}
+#root{display:flex;flex-direction:column;height:100vh}
+.bar{height:52px;flex-shrink:0;display:flex;align-items:center;gap:18px;padding:0 20px;background:var(--ink);color:#fff}
+.mark{width:30px;height:30px;border-radius:6px;background:#F4F5F5 url(assets/nondominium_logo.png) no-repeat;background-size:70px;background-position:-20px -16px;flex-shrink:0}
+.nm{font-weight:600;letter-spacing:.02em}
+.bar nav{display:flex;gap:4px;margin-left:10px;overflow-x:auto;flex:1 1 auto;min-width:0;scrollbar-width:thin}.bar nav>span{max-width:160px;overflow:hidden;text-overflow:ellipsis;flex-shrink:0}.peer{flex-shrink:0}
+.bar>nav{position:relative;font:12px 'Space Mono';padding:6px 10px;border-radius:4px;color:#9fb0ad;cursor:pointer;white-space:nowrap}.bar>nav.on{background:#26302f;color:#fff}.bar>nav:hover{color:#fff}
+.dot{position:absolute;top:3px;right:2px;width:6px;height:6px;border-radius:50%;background:#E0A21A}
+.peer{margin-left:auto;font:11px 'Space Mono';color:#9fb0ad;display:flex;gap:14px;white-space:nowrap}.peer b{color:#6ee7d8;font-weight:400}
+.wrap{display:grid;grid-template-columns:310px minmax(0,1fr);flex:1;min-height:0}
+.spec{background:#fff;border-right:1px solid var(--grid);padding:18px;overflow:auto}
+.lbl{font:10px 'Space Mono';text-transform:uppercase;letter-spacing:.1em;color:var(--mute)}
+.spec h1{font-size:22px;margin:6px 0 4px;font-weight:600;letter-spacing:-.01em}
+.hash{font:11px 'Space Mono';color:var(--mute);margin-bottom:16px}
+table{width:100%;border-collapse:collapse;font-size:12px;margin-bottom:18px}
+td{padding:7px 0;border-top:1px solid var(--grid)}td:first-child{font:11px 'Space Mono';color:var(--mute);width:42%}td b{font-weight:600}
+.led{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px}
+.inst{display:grid;grid-template-columns:1fr auto;padding:8px 10px;border:1px solid var(--grid);border-radius:4px;margin-bottom:6px;font-size:12px}
+.inst small{font:11px 'Space Mono';color:var(--mute)}
+.sg{display:flex;gap:8px;align-items:center;padding:8px 10px;border:1px solid #F0D48A;background:#FFF8E6;border-radius:4px;margin-bottom:6px;font-size:12px}
+.sg>b{display:block;font-weight:600}.sg small{font:11px 'Space Mono';color:var(--mute)}.sg .btn{margin-left:auto}
+.lnk{font:11px 'Space Mono';color:var(--teal);cursor:pointer;text-decoration:underline;margin-left:4px}
+.bench{position:relative;background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);background-size:24px 24px;overflow:hidden}
+.hdr{position:absolute;left:20px;top:14px;right:20px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;z-index:2}
+.chip{font:11px 'Space Mono';background:#fff;border:1px solid var(--grid);padding:4px 8px;border-radius:4px;white-space:nowrap}
+.chip.tog{cursor:pointer}.chip.tog:hover{border-color:var(--ink)}
+.btn{font:600 12px 'Space Grotesk';background:var(--ink);color:#fff;padding:8px 12px;border-radius:4px;cursor:pointer;white-space:nowrap}
+.hdr>.btn{flex-shrink:0}.hdr .btn{padding:6px 10px;font-size:11px}.hdr .chip+.btn{margin-left:auto}.btn:hover{background:var(--teal)}
+.btn.sm{padding:5px 9px;font-size:11px}.btn.ghost{background:#fff;color:var(--ink);border:1px solid var(--ink)}.btn.ghost:hover{background:var(--ink);color:#fff}
+svg text{font-family:'Space Mono'}
+.pop{position:absolute;left:50%;top:70px;transform:translateX(-50%);background:#fff;border:1.5px solid var(--ink);border-radius:6px;padding:10px 14px;display:flex;gap:14px;align-items:center;font-size:12px;z-index:3;box-shadow:4px 4px 0 var(--ink);white-space:nowrap}
+.pop span{color:var(--mute);font:11px 'Space Mono'}
+.scope{position:absolute;left:20px;right:20px;bottom:12px;height:112px;background:#fff;border:1px solid var(--grid);border-radius:6px;padding:12px 14px}
+.scope .h{display:flex;gap:14px;align-items:center;font-size:12px;margin-bottom:6px;flex-wrap:wrap}
+.scope .h span{font:11px 'Space Mono';color:var(--mute);white-space:nowrap}
+.scope .h i{display:inline-block;width:10px;height:2px;margin-right:5px;vertical-align:middle}
+.axis{display:flex;justify-content:space-between;font:10px 'Space Mono';color:var(--mute)}
+</style></head><body><template id="__bundler_thumbnail"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" fill="#0B1113"/><text x="50" y="64" font-family="sans-serif" font-size="40" font-weight="700" fill="#2EC4B6" text-anchor="middle">C</text></svg></template><div id="root"></div>
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script type="text/babel" src="core.jsx"></script>
+<script type="text/babel" src="ui.jsx"></script>
+<script type="text/babel" src="C.jsx"></script>
+</body></html>

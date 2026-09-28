@@ -30,7 +30,7 @@
         <h2>{title}</h2>
         {#if sub}<p class="pu-muted">{sub}</p>{/if}
       </div>
-      <button class="pu-btn pu-btn--ghost pu-btn--sm" onclick={onclose} aria-label="Close">✕</button>
+      <button class="pu-btn pu-btn--ghost close" onclick={onclose} aria-label="Close">✕</button>
     </header>
     <div class="body">
       {@render children()}
@@ -58,7 +58,9 @@
     color: var(--_ink);
     border: 1px solid var(--_line);
     border-radius: var(--_radius);
-    box-shadow: var(--_shadow);
+    /* ui.jsx PModal's boxShadow is its own literal, distinct from FlowMenu's
+     * and PToasts', not a themed variable. */
+    box-shadow: var(--proto-modal-shadow, 0 30px 60px -20px rgba(0, 0, 0, 0.5));
   }
   header {
     padding: 18px 22px 12px;
@@ -78,6 +80,12 @@
   }
   .titles p {
     margin-top: 3px;
+  }
+  /* ui.jsx PModal's close button only overrides pBtnGhost's padding, keeping
+   * its fontSize 13 / fontWeight 600 (unlike the smaller ✕-sized buttons
+   * elsewhere in the shared kit, which override fontSize too). */
+  .close {
+    padding: 4px 9px;
   }
   .body {
     padding: 16px 22px 20px;

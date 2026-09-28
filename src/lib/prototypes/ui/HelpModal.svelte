@@ -29,7 +29,10 @@
   dl {
     display: grid;
     grid-template-columns: 130px 1fr;
-    gap: 12px;
+    /* ui.jsx renders each row as its own grid (gap: 12, label-to-value only);
+     * between rows, spacing comes from the modal body's own flex gap (14).
+     * This single grid needs both: row-gap 14, column-gap 12. */
+    gap: 14px 12px;
     margin: 0;
     font-size: 14px;
     line-height: 1.5;

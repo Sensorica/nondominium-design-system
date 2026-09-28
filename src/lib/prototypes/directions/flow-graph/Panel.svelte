@@ -3,10 +3,10 @@
   // steps. A card selected: what it is in plain words, who holds it, what it
   // is connected to, its history, and what the current person can do with it.
   // Every form maps one to one onto a zome call's input.
-  import { friendly } from '$lib/prototypes/plain';
   import { focusOnMount } from '$lib/prototypes/ui';
   import Badge from './Badge.svelte';
-  import { CONDUCTORS, SCENARIO_ORDER, TYPES, type AgentKey } from './backend';
+  import { CONDUCTORS, TYPES, type AgentKey } from './backend';
+  import { friendlyErr } from './words';
   import {
     HIDE,
     LANE_COL,
@@ -173,7 +173,26 @@
 
   // ── Form ──
   const form = $derived(current ? { a: current, ...fieldsOf(current, vals) } : null);
-  const errText = $derived(err ? (dev ? err : friendly(err, { stripCallPrefix: true })) : '');
+  const errText = $derived(err ? (dev ? err : friendlyErr(err)) : '');
+
+  // The original's Scenario list has three buttons (equipment, science, art):
+  // `blank` is a port-only addition (ISA claim 34's fresh-start capability),
+  // reached only through `?fresh=1` / the design-system screen map, never
+  // through this list.
+  const VISIBLE_SCENARIOS = ['equipment', 'science', 'art'] as const;
+
+  // CONDUCTORS is a plain module object backend.ts mutates in place on every
+  // scenario switch (setConductors): Svelte 5 never tracks that write, so a
+  // bare `Object.values(CONDUCTORS)` in the template freezes at whatever the
+  // agents were on first render. Reading `s.scenario` here (already reactive:
+  // it flows through ctx from the backend's `rev` counter) forces this to
+  // recompute exactly when setConductors has just repopulated CONDUCTORS.
+  const conductorsLine = $derived.by(() => {
+    void s.scenario;
+    return Object.values(CONDUCTORS)
+      .map((a) => a.name + ' · ' + a.org)
+      .join('  ·  ');
+  });
 </script>
 
 <aside class="panel">
@@ -184,13 +203,13 @@
       <div class="kicker">{perspTitle}</div>
       <div class="h">{sc.title}</div>
       <p class="p">{sc.summary}</p>
-      <div class="small">{Object.values(CONDUCTORS).map((a) => a.name + ' · ' + a.org).join('  ·  ')}</div>
+      <div class="small">{conductorsLine}</div>
       {#if sc.story}
         <div class="small">From <span class="mono">documentation/Applications/user-story/{sc.story}</span></div>
       {/if}
       <div class="kicker kicker--gap">Scenario</div>
       <div class="scenarios">
-        {#each SCENARIO_ORDER as id (id)}
+        {#each VISIBLE_SCENARIOS as id (id)}
           {@const x = B.scenarios[id]}
           <button type="button" class="scenario" class:scenario--on={x.id === s.scenario} aria-pressed={x.id === s.scenario} onclick={() => onscenario(x.id)}>{x.title}</button>
         {/each}
@@ -259,7 +278,12 @@
           {#each insp.links as k, i (i)}
             <button type="button" class="link" onclick={() => onpick(k.to)}>
               <span class="mono muted">{k.dir}</span>
-              {#if k.field}<span class="mono link__f">{k.field}</span>{/if}
+              <!-- Always present, like the original's three-span button (line
+                   181): empty and invisible when not `dev`, but this row is a
+                   `gap:8px` flex row, and removing the middle span entirely
+                   drops one whole gap, pulling k.title 8px left of where the
+                   original renders it. -->
+              <span class="mono link__f">{k.field}</span>
               <span class="link__t">{k.title}</span>
             </button>
           {/each}
@@ -281,7 +305,13 @@
       {#each actions as a (a.id)}
         <button type="button" class="action" onclick={() => onaction(a.id)}>
           <span class="action__l">{a.label}</span>
-          {#if dev}<span class="mono action__c">{a.call}</span>{/if}
+          <!-- Always present, like the original's second span (line 199): empty
+               and so invisible when not `dev`, but it still claims its
+               `gap:2px` row in this flex column, and hiding it entirely made
+               every action button 2px shorter than the original's, an error
+               that compounded down the list (36px measured on the original,
+               34px before this fix). -->
+          <span class="mono action__c">{dev ? a.call : ''}</span>
         </button>
       {/each}
     </div>
@@ -297,12 +327,19 @@
     >
       <div class="form__head">
         <span class="form__l">{form.a.label}</span>
-        {#if dev}<span class="mono action__c">{form.a.call}</span>{/if}
+        <!-- Always present, like the original's `form.call` span (line 206):
+             empty and invisible when not `dev`, but `.form__head` is a
+             `gap:2px` flex column, and hiding this row entirely made the
+             form 2px shorter than the original's, throwing off every
+             scroll-driven pair that lands on a form. -->
+        <span class="mono action__c">{dev ? form.a.call : ''}</span>
         {#if !sel}<span class="form__as">as {writerName}</span>{/if}
       </div>
       {#each form.fields as [k, l, kind, options], i (k)}
         <label class="field">
-          <span class:mono={dev}>{fieldLabel(l, dev)}</span>
+          <!-- Always mono, like the original's field-label span (line 209):
+               `font-family:var(--ndo-font-mono)` with no `dev` gate. -->
+          <span class="mono">{fieldLabel(l, dev)}</span>
           {#if kind === 'select'}
             <select class="control" value={form.v[k] ?? ''} onchange={(e) => onval(k, e.currentTarget.value)}>
               {#each options ?? [] as [ov, ol] (ov)}
@@ -339,7 +376,18 @@
     border-left: 1px solid rgb(var(--ndo-gray-200));
     overflow: auto;
     overscroll-behavior: contain;
-    padding: 20px 20px 72px;
+    /* The original's aside (line 111) pads all four sides 20px alike; a
+       flat 72px bottom pad here would add exactly that much to this panel's
+       own scrollHeight, which is what was throwing off every scroll-driven
+       pair (Playwright's click() scrolls a target into view, and a taller
+       scrollHeight lands it at a different scrollTop): measured 52px too
+       much on form-change-stage, matching 72-20 exactly. `scroll-padding`
+       keeps the padding's real job, reserving room so the fixed comments fab
+       (claim 41, CommentsHost.svelte, bottom:24px/right:24px) never covers
+       a control that scroll-into-view just brought up, without adding
+       visual/layout padding the original never had. */
+    padding: 20px;
+    scroll-padding-bottom: 72px;
     box-sizing: border-box;
     display: flex;
     flex-direction: column;
@@ -360,6 +408,8 @@
     border-radius: var(--ndo-radius-md);
     cursor: pointer;
     color: rgb(var(--ndo-gray-600));
+    font-family: revert;
+    line-height: revert;
     font-size: 14px;
   }
   .stack {
@@ -378,11 +428,15 @@
     margin-top: 4px;
   }
   .h {
+    /* No padding-right/overflow-wrap here: the original's title never
+       reserves space for the panel's absolutely-positioned "hide panel" (›)
+       button, because that button sits at top:12/right:12 and every title
+       (Guide or inspector) starts well below it. Adding one made a two-word
+       title like "CNC Machine · Proxxon MF70" wrap to a second line the
+       original never does, shifting everything below it down the page. */
     font-size: 20px;
     font-weight: var(--ndo-weight-bold);
     line-height: 1.3;
-    padding-right: 32px;
-    overflow-wrap: anywhere;
   }
   .p {
     margin: 0;
@@ -421,7 +475,12 @@
     color: rgb(var(--ndo-gray-700));
     border-radius: var(--ndo-radius-md);
     padding: 6px 10px;
-    font: inherit;
+    /* Plain <button> in the original: no font-family there, so it renders in
+       the browser's UA button font. `revert` undoes both the browser's own
+       button reset and src/app.css's UnoCSS preflight (button{font-family:
+       inherit}), which is outside this direction's ownership. */
+    font-family: revert;
+    line-height: revert;
     font-size: 12px;
     font-weight: var(--ndo-weight-medium);
     cursor: pointer;
@@ -457,10 +516,12 @@
   }
 
   .insp-head {
+    /* The original's row has no padding-right either: the ✕ button is a
+       normal flex item pushed right by margin-left: auto, not reserved
+       space, and the "hide panel" button never overlaps this row. */
     display: flex;
     align-items: center;
     gap: 8px;
-    padding-right: 36px;
   }
   .dot {
     width: 8px;
@@ -474,6 +535,8 @@
     background: transparent;
     cursor: pointer;
     color: rgb(var(--ndo-gray-400));
+    font-family: revert;
+    line-height: revert;
     font-size: 16px;
     padding: 2px 6px;
     border-radius: var(--ndo-radius-sm);
@@ -570,7 +633,8 @@
     border-radius: var(--ndo-radius-md);
     padding: 6px 10px;
     cursor: pointer;
-    font: inherit;
+    font-family: revert;
+    line-height: revert;
     font-size: 12px;
     min-width: 0;
   }
@@ -612,7 +676,8 @@
     border-radius: var(--ndo-radius-md);
     padding: 8px 10px;
     cursor: pointer;
-    font: inherit;
+    font-family: revert;
+    line-height: revert;
   }
   .action.action:hover {
     border-color: rgb(var(--ndo-blue-600));
@@ -660,7 +725,13 @@
     color: rgb(var(--ndo-gray-700));
   }
   .control.control {
-    font: inherit;
+    /* The original's head <style> block has a `select,input{font-family:
+       inherit}` rule (font-family only, not the full shorthand): line-height
+       for these controls still falls back to the browser's own default,
+       so it's reverted here past both the browser's UA default AND
+       src/app.css's UnoCSS preflight (input,select{line-height:inherit}). */
+    font-family: inherit;
+    line-height: revert;
     font-size: 14px;
     font-weight: var(--ndo-weight-normal);
     padding: 6px 8px;
@@ -693,11 +764,14 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    min-width: 72px;
-    height: 32px;
-    padding: 0 14px;
+    /* The real design-system Button (Cancel, Call): it sizes itself from
+       padding and line-height, not a fixed box (hint-size="72px,32px" is only
+       an editor-time placeholder). Font-family and line-height
+       (var(--ndo-lh-sm)) are its own too, unlike a plain button. */
+    padding: var(--ndo-spacing-1-5) var(--ndo-spacing-4);
     border-radius: var(--ndo-radius-md);
-    font: inherit;
+    font-family: var(--ndo-font-sans);
+    line-height: var(--ndo-lh-sm);
     font-size: 14px;
     font-weight: var(--ndo-weight-medium);
     cursor: pointer;

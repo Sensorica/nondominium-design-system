@@ -439,3 +439,52 @@ The Claude Design handoff (`Prototype export options.zip`) holds six UI directio
 **Two handoff rules are not the hApp's yet.** "No self-validation" and "one claim per commitment" are TODOs in `zome_gouvernance` at `3cbebf0`. The prototypes keep them and say so.
 
 **What the ports gave up.** The handoff gave each direction its own typeface; the tokens-only rule sets all six in the design-system sans and mono. Each direction's card on `/prototypes` names what it lost.
+
+---
+
+## Phase 9: total fidelity to Claude Design, and prototypes that fully work (2026-09-27)
+
+**principal_stated_goal:** "Ensure the Design System replicate with hight fidelity the Claude design one." Then, as the run's stop condition: "work on it untill total hight fidelity and fully functional prototypes. You can merge once done". Direction ratified by Soushi the same evening: Claude Design is the source, this repo follows it.
+
+**Sources, measured rather than assumed.** The live Claude Design project `Nondominium Design System` (`c29c2bb3`) was read through DesignSync on 2026-09-27. Its bundle header carries a sha256 prefix per source file, and every component and UI-kit source hashes identical to the handoff Phase 7 was built from (`Badge`, `Button`, `Card`, `StatusDot`, all 16 `ui_kits/app/*.jsx`). The project's `explorations/revamp/proto/*` is an older copy of A to E (no fresh start, no F), superseded by the prototype export `Prototype export options.zip` of 2026-09-27, whose `prototypes/` sources are byte-identical to the handoff Phase 8 ported. So the sources are not the gap. The ports are.
+
+**The gap, seen in pixels.** Original and port side by side at 1680 wide, `--pixel` frames: A to E keep layout and data but lose each direction's typefaces and palette (Phase 8 claim 33 restyled them onto design-system tokens, as the handoff's README asked). F, the handoff's high-fidelity direction, drifted in copy (the plain-language layer renamed rules: "Access requirement" became "Who can access"), in the Layer 1 rule chip tints, avatars and card spacing. B's port clips its Flows button and scrolls its sidebar horizontally.
+
+### Criteria
+
+| # | Claim | Falsifier |
+|---|---|---|
+| 36 | The original prototypes are committed as the reference under `docs/prototypes/original/` and served locally by one command | The comparison cannot load an original |
+| 37 | `bun run compare:prototypes` captures every (direction, view) pair original versus port in its own headless browser, writes both frames and a diff image, reports a mismatch ratio per pair, and exits non-zero above threshold | A view registered in `directions.ts` with no pair; a deliberately broken port colour not turning the report red |
+| 38 | Each of A to E renders in its original typefaces and palette: the theme variables and font families declared in its original HTML, fonts self-hosted | Computed `font-family` or a theme colour on the direction root differs from the original's declaration; a font request leaves the origin |
+| 39 | Every view of every direction matches its original in layout, copy and colour: each pair under its threshold, and every remaining diff region attributed to a named cause (clock-relative text, animation phase, the design-system chrome additions of claim 41) | A pair over threshold, or a diff region nobody can name |
+| 40 | Every interactive control in each original has a working counterpart in the port, recorded as a per-direction inventory, with the same effect on state | A control in the original's inventory absent from the port, or producing a different state change |
+| 41 | Additions over the originals are only the design-system chrome (exit chip, `m` screen map, `c` comments) and the fresh-start entry Phase 8 required; each is listed | An unlisted control or view that the original does not have |
+| 42 | Every view of every direction renders with zero console errors in a real browser | Any console error at any view |
+| 43 | `bun run check` (svelte-check, fidelity, prototype rules) and `bun run build` pass | Non-zero exit |
+| 44 | Each Claude Design card (16 guidelines, 4 components) has a surface in this repo that renders the same content | A card with no counterpart surface |
+
+**Anti-claims.** Nothing under `src/lib/replica/` changes (claim 35 carries over). The stores still enforce exactly what the zome enforces: `check:prototypes` stays green and claims 31 and 32 still hold, because fidelity to a mock never outranks fidelity to the hApp. No font or script is fetched from a CDN at runtime by the design system's own pages. Nothing is merged to `master` until every claim above closes on evidence.
+
+### Decisions
+
+| # | Decision | Why |
+|---|---|---|
+| D8 | Claim 33 is reversed: A to E carry their original palettes and webfonts, scoped to each direction's root | Soushi asked for total fidelity to Claude Design. The directions exist to be compared by their look, and the design-system restyle had removed exactly what differs between them. The design system's own pages keep tokens only |
+| D9 | Webfonts are self-hosted through `@fontsource` packages, not linked from Google Fonts | The static site must not phone a third party for its own pages, and the offline standalone exports the originals shipped prove the look works without a CDN |
+| D10 | Builders iterate in a headless browser from the committed comparison script; appearance claims close only on `--pixel` frames from the real browser | One real browser cannot be shared by parallel builders, and Phase 8 showed a DOM re-render lying about SVG |
+| D11 | A pair's ceiling defaults to 1%. A higher ceiling needs measured element boxes showing identically placed text on both sides, and sits at most 0.5 point above the measured mismatch | The first wave set ceilings just above whatever it measured. That hid a restructured RuleModal (renamed fields, an extra select) at 9.7% in every direction, and C's reworded usage limit and drifting sidebar at 2.4%. A ceiling that follows the measurement is a green that cannot go red |
+| D12 | A class name in the ports must never be a UnoCSS utility name; `check:uno` enforces it | UnoCSS emits a rule for any class-shaped token in any Svelte file. `.h3` became `height: 0.75rem` in Field Notes, a 12px box no line-height could move, and `me`, `grow`, `grid`, `static`, `ring`, `outline` were live the same way |
+
+### What the phase learned
+
+**Every "font rendering" residual this run investigated was a real defect.** Four single fixes each removed what a builder had called antialiasing noise: a missing `line-height: normal` on A's root (3.3% to 0.53%), a flex column where F's original is a plain block (2% off every pair), UnoCSS styling a class named `h3` (B's rules tab, 1.16% to 0.37%), and FlowMenu pinning a font the original inherits (C's menu, 2.31% to 0.31%). The toast sat 70px high to clear the comments button (3.66% to 0.20%). D11 and D12 are the two rules this produced.
+
+**The sources were never the gap.** DesignSync read the live project; its bundle header's sha256 prefixes prove all 20 component and UI-kit sources identical to the handoff Phase 7 used, and the 2026-09-27 prototype export identical to Phase 8's. The ports had drifted: renamed copy in 14 shared components, a restructured RuleModal, an em dash replaced by words in the store seed (the no-em-dash writing rule applies to prose written here, never to verbatim source text).
+
+**State at close of the build.** 136 pairs across A to F, the shared layer and the 20 Claude Design cards, every one within its ceiling; ceilings above 1% remain only where a cause is named: D's glyph edges (Google's Bricolage files against the self-hosted ones, visually identical), E's three create, group and join modals at about 1.03%, the logo and favicon cards (this repo's assets are a different crop and format), the badge card (the open three-way colour question below). Functional inventories: A 45 controls, B 31, C 22, D 21, E 24, F 28 checks, shared 15 modals at 0px box deltas. Evidence: commits `de64154` to `bae2385`.
+
+**Close (2026-09-28).** An independent review returned "merge after fixes"; its blockers were two ceilings hiding real layout bugs (D's header gap, the card frame's base line-height) and the badge card diverging from Claude Design, all fixed along with its high and medium findings (`2d81732`, `80161dd`, `83ac8e6`, `c4cc20f`, `d9b6373`). Final measure: `bun run compare:prototypes` 139/139 with view coverage enforced, only D's three board pairs above 1% (bounding-box proof 10/10); `bun run verify:prototypes` 186/186; `bun run check` and `bun run build` exit 0. `ndo-badge` now follows Claude Design's Badge; the replica still mirrors the app.
+
+**Open for Soushi.** The badge ruling was taken for Claude Design (the ratified source), reversible in one commit if the team prefers the app's grey regimes. Local `master` is 16 commits behind `origin/master` with two commits Phase 6 already folded in.
+

@@ -29,21 +29,21 @@
       <span class="faces"><AgentAvatar id={c.provider} size={26} /><span class="second"><AgentAvatar id={c.receiver} size={26} ring /></span></span>
       <div class="what">
         <strong>{plain(c.action)}</strong>
-        <span class="pu-muted">
+        <span class="pu-muted pu-muted--12">
           {proto.q.agent(c.provider)} → {proto.q.agent(c.receiver)}{!ndo ? ' · ' + (proto.q.ndo(c.ndo)?.name ?? '') : ''}
         </span>
-        {#if c.note}<p class="pu-muted">{c.note}</p>{/if}
+        {#if c.note}<p class="pu-muted pu-muted--12">{c.note}</p>{/if}
       </div>
       {#if c.status === 'open'}
-        <button type="button" class="pu-btn pu-btn--sm" onclick={() => fulfil(c.id)}>{$developer ? 'Fulfil' : 'Mark as done'}</button>
+        <button type="button" class="pu-btn pu-btn--sm fulfil" onclick={() => fulfil(c.id)}>{$developer ? 'Fulfil' : 'Mark as done'}</button>
       {:else}
-        <span class="pu-muted">done</span>
+        <span class="pu-muted pu-muted--12">claimed</span>
       {/if}
     </div>
   {:else}
-    <p class="pu-muted">No requests yet.</p>
+    <p class="pu-muted">No commitments yet.</p>
   {/each}
-  <p class="pu-muted">
+  <p class="pu-muted pu-muted--12">
     {$developer
       ? 'Fulfil runs [transfer_custody →] log_economic_event → claim_commitment → issue_participation_receipts.'
       : 'Complete a request when it has happened. Both people get a private receipt.'}
@@ -51,7 +51,7 @@
   <ErrorNote {error} />
   {#if ndo}
     <div class="pu-row pu-row--end">
-      <button type="button" class="pu-btn pu-btn--ghost" onclick={() => modals.open({ type: 'commit', ndo: ndo.id })}>+ New request</button>
+      <button type="button" class="pu-btn pu-btn--ghost" onclick={() => modals.open({ type: 'commit', ndo: ndo.id })}>+ Propose commitment</button>
     </div>
   {/if}
 </Modal>
@@ -78,5 +78,10 @@
   .what strong {
     font-size: 14px;
     margin-right: 6px;
+  }
+  /* ui.jsx's fulfil button is {...pBtn, fontSize:12, padding:'6px 10px'}: the
+   * padding here differs from pu-btn--sm's 5px 10px default. */
+  .fulfil {
+    padding: 6px 10px;
   }
 </style>

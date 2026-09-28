@@ -4,14 +4,12 @@
   // assign_person_role; private data via store_private_person_data.
   import Modal from './Modal.svelte';
   import Field from './Field.svelte';
-  import Call from './Call.svelte';
   import ErrorNote from './ErrorNote.svelte';
   import ModalActions from './ModalActions.svelte';
   import AgentAvatar from './AgentAvatar.svelte';
   import { isHttpsUrl } from './avatar';
   import { proto } from '../store/store.svelte';
   import { ENUM, type RoleType } from '../store/logic';
-  import { plain, developer } from '../plain';
 
   let { onclose }: { onclose: () => void } = $props();
 
@@ -48,53 +46,46 @@
   <div class="pu-row head">
     <AgentAvatar id={proto.me.id} size={64} url={isHttpsUrl(avatar) ? avatar : null} ring />
     <div class="who">
-      <strong>{name || '?'}</strong>
-      <p class="pu-muted">@{handle || name.toLowerCase().replace(/\s+/g, '')} · {proto.me.roles.map((r) => plain(r)).join(', ')}</p>
-      {#if $developer}<p class="pu-muted pu-mono small">agent uhCAkT1b3r1usK9x… · roles {proto.me.roles.join(', ')}</p>{/if}
+      <strong>{name || '—'}</strong>
+      <p class="pu-muted pu-muted--12">@{handle || name.toLowerCase().replace(/\s+/g, '')} · {proto.me.roles.join(', ')}</p>
+      <p class="pu-muted pu-mono small">agent uhCAkT1b3r1usK9x… · joined 3 groups</p>
     </div>
   </div>
   <div class="pu-grid two">
     <Field label="Name *"><input class="pu-input" bind:value={name} /></Field>
-    <Field label="Lobby handle"><input class="pu-input" bind:value={handle} placeholder="max 64 characters" /></Field>
+    <Field label="Lobby handle"><input class="pu-input" bind:value={handle} placeholder="max 64 chars" /></Field>
   </div>
   <Field label="Bio"><input class="pu-input" bind:value={bio} /></Field>
-  <Field label="Picture URL" hint="Optional, must start with https://. Without it, your initials are shown.">
+  <Field label="Avatar URL" hint="Optional, must start with https://. Without it, initials are shown.">
     <input class="pu-input" bind:value={avatar} placeholder="https://…" />
   </Field>
-  <p class="pu-sec">Private details{$developer ? ' · store_private_person_data' : ''}</p>
+  <p class="pu-sec sec">Private data · store_private_person_data</p>
   <div class="pu-grid three">
     <Field label="Email"><input class="pu-input" bind:value={email} /></Field>
     <Field label="Location"><input class="pu-input" bind:value={location} /></Field>
     <Field label="Time zone"><input class="pu-input" bind:value={timeZone} /></Field>
   </div>
-  <p class="pu-muted">
-    Shared only when you allow it{$developer ? ' (grant_private_data_access)' : ''}, for example with the next
-    person to hold an item you hand over.
+  <p class="pu-muted pu-muted--12">
+    Shared only through a capability grant (grant_private_data_access), e.g. with the next custodian during a transfer.
   </p>
-  <Field
-    label="Roles"
-    hint={$developer
-      ? 'assign_person_role · Accountable roles need peer validation (request_role_promotion)'
-      : 'Trusted roles are confirmed by other members.'}
-  >
-    <div class="pu-row">
+  <Field label="Roles" hint="assign_person_role · Accountable roles need peer validation (request_role_promotion)">
+    <div class="pu-row pu-row--tight">
       {#each ENUM.role as r (r)}
         <button
           type="button"
-          class="pu-btn pu-btn--ghost pu-btn--sm"
+          class="pu-btn pu-btn--ghost pu-btn--sm pu-btn--choice"
           class:is-on={roles.includes(r)}
           aria-pressed={roles.includes(r)}
           title={r}
-          onclick={() => toggle(r)}>{plain(r)}</button
+          onclick={() => toggle(r)}>{r}</button
         >
       {/each}
     </div>
   </Field>
-  <p class="pu-sec">Reputation{$developer ? ' · derive_reputation_summary' : ''}</p>
+  <p class="pu-sec sec">Reputation · derive_reputation_summary</p>
   <p class="pu-muted">
-    {rep.total_claims} receipts · {rep.custody_claims} hand-overs · {rep.service_claims} services · {rep.creation_claims} created
+    {rep.total_claims} receipts · {rep.custody_claims} custody · {rep.service_claims} service · {rep.creation_claims} creation
   </p>
-  <Call c="zome_person::update_person · assign_person_role" />
   <ErrorNote {error} />
   <ModalActions {onclose} onok={submit} label="Save profile" />
 </Modal>
@@ -112,6 +103,16 @@
   }
   .small {
     font-size: 11px;
+    /* ui.jsx's agent-id line has marginTop: 2 (the handle line above it has
+     * none: normal block-flow spacing, no gap of its own). */
+    margin-top: 2px;
+  }
+  /* ui.jsx's ProfileModal `sec` is its own literal (fontSize 10, marginBottom
+   * -4), distinct from WhyModal's `sec` that .pu-sec matches (fontSize 11,
+   * no margin). */
+  .sec {
+    font-size: 10px;
+    margin-bottom: -4px;
   }
   .two {
     grid-template-columns: 1fr 1fr;

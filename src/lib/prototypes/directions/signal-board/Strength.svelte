@@ -1,9 +1,11 @@
 <script lang="ts">
-  // Signal strength: five bars, `n` of them lit, in the lane's colour.
-  let { n }: { n: number } = $props();
+  // Signal strength: five bars, `n` of them lit. `color` is the original
+  // lane colour (a CSS value or var() reference); the card passes its own
+  // muted colour when it is cold.
+  let { n, color = 'currentColor' }: { n: number; color?: string } = $props();
 </script>
 
-<span class="str" role="img" aria-label="Signal strength {n} of 5">
+<span class="str" style:color role="img" aria-label="Signal strength {n} of 5">
   {#each [0, 1, 2, 3, 4] as i (i)}<i class:on={i < n}></i>{/each}
 </span>
 
@@ -11,7 +13,6 @@
   .str {
     display: inline-flex;
     gap: 2px;
-    color: rgb(var(--lane, var(--ndo-gray-500)));
   }
   i {
     width: 5px;

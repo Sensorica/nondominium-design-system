@@ -1,0 +1,22 @@
+<!-- @dsCard group="Components" viewport="700x360" name="Badge" subtitle="Layer 0 / 1 / 2 domain badges" -->
+<!DOCTYPE html><html><head><meta charset="utf-8"><link rel="stylesheet" href="../../styles.css">
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script src="../../_ds_bundle.js"></script>
+<style>body{background:#fff;padding:16px}.row{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-bottom:10px}.k{width:92px;font-size:11px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:rgb(var(--ndo-gray-500))}</style>
+</head><body><div id="root"></div>
+<script type="text/babel">
+const { Badge } = window.NondominiumDesignSystem_c29c2b;
+const rows = [
+ ['Lifecycle', ['ideation:Ideation','specification:Specification','development:Development','prototype:Prototype','stable:Stable','distributed:Distributed','active:Active','hibernating:Hibernating','deprecated:Deprecated','end-of-life:EndOfLife'].map(x=>'lifecycle-'+x)],
+ ['Nature', ['physical:Physical','digital:Digital','service:Service','hybrid:Hybrid','information:Information'].map(x=>'nature-'+x)],
+ ['Regime', ['nondominium:Nondominium','commons:Commons','collective:Collective','pool:Pool','common-pool:CommonPool','private:Private'].map(x=>'regime-'+x)],
+ ['Rule', ['access-requirement:AccessRequirement','usage-limit:UsageLimit','transfer-condition:TransferCondition','maintenance-schedule:MaintenanceSchedule'].map(x=>'rule-'+x)],
+ ['Rivalry · Scope', ['rivalry-rivalrous:Rivalrous','rivalry-non-rivalrous:NonRivalrous','scope-project:Project','scope-network:Network','scope-public:Public']],
+ ['Op state', ['available:Available','reserved:Reserved','in-transit:InTransit','in-storage:InStorage','in-maintenance:InMaintenance','in-use:InUse','pending-validation:PendingValidation'].map(x=>'opstate-'+x)],
+ ['Special', ['coming-soon:Coming soon','neutral:Neutral']],
+];
+ReactDOM.createRoot(document.getElementById('root')).render(<div>{rows.map(([k,vs])=>(
+ <div className="row" key={k}><span className="k">{k}</span>{vs.map(v=>{const i=v.indexOf(':');return <Badge key={v} variant={v.slice(0,i)} label={v.slice(i+1)}/>})}</div>))}</div>);
+</script></body></html>

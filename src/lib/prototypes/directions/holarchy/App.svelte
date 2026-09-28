@@ -22,6 +22,17 @@
   import HoloCard from './HoloCard.svelte';
   import { RING_COLOR, type Ring } from './geometry';
 
+  // ISA Phase 9, D8/D9: the original's own webfonts, self-hosted (no CDN
+  // request). "E Holarchy.html" loaded Manrope 400/500/600/700/800 and Fira
+  // Code 400/500 from Google Fonts; these are the same families and weights.
+  import '@fontsource/manrope/400.css';
+  import '@fontsource/manrope/500.css';
+  import '@fontsource/manrope/600.css';
+  import '@fontsource/manrope/700.css';
+  import '@fontsource/manrope/800.css';
+  import '@fontsource/fira-code/400.css';
+  import '@fontsource/fira-code/500.css';
+
   type View = ViewOf<'holarchy'>;
   interface Loc {
     view: View;
@@ -133,7 +144,7 @@
 
 <div class="holarchy">
   <header class="top">
-    <img class="mark" src={paths.logoMark()} alt="Nondominium" width="32" height="32" />
+    <img class="mark" src={paths.logoMark()} alt="Nondominium" width="40" height="40" />
     <nav class="crumbs" aria-label="Level">
       <button
         type="button"
@@ -202,18 +213,17 @@
       onclick={proto.actions.toggleOffline}
       title="Go {proto.s.offline ? 'online' : 'offline'}"
     >
-      <i class="status" class:off={proto.s.offline}></i>
       {#if proto.s.offline}
         {proto.dev
-          ? 'offline · traces queue locally'
-          : 'offline · your changes are saved and will be shared later'}
+          ? '○ offline · traces queue locally'
+          : '○ offline · your changes are saved and will be shared later'}
       {:else}
-        {proto.dev ? '23 peers hold this holon' : 'online · shared with 23 people'}
+        {proto.dev ? '● 23 peers hold this holon' : '● online · shared with 23 people'}
       {/if}
     </button>
     ·
     <button type="button" onclick={() => modals.open({ type: 'receipts' })}
-      >{proto.s.receipts.length} receipts</button
+      >◆ {proto.s.receipts.length} receipts</button
     >
     ·
     <button type="button" class="reset" onclick={proto.actions.reset}>reset</button>
@@ -225,13 +235,54 @@
 </div>
 
 <style>
+  /* ISA Phase 9, D8: the original's own theme variables, scoped to this
+   * direction's root, with their original values ("E Holarchy.html" :root).
+   * --ho-* are local to this file tree; --proto-* theme the shared modal /
+   * menu / onboarding / toast kit the same way ui.jsx's --pb/--pi/--pm/--pl/
+   * --pa/--pac/--pr/--prb/--pmono did (mapping in
+   * src/lib/prototypes/README.md). */
   .holarchy {
+    --ho-bg: #f3f6f8;
+    --ho-ink: #0f1a2a;
+    --ho-ink2: #48566a;
+    --ho-mute: #8592a3;
+    --ho-line: #dde4eb;
+    --ho-card-bg: #fff;
+    --ho-font: 'Manrope', sans-serif;
+    --ho-mono: 'Fira Code', monospace;
+
+    --proto-bg: var(--ho-card-bg);
+    --proto-ink: var(--ho-ink);
+    --proto-muted: var(--ho-mute);
+    --proto-line: var(--ho-line);
+    --proto-accent: var(--ho-ink);
+    --proto-accent-hover: #3f6fdb;
+    --proto-accent-ink: #fff;
+    --proto-radius: 20px;
+    --proto-control-radius: 12px;
+    --proto-field-radius: 8px;
+    --proto-font: var(--ho-font);
+    --proto-mono: var(--ho-mono);
+    --proto-danger: #d8452f;
+    --proto-overlay: rgba(0, 0, 0, 0.45);
+    --proto-shadow: 0 30px 60px -20px rgba(0, 0, 0, 0.5);
+    --proto-toast-bg: #131a1c;
+    --proto-toast-ink: #fff;
+    --proto-progress: #2ec4b6;
+    --proto-queued: #e0a21a;
+
     position: relative;
     height: 100%;
     overflow: hidden;
-    background: var(--ndo-color-bg-app);
-    color: var(--ndo-color-text-primary);
-    font-family: var(--ndo-font-sans);
+    background: var(--ho-bg);
+    color: var(--ho-ink);
+    font-family: var(--ho-font);
+    /* The design system's own reset sets line-height:1.5 at the document
+     * root; the original never sets one outside .card h2 (1.1) and .p
+     * (1.5), so it renders each element at the browser's own metric
+     * line-height. Falling back to that here keeps every row (card rings,
+     * crumbs, legend, peers) the original's height instead of taller. */
+    line-height: normal;
   }
 
   .top {
@@ -260,24 +311,24 @@
   }
   .crumbs button {
     font: inherit;
-    font-size: var(--ndo-text-sm);
-    font-weight: var(--ndo-weight-semibold);
+    font-size: 14px;
+    font-weight: 600;
     padding: 6px 12px;
-    border-radius: var(--ndo-radius-pill);
-    background: rgb(var(--ndo-color-card-bg));
-    border: 1px solid var(--ndo-color-border);
-    color: var(--ndo-color-text-secondary);
+    border-radius: 999px;
+    background: var(--ho-card-bg);
+    border: 1px solid var(--ho-line);
+    color: var(--ho-ink2);
     cursor: pointer;
     white-space: nowrap;
     transition: var(--ndo-transition-colors);
   }
   .crumbs button:hover {
-    border-color: var(--ndo-color-text-primary);
+    border-color: var(--ho-ink);
   }
   .crumbs button.on {
-    background: var(--ndo-color-text-primary);
-    border-color: var(--ndo-color-text-primary);
-    color: rgb(var(--ndo-color-card-bg));
+    background: var(--ho-ink);
+    border-color: var(--ho-ink);
+    color: var(--ho-card-bg);
   }
   .crumbs button:focus-visible,
   .peers button:focus-visible {
@@ -285,22 +336,25 @@
     box-shadow: var(--ndo-focus-ring);
   }
   .crumbs em {
-    color: var(--ndo-color-text-muted);
+    color: var(--ho-mute);
     font-style: normal;
   }
   .menu {
     margin-left: auto;
   }
   .zoom {
-    margin: 0;
-    font-size: var(--ndo-text-xs);
-    color: var(--ndo-color-text-muted);
+    /* The original gives both the menu and this label their own auto
+     * margin, so the free space splits between them (a visible gap
+     * between "Menu" and this text, not the two flush together). */
+    margin: 0 0 0 auto;
+    font-size: 12px;
+    color: var(--ho-mute);
     white-space: nowrap;
   }
   .zoom b {
-    font-family: var(--ndo-font-mono);
-    font-weight: var(--ndo-weight-normal);
-    color: var(--ndo-color-text-secondary);
+    font-family: var(--ho-mono);
+    font-weight: 400;
+    color: var(--ho-ink2);
   }
 
   .stage {
@@ -329,12 +383,12 @@
     max-width: calc(100% - 380px - 56px);
     margin: 0;
     list-style: none;
-    background: rgb(var(--ndo-color-card-bg));
-    border: 1px solid var(--ndo-color-border);
-    border-radius: var(--ndo-radius-xl);
+    background: var(--ho-card-bg);
+    border: 1px solid var(--ho-line);
+    border-radius: 14px;
     padding: 12px 16px;
-    font-size: var(--ndo-text-xs);
-    color: var(--ndo-color-text-secondary);
+    font-size: 12px;
+    color: var(--ho-ink2);
     display: flex;
     gap: 6px 18px;
     flex-wrap: wrap;
@@ -352,15 +406,17 @@
     vertical-align: -1px;
   }
 
-  /* Right of the card's bottom edge, clear of the comments button. */
+  /* Right of the card's bottom edge, clear of the comments button (the
+   * original sits at right:28px/bottom:22px; this offset is the named,
+   * legitimate accommodation for that design-system chrome addition). */
   .peers {
     position: absolute;
     right: 92px;
     bottom: 40px;
     margin: 0;
-    font-family: var(--ndo-font-mono);
-    font-size: var(--ndo-text-xs);
-    color: var(--ndo-color-text-muted);
+    font-family: var(--ho-mono);
+    font-size: 12px;
+    color: var(--ho-mute);
     white-space: nowrap;
     z-index: 2;
   }
@@ -374,24 +430,10 @@
     border-radius: var(--ndo-radius-sm);
   }
   .peers button:hover {
-    color: var(--ndo-color-text-primary);
+    color: var(--ho-ink);
   }
   .peers .reset {
     text-decoration: underline;
-  }
-  .status {
-    display: inline-block;
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    margin-right: 4px;
-    background: rgb(var(--ndo-green-600));
-    border: 1.5px solid rgb(var(--ndo-green-600));
-    vertical-align: 0;
-  }
-  .status.off {
-    background: transparent;
-    border-color: var(--ndo-color-text-muted);
   }
 
   @media (prefers-reduced-motion: reduce) {

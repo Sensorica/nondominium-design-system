@@ -10,7 +10,6 @@
   import ModalActions from './ModalActions.svelte';
   import { proto } from '../store/store.svelte';
   import { AGENTS, ENUM, type Ndo } from '../store/logic';
-  import { plain } from '../plain';
 
   let { ndo, onclose }: { ndo: Ndo; onclose: () => void } = $props();
 
@@ -37,17 +36,17 @@
 
 <Modal title="Ask to borrow or receive" sub="Send a request to the person holding the item. They complete it by handing it over." {onclose}>
   <Call c="zome_gouvernance::propose_commitment" />
-  <Field label="What">
+  <Field label="VfAction">
     <Choice options={ENUM.action} value={action} onchange={(v) => (action = v)} />
   </Field>
   {#if items.length}
-    <Field label="Item">
+    <Field label="Resource">
       <select class="pu-select" bind:value={inst}>
-        {#each items as r, i (i)}<option value={i}>{r[0]} · {plain(r[1])}</option>{/each}
+        {#each items as r, i (i)}<option value={i}>{r[0]} · {r[1]}</option>{/each}
       </select>
     </Field>
   {/if}
-  <Field label="From">
+  <Field label="Provider">
     <select class="pu-select" bind:value={provider}>
       {#each Object.keys(AGENTS) as a (a)}<option value={a}>{proto.q.agent(a)}</option>{/each}
     </select>
@@ -56,5 +55,5 @@
     <input class="pu-input" bind:value={note} placeholder="e.g. 2 weeks, 48 h transport notice" />
   </Field>
   <ErrorNote {error} />
-  <ModalActions {onclose} onok={submit} label="Send request" />
+  <ModalActions {onclose} onok={submit} label="Propose" />
 </Modal>

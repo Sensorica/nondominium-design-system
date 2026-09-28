@@ -49,30 +49,30 @@
     height: 6px;
     margin-top: 5px;
     border-radius: 50%;
-    background: rgb(var(--ndo-brand-teal-300));
+    background: #2ec4b6;
   }
   .d.queued {
-    background: rgb(var(--ndo-amber-600));
+    background: #f2b84b;
   }
   .on {
-    color: rgb(var(--ndo-gray-500));
+    color: #56706f;
   }
   em {
     display: block;
     margin-top: 2px;
-    color: rgb(var(--ndo-gray-400));
+    color: #8ca3a2;
   }
   .t {
     font-size: 11px;
     white-space: nowrap;
-    color: rgb(var(--ndo-gray-500));
+    color: #56706f;
   }
   .st {
-    font-family: var(--ndo-font-mono);
+    font-family: 'JetBrains Mono', monospace;
     font-size: 10px;
-    color: rgb(var(--ndo-brand-teal-300));
+    color: #2ec4b6;
   }
   .st.queued {
-    color: rgb(var(--ndo-amber-600));
+    color: #f2b84b;
   }
 </style>

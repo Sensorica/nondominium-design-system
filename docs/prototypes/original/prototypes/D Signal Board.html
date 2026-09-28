@@ -1,0 +1,63 @@
+<!-- @startingPoint section="Stigmergic v0.1" subtitle="Home as signals emitted by resources; pick up to leave a trace" viewport="1280x800" -->
+<!DOCTYPE html>
+<html><head><meta charset="utf-8"><title>D · Signal Board — prototype</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,700;12..96,800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#FBFAF7;--ink:#101418;--ink2:#4B5258;--mute:#8A9096;--line:#E6E3DC;--teal:#1FB5A6;--tealbg:#D7F3EF;--blue:#3565DA;--bluebg:#DDE6FB;--violet:#7A4DE3;--violetbg:#E9E1FB;--amber:#E7A117;--amberbg:#FBEBC7;--pb:#fff;--pi:#101418;--pm:#8A9096;--pl:#E6E3DC;--pa:#101418;--pac:#fff;--pr:18px;--pmono:'DM Mono'}
+*{box-sizing:border-box}html,body{margin:0;height:100%}body{background:var(--bg);color:var(--ink);font-family:'Bricolage Grotesque',sans-serif}
+a{color:var(--blue)}a:hover{color:var(--ink)}
+#root{display:flex;flex-direction:column;min-height:100vh}
+.mono{font-family:'DM Mono',monospace}
+header{display:flex;align-items:center;gap:16px;padding:18px 28px 10px;flex-wrap:wrap}
+.mark{width:40px;height:40px;background:url(assets/nondominium_logo.png) no-repeat;background-size:96px;background-position:-28px -23px;mix-blend-mode:multiply}
+h1{font-size:34px;font-weight:800;letter-spacing:-.03em;margin:0}
+.scope{display:flex;gap:6px;margin-left:18px;flex-wrap:wrap}
+.scope>span{font-size:13px;font-weight:500;padding:7px 12px;border-radius:999px;border:1.5px solid var(--line);cursor:pointer;white-space:nowrap}.scope>span.on{background:var(--ink);color:#fff;border-color:var(--ink)}.scope>span:hover{border-color:var(--ink)}
+.me{margin-left:auto;display:flex;align-items:center;gap:12px;font-size:13px;white-space:nowrap}
+.av{width:34px;height:34px;border-radius:50%;background:var(--tealbg);color:var(--teal);display:grid;place-items:center;font-weight:700;cursor:pointer}
+.sub{padding:0 28px 14px;font-size:15px;color:var(--ink2);max-width:980px}
+.board{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;padding:0 28px 28px;flex:1}
+.col{background:#fff;border:1.5px solid var(--line);border-radius:18px;padding:14px;display:flex;flex-direction:column;gap:10px;min-width:0}
+.ch{display:flex;align-items:center;gap:8px;padding:2px 4px 6px}
+.ch b{font-size:17px;font-weight:700;letter-spacing:-.01em;white-space:nowrap}.ch .n{margin-left:auto;font:500 12px 'DM Mono';color:var(--mute)}
+.ch .sw{width:12px;height:12px;border-radius:4px}
+.card{border-radius:14px;padding:14px;cursor:pointer;transition:transform 150ms ease,box-shadow 150ms ease,opacity 400ms;animation:in 350ms ease}
+@keyframes in{from{opacity:0;transform:translateY(6px)}}
+.card:hover{transform:translateY(-2px);box-shadow:0 8px 20px -10px rgba(16,20,24,.25)}
+.res{font:500 11px 'DM Mono';color:var(--ink2);text-transform:uppercase;letter-spacing:.04em}
+.card h3{font-size:18px;line-height:1.15;font-weight:700;margin:6px 0 6px;letter-spacing:-.01em}
+.card p{font-size:13px;color:var(--ink2);margin:0 0 12px}
+.foot{display:flex;align-items:center;gap:8px}
+.str{display:flex;gap:2px}.str i{width:5px;height:14px;border-radius:2px;background:currentColor;opacity:.25}.str i.on{opacity:1}
+.faces{display:flex;margin-left:auto}.faces>span{width:24px;height:24px;border-radius:50%;border:2px solid #fff;margin-left:-6px;display:grid;place-items:center;font-size:10px;font-weight:700;background:#fff;color:var(--ink)}
+.take{font:700 13px 'Bricolage Grotesque';padding:7px 12px;border-radius:999px;background:var(--ink);color:#fff;border:1.5px solid var(--ink);cursor:pointer;white-space:nowrap}
+.take:hover{background:var(--blue);border-color:var(--blue)}
+.take.ghost{background:transparent;color:var(--ink);border-color:rgba(16,20,24,.25)}.take.ghost:hover{border-color:var(--ink)}
+.card.t{background:var(--tealbg)}.card.t .str{color:var(--teal)}
+.card.a{background:var(--amberbg)}.card.a .str{color:var(--amber)}
+.card.v{background:var(--violetbg)}.card.v .str{color:var(--violet)}
+.card.b{background:var(--bluebg)}
+.card.cold{background:#F4F2EE}.card.cold .str{color:var(--mute)}
+.why{font:12px 'DM Mono';color:var(--ink2);border-top:1px dashed rgba(16,20,24,.18);margin-top:10px;padding-top:8px}.why:hover{color:var(--ink);text-decoration:underline}
+.taken{font-size:12px;font-weight:600;color:#0F7D72}
+.emptyLane{font-size:13px;color:var(--mute);padding:16px 6px;text-align:center;border:1.5px dashed var(--line);border-radius:14px}
+.drawerWrap{position:fixed;inset:0;background:rgba(16,20,24,.25);z-index:40}
+.drawer{position:absolute;right:0;top:0;bottom:0;width:440px;max-width:100vw;background:#fff;padding:26px;overflow:auto;box-shadow:-20px 0 40px -20px rgba(0,0,0,.3);animation:slide 250ms ease}
+@keyframes slide{from{transform:translateX(40px);opacity:0}}
+.drawer h2{font-size:28px;font-weight:800;letter-spacing:-.02em;margin:6px 0 10px;line-height:1.05}
+.drawer p{color:var(--ink2);font-size:14px}
+.drawer h4{font-size:14px;margin:20px 0 8px}
+.drawer .x{position:absolute;right:18px;top:18px;background:none;border:0;font-size:16px;cursor:pointer;color:var(--mute)}
+.pills{display:flex;flex-wrap:wrap;gap:6px}.pills>span{font:500 12px 'DM Mono';padding:4px 9px;border-radius:999px;background:var(--bg);border:1px solid var(--line)}
+.dact{display:flex;gap:8px;flex-wrap:wrap}
+.drow{display:flex;justify-content:space-between;gap:10px;align-items:center;padding:8px 0;border-bottom:1px solid var(--line);font-size:13px}
+.drow>em{color:var(--ink2)}.muted{color:var(--mute);font-size:12px}
+</style></head><body><template id="__bundler_thumbnail"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" fill="#0B1113"/><text x="50" y="64" font-family="sans-serif" font-size="40" font-weight="700" fill="#2EC4B6" text-anchor="middle">D</text></svg></template><div id="root"></div>
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script type="text/babel" src="core.jsx"></script>
+<script type="text/babel" src="ui.jsx"></script>
+<script type="text/babel" src="D.jsx"></script>
+</body></html>

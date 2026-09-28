@@ -1,10 +1,10 @@
 <script lang="ts">
   // The bottom bar: the Activity feed of zome calls (collapsed by default) and
   // each conductor's online / offline toggle.
-  import { Avatar } from '$lib/prototypes/ui';
-  import { friendly } from '$lib/prototypes/plain';
   import { CONDUCTORS } from './backend';
   import { aname, callPhrase, hhmm, short, type Ctx } from './model';
+  import { friendlyErr } from './words';
+  import AgentAvatar from './AgentAvatar.svelte';
 
   interface Props {
     ctx: Ctx;
@@ -34,7 +34,7 @@
             : 'saved and shared'
         : dev
           ? (r.error ?? '')
-          : (friendly(r.error, { stripCallPrefix: true }) ?? ''),
+          : r.error ? friendlyErr(r.error) : '',
       ok: !!r.ok,
       hash: r.hash ? short(r.hash) : 'none',
       time: hhmm(r.ts),
@@ -47,7 +47,7 @@
   <div class="bar">
     <span class="title">{dev ? 'Conductor calls' : 'Activity'}</span>
     <span>{s.log.length} this session</span>
-    <span class="grow"></span>
+    <span class="k-grow"></span>
     {#each Object.keys(CONDUCTORS) as a (a)}
       {@const on = s.online[a]}
       <button type="button" class="cond" title="Toggle this conductor's network connection" aria-pressed={on} onclick={() => ctx.B.setOnline(a, !on)}>
@@ -60,7 +60,7 @@
     <div class="log">
       {#each rows as r (r.id)}
         <div class="row">
-          <Avatar id={CONDUCTORS[r.as]?.pubkey ?? r.as} name={who(r.as)} size={18} />
+          <AgentAvatar agent={r.as} name={who(r.as)} />
           <span class="mono call">{r.call}</span>
           <span class="detail" class:detail--err={!r.ok}>{r.detail}</span>
           <span class="mono muted">{r.hash}</span>
@@ -96,7 +96,7 @@
     letter-spacing: 0.06em;
     text-transform: uppercase;
   }
-  .grow {
+  .k-grow {
     flex: 1;
   }
   .cond.cond {
@@ -107,7 +107,12 @@
     background: rgb(var(--ndo-color-card-bg));
     border-radius: var(--ndo-radius-md);
     padding: 2px 8px;
-    font: inherit;
+    /* Plain <button> in the original: no font-family there, so it renders in
+       the browser's UA button font. `revert` undoes both the browser's own
+       button reset and src/app.css's UnoCSS preflight, outside this
+       direction's ownership. */
+    font-family: revert;
+    line-height: revert;
     font-size: 12px;
     color: rgb(var(--ndo-gray-600));
     cursor: pointer;

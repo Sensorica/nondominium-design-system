@@ -4,7 +4,7 @@
   // entered (NDO level) it summarises each ring, what needs attention, the
   // recent activity, and the actions for it.
   import { proto } from '$lib/prototypes/store/store.svelte';
-  import { plain, stageLabel } from '$lib/prototypes/plain';
+  import { plain } from '$lib/prototypes/plain';
   import { fmtAgo } from '$lib/prototypes/store/logic';
   import { modals, AgentAvatar, ErrorNote } from '$lib/prototypes/ui';
   import { RING_COLOR, type Ring } from './geometry';
@@ -109,8 +109,8 @@
     <h2>{at.group ? group?.name : 'Your holarchy'}</h2>
     <p class="p">
       {at.group
-        ? 'Click a resource once to inspect it, twice to enter it.'
-        : 'Each circle is a group you belong to. Click one to zoom in.'}
+        ? 'Click an NDO once to inspect it, twice to enter it.'
+        : 'Each circle is a group DHT you belong to. Click one to zoom in.'}
     </p>
     <div class="cta">
       <button type="button" class="pbtn" onclick={createNdo}>+ Add resource</button>
@@ -135,11 +135,15 @@
     <p class="k">Shared resource</p>
     <h2>{n.name}</h2>
 
+    <!-- The original renders all four summary rows first, then a single
+         detail box after them (whichever ring is focused), not interleaved
+         under the row that opened it: rows.map(...) followed by three
+         sibling {focus === k && ...} expressions in HoCard. -->
     {#each rows as r (r.k)}
       {#if at.ndo}
         <button
           type="button"
-          class="ring"
+          class="card-ring"
           class:on={focus === r.k}
           aria-pressed={focus === r.k}
           onclick={() => onfocus(focus === r.k ? null : r.k)}
@@ -149,36 +153,33 @@
           {#if proto.dev}<small class="mono">{r.layer}</small>{/if}
         </button>
       {:else}
-        <div class="ring static">
+        <div class="card-ring k-static">
           <i style:border-color={RING_COLOR[r.k]}></i>
           <span><b>{r.title}</b><br /><small>{r.sub}</small></span>
           {#if proto.dev}<small class="mono">{r.layer}</small>{/if}
         </div>
       {/if}
-      {#if at.ndo && focus === r.k && r.k !== 'id'}
-        <div class="detail">
-          {#if r.k === 'slots'}
-            {#each links as x (x.key)}
-              <div><span>{x.text}</span><small>{x.dir}</small></div>
-            {:else}
-              <div><small>No linked resources yet.</small></div>
-            {/each}
-          {:else if r.k === 'rules'}
-            {#each rules as [type, summary], i (i)}
-              <div><span>{plain(type)}</span><small>{plain(summary)}</small></div>
-            {:else}
-              <div><small>No rules yet.</small></div>
-            {/each}
-          {:else}
-            {#each inst as [label, state, holder], i (i)}
-              <div><span>{label}</span><small>{plain(state)} · {proto.q.agent(holder)}</small></div>
-            {:else}
-              <div><small>No items yet.</small></div>
-            {/each}
-          {/if}
-        </div>
-      {/if}
     {/each}
+
+    {#if at.ndo && focus === 'slots'}
+      <div class="detail">
+        {#each links as x (x.key)}
+          <div><span>{x.text}</span><small>{x.dir}</small></div>
+        {/each}
+      </div>
+    {:else if at.ndo && focus === 'rules'}
+      <div class="detail">
+        {#each rules as [type, summary], i (i)}
+          <div><span>{plain(type)}</span><small>{plain(summary)}</small></div>
+        {/each}
+      </div>
+    {:else if at.ndo && focus === 'inst'}
+      <div class="detail">
+        {#each inst as [label, state, holder], i (i)}
+          <div><span>{label}</span><small>{plain(state)} · {proto.q.agent(holder)}</small></div>
+        {/each}
+      </div>
+    {/if}
 
     {#if sg.length}
       <p class="k sub-k">Needs attention · {sg.length}</p>
@@ -202,14 +203,22 @@
       <p class="k sub-k">Recent activity</p>
       {#each traces as t (t.id)}
         <div class="sgr" class:pending={t.status !== 'validated'}>
-          <span class="who">
+          <!-- No wrapper styling here on purpose: the original wraps the
+               avatar and the name in nothing at all, one plain <span>
+               holding "<Avatar/> <b>Name</b> text", flowing inline with a
+               single literal space after the avatar. A `display: flex;
+               gap: 6px` here used to replace that ~2.6px space with a 6px
+               gap and pin the avatar to the top of the line instead of its
+               original, roughly-centred inline position (measured via
+               boundingBox(): a 3.4px rightward shift of the name and text,
+               a ~2.5px vertical shift of the avatar). Left plain, it
+               matches. -->
+          <span>
             <AgentAvatar id={t.agent} size={16} />
             <span><b>{proto.q.agent(t.agent)}</b> {t.text}</span>
           </span>
-          <small>{t.status === 'validated' ? fmtAgo(t.ago) : stageLabel(t.status, proto.dev)}</small>
+          <small>{t.status === 'validated' ? fmtAgo(t.ago) : t.status}</small>
         </div>
-      {:else}
-        <p class="p small">Nothing has happened here yet.</p>
       {/each}
     {/if}
 
@@ -258,12 +267,12 @@
     width: 340px;
     max-height: calc(100% - 170px);
     overflow: auto;
-    background: rgb(var(--ndo-color-card-bg));
-    color: var(--ndo-color-text-primary);
-    border: 1px solid var(--ndo-color-border);
-    border-radius: var(--ndo-radius-xl);
+    background: #fff;
+    color: #0f1a2a;
+    border: 1px solid #dde4eb;
+    border-radius: 20px;
     padding: 22px;
-    box-shadow: var(--ndo-shadow-xl);
+    box-shadow: 0 20px 40px -24px rgba(15, 26, 42, 0.25);
     z-index: 2;
   }
   .k {
@@ -272,29 +281,25 @@
     font-weight: var(--ndo-weight-bold);
     letter-spacing: 0.08em;
     text-transform: uppercase;
-    color: var(--ndo-color-text-muted);
+    color: #8592a3;
   }
   .sub-k {
     margin: 12px 0 6px;
   }
   h2 {
-    font-size: var(--ndo-text-2xl);
-    font-weight: var(--ndo-weight-bold);
+    font-size: 24px;
+    font-weight: 800;
     letter-spacing: -0.02em;
     margin: 6px 0 12px;
     line-height: 1.1;
   }
   .p {
     margin: 0;
-    font-size: var(--ndo-text-sm);
-    color: var(--ndo-color-text-secondary);
+    font-size: 14px;
+    color: #48566a;
     line-height: 1.5;
   }
-  .p.small {
-    font-size: var(--ndo-text-xs);
-    padding: 4px 0;
-  }
-  .ring {
+  .card-ring {
     display: grid;
     grid-template-columns: 14px 1fr auto;
     gap: 10px;
@@ -302,8 +307,8 @@
     width: 100%;
     padding: 10px 6px;
     border: none;
-    border-top: 1px solid var(--ndo-color-border);
-    border-radius: var(--ndo-radius-lg);
+    border-top: 1px solid #dde4eb;
+    border-radius: 8px;
     background: none;
     font: inherit;
     font-size: 13px;
@@ -312,36 +317,36 @@
     cursor: pointer;
     transition: var(--ndo-transition-colors);
   }
-  .ring.static {
+  .card-ring.k-static {
     cursor: default;
   }
-  .ring:not(.static):hover,
-  .ring.on {
-    background: var(--ndo-color-bg-app);
+  .card-ring:not(.k-static):hover,
+  .card-ring.on {
+    background: #f3f6f8;
   }
-  .ring:focus-visible {
+  .card-ring:focus-visible {
     outline: none;
     box-shadow: var(--ndo-focus-ring);
   }
-  .ring i {
+  .card-ring i {
     width: 14px;
     height: 14px;
     border-radius: 50%;
     border: 3px solid;
   }
-  .ring small {
-    color: var(--ndo-color-text-muted);
+  .card-ring small {
+    color: #8592a3;
     font-size: 12px;
   }
-  .ring b {
+  .card-ring b {
     font-weight: var(--ndo-weight-bold);
   }
   .mono {
-    font-family: var(--ndo-font-mono);
+    font-family: var(--ho-mono);
   }
   .detail {
-    background: var(--ndo-color-bg-app);
-    border-radius: var(--ndo-radius-lg);
+    background: #f3f6f8;
+    border-radius: 10px;
     padding: 8px 10px;
     margin: 4px 0 6px;
     font-size: 12px;
@@ -353,7 +358,7 @@
     padding: 4px 0;
   }
   .detail small {
-    color: var(--ndo-color-text-muted);
+    color: #8592a3;
     text-align: right;
   }
   .sgr {
@@ -362,47 +367,41 @@
     align-items: center;
     font-size: 13px;
     padding: 6px 0;
-    border-bottom: 1px solid var(--ndo-color-border);
+    border-bottom: 1px solid #dde4eb;
   }
   .sgr > span:first-child {
     flex: 1;
   }
   .sgr small {
-    color: var(--ndo-color-text-muted);
+    color: #8592a3;
     font-size: 11px;
     white-space: nowrap;
   }
   .sgr.pending {
     opacity: 0.7;
   }
-  .who {
-    display: flex;
-    gap: 6px;
-    align-items: flex-start;
-  }
+  /* Same cascade order as ui.jsx's ".mini"/".mini:hover"/".mini.g": the
+   * quiet variant's own rule comes after ".mini:hover" so it wins the
+   * specificity tie and never changes colour on hover, matching the
+   * original exactly. */
   .mini {
     font: inherit;
     font-size: 12px;
     font-weight: var(--ndo-weight-bold);
-    background: rgb(var(--ndo-amber-100));
-    color: rgb(var(--ndo-amber-800));
+    background: #fbefd5;
+    color: #8a5d00;
     padding: 4px 9px;
     border: none;
-    border-radius: var(--ndo-radius-pill);
+    border-radius: 999px;
     cursor: pointer;
     white-space: nowrap;
-    transition: var(--ndo-transition-colors);
   }
   .mini:hover {
-    background: rgb(var(--ndo-amber-50));
-    box-shadow: inset 0 0 0 1px rgb(var(--ndo-amber-600));
+    background: #f5dda6;
   }
   .mini.quiet {
-    background: var(--ndo-color-bg-app);
-    color: var(--ndo-color-text-secondary);
-  }
-  .mini.quiet:hover {
-    box-shadow: inset 0 0 0 1px var(--ndo-color-border-strong);
+    background: #f3f6f8;
+    color: #48566a;
   }
   .mini:focus-visible,
   .pbtn:focus-visible,
@@ -423,23 +422,22 @@
     font-weight: var(--ndo-weight-bold);
     padding: 10px;
     border: none;
-    border-radius: var(--ndo-radius-lg);
+    border-radius: 12px;
     cursor: pointer;
     white-space: nowrap;
-    transition: var(--ndo-transition-colors);
   }
   .pbtn {
-    background: var(--proto-accent, rgb(var(--ndo-blue-600)));
-    color: rgb(255 255 255);
+    background: #0f1a2a;
+    color: #fff;
   }
   .pbtn:hover {
-    background: var(--proto-accent-hover, rgb(var(--ndo-blue-700)));
+    background: #3f6fdb;
   }
   .gbtn {
-    background: var(--ndo-color-bg-app);
-    color: var(--ndo-color-text-primary);
+    background: #f3f6f8;
+    color: #0f1a2a;
   }
   .gbtn:hover {
-    background: var(--ndo-color-border);
+    background: #dde4eb;
   }
 </style>

@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<title>F · Flow Graph · Nondominium</title>
+<link rel="stylesheet" href="../_ds/nondominium-design-system-c29c2bb3-c4fd-4003-9044-00fef2e83a1c/tokens/colors.css">
+<link rel="stylesheet" href="../_ds/nondominium-design-system-c29c2bb3-c4fd-4003-9044-00fef2e83a1c/tokens/app-extended.css">
+<link rel="stylesheet" href="../_ds/nondominium-design-system-c29c2bb3-c4fd-4003-9044-00fef2e83a1c/tokens/typography.css">
+<link rel="stylesheet" href="../_ds/nondominium-design-system-c29c2bb3-c4fd-4003-9044-00fef2e83a1c/tokens/spacing.css">
+<link rel="stylesheet" href="../_ds/nondominium-design-system-c29c2bb3-c4fd-4003-9044-00fef2e83a1c/tokens/base.css">
+<link rel="stylesheet" href="../_ds/nondominium-design-system-c29c2bb3-c4fd-4003-9044-00fef2e83a1c/styles.css">
+<script src="../_ds/nondominium-design-system-c29c2bb3-c4fd-4003-9044-00fef2e83a1c/_ds_bundle.js"></script>
+<style>
+html,body{margin:0;height:100%;overflow:hidden;overscroll-behavior:none}
+aside{overscroll-behavior:contain}
+body{font-family:var(--ndo-font-sans);color:rgb(var(--ndo-gray-900));background:rgb(var(--ndo-gray-100))}
+a{color:rgb(var(--ndo-blue-600));text-decoration:none;cursor:pointer}a:hover{text-decoration:underline;color:rgb(var(--ndo-blue-700))}
+select,input{font-family:inherit}
+</style>
+</helmet>
+<div style="display:grid;grid-template-rows:52px minmax(0,1fr) auto;grid-template-columns:minmax(0,1fr);height:100vh;background:rgb(var(--ndo-gray-100))">
+
+  <header style="display:flex;align-items:center;gap:12px;padding:0 16px;background:#fff;border-bottom:1px solid rgb(var(--ndo-gray-200));min-width:0;position:relative;z-index:10">
+    <div style="display:flex;align-items:baseline;gap:8px;white-space:nowrap;flex-shrink:0">
+      <a href="index.html" style="font-weight:700;letter-spacing:.06em;color:rgb(var(--ndo-blue-700));font-size:14px">NDO</a>
+      <span style="color:rgb(var(--ndo-gray-400))">/</span>
+      <span style="font-weight:600;font-size:14px">Flow graph</span>
+    </div>
+    <div style="display:flex;gap:2px;padding:3px;background:rgb(var(--ndo-gray-100));border-radius:6px;flex-shrink:0">
+      <sc-for list="{{ persps }}" as="p" hint-placeholder-count="3">
+        <button onClick="{{ p.onClick }}" style="{{ p.st }}"><span style="{{ p.dotSt }}"></span>{{ p.label }}</button>
+      </sc-for>
+    </div>
+    <sc-if value="{{ isNetwork }}" hint-placeholder-val="{{ true }}">
+      <div style="display:flex;align-items:center;gap:6px;font-size:12px;color:rgb(var(--ndo-gray-500));white-space:nowrap">writing as
+        <sc-for list="{{ writers }}" as="w" hint-placeholder-count="2">
+          <button onClick="{{ w.onClick }}" style="{{ w.st }}">{{ w.label }}</button>
+        </sc-for>
+      </div>
+    </sc-if>
+    <div style="flex:1 1 0;min-width:0"></div>
+    <button onClick="{{ toggleDev }}" style="{{ devBtnSt }}">{{ devLabel }}</button>
+    <x-import component-from-global-scope="NondominiumDesignSystem_c29c2b.Button" variant="ghost" onClick="{{ reset }}" hint-size="70px,32px">Reset</x-import>
+    <x-import component-from-global-scope="NondominiumDesignSystem_c29c2b.Button" variant="primary" onClick="{{ toggleMenu }}" hint-size="110px,32px">+ New entry</x-import>
+    <sc-if value="{{ menuOpen }}" hint-placeholder-val="{{ false }}">
+      <div style="position:absolute;right:16px;top:48px;width:260px;background:#fff;border:1px solid rgb(var(--ndo-gray-200));border-radius:8px;box-shadow:0 4px 6px -1px rgb(0 0 0 / .08);padding:6px;display:flex;flex-direction:column;gap:2px">
+        <div style="font-size:12px;color:rgb(var(--ndo-gray-500));padding:6px 8px">Written as {{ writerName }}</div>
+        <sc-for list="{{ rootActions }}" as="r" hint-placeholder-count="3">
+          <button onClick="{{ r.onClick }}" style="text-align:left;border:0;background:transparent;border-radius:6px;padding:8px;cursor:pointer;display:flex;flex-direction:column;gap:2px" style-hover="background:rgb(var(--ndo-gray-50))"><span style="font-size:14px;font-weight:500;color:rgb(var(--ndo-gray-900))">{{ r.label }}</span><span style="font-family:var(--ndo-font-mono);font-size:11px;color:rgb(var(--ndo-gray-500))">{{ r.call }}</span></button>
+        </sc-for>
+      </div>
+    </sc-if>
+  </header>
+
+  <div style="display:flex;min-height:0;min-width:0">
+    <div ref="{{ canvasRef }}" onPointerDown="{{ onDown }}" onPointerMove="{{ onMove }}" onPointerUp="{{ onUp }}" onPointerCancel="{{ onUp }}" style="{{ canvasSt }}">
+      <div style="{{ innerSt }}">
+        <sc-for list="{{ lanes }}" as="l" hint-placeholder-count="8">
+          <div style="{{ l.st }}"></div>
+        </sc-for>
+        {{ edgesEl }}
+        <sc-for list="{{ nodes }}" as="n" hint-placeholder-count="12">
+          <div data-node="1" onClick="{{ n.onClick }}" style="{{ n.st }}">
+            <div style="display:flex;align-items:center;gap:6px;font-size:11px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:rgb(var(--ndo-gray-500))"><span style="{{ n.dotSt }}"></span>{{ n.typeLabel }}<span style="{{ n.flagSt }}">{{ n.flag }}</span></div>
+            <div style="font-size:14px;font-weight:600;color:rgb(var(--ndo-gray-900));margin:4px 0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ n.title }}</div>
+            <div style="display:flex;gap:4px;overflow:hidden;height:21px">
+              <sc-for list="{{ n.badges }}" as="b" hint-placeholder-count="1">
+                <x-import component-from-global-scope="NondominiumDesignSystem_c29c2b.Badge" variant="{{ b.variant }}" label="{{ b.label }}" hint-size="auto,20px"></x-import>
+              </sc-for>
+            </div>
+            <div style="display:flex;gap:6px;align-items:center;font-size:12px;color:rgb(var(--ndo-gray-500));margin-top:6px;min-width:0"><span style="{{ n.authorSt }}">{{ n.authorInitial }}</span><span style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ n.sub }}</span></div>
+          </div>
+        </sc-for>
+      </div>
+
+      <div data-node="1" style="position:absolute;left:0;right:0;top:0;height:44px;background:rgb(255 255 255 / .92);border-bottom:1px solid rgb(var(--ndo-gray-200));overflow:hidden">
+        <sc-for list="{{ laneHeads }}" as="l" hint-placeholder-count="8">
+          <button onClick="{{ l.onClick }}" title="Jump to this lane" style="{{ l.st }}"><span style="{{ l.dotSt }}"></span><span style="overflow:hidden;text-overflow:ellipsis">{{ l.label }}</span><span style="font-family:var(--ndo-font-mono);font-weight:400;letter-spacing:0;color:rgb(var(--ndo-gray-400))">{{ l.n }}</span></button>
+        </sc-for>
+      </div>
+      <div data-node="1" style="position:absolute;left:12px;bottom:12px;display:flex;align-items:center;gap:4px;background:#fff;border:1px solid rgb(var(--ndo-gray-200));border-radius:8px;box-shadow:0 1px 2px rgb(0 0 0 / .05);padding:4px 6px 4px 10px;font-size:12px;color:rgb(var(--ndo-gray-500))">
+        <span>Links</span>
+        <span style="display:flex;align-items:center;gap:6px;padding:4px 8px;color:rgb(var(--ndo-gray-900))"><span style="width:14px;height:2px;background:rgb(var(--ndo-gray-500))"></span>Flow</span>
+        <button onClick="{{ toggleAgents }}" style="{{ agentsBtnSt }}"><span style="width:14px;border-top:2px dashed rgb(var(--ndo-violet-700))"></span>Agents</button>
+        <button onClick="{{ toggleStruct }}" style="{{ structBtnSt }}"><span style="width:14px;border-top:2px dotted rgb(var(--ndo-blue-600))"></span>Structure</button>
+      </div>
+      <div data-node="1" style="position:absolute;right:12px;bottom:12px;display:flex;gap:2px;background:#fff;border:1px solid rgb(var(--ndo-gray-200));border-radius:8px;box-shadow:0 1px 2px rgb(0 0 0 / .05);padding:3px">
+        <button onClick="{{ zoomOut }}" style="border:0;background:transparent;min-width:30px;height:28px;border-radius:4px;cursor:pointer;font-size:14px;color:rgb(var(--ndo-gray-700))" style-hover="background:rgb(var(--ndo-gray-100))">−</button>
+        <span style="min-width:44px;display:flex;align-items:center;justify-content:center;font-size:12px;font-family:var(--ndo-font-mono);color:rgb(var(--ndo-gray-500))">{{ zoomPct }}</span>
+        <button onClick="{{ zoomIn }}" style="border:0;background:transparent;min-width:30px;height:28px;border-radius:4px;cursor:pointer;font-size:14px;color:rgb(var(--ndo-gray-700))" style-hover="background:rgb(var(--ndo-gray-100))">+</button>
+        <button onClick="{{ fit }}" style="border:0;background:transparent;min-width:36px;height:28px;border-radius:4px;cursor:pointer;font-size:12px;font-weight:500;color:rgb(var(--ndo-gray-700))" style-hover="background:rgb(var(--ndo-gray-100))">Fit</button>
+      </div>
+      <sc-if value="{{ loading }}" hint-placeholder-val="{{ true }}">
+        <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:14px;color:rgb(var(--ndo-gray-500));font-style:italic">Connecting to conductors…</div>
+      </sc-if>
+    </div>
+
+    <sc-if value="{{ sideClosed }}" hint-placeholder-val="{{ false }}">
+      <aside style="width:44px;flex-shrink:0;background:#fff;border-left:1px solid rgb(var(--ndo-gray-200));display:flex;flex-direction:column;align-items:center;padding-top:10px;gap:10px">
+        <button onClick="{{ toggleSide }}" title="Show panel" style="border:1px solid rgb(var(--ndo-gray-200));background:#fff;border-radius:6px;width:30px;height:30px;cursor:pointer;color:rgb(var(--ndo-gray-600));font-size:14px">‹</button>
+        <span style="writing-mode:vertical-rl;transform:rotate(180deg);font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:rgb(var(--ndo-gray-500));cursor:pointer" onClick="{{ toggleSide }}">{{ sideLabel }}</span>
+      </aside>
+    </sc-if>
+    <sc-if value="{{ sideOpen }}" hint-placeholder-val="{{ true }}">
+    <aside style="width:360px;flex-shrink:0;background:#fff;border-left:1px solid rgb(var(--ndo-gray-200));overflow:auto;padding:20px;box-sizing:border-box;display:flex;flex-direction:column;gap:16px;position:relative">
+      <button onClick="{{ toggleSide }}" title="Hide panel" style="position:absolute;top:12px;right:12px;border:1px solid rgb(var(--ndo-gray-200));background:#fff;border-radius:6px;width:28px;height:28px;cursor:pointer;color:rgb(var(--ndo-gray-600));font-size:14px;z-index:1">›</button>
+      <sc-if value="{{ showGuide }}" hint-placeholder-val="{{ true }}">
+        <div style="display:flex;flex-direction:column;gap:12px">
+          <div style="font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:rgb(var(--ndo-gray-500))">{{ perspTitle }}</div>
+          <div style="font-size:20px;font-weight:700;line-height:1.3">{{ scTitle }}</div>
+          <p style="margin:0;font-size:14px;line-height:1.55;color:rgb(var(--ndo-gray-600))">{{ scSummary }}</p>
+          <div style="font-size:12px;color:rgb(var(--ndo-gray-500))">{{ scAgents }}</div>
+          <div style="font-size:12px;color:rgb(var(--ndo-gray-500))">From <span style="font-family:var(--ndo-font-mono)">documentation/Applications/user-story/{{ scStory }}</span></div>
+          <div style="font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:rgb(var(--ndo-gray-500));margin-top:4px">Scenario</div>
+          <div style="display:flex;flex-direction:column;gap:4px">
+            <sc-for list="{{ scenarios }}" as="x" hint-placeholder-count="3"><button onClick="{{ x.onClick }}" style="{{ x.st }}">{{ x.label }}</button></sc-for>
+          </div>
+          <p style="margin:0;font-size:12px;line-height:1.5;color:rgb(var(--ndo-gray-500))">Switching scenario resets the mock DHT. Each card is an entry written by a zome call; dashed cards have not reached this conductor yet.</p>
+          <div style="font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:rgb(var(--ndo-gray-500));margin-top:4px">Try</div>
+          <sc-for list="{{ tries }}" as="t" hint-placeholder-count="4">
+            <div style="display:grid;grid-template-columns:20px minmax(0,1fr);gap:8px;font-size:14px;line-height:1.5;color:rgb(var(--ndo-gray-700))"><span style="font-family:var(--ndo-font-mono);color:rgb(var(--ndo-gray-400))">{{ t.n }}</span><span>{{ t.text }}</span></div>
+          </sc-for>
+          <sc-if value="{{ hasRep }}" hint-placeholder-val="{{ false }}">
+            <div style="border:1px solid rgb(var(--ndo-gray-200));border-radius:8px;padding:12px 16px;background:rgb(var(--ndo-gray-50))">
+              <div style="font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:rgb(var(--ndo-gray-500))">derive_reputation_summary · {{ writerName }}</div>
+              <div style="display:grid;grid-template-columns:1fr auto;gap:4px 12px;font-size:14px;margin-top:8px">
+                <sc-for list="{{ rep }}" as="r" hint-placeholder-count="4"><span style="color:rgb(var(--ndo-gray-600))">{{ r.k }}</span><span style="font-family:var(--ndo-font-mono)">{{ r.v }}</span></sc-for>
+              </div>
+            </div>
+          </sc-if>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ hasSel }}" hint-placeholder-val="{{ false }}">
+        <div style="display:flex;flex-direction:column;gap:12px">
+          <div style="display:flex;align-items:center;gap:8px">
+            <span style="{{ insp.dotSt }}"></span>
+            <span style="font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:rgb(var(--ndo-gray-500))">{{ insp.type }}</span>
+            <button onClick="{{ clearSel }}" style="margin-left:auto;border:0;background:transparent;cursor:pointer;color:rgb(var(--ndo-gray-400));font-size:16px;padding:2px 6px;border-radius:4px" style-hover="background:rgb(var(--ndo-gray-100))">✕</button>
+          </div>
+          <div style="font-size:20px;font-weight:700;line-height:1.3">{{ insp.title }}</div>
+          <div style="display:flex;gap:4px;flex-wrap:wrap">
+            <sc-for list="{{ insp.badges }}" as="b" hint-placeholder-count="2">
+              <x-import component-from-global-scope="NondominiumDesignSystem_c29c2b.Badge" variant="{{ b.variant }}" label="{{ b.label }}" hint-size="auto,20px"></x-import>
+            </sc-for>
+          </div>
+          <div style="font-size:14px;line-height:1.5;color:rgb(var(--ndo-gray-600))">{{ insp.summary }}</div>
+          <sc-if value="{{ isDev }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex;flex-direction:column;gap:4px;font-size:12px;color:rgb(var(--ndo-gray-500))">
+            <span style="font-family:var(--ndo-font-mono);color:rgb(var(--ndo-gray-700))">#{{ insp.hash }}</span>
+            <span><span style="font-family:var(--ndo-font-mono)">{{ insp.call }}</span> · {{ insp.author }} · {{ insp.time }}</span>
+          </div>
+          </sc-if>
+          <div style="display:flex;gap:6px;flex-wrap:wrap">
+            <sc-for list="{{ insp.held }}" as="h" hint-placeholder-count="2"><span style="{{ h.st }}">{{ h.text }}</span></sc-for>
+          </div>
+          <sc-for list="{{ insp.notes }}" as="w" hint-placeholder-count="0">
+            <div style="font-size:12px;line-height:1.5;background:rgb(var(--ndo-amber-50));color:rgb(var(--ndo-amber-800));border:1px solid rgb(var(--ndo-amber-100));border-radius:6px;padding:8px 10px">⚠ {{ w.text }}</div>
+          </sc-for>
+
+          <sc-if value="{{ isDev }}" hint-placeholder-val="{{ false }}">
+          <div style="font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:rgb(var(--ndo-gray-500));margin-top:4px">{{ entryTitle }}</div>
+          <div style="display:grid;grid-template-columns:128px minmax(0,1fr);gap:6px 12px;font-size:12px">
+            <sc-for list="{{ insp.fields }}" as="f" hint-placeholder-count="5">
+              <span style="font-family:var(--ndo-font-mono);color:rgb(var(--ndo-gray-500));word-break:break-all">{{ f.k }}</span>
+              <span style="{{ f.st }}" onClick="{{ f.onClick }}">{{ f.v }}</span>
+            </sc-for>
+          </div>
+          </sc-if>
+
+          <sc-if value="{{ insp.hasLinks }}" hint-placeholder-val="{{ false }}">
+            <div style="font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:rgb(var(--ndo-gray-500));margin-top:4px">{{ linksTitle }}</div>
+            <div style="display:flex;flex-direction:column;gap:4px">
+              <sc-for list="{{ insp.links }}" as="k" hint-placeholder-count="2">
+                <button onClick="{{ k.onClick }}" style="display:flex;gap:8px;align-items:center;text-align:left;border:1px solid rgb(var(--ndo-gray-200));background:#fff;border-radius:6px;padding:6px 10px;cursor:pointer;font-size:12px" style-hover="background:rgb(var(--ndo-gray-50))"><span style="font-family:var(--ndo-font-mono);color:rgb(var(--ndo-gray-400))">{{ k.dir }}</span><span style="font-family:var(--ndo-font-mono);color:rgb(var(--ndo-gray-500))">{{ k.field }}</span><span style="color:rgb(var(--ndo-gray-900));font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ k.title }}</span></button>
+              </sc-for>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ insp.hasHistory }}" hint-placeholder-val="{{ false }}">
+            <div style="font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:rgb(var(--ndo-gray-500));margin-top:4px">{{ historyTitle }}</div>
+            <sc-for list="{{ insp.history }}" as="u" hint-placeholder-count="2">
+              <div style="display:grid;grid-template-columns:60px minmax(0,1fr);gap:8px;font-size:12px;color:rgb(var(--ndo-gray-600))"><span style="font-family:var(--ndo-font-mono);color:rgb(var(--ndo-gray-400))">{{ u.time }}</span><span><span style="font-family:var(--ndo-font-mono)">{{ u.fn }}</span> · {{ u.text }}</span></div>
+            </sc-for>
+          </sc-if>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ hasActions }}" hint-placeholder-val="{{ false }}">
+        <div style="display:flex;flex-direction:column;gap:8px;border-top:1px solid rgb(var(--ndo-gray-100));padding-top:16px">
+          <div style="font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:rgb(var(--ndo-gray-500))">{{ actionsTitle }} {{ writerName }}</div>
+          <sc-for list="{{ actions }}" as="a" hint-placeholder-count="3">
+            <button onClick="{{ a.onClick }}" style="{{ a.st }}"><span style="font-size:14px;font-weight:500;color:rgb(var(--ndo-gray-900))">{{ a.label }}</span><span style="font-family:var(--ndo-font-mono);font-size:11px;color:rgb(var(--ndo-gray-500))">{{ a.call }}</span></button>
+          </sc-for>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ hasForm }}" hint-placeholder-val="{{ false }}">
+        <div style="display:flex;flex-direction:column;gap:12px;border:1px solid rgb(var(--ndo-gray-200));border-radius:12px;padding:16px;background:rgb(var(--ndo-gray-50))">
+          <div style="display:flex;flex-direction:column;gap:2px"><span style="font-size:16px;font-weight:600">{{ form.label }}</span><span style="font-family:var(--ndo-font-mono);font-size:11px;color:rgb(var(--ndo-gray-500))">{{ form.call }}</span></div>
+          <sc-for list="{{ form.fields }}" as="f" hint-placeholder-count="2">
+            <label style="display:flex;flex-direction:column;gap:4px;font-size:12px;font-weight:500;color:rgb(var(--ndo-gray-700))">
+              <span style="font-family:var(--ndo-font-mono)">{{ f.label }}</span>
+              <sc-if value="{{ f.isSelect }}" hint-placeholder-val="{{ false }}">
+                <select value="{{ f.value }}" onChange="{{ f.onChange }}" style="font-size:14px;padding:6px 8px;border:1px solid rgb(var(--ndo-gray-300));border-radius:6px;background:#fff;color:rgb(var(--ndo-gray-900))">
+                  <sc-for list="{{ f.options }}" as="o" hint-placeholder-count="2"><option value="{{ o.v }}">{{ o.l }}</option></sc-for>
+                </select>
+              </sc-if>
+              <sc-if value="{{ f.isInput }}" hint-placeholder-val="{{ true }}">
+                <input type="{{ f.inputType }}" value="{{ f.value }}" onChange="{{ f.onChange }}" style="font-size:14px;padding:6px 8px;border:1px solid rgb(var(--ndo-gray-300));border-radius:6px;background:#fff;color:rgb(var(--ndo-gray-900));outline:none" style-focus="border-color:rgb(var(--ndo-blue-600));box-shadow:0 0 0 3px rgb(var(--ndo-blue-600) / .12)">
+              </sc-if>
+            </label>
+          </sc-for>
+          <sc-if value="{{ hasErr }}" hint-placeholder-val="{{ false }}">
+            <div style="font-size:12px;line-height:1.5;color:rgb(var(--ndo-red-700));background:rgb(var(--ndo-red-50));border:1px solid rgb(var(--ndo-red-200));border-radius:6px;padding:8px 10px;font-family:var(--ndo-font-mono)">{{ err }}</div>
+          </sc-if>
+          <div style="display:flex;gap:8px;justify-content:flex-end">
+            <x-import component-from-global-scope="NondominiumDesignSystem_c29c2b.Button" variant="ghost" onClick="{{ cancelForm }}" hint-size="72px,32px">Cancel</x-import>
+            <x-import component-from-global-scope="NondominiumDesignSystem_c29c2b.Button" variant="primary" onClick="{{ submitForm }}" hint-size="72px,32px">Call</x-import>
+          </div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ hasOk }}" hint-placeholder-val="{{ false }}">
+        <div style="font-size:12px;line-height:1.5;color:rgb(var(--ndo-green-700));background:rgb(var(--ndo-green-50));border:1px solid rgb(var(--ndo-green-100));border-radius:6px;padding:8px 10px">✓ {{ ok }}</div>
+      </sc-if>
+    </aside>
+    </sc-if>
+  </div>
+
+  <div style="background:#fff;border-top:1px solid rgb(var(--ndo-gray-200))">
+    <div style="display:flex;align-items:center;gap:12px;padding:6px 16px;font-size:12px;color:rgb(var(--ndo-gray-500))">
+      <span style="font-weight:600;letter-spacing:.06em;text-transform:uppercase">{{ activityTitle }}</span><span>{{ logCount }}</span>
+      <span style="flex:1"></span>
+      <sc-for list="{{ conds }}" as="c" hint-placeholder-count="2">
+        <button onClick="{{ c.onClick }}" title="Toggle this conductor's network connection" style="display:flex;align-items:center;gap:6px;border:1px solid rgb(var(--ndo-gray-200));background:#fff;border-radius:6px;padding:2px 8px;font-size:12px;color:rgb(var(--ndo-gray-600));cursor:pointer;white-space:nowrap"><span style="{{ c.dotSt }}"></span>{{ c.label }} {{ c.port }} · {{ c.text }}</button>
+      </sc-for>
+      <a onClick="{{ toggleDock }}">{{ dockLabel }}</a>
+    </div>
+    <sc-if value="{{ dockOpen }}" hint-placeholder-val="{{ true }}">
+      <div style="height:120px;overflow:auto;border-top:1px solid rgb(var(--ndo-gray-100))">
+        <sc-for list="{{ log }}" as="r" hint-placeholder-count="4">
+          <div style="display:grid;grid-template-columns:22px minmax(0,1.3fr) minmax(0,1.6fr) 120px 64px 44px;gap:12px;align-items:center;padding:5px 16px;border-bottom:1px solid rgb(var(--ndo-gray-100));font-size:12px">
+            <span style="{{ r.asSt }}">{{ r.asInitial }}</span>
+            <span style="font-family:var(--ndo-font-mono);color:rgb(var(--ndo-gray-900));white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ r.call }}</span>
+            <span style="{{ r.detailSt }}">{{ r.detail }}</span>
+            <span style="font-family:var(--ndo-font-mono);color:rgb(var(--ndo-gray-400))">{{ r.hash }}</span>
+            <span style="font-family:var(--ndo-font-mono);color:rgb(var(--ndo-gray-400))">{{ r.time }}</span>
+            <span style="{{ r.statusSt }}">{{ r.status }}</span>
+          </div>
+        </sc-for>
+        <sc-if value="{{ logEmpty }}" hint-placeholder-val="{{ false }}">
+          <div style="padding:16px;font-size:12px;color:rgb(var(--ndo-gray-500));font-style:italic">No calls yet. Pick an entry and run a zome call.</div>
+        </sc-if>
+      </div>
+    </sc-if>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+const LW = 250, NW = 218, NH = 116, RH = 132, TOP = 20, HEAD = 44;
+const C = (t, a) => a == null ? `rgb(var(--ndo-${t}))` : `rgb(var(--ndo-${t}) / ${a})`;
+const LANE_COL = { group: 'sky-700', agent: 'gray-500', l0: 'blue-600', l1: 'violet-700', l2: 'green-700', plan: 'amber-600', event: 'teal-700', ppr: 'rose-700' };
+const AG_COL = { a: ['blue-100', 'blue-700'], b: ['amber-100', 'amber-800'] };
+const kebab = s => String(s).replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase();
+const short = h => h ? h.slice(0, 12) + '…' : '—';
+const hhmm = t => new Date(t).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+const dot = (col, sz = 8) => ({ width: sz, height: sz, borderRadius: '50%', background: C(col), flexShrink: 0, display: 'inline-block' });
+const agSt = a => ({ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: 18, height: 18, borderRadius: 4, fontSize: 11, fontWeight: 700, background: C((AG_COL[a] || ['gray-100'])[0]), color: C((AG_COL[a] || [0, 'gray-700'])[1]), flexShrink: 0 });
+const HIDE = new Set(['provider_person', 'receiver_person', 'custodian_person', 'person', 'event_hash_ui', 'owner', 'label', 'agent']);
+// Plain-language layer. Developer details (entry types, zome calls, hashes) appear only when "Developer details" is on.
+const F_TYPE = { GroupProfile: 'Group', NdoAnchor: 'Listed in group', Person: 'Person', PersonRole: 'Role', NondominiumIdentity: 'Shared resource', ResourceSpecification: 'Kind of item', GovernanceRule: 'Rule', EconomicResource: 'Item', Commitment: 'Promise', Claim: 'Promise kept', EconomicEvent: 'What happened', ValidationReceipt: 'Approval', PrivateParticipationClaim: 'Private receipt' };
+const F_LANE = { group: 'Groups', agent: 'People', l0: 'Shared resources', l1: 'Rules', l2: 'Items', plan: 'Promises', event: 'What happened', ppr: 'Receipts' };
+const human = s => String(s).replace(/([a-z])([A-Z])/g, '$1 $2').replace(/_/g, ' ').toLowerCase().replace(/^./, c => c.toUpperCase());
+const F_ACT = { TransferCustody: 'hand over', AccessForUse: 'lend for use', Use: 'use', Work: 'work on', Move: 'move', Modify: 'modify', Cite: 'cite', Transfer: 'transfer' };
+const F_FIELD = { name: 'Name', description: 'Description', property_regime: 'Ownership model', resource_nature: 'Type', 'anchor in group': 'Group', role_name: 'Role', new_stage: 'Next stage', successor_ndo_hash: 'Replaced by', group_hash: 'Group', RuleData: 'Kind of rule', accessibility: 'Who can access', required_role: 'Required role', max_duration_hours: 'Max hours', period_days: 'Per number of days', transfer_type: 'What is transferred', requires_validation: 'Needs approval', validator_role: 'Approved by role', interval_days: 'Every (days)', 'label (UI only)': 'Name', quantity: 'Quantity', unit: 'Unit', current_location: 'Location', approved: 'Approve', notes: 'Comment', new_operational_state: 'New status', new_custodian: 'Hand over to', action: 'What', provider: 'From', receiver: 'To', note: 'Note', resource_quantity: 'Quantity', fulfillment_note: 'Note' };
+const F_ERR = [[/NotCustodian|Only the current custodian/, 'Only the person currently holding this item can do that.'], [/NotAuthor|only the initiator/, 'Only the person who created this resource can change its stage.'], [/requires successor/, 'Pick the resource that replaces this one first.'], [/cannot validate their own/, 'You can\'t approve your own item. Ask someone else.'], [/already validated/, 'You have already approved this.'], [/already claimed/, 'This promise has already been kept.'], [/already a member/, 'You are already in this group.'], [/cannot be empty/, 'Please fill in the name.'], [/No Person profile/, 'Create a profile first.'], [/Only group members/, 'Join the group first.'], [/already assigned/, 'This person already has that role.']];
+const F_WORD = { Ideation: 'Idea', Specification: 'Being specified', Development: 'In development', Hibernating: 'Paused', Deprecated: 'Replaced', EndOfLife: 'Retired', Nondominium: 'Uncapturable', Collective: 'Co-owned', Pool: 'Shared pool', CommonPool: 'Common pool', Hybrid: 'Physical + digital', InTransit: 'On the move', InStorage: 'In storage', InMaintenance: 'Being repaired', InUse: 'In use', PendingValidation: 'Waiting for approval' };
+const friendlyErr = m => { const f = F_ERR.find(([r]) => r.test(m)); return f ? f[1] : m.replace(/^[a-z_]+: /, ''); };
+
+const PPR = { TransferCustody: ['CustodyTransfer', 'CustodyAcceptance'], Move: ['TransportFulfillmentCompleted', null], Work: ['MaintenanceFulfillmentCompleted', null], Modify: ['MaintenanceFulfillmentCompleted', null], Use: ['RuleCompliance', null], AccessForUse: ['RuleCompliance', 'RuleCompliance'] };
+
+class Component extends DCLogic {
+  state = { rev: 0, persp: 'network', writer: 'a', sel: null, act: null, vals: {}, err: null, ok: null, dock: false, showAgents: false, showStruct: true, dev: false, view: { x: 20, y: HEAD, k: 0.8 }, menu: false };
+  canvasRef = React.createRef();
+  g = {};
+
+  componentDidMount() {
+    try { const u = JSON.parse(localStorage.getItem('ndo-f-ui') || '{}'); if (u.persp) this.setState(u); } catch (e) {}
+    import(new URL('./ndo-backend.js', location.href).href).then(m => {
+      this.M = m; this.B = m.createBackend();
+      const ok = k => k === 'network' || m.CONDUCTORS[k];
+      if (!ok(this.state.persp)) this.setState({ persp: 'network' });
+      if (!m.CONDUCTORS[this.state.writer]) this.setState({ writer: 'a' });
+      this.unsub = this.B.subscribe(() => this.setState(s => ({ rev: s.rev + 1 })));
+      this.setState(s => ({ rev: s.rev + 1 }), () => setTimeout(() => this.fit(), 40));
+    });
+    const bind = () => {
+      const el = this.canvasRef.current; if (!el) return setTimeout(bind, 50);
+      this.wheel = (e) => {
+        e.preventDefault(); const b = el.getBoundingClientRect();
+        if (e.ctrlKey || e.metaKey) this.zoomAt(Math.exp(-Math.max(-50, Math.min(50, e.deltaY)) * 0.004), e.clientX - b.left, e.clientY - b.top);
+        else this.setState(s => ({ view: { ...s.view, x: s.view.x - e.deltaX, y: s.view.y - e.deltaY } }));
+      };
+      el.addEventListener('wheel', this.wheel, { passive: false });
+    };
+    bind();
+  }
+  componentWillUnmount() { this.unsub && this.unsub(); const el = this.canvasRef.current; el && this.wheel && el.removeEventListener('wheel', this.wheel); }
+
+  saveUi(p) { this.setState(p, () => { const { persp, writer, showAgents, showStruct, dock, dev } = this.state; try { localStorage.setItem('ndo-f-ui', JSON.stringify({ persp, writer, showAgents, showStruct, dock, dev })); } catch (e) {} }); }
+  writer() { return this.state.persp !== 'network' ? this.state.persp : this.state.writer; }
+  zoomAt(f, px, py) { this.setState(s => { const v = s.view; const k = Math.min(1.8, Math.max(0.3, v.k * f)); const r = k / v.k; return { view: { k, x: px - (px - v.x) * r, y: py - (py - v.y) * r } }; }); }
+  zoomC(f) { const el = this.canvasRef.current; if (el) this.zoomAt(f, el.clientWidth / 2, el.clientHeight / 2); }
+  fit() {
+    const el = this.canvasRef.current; if (!el || !this.B) return;
+    const { pos } = this.layout(); const ps = Object.values(pos); if (!ps.length) return;
+    const w = this.M.LANES.length * LW, h = Math.max(...ps.map(p => p.y)) + NH + 20;
+    const k = Math.min(1, Math.max(0.85, Math.min((el.clientWidth - 40) / w, (el.clientHeight - HEAD - 20) / h)));
+    this.setState({ view: { k, x: 20, y: HEAD } });
+  }
+  reveal(hash) {
+    const el = this.canvasRef.current; if (!el || !this.B) return; const p = this.layout().pos[hash]; if (!p) return;
+    const v = this.state.view, sx = v.x + p.x * v.k, sy = v.y + p.y * v.k, w = el.clientWidth, hh = el.clientHeight;
+    const inX = sx > 10 && sx + NW * v.k < w - 10, inY = sy > HEAD && sy + NH * v.k < hh - 10;
+    if (inX && inY) return;
+    this.setState({ view: { ...v, x: inX ? v.x : w * 0.35 - p.x * v.k, y: inY ? v.y : Math.min(HEAD, hh * 0.4 - p.y * v.k) } });
+  }
+  pick(hash) { this.setState({ sel: hash, act: null, err: null }, () => this.reveal(hash));
+  }
+
+  layout() {
+    const M = this.M, s = this.B.state, persp = this.state.persp;
+    const vis = s.order.map(h => s.entries[h]).filter(e => !M.TYPES[e.type].hidden && !(e.private && persp !== 'network' && e.data.owner !== persp));
+    const col = {}, pos = {};
+    vis.forEach(e => { const lane = M.TYPES[e.type].lane; const li = M.LANES.findIndex(l => l.id === lane); const i = col[lane] = (col[lane] || 0) + 1; pos[e.hash] = { x: li * LW + 16, y: TOP + (i - 1) * RH }; });
+    return { vis, pos };
+  }
+  aname(a) { return (this.M.CONDUCTORS[a] || {}).name || short(a); }
+  title(e) {
+    if (!this.state.dev) { const d = e.data, s = this.B.state, res = h => (s.entries[h] ? s.entries[h].data.label || this.M.TYPES[s.entries[h].type].title(s.entries[h].data) : 'an item');
+      if (e.type === 'Commitment') return this.aname(d.provider) + ' will ' + (F_ACT[d.action] || human(d.action)) + ' ' + res(d.resource_inventoried_as);
+      if (e.type === 'EconomicEvent') return this.aname(d.provider) + ' ' + ({ TransferCustody: 'handed over', AccessForUse: 'lent', Use: 'used', Work: 'worked on', Move: 'moved', Modify: 'modified', Cite: 'cited' }[d.action] || human(d.action)) + ' ' + res(d.resource_inventoried_as);
+      if (e.type === 'GovernanceRule') return human(d.rule_type);
+      if (e.type === 'ValidationReceipt') return (d.approved ? 'Approved by ' : 'Rejected by ') + this.aname(d.validator);
+      if (e.type === 'PrivateParticipationClaim') return human(d.claim_type);
+      if (e.type === 'Claim') return 'Promise kept';
+      if (e.type === 'NdoAnchor') return 'Listed: ' + d.name;
+      if (e.type === 'PersonRole') return ({ SimpleAgent: 'Member', AccountableAgent: 'Trusted member', PrimaryAccountableAgent: 'Steward' }[d.role_name] || d.role_name); }
+    const t = this.M.TYPES[e.type].title(e.data); return t || e.type;
+  }
+  badges(e) {
+    const d = e.data, B = this.B; const w = x => this.state.dev ? x : (F_WORD[x] || x);
+    switch (e.type) {
+      case 'NondominiumIdentity': return [{ variant: 'lifecycle-' + kebab(d.lifecycle_stage), label: w(d.lifecycle_stage) }, { variant: 'regime-' + kebab(d.property_regime), label: w(d.property_regime) }, { variant: 'nature-' + kebab(d.resource_nature), label: d.resource_nature }];
+      case 'NdoAnchor': return [{ variant: 'lifecycle-' + kebab(d.lifecycle_stage), label: w(d.lifecycle_stage) }];
+      case 'GovernanceRule': { const r = d.rule_data; const RL = { SimpleAgent: 'Member', AccountableAgent: 'Trusted member', PrimaryAccountableAgent: 'Steward' }; const role = x => RL[x] || x;
+        if (!this.state.dev) { const f = { AccessRequirement: () => ({ Free: 'Open to all', Credentialed: 'Needs role: ' + role(r.required_role || 'a role'), Gated: 'Needs approval' }[r.accessibility]), UsageLimit: () => [r.max_duration_hours ? 'Max ' + r.max_duration_hours + ' h' : null, r.period_days ? 'per ' + r.period_days + ' days' : null].filter(Boolean).join(' ') || 'Limited use', TransferCondition: () => (r.requires_validation ? 'Hand-over needs approval' : 'Free hand-over'), MaintenanceSchedule: () => 'Every ' + r.interval_days + ' days' + (r.required_role ? ' · ' + role(r.required_role) : '') }[r.type]; return [{ variant: 'rule-' + kebab(r.type), label: f() }]; }
+        const sum = { AccessRequirement: () => r.accessibility + (r.required_role ? ' · ' + r.required_role : ''), UsageLimit: () => (r.max_duration_hours || '—') + ' h / ' + (r.period_days || '—') + ' d', TransferCondition: () => r.transfer_type + (r.requires_validation ? ' · validated' : ''), MaintenanceSchedule: () => r.interval_days + ' d' + (r.required_role ? ' · ' + r.required_role : '') }[r.type]; return [{ variant: 'rule-' + kebab(r.type), label: sum() }]; }
+      case 'EconomicResource': return [{ variant: 'opstate-' + kebab(d.operational_state), label: w(d.operational_state) }];
+      case 'ResourceSpecification': return [{ variant: 'neutral', label: d.category }];
+      case 'Commitment': return [{ variant: B.claimsOf(e.hash).length ? 'lifecycle-active' : 'coming-soon', label: B.claimsOf(e.hash).length ? (this.state.dev ? 'claimed' : 'kept') : (this.state.dev ? 'open' : 'waiting') }];
+      case 'ValidationReceipt': return [{ variant: d.approved ? 'opstate-available' : 'lifecycle-end-of-life', label: d.approved ? 'approved' : 'rejected' }];
+      case 'PrivateParticipationClaim': return [{ variant: 'neutral', label: 'private' }];
+      case 'PersonRole': return this.state.dev ? [{ variant: 'scope-network', label: 'RoleType' }] : [];
+      default: return [];
+    }
+  }
+  sub(e) {
+    const d = e.data, B = this.B, s = B.state, t = h => s.entries[h] ? this.title(s.entries[h]) : '—';
+    switch (e.type) {
+      case 'GroupProfile': return B.membersOf(e.hash).length + ' members';
+      case 'NdoAnchor': return 'anchors ' + d.name;
+      case 'Person': return B.rolesOf(d.agent).map(r => this.state.dev ? r : ({ SimpleAgent: 'Member', AccountableAgent: 'Trusted member', PrimaryAccountableAgent: 'Steward' }[r] || r)).join(', ') || 'no roles';
+      case 'PersonRole': return '→ ' + this.aname(d.assigned_to);
+      case 'NondominiumIdentity': return 'initiator ' + this.aname(d.initiator);
+      case 'ResourceSpecification': return 'of ' + t(d.ndo_identity_hash);
+      case 'GovernanceRule': return d.specification_hash ? 'on ' + t(d.specification_hash) : 'on ' + t(d.ndo_identity_hash);
+      case 'EconomicResource': return d.quantity + ' ' + d.unit + ' · custodian ' + this.aname(d.custodian);
+      case 'Commitment': case 'EconomicEvent': return this.aname(d.provider) + ' → ' + this.aname(d.receiver) + ' · ' + (s.entries[d.resource_inventoried_as] ? s.entries[d.resource_inventoried_as].data.label : '—');
+      case 'Claim': return 'claims ' + t(d.fulfills);
+      case 'ValidationReceipt': return 'of ' + t(d.validated_item);
+      case 'PrivateParticipationClaim': return 'on ' + this.aname(d.owner) + "'s chain · with " + this.aname(d.counterparty);
+      default: return '';
+    }
+  }
+
+  actionsFor(e) {
+    const B = this.B, M = this.M, s = B.state, w = this.writer(), E = M.ENUMS, ag = Object.keys(M.CONDUCTORS);
+    const opt = a => a.map(x => [x, x]); const agOpt = a => a.map(x => [x, this.aname(x)]);
+    const all = t => s.order.map(h => s.entries[h]).filter(x => x.type === t);
+    const roleOpt = [['', '— none'], ...opt(E.RoleType)];
+    const ruleFields = v => { const t = v.rule_type || 'AccessRequirement'; const f = [['rule_type', 'RuleData', 'select', opt(E.GovernanceRuleType), 'AccessRequirement']];
+      if (t === 'AccessRequirement') f.push(['accessibility', 'accessibility', 'select', opt(E.Accessibility), 'Credentialed'], ['required_role', 'required_role', 'select', roleOpt, 'AccountableAgent']);
+      if (t === 'UsageLimit') f.push(['max_duration_hours', 'max_duration_hours', 'number', null, '40'], ['period_days', 'period_days', 'number', null, '7']);
+      if (t === 'TransferCondition') f.push(['transfer_type', 'transfer_type', 'select', opt(E.TransferType), 'Custody'], ['requires_validation', 'requires_validation', 'select', [['true', 'true'], ['false', 'false']], 'true'], ['validator_role', 'validator_role', 'select', roleOpt, '']);
+      if (t === 'MaintenanceSchedule') f.push(['interval_days', 'interval_days', 'number', null, '90'], ['required_role', 'required_role', 'select', roleOpt, 'Repair']);
+      return f; };
+    const ruleData = v => { const t = v.rule_type; if (t === 'AccessRequirement') return { type: t, accessibility: v.accessibility, required_role: v.required_role || null, min_affiliation: null }; if (t === 'UsageLimit') return { type: t, max_duration_hours: +v.max_duration_hours || null, max_quantity_per_period: null, period_days: +v.period_days || null }; if (t === 'TransferCondition') return { type: t, transfer_type: v.transfer_type, requires_validation: v.requires_validation === 'true', validator_role: v.validator_role || null }; return { type: t, interval_days: +v.interval_days, required_role: v.required_role || null }; };
+    const pprs = (c, ev, d, fulfills) => { const [pc, rc] = PPR[d.action] || ['RuleCompliance', null]; c('zome_gouvernance', 'issue_participation_receipts', { fulfills, fulfilled_by: ev, provider: d.provider, receiver: d.receiver, provider_claim_type: pc, receiver_claim_type: rc }); };
+    if (!e) return [
+      { id: 'person', label: 'Create person', call: 'zome_person::create_person', fields: () => [['name', 'name', 'text', null, '']], run: (v, c) => c('zome_person', 'create_person', { name: v.name }) },
+      { id: 'group', label: 'Create group', call: 'zome_group::create_group', fields: () => [['name', 'name', 'text', null, ''], ['description', 'description', 'text', null, '']], run: (v, c) => c('zome_group', 'create_group', { name: v.name, description: v.description }) },
+      { id: 'ndo', label: 'Create a shared resource', call: 'zome_resource::create_ndo → zome_group::create_ndo_anchor', fields: () => [['name', 'name', 'text', null, ''], ['description', 'description', 'text', null, ''], ['property_regime', 'property_regime', 'select', opt(E.PropertyRegime), 'Nondominium'], ['resource_nature', 'resource_nature', 'select', opt(E.ResourceNature), 'Physical'], ['group', 'anchor in group', 'select', [['', '— none'], ...all('GroupProfile').filter(g => B.membersOf(g.hash).includes(w)).map(g => [g.hash, g.data.name])], '']],
+        run: (v, c) => { const n = c('zome_resource', 'create_ndo', { name: v.name, description: v.description, property_regime: v.property_regime, resource_nature: v.resource_nature, lifecycle_stage: 'Ideation' }); if (v.group) c('zome_group', 'create_ndo_anchor', { group_hash: v.group, identity_action_hash: n }); return n; } },
+    ];
+    const d = e.data;
+    switch (e.type) {
+      case 'Person': return [{ id: 'role', label: 'Assign role to ' + d.name, call: 'zome_person::assign_person_role', fields: () => [['role_name', 'role_name', 'select', opt(E.RoleType), 'Transport']], run: (v, c) => c('zome_person', 'assign_person_role', { role_name: v.role_name, assigned_to: d.agent }) }];
+      case 'GroupProfile': return [{ id: 'join', label: 'Join group', call: 'zome_group::join_group', fields: () => [], run: (v, c) => { c('zome_group', 'join_group', { group_hash: e.hash }); return e.hash; } }];
+      case 'NondominiumIdentity': return [
+        { id: 'stage', label: 'Change stage', call: 'zome_resource::update_lifecycle_stage', fields: v => { const f = [['new_stage', 'new_stage', 'select', opt(M.allowedTransitions(d)), M.allowedTransitions(d)[0] || '']]; if ((v.new_stage || M.allowedTransitions(d)[0]) === 'Deprecated') f.push(['successor_ndo_hash', 'successor_ndo_hash', 'select', [['', '— required'], ...all('NondominiumIdentity').filter(x => x.hash !== e.hash).map(x => [x.hash, x.data.name])], '']); return f; },
+          run: (v, c) => { c('zome_resource', 'update_lifecycle_stage', { original_action_hash: e.hash, new_stage: v.new_stage, successor_ndo_hash: v.successor_ndo_hash || null, transition_event_hash: null }); return e.hash; } },
+        { id: 'spec', label: 'Add a kind of item', call: 'zome_resource::create_resource_specification', fields: () => [['name', 'name', 'text', null, ''], ['description', 'description', 'text', null, '']], run: (v, c) => c('zome_resource', 'create_resource_specification', { name: v.name, description: v.description, ndo_identity_hash: e.hash }) },
+        { id: 'rule', label: 'Add governance rule', call: 'zome_resource::create_governance_rule', fields: ruleFields, run: (v, c) => c('zome_resource', 'create_governance_rule', { ndo_identity_hash: e.hash, rule_data: ruleData(v) }) },
+        { id: 'anchor', label: 'List in a group', call: 'zome_group::create_ndo_anchor', fields: () => [['group', 'group_hash', 'select', all('GroupProfile').map(g => [g.hash, g.data.name]), (all('GroupProfile')[0] || {}).hash]], run: (v, c) => c('zome_group', 'create_ndo_anchor', { group_hash: v.group, identity_action_hash: e.hash }) },
+      ];
+      case 'ResourceSpecification': return [
+        { id: 'res', label: 'Add an item', call: 'zome_resource::create_economic_resource', fields: () => [['label', 'label (UI only)', 'text', null, d.name], ['quantity', 'quantity', 'number', null, '1'], ['unit', 'unit', 'text', null, 'unit'], ['current_location', 'current_location', 'text', null, '']], run: (v, c) => c('zome_resource', 'create_economic_resource', { spec_hash: e.hash, label: v.label, quantity: +v.quantity, unit: v.unit, current_location: v.current_location }) },
+        { id: 'rule', label: 'Add governance rule', call: 'zome_resource::create_governance_rule', fields: ruleFields, run: (v, c) => c('zome_resource', 'create_governance_rule', { ndo_identity_hash: d.ndo_identity_hash, specification_hash: e.hash, rule_data: ruleData(v) }) },
+      ];
+      case 'EconomicResource': return [
+        { id: 'val', label: 'Approve this item', call: 'zome_gouvernance::create_validation_receipt', fields: () => [['approved', 'approved', 'select', [['true', 'true'], ['false', 'false']], 'true'], ['notes', 'notes', 'text', null, '']], run: (v, c) => c('zome_gouvernance', 'create_validation_receipt', { validated_item: e.hash, validation_type: 'resource_approval', approved: v.approved === 'true', notes: v.notes }) },
+        { id: 'op', label: 'Change status', call: 'zome_resource::update_operational_state', fields: () => [['state', 'new_operational_state', 'select', opt(E.OperationalState.filter(x => x !== d.operational_state)), E.OperationalState.find(x => x !== d.operational_state)]], run: (v, c) => { c('zome_resource', 'update_operational_state', { resource_hash: e.hash, new_operational_state: v.state }); return e.hash; } },
+        { id: 'cust', label: 'Transfer custody', call: 'transfer_custody → log_economic_event → issue_participation_receipts', fields: () => [['to', 'new_custodian', 'select', agOpt(ag.filter(a => a !== d.custodian)), ag.find(a => a !== d.custodian)]],
+          run: (v, c) => { const from = d.custodian; c('zome_resource', 'transfer_custody', { resource_hash: e.hash, new_custodian: v.to, request_contact_info: false }); const ev = c('zome_gouvernance', 'log_economic_event', { action: 'TransferCustody', provider: from, receiver: v.to, resource_inventoried_as: e.hash }); pprs(c, ev, { action: 'TransferCustody', provider: from, receiver: v.to }, null); return ev; } },
+        { id: 'commit', label: 'Make a promise', call: 'zome_gouvernance::propose_commitment', fields: () => [['action', 'action', 'select', opt(['TransferCustody', 'Use', 'Work', 'Move', 'AccessForUse']), 'Use'], ['provider', 'provider', 'select', agOpt(ag), d.custodian], ['note', 'note', 'text', null, '']], run: (v, c) => c('zome_gouvernance', 'propose_commitment', { action: v.action, resource_hash: e.hash, provider: v.provider, note: v.note, ndo_identity_hash: d.ndo_identity_hash }) },
+        { id: 'event', label: 'Record what happened', call: 'zome_gouvernance::log_economic_event', fields: () => [['action', 'action', 'select', opt(['Use', 'Work', 'Modify', 'Move', 'Cite']), 'Use'], ['provider', 'provider', 'select', agOpt(ag), w], ['receiver', 'receiver', 'select', agOpt(ag), d.custodian], ['qty', 'resource_quantity', 'number', null, String(d.quantity)], ['note', 'note', 'text', null, '']], run: (v, c) => c('zome_gouvernance', 'log_economic_event', { action: v.action, provider: v.provider, receiver: v.receiver, resource_inventoried_as: e.hash, resource_quantity: +v.qty, note: v.note }) },
+      ];
+      case 'Commitment': return B.claimsOf(e.hash).length ? [] : [
+        { id: 'val', label: 'Approve this promise', call: 'zome_gouvernance::create_validation_receipt', fields: () => [['approved', 'approved', 'select', [['true', 'true'], ['false', 'false']], 'true'], ['notes', 'notes', 'text', null, '']], run: (v, c) => c('zome_gouvernance', 'create_validation_receipt', { validated_item: e.hash, validation_type: 'commitment_approval', approved: v.approved === 'true', notes: v.notes }) },
+        { id: 'fulfil', label: 'Keep this promise', call: (d.action === 'TransferCustody' ? 'transfer_custody → ' : '') + 'log_economic_event → claim_commitment → issue_participation_receipts', fields: () => [['note', 'fulfillment_note', 'text', null, '']],
+          run: (v, c) => { if (!d.resource_inventoried_as) throw new Error('Commitment has no resource_inventoried_as'); if (d.action === 'TransferCustody') c('zome_resource', 'transfer_custody', { resource_hash: d.resource_inventoried_as, new_custodian: d.receiver, request_contact_info: false }); const ev = c('zome_gouvernance', 'log_economic_event', { action: d.action, provider: d.provider, receiver: d.receiver, resource_inventoried_as: d.resource_inventoried_as, note: v.note }); c('zome_gouvernance', 'claim_commitment', { commitment_hash: e.hash, fulfillment_note: v.note }); pprs(c, ev, d, e.hash); return ev; } },
+      ];
+      case 'EconomicEvent': return [{ id: 'val', label: 'Confirm what happened', call: 'zome_gouvernance::create_validation_receipt', fields: () => [['approved', 'approved', 'select', [['true', 'true'], ['false', 'false']], 'true']], run: (v, c) => c('zome_gouvernance', 'create_validation_receipt', { validated_item: e.hash, validation_type: 'process_validation', approved: v.approved === 'true' }) }];
+      default: return [];
+    }
+  }
+  fieldsOf(a, vals) { const f1 = a.fields(vals); const def = Object.fromEntries(f1.map(f => [f[0], f[4] ?? ''])); const v = { ...def, ...vals }; const f2 = a.fields(v); const def2 = Object.fromEntries(f2.map(f => [f[0], f[4] ?? ''])); return { fields: f2, v: { ...def2, ...vals } }; }
+  currentAction() { if (!this.state.act) return null; const e = this.state.sel && this.B.state.entries[this.state.sel]; return (this.actionsFor(e) || []).find(x => x.id === this.state.act.id) || (this.state.act.root ? this.actionsFor(null).find(x => x.id === this.state.act.id) : null); }
+  submit() {
+    const a = this.currentAction(); if (!a) return; const { v } = this.fieldsOf(a, this.state.vals); const w = this.writer(); const done = [];
+    const c = (z, f, i) => { const r = this.B.call(z, f, i, w); if (!r.ok) throw new Error(f + ': ' + r.error + (done.length ? '  (already committed: ' + done.join(', ') + ')' : '')); done.push(f); return r.value; };
+    try { const out = a.run(v, c); const nh = Array.isArray(out) ? out[0] : out; this.setState({ act: null, vals: {}, err: null, ok: this.state.dev ? done.length + ' zome call' + (done.length > 1 ? 's' : '') + ' · ' + done.join(' → ') : 'Done. ' + (done.length > 1 ? done.length + ' steps saved and shared.' : 'Saved and shared.'), sel: nh && this.B.state.entries[nh] ? nh : this.state.sel }, () => this.state.sel && this.reveal(this.state.sel)); }
+    catch (e) { this.setState({ err: e.message }); }
+  }
+
+  edgePath(a, b) {
+    const ay = a.y + NH / 2, by = b.y + NH / 2;
+    if (Math.abs(a.x - b.x) < 10) { const x = a.x + NW, m = x + 28 + Math.abs(by - ay) * 0.08; return { d: `M${x} ${ay} C${m} ${ay} ${m} ${by} ${x} ${by}`, mx: m - 6, my: (ay + by) / 2 }; }
+    const [x1, x2] = b.x > a.x ? [a.x + NW, b.x] : [a.x, b.x + NW]; const dx = Math.max(40, Math.abs(x2 - x1) / 2) * (x2 > x1 ? 1 : -1);
+    return { d: `M${x1} ${ay} C${x1 + dx} ${ay} ${x2 - dx} ${by} ${x2} ${by}`, mx: (x1 + x2) / 2, my: (ay + by) / 2 };
+  }
+
+  renderVals() {
+    const st = this.state, go = p => this.saveUi(p);
+    const base = {
+      canvasRef: this.canvasRef, loading: !this.B, menuOpen: st.menu, toggleMenu: () => this.setState({ menu: !st.menu }),
+      zoomIn: () => this.zoomC(1.2), zoomOut: () => this.zoomC(1 / 1.2), fit: () => this.fit(), zoomPct: Math.round(st.view.k * 100) + '%',
+      toggleAgents: () => go({ showAgents: !st.showAgents }), toggleStruct: () => go({ showStruct: !st.showStruct }),
+      agentsBtnSt: this.lkSt(st.showAgents), structBtnSt: this.lkSt(st.showStruct),
+      sideOpen: !st.sideClosed, sideClosed: !!st.sideClosed, toggleSide: () => this.setState({ sideClosed: !st.sideClosed }, () => setTimeout(() => this.fit(), 30)), sideLabel: st.sel ? 'Details' : 'Guide',
+      toggleDev: () => go({ dev: !st.dev }), devLabel: st.dev ? 'Developer details: on' : 'Developer details: off', devBtnSt: { border: '1px solid ' + (st.dev ? C('blue-600') : C('gray-200')), background: st.dev ? C('blue-50') : '#fff', color: st.dev ? C('blue-700') : C('gray-600'), borderRadius: 6, padding: '4px 10px', fontSize: 12, cursor: 'pointer', whiteSpace: 'nowrap', flexShrink: 0 },
+      isDev: st.dev, activityTitle: st.dev ? 'Conductor calls' : 'Activity', actionsTitle: st.dev ? 'Zome calls as' : 'What you can do as', entryTitle: st.dev ? 'Entry' : 'Details', linksTitle: st.dev ? 'Linked entries' : 'Connected to', historyTitle: st.dev ? 'Update chain' : 'History',
+      toggleDock: () => go({ dock: !st.dock }), dockOpen: st.dock, dockLabel: st.dock ? 'Hide activity' : 'Show activity',
+      canvasSt: { position: 'relative', flex: 1, minWidth: 0, overflow: 'hidden', cursor: 'grab', touchAction: 'none', userSelect: 'none', overscrollBehavior: 'none', backgroundColor: C('gray-100'), backgroundImage: `radial-gradient(${C('gray-300')} 1px, transparent 1px)`, backgroundSize: `${20 * st.view.k}px ${20 * st.view.k}px`, backgroundPosition: `${st.view.x}px ${st.view.y}px` },
+      innerSt: { position: 'absolute', left: 0, top: 0, transformOrigin: '0 0', transform: `translate(${st.view.x}px, ${st.view.y}px) scale(${st.view.k})` },
+      onDown: e => { if (e.button !== 0 || e.target.closest('[data-node]')) return; this.g = { sx: e.clientX, sy: e.clientY, ox: st.view.x, oy: st.view.y, on: true, moved: false }; try { e.currentTarget.setPointerCapture(e.pointerId); } catch (_) {} },
+      onMove: e => { const g = this.g; if (!g.on) return; const dx = e.clientX - g.sx, dy = e.clientY - g.sy; if (!g.moved && Math.hypot(dx, dy) < 4) return; g.moved = true; this.setState(s => ({ view: { ...s.view, x: g.ox + dx, y: g.oy + dy } })); },
+      onUp: () => { const g = this.g; if (g.on && !g.moved) this.setState({ sel: null, act: null, err: null }); this.g = {}; },
+      reset: () => { if (this.B) { this.B.reset(); this.setState({ sel: null, act: null, ok: null, err: null }); } },
+    };
+    if (!this.B) return { ...base, persps: [], writers: [], conds: [], lanes: [], laneHeads: [], scenarios: [], scTitle: '', scSummary: '', scStory: '', scAgents: '', nodes: [], edgesEl: null, showGuide: true, tries: [], hasSel: false, hasActions: false, hasForm: false, hasOk: false, log: [], logCount: '', logEmpty: false, rootActions: [], isNetwork: true, perspTitle: '', writerName: '', hasRep: false, rep: [] };
+    const M = this.M, B = this.B, s = B.state, w = this.writer(), persp = st.persp;
+    const { vis, pos } = this.layout();
+    const sel = st.sel && pos[st.sel] ? s.entries[st.sel] : null;
+
+    // edges
+    const edges = [], linked = new Set(sel ? [sel.hash] : []);
+    for (const e of vis) for (const [f, cat] of M.TYPES[e.type].refs) { const t = e.data[f]; if (!t || !pos[t]) continue; const touch = sel && (e.hash === sel.hash || t === sel.hash); if (touch) { linked.add(e.hash); linked.add(t); } if (cat === 'flow' || touch || (cat === 'agents' && st.showAgents) || (cat === 'structure' && st.showStruct)) edges.push({ from: t, to: e.hash, f, cat, touch }); }
+    const h = React.createElement;
+    const maxY = Math.max(420, ...Object.values(pos).map(p => p.y + NH + 40));
+    const edgesEl = h('svg', { width: M.LANES.length * LW, height: maxY, style: { position: 'absolute', left: 0, top: 0, overflow: 'visible', pointerEvents: 'none' } },
+      h('defs', null, h('marker', { id: 'f-arr', viewBox: '0 0 10 10', refX: 9, refY: 5, markerWidth: 6, markerHeight: 6, orient: 'auto-start-reverse' }, h('path', { d: 'M0 0 L10 5 L0 10 z', fill: C('gray-400') }))),
+      edges.map(ed => { const a = pos[ed.from], b = pos[ed.to]; const p = this.edgePath(a, b); const pend = persp !== 'network' && (!s.entries[ed.from].held[persp] || !s.entries[ed.to].held[persp]);
+        const col = ed.touch ? C('blue-600') : ed.cat === 'flow' ? C('gray-500') : ed.cat === 'agents' ? C('violet-700') : C('blue-600', 0.6);
+        return h('g', { key: ed.from + ed.f + ed.to, opacity: pend ? 0.35 : sel && !ed.touch ? 0.18 : ed.cat === 'flow' ? 0.8 : 0.55 },
+          h('path', { d: p.d, fill: 'none', stroke: col, strokeWidth: ed.touch ? 2 : ed.cat === 'flow' ? 1.5 : 1, strokeDasharray: ed.cat === 'agents' ? '5 4' : ed.cat === 'structure' ? '2 4' : null, markerEnd: 'url(#f-arr)' }),
+          (ed.touch || (ed.cat === 'flow' && !sel)) && h('text', { x: p.mx, y: p.my - 6, textAnchor: 'middle', style: { fontSize: 11, fontFamily: 'var(--ndo-font-mono)', fill: ed.touch ? C('blue-700') : C('gray-500'), paintOrder: 'stroke', stroke: C('gray-100'), strokeWidth: 4, strokeLinejoin: 'round' } }, ed.f)); }));
+
+    const lanes = M.LANES.map((l, i) => ({ st: { position: 'absolute', left: i * LW, top: -8, width: LW - 8, height: maxY + 8, borderRadius: 8, background: i % 2 ? 'rgb(255 255 255 / .45)' : 'transparent' } }));
+    const counts = {}; vis.forEach(e => { const ln = M.TYPES[e.type].lane; counts[ln] = (counts[ln] || 0) + 1; });
+    const laneHeads = M.LANES.map((l, i) => ({ label: st.dev ? l.label : F_LANE[l.id], n: String(counts[l.id] || 0), dotSt: dot(LANE_COL[l.id]), onClick: () => { const el = this.canvasRef.current; if (el) this.setState(x => ({ view: { ...x.view, x: 20 - i * LW * x.view.k } })); },
+      st: { position: 'absolute', top: 0, height: HEAD, left: st.view.x + i * LW * st.view.k, width: Math.max(40, (LW - 8) * st.view.k), boxSizing: 'border-box', padding: '0 10px', display: 'flex', alignItems: 'center', gap: 6, border: 0, background: 'transparent', cursor: 'pointer', fontSize: 11, fontWeight: 600, letterSpacing: '.06em', textTransform: 'uppercase', color: C('gray-600'), whiteSpace: 'nowrap', overflow: 'hidden', textAlign: 'left' } }));
+    const nodes = vis.map(e => { const p = pos[e.hash]; const lane = M.TYPES[e.type].lane; const pending = persp !== 'network' ? !e.held[persp] : Object.values(e.held).some(x => x === false); const on = sel && sel.hash === e.hash; const dim = sel && !linked.has(e.hash);
+      const flag = pending ? (st.dev ? (persp !== 'network' ? 'arriving…' : 'gossiping') : 'syncing…') : e.private ? 'private' : e.updates.length ? (st.dev ? 'v' + (e.updates.length + 1) : 'updated') : '';
+      return { onClick: () => this.setState({ sel: e.hash, act: null, err: null, ok: null, menu: false, sideClosed: false }), typeLabel: st.dev ? e.type : F_TYPE[e.type], title: this.title(e), badges: this.badges(e).slice(0, 2), sub: this.sub(e), authorInitial: this.aname(e.author)[0], authorSt: agSt(e.author), dotSt: dot(LANE_COL[lane], 7),
+        flag, flagSt: { marginLeft: 'auto', textTransform: 'none', letterSpacing: 0, fontWeight: 500, fontFamily: 'var(--ndo-font-mono)', color: pending ? C('amber-700') : C('gray-400') },
+        st: { position: 'absolute', left: p.x, top: p.y, width: NW, height: NH, overflow: 'hidden', boxSizing: 'border-box', padding: '10px 12px', borderRadius: 8, cursor: 'pointer', background: pending ? 'rgb(255 255 255 / .5)' : '#fff', border: pending ? `1px dashed ${C('gray-300')}` : `1px solid ${C('gray-200')}`, boxShadow: on ? `0 0 0 2px ${C('blue-600')}` : '0 1px 2px rgb(0 0 0 / .05)', opacity: dim ? 0.35 : pending ? 0.7 : 1, transition: 'opacity 150ms ease, box-shadow 150ms ease' } }; });
+
+    const persps = [['network', 'Whole network', '', null], ...Object.entries(M.CONDUCTORS).map(([k, c]) => [k, c.name, ':' + c.port, k])].map(([k, l, sub, a]) => ({ label: l, sub, onClick: () => go({ persp: k, sel: null, act: null }), dotSt: a ? { ...dot(s.online[a] ? 'green-700' : 'amber-600', 7) } : { display: 'none' },
+      st: { display: 'flex', alignItems: 'center', gap: 6, border: 0, borderRadius: 4, padding: '5px 10px', fontSize: 12, fontWeight: 500, cursor: 'pointer', whiteSpace: 'nowrap', background: persp === k ? '#fff' : 'transparent', color: persp === k ? C('gray-900') : C('gray-600'), boxShadow: persp === k ? '0 1px 2px rgb(0 0 0 / .06)' : 'none' } }));
+    const writers = Object.keys(M.CONDUCTORS).map(a => ({ label: this.aname(a), onClick: () => go({ writer: a, act: null }), st: { ...agSt(a), width: 'auto', padding: '2px 8px', height: 22, border: 0, cursor: 'pointer', opacity: st.writer === a ? 1 : 0.45, outline: st.writer === a ? `2px solid ${C((AG_COL[a] || [0, 'gray-700'])[1])}` : 'none', outlineOffset: 1 } }));
+    const conds = Object.keys(M.CONDUCTORS).map(a => ({ label: this.aname(a), text: s.online[a] ? 'online' : 'offline', port: ':' + M.CONDUCTORS[a].port, dotSt: dot(s.online[a] ? 'green-700' : 'amber-600', 7), onClick: () => B.setOnline(a, !s.online[a]) }));
+    const rootActions = this.actionsFor(null).map(a => ({ label: a.label, call: st.dev ? a.call : '', onClick: () => this.setState({ menu: false, sel: null, act: { id: a.id, root: true }, vals: {}, err: null, ok: null }) }));
+
+    // inspector
+    let insp = {}, actions = [];
+    if (sel) {
+      const d = sel.data;
+      const fmt = (k, v) => { if (v == null || v === '') return ['—', null]; if (typeof v === 'string' && s.entries[v]) return [short(v) + ' · ' + this.title(s.entries[v]), v]; if (M.CONDUCTORS[v]) return [M.CONDUCTORS[v].name + ' · ' + M.CONDUCTORS[v].pubkey.slice(0, 10) + '…', null]; if (typeof v === 'number' && /(_at|_time|due_date)$/.test(k)) return [new Date(v).toLocaleString(), null]; if (typeof v === 'object') return [JSON.stringify(v), null]; return [String(v), null]; };
+      const fields = Object.entries(d).filter(([k]) => !HIDE.has(k)).map(([k, v]) => { const [txt, link] = fmt(k, v); return { k, v: txt, onClick: link ? () => this.pick(link) : null, st: { color: link ? C('blue-600') : C('gray-900'), cursor: link ? 'pointer' : 'default', fontFamily: /hash|_as|conforms|fulfil|validated_item|signature/.test(k) ? 'var(--ndo-font-mono)' : 'inherit', wordBreak: 'break-word' } }; });
+      const links = [];
+      for (const [f] of M.TYPES[sel.type].refs) { const t = d[f]; if (t && s.entries[t] && !HIDE.has(f)) links.push({ dir: '→', field: st.dev ? f : '', title: (st.dev ? s.entries[t].type : F_TYPE[s.entries[t].type]) + ' · ' + this.title(s.entries[t]), onClick: () => this.pick(t) }); }
+      for (const e of vis) for (const [f] of M.TYPES[e.type].refs) if (e.data[f] === sel.hash && !HIDE.has(f)) links.push({ dir: '←', field: st.dev ? f : '', title: (st.dev ? e.type : F_TYPE[e.type]) + ' · ' + this.title(e), onClick: () => this.pick(e.hash) });
+      const notes = [];
+      if (sel.type === 'Claim') notes.push({ text: 'Backend gap: claim_commitment sets fulfilled_by to the commitment hash, not the EconomicEvent (TODO in commitment.rs). The event is linked through the PPRs instead.' });
+      if (sel.type === 'EconomicEvent' && d.action === 'TransferCustody') notes.push({ text: 'transfer_custody does not log this event itself. The UI calls log_economic_event right after it.' });
+      if (sel.private) notes.push({ text: 'Private entry. It stays on ' + this.aname(sel.author) + "'s source chain and never gossips." });
+      if (sel.type === 'NondominiumIdentity') notes.push({ text: 'Only the initiator (' + this.aname(d.initiator) + ') may call update_lifecycle_stage in the MVP.' });
+      if (!st.dev) { notes.length = 0; if (sel.private) notes.push({ text: 'Only ' + this.aname(sel.author) + ' can see this receipt. It is never shared.' }); if (sel.type === 'NondominiumIdentity') notes.push({ text: 'Only ' + this.aname(d.initiator) + ', who created it, can change its stage.' }); }
+      insp = { type: st.dev ? sel.type : F_TYPE[sel.type], title: this.title(sel), summary: this.sub(sel), dotSt: dot(LANE_COL[M.TYPES[sel.type].lane]), badges: this.badges(sel), hash: sel.hash, call: sel.zome + '::' + sel.fn, author: this.aname(sel.author), time: hhmm(sel.ts), fields, links, hasLinks: links.length > 0, notes,
+        held: Object.keys(M.CONDUCTORS).map(a => { const hv = sel.held[a]; const own = sel.author === a; const txt = !st.dev ? (own ? 'Created by ' + this.aname(a) : sel.private ? 'Hidden from ' + this.aname(a) : hv ? this.aname(a) + ' has it' : this.aname(a) + ' will get it soon') : own ? 'on ' + this.aname(a) + "'s chain" : sel.private ? 'not shared with ' + this.aname(a) : hv ? 'held by ' + this.aname(a) : 'not yet at ' + this.aname(a); return { text: txt, st: { fontSize: 12, whiteSpace: 'nowrap', padding: '2px 8px', borderRadius: 12, background: own || hv ? C('green-50') : C('gray-100'), color: own || hv ? C('green-700') : C('gray-500'), border: `1px ${own || hv ? 'solid' : 'dashed'} ${own || hv ? C('green-100') : C('gray-300')}` } }; }),
+        history: sel.updates.map(u => ({ time: hhmm(u.ts).slice(0, 5), fn: u.fn, text: Object.keys(u.patch).filter(k => !HIDE.has(k)).map(k => k + ': ' + (u.before[k] == null ? '—' : typeof u.before[k] === 'string' && s.entries[u.before[k]] ? short(u.before[k]) : M.CONDUCTORS[u.before[k]] ? this.aname(u.before[k]) : u.before[k]) + ' → ' + (M.CONDUCTORS[u.patch[k]] ? this.aname(u.patch[k]) : typeof u.patch[k] === 'string' && s.entries[u.patch[k]] ? short(u.patch[k]) : u.patch[k])).join(', ') + ' · ' + this.aname(u.author) })) };
+      insp.hasHistory = insp.history.length > 0;
+      actions = this.actionsFor(sel).map(a => ({ label: a.label, call: st.dev ? a.call : '', onClick: () => this.setState({ act: { id: a.id }, vals: {}, err: null, ok: null }), st: { display: 'flex', flexDirection: 'column', gap: 2, textAlign: 'left', border: `1px solid ${st.act && st.act.id === a.id ? C('blue-600') : C('gray-200')}`, background: st.act && st.act.id === a.id ? C('blue-50') : '#fff', borderRadius: 6, padding: '8px 10px', cursor: 'pointer' } }));
+    }
+    const ca = this.currentAction(); let form = null;
+    if (ca) { const { fields, v } = this.fieldsOf(ca, st.vals); form = { label: ca.label, call: st.dev ? ca.call : '', fields: fields.map(([k, l, t, o]) => ({ label: st.dev ? l : (F_FIELD[l] || human(l)), isSelect: t === 'select', isInput: t !== 'select', inputType: t === 'number' ? 'number' : 'text', value: v[k] ?? '', options: (o || []).map(([ov, ol]) => ({ v: ov, l: st.dev || ov !== ol ? ol : human(ol) })), onChange: ev => { const val = ev.target.value; this.setState(x => ({ vals: { ...x.vals, [k]: val }, err: null })); } })) }; }
+    const rep = B.derive_reputation_summary(w);
+    const FN = { create_person: 'created a profile', assign_person_role: 'assigned a role', create_group: 'created a group', join_group: 'joined a group', create_ndo_anchor: 'listed a resource in a group', create_ndo: 'created a shared resource', update_lifecycle_stage: 'changed a resource stage', create_resource_specification: 'added a kind of item', create_governance_rule: 'added a rule', create_economic_resource: 'added an item', update_operational_state: 'changed an item status', transfer_custody: 'handed over an item', propose_commitment: 'made a promise', log_economic_event: 'recorded what happened', claim_commitment: 'kept a promise', create_validation_receipt: 'approved something', issue_participation_receipts: 'issued private receipts', refresh_ndo_anchor_lifecycle_stage: 'updated a group listing' };
+    const log = s.log.slice(0, 60).map(r => ({ asInitial: this.aname(r.as)[0], asSt: agSt(r.as), call: st.dev ? r.zome + '::' + r.fn : this.aname(r.as) + ' ' + (FN[r.fn] || human(r.fn).toLowerCase()), detail: r.ok ? (st.dev ? (r.queued ? 'committed offline · gossip queued' : 'committed · gossiping') : (r.queued ? 'saved offline, will sync later' : 'saved and shared')) : (st.dev ? r.error : friendlyErr(r.error)), detailSt: { fontSize: 12, color: r.ok ? C('gray-500') : C('red-700'), whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }, hash: r.hash ? short(r.hash) : '—', time: hhmm(r.ts), status: r.ok ? (st.dev ? 'Ok' : '✓') : (st.dev ? 'Err' : '⚠'), statusSt: { fontSize: 11, fontWeight: 600, textAlign: 'center', borderRadius: 4, padding: '1px 0', background: r.ok ? C('green-100') : C('red-100'), color: r.ok ? C('green-700') : C('red-700') } }));
+
+    const sc = B.scenarios[s.scenario];
+    const scenarios = Object.values(B.scenarios).map(x => ({ label: x.title, onClick: () => { B.reset(x.id); this.setState({ sel: null, act: null, ok: null, err: null, writer: 'a' }, () => setTimeout(() => this.fit(), 30)); }, st: { textAlign: 'left', border: `1px solid ${x.id === s.scenario ? C('blue-600') : C('gray-200')}`, background: x.id === s.scenario ? C('blue-50') : '#fff', color: x.id === s.scenario ? C('blue-700') : C('gray-700'), borderRadius: 6, padding: '6px 10px', fontSize: 12, fontWeight: 500, cursor: 'pointer' } }));
+    return { ...base, persps, writers, conds, lanes, laneHeads, nodes, edgesEl, rootActions, scenarios, scTitle: sc.title, scSummary: sc.summary, scStory: sc.story, scAgents: Object.values(M.CONDUCTORS).map(a => a.name + ' · ' + a.org).join('  ·  '),
+      isNetwork: persp === 'network', writerName: this.aname(w), perspTitle: st.dev ? (persp === 'network' ? 'Whole network · ' + Object.keys(M.CONDUCTORS).length + ' conductors' : this.aname(persp) + "'s conductor · :" + M.CONDUCTORS[persp].port) : (persp === 'network' ? 'Seeing everyone\'s view' : 'Seeing what ' + this.aname(persp) + ' sees'),
+      showGuide: !sel && !ca, hasSel: !!sel, insp, clearSel: () => this.setState({ sel: null, act: null, err: null }),
+      tries: [...sc.tries, 'Any time · switch to the other conductor right after a call to watch entries arrive by gossip, or take one offline.'].map((t, i) => ({ n: String(i + 1), text: t })),
+      hasRep: true, rep: [['total_claims', rep.total_claims], ['custody_claims', rep.custody_claims], ['service_claims', rep.service_claims], ['governance_claims', rep.governance_claims]].map(([k, v]) => ({ k, v: String(v) })),
+      hasActions: actions.length > 0 && !ca, actions, hasForm: !!form, form: form || { fields: [] }, cancelForm: () => this.setState({ act: null, err: null }), submitForm: () => this.submit(),
+      hasErr: !!st.err, err: st.err ? (st.dev ? st.err : friendlyErr(st.err)) : '', hasOk: !!st.ok && !ca, ok: st.ok,
+      log, logCount: s.log.length + ' this session', logEmpty: s.log.length === 0 };
+  }
+  lkSt(on) { return { display: 'flex', alignItems: 'center', gap: 6, border: 0, background: 'transparent', padding: '4px 8px', borderRadius: 4, cursor: 'pointer', fontSize: 12, color: on ? C('gray-900') : C('gray-400') }; }
+}
+</script>
+</body>
+</html>

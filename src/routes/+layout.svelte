@@ -24,7 +24,11 @@
   // direction index at /prototypes keeps the chrome.
   const isApp = $derived(
     current.startsWith(paths.appHome()) ||
-      DIRECTION_LIST.some((d) => current === paths.protoDirection(d.slug as DirectionSlug))
+      DIRECTION_LIST.some((d) => current === paths.protoDirection(d.slug as DirectionSlug)) ||
+      // A guideline card's isolated frame (/guidelines/<id>) must paint only the
+      // card body, same as the original's own <body> — not the index at
+      // /guidelines itself, which keeps the chrome.
+      (current.startsWith(paths.guidelines() + '/') && current !== paths.guidelines())
   );
 
   // No icons in the lists. The app has no icon set, and inventing one for the
@@ -83,6 +87,12 @@
       <nav class="nav">
         <div class="group">
           <a class="grouphead" href={paths.tokens()} class:on={current === paths.tokens()}>Tokens</a>
+        </div>
+
+        <div class="group">
+          <a class="grouphead" href={paths.guidelines()} class:on={current === paths.guidelines()}>
+            Claude Design cards
+          </a>
         </div>
 
         <div class="group">

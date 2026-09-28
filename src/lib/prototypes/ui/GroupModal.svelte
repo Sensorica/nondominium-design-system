@@ -40,7 +40,7 @@
 </script>
 
 {#if done}
-  <Modal title="Group created" sub={done.name + ' is its own shared space. Share the invite link so others can join.'} {onclose}>
+  <Modal title="Group created" sub={done.name + ' is its own DHT. Share the invite link so others can join.'} {onclose}>
     <p class="invite pu-mono">{done.invite}</p>
     <div class="pu-row pu-row--end">
       <button type="button" class="pu-btn pu-btn--ghost" onclick={copy}>{copied ? '✓ Copied' : '⎘ Copy invite link'}</button>

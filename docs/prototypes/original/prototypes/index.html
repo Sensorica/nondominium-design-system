@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8"><title>Nondominium · Stigmergic prototypes</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box}body{margin:0;background:#F5F6F5;color:#131A1C;font-family:'Instrument Sans',sans-serif;padding:40px 28px}
+a{color:#17A596}a:hover{color:#131A1C}
+.w{max-width:980px;margin:0 auto}
+img{height:56px;mix-blend-mode:multiply}
+h1{font-size:34px;letter-spacing:-.02em;margin:12px 0 8px}
+p{font-size:15px;color:#4A5654;line-height:1.55;max-width:760px}
+.g{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px;margin-top:24px}
+.c{display:block;background:#fff;border:1px solid #E0E5E3;border-radius:14px;padding:18px;text-decoration:none;color:inherit;transition:box-shadow 150ms,transform 150ms}
+.c:hover{box-shadow:0 10px 24px -14px rgba(0,0,0,.3);transform:translateY(-2px);color:inherit}
+.c b{font-size:18px;display:block;margin-bottom:4px}.c span{font-size:13px;color:#5C6866;line-height:1.5}
+.c em{font-style:normal;font-size:12px;font-weight:700;background:#131A1C;color:#fff;padding:2px 8px;border-radius:6px;margin-right:8px}
+ul{font-size:14px;color:#4A5654;line-height:1.7;padding-left:18px}
+</style></head><body><div class="w">
+<img src="assets/nondominium_logo.png" alt="Nondominium">
+<h1>Stigmergic UI · working prototypes</h1>
+<p>All five directions run on the same mock peer-to-peer store, so what you do in one shows up in the others: pick up a signal in D, then see the trace in A. The data is saved in your browser, and each prototype has a reset control.</p>
+<p><a href="A Mycelium.html?fresh=1">Start as a new agent</a> opens A with no profile and no groups, so you can walk the whole flow: create a profile, then join the example network, start from a blank canvas (a new group) or paste an invite link, then declare your first NDO. Every prototype also has this under <b>v0.1 flows ▾ → Prototype</b>.</p>
+<div class="g">
+<a class="c" href="A Mycelium.html"><b><em>A</em>Mycelium</b><span>Trace field, fade slider, trail modes, signals, traces and You views, plus offline mode in the status bar.</span></a>
+<a class="c" href="B Field Notes.html"><b><em>B</em>Field Notes</b><span>Searchable register, the trail as a journal, margin notes, and tabs for rules, instances and attachments.</span></a>
+<a class="c" href="C Instrument.html"><b><em>C</em>Instrument</b><span>Capability sockets with a trust filter, a 30-day trace scope, and signals on the spec sheet.</span></a>
+<a class="c" href="D Signal Board.html"><b><em>D</em>Signal Board</b><span>Pick up signals by lane, a live "just happened" column, a resource drawer and group scope.</span></a>
+<a class="c" href="E Holarchy.html"><b><em>E</em>Holarchy</b><span>Zoom Lobby → Group → NDO. Click a ring to focus it; scroll down to zoom out.</span></a>
+<a class="c" href="F Flow Graph.dc.html"><b><em>F</em>Flow Graph</b><span>ValueFlows lanes graph of the DHT, per conductor. Every action is a real zome call (see BACKEND.md). Uses its own store.</span></a>
+</div>
+<p style="margin-top:28px"><b>What works everywhere</b></p>
+<ul><li>Scenario data comes from the user stories in <code>documentation/Applications/user-story/</code>: equipment sharing (CNC machine), open science (cryo-EM), ArtCoin (Urban Rhythms), art production, exhibition tour, peer production and the food basket network.</li><li>All v0.1 flows are available in A–E from the <b>v0.1 flows</b> menu (⌘K), and also inline where each prototype shows them: profile and roles, new group with an invite link, join a group (try <code>ndo-invite:food-7k2p</code>), declare an NDO, browse and filter NDOs, lifecycle transitions, governance rules, resources and custody, commitments and fulfilment, receipts and the reputation summary, and offline mode.</li><li>Backend rules are enforced. Only the initiator can change the lifecycle, only the custodian can transfer custody or change operational state, and Deprecated needs a successor.</li><li>F runs on its own mock of the real zome calls. BACKEND.md maps each flow to its zome function.</li></ul>
+</div></body></html>

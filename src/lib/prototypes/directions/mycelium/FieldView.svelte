@@ -124,7 +124,10 @@
     inset: 0;
   }
 
-  /* Trails: use and custody, citation, hard link. */
+  /* Trails: use and custody, citation, hard link. Literal hex from A.jsx's
+     `style` object (ISA Phase 9, D8): these never went through the shared
+     token palette even in the handoff, so a direction-scoped custom property
+     is unnecessary here. */
   .trails {
     fill: none;
     stroke-linecap: round;
@@ -137,39 +140,40 @@
     opacity: 0.85;
   }
   .trail--use {
-    stroke: rgb(var(--ndo-brand-teal-300));
+    stroke: #2ec4b6;
   }
   .trail--cite {
-    stroke: rgb(var(--ndo-violet-300));
+    stroke: #8b5cf6;
   }
   .trail--hard {
-    stroke: rgb(var(--ndo-brand-blue-300));
+    stroke: #4c7be0;
     stroke-dasharray: 1 7;
   }
 
-  /* Stage colour. Quiet stages (idea, paused, retired) draw a dashed ring. */
+  /* Stage colour: A.jsx MyNode's `col` map, verbatim. Quiet stages (idea,
+     paused, retired) draw a dashed ring. */
   .node {
     cursor: pointer;
     outline: none;
-    --c: rgb(var(--ndo-gray-500));
+    --c: #56706f;
   }
   .stage-Active,
   .stage-Stable {
-    --c: rgb(var(--ndo-brand-teal-300));
+    --c: #2ec4b6;
   }
   .stage-Distributed,
   .stage-Deprecated {
-    --c: rgb(var(--ndo-violet-300));
+    --c: #8b5cf6;
   }
   .stage-Prototype,
   .stage-Development {
-    --c: rgb(var(--ndo-amber-600));
+    --c: #f2b84b;
   }
   .stage-Specification {
-    --c: rgb(var(--ndo-brand-blue-300));
+    --c: #4c7be0;
   }
   .stage-EndOfLife {
-    --c: rgb(var(--ndo-gray-600));
+    --c: #3a4a4a;
   }
 
   .glow {
@@ -179,12 +183,12 @@
   }
   .ring-sel {
     fill: none;
-    stroke: rgb(var(--ndo-gray-50));
+    stroke: #e6efee;
     stroke-opacity: 0.5;
     stroke-dasharray: 2 4;
   }
   .core {
-    fill: rgb(var(--ndo-gray-950));
+    fill: #0b1113;
     stroke: var(--c);
     stroke-width: 2;
     transition: r 600ms;
@@ -199,7 +203,7 @@
     transition: r 600ms;
   }
   .node:focus-visible .halo {
-    stroke: rgb(var(--ndo-gray-50));
+    stroke: #e6efee;
     stroke-opacity: 0.9;
     stroke-width: 2;
   }
@@ -207,7 +211,7 @@
   /* A fresh trace: three expanding rings, replayed on every new write. */
   .ping {
     fill: none;
-    stroke: rgb(var(--ndo-brand-teal-300));
+    stroke: #2ec4b6;
     stroke-width: 2;
     vector-effect: non-scaling-stroke;
     transform-box: fill-box;
@@ -228,7 +232,7 @@
 
   /* An open signal on this resource. */
   .dot {
-    fill: rgb(var(--ndo-amber-600));
+    fill: #f2b84b;
     animation: blink 1.8s ease-in-out infinite;
   }
   @keyframes blink {
@@ -242,21 +246,21 @@
   }
 
   text {
-    font-family: var(--ndo-font-sans);
+    font-family: 'Instrument Sans', sans-serif;
   }
   .name {
     font-size: 13px;
     font-weight: 600;
-    fill: rgb(var(--ndo-gray-50));
+    fill: #e6efee;
   }
   .quiet .name {
-    fill: rgb(var(--ndo-gray-400));
+    fill: #8ca3a2;
   }
   .meta {
     font-size: 11px;
-    fill: rgb(var(--ndo-gray-400));
+    fill: #8ca3a2;
   }
   .meta--sig {
-    fill: rgb(var(--ndo-amber-600));
+    fill: #f2b84b;
   }
 </style>

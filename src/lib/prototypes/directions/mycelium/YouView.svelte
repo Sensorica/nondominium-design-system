@@ -28,7 +28,7 @@
       <span class="d"></span>
       <span>
         ◆ {r.text} · {proto.q.ndo(r.ndo)?.name ?? ''}
-        {#if r.type}<em>{proto.dev ? r.type : plain(r.type)}</em>{/if}
+        {#if r.type}<em>{r.type}</em>{/if}
       </span>
       <span class="t">private</span>
     </div>
@@ -62,7 +62,7 @@
     letter-spacing: -0.01em;
   }
   .lede {
-    color: rgb(var(--ndo-gray-400));
+    color: var(--mute);
     font-size: 14px;
     margin: 0 0 18px;
   }
@@ -72,30 +72,29 @@
     margin: 4px 0 12px;
   }
   .new {
-    font: inherit;
-    font-size: 12px;
-    font-weight: 600;
+    font: 600 12px 'Instrument Sans', sans-serif;
     white-space: nowrap;
     padding: 8px 14px;
-    border-radius: var(--ndo-radius-pill);
-    border: 1px solid rgb(var(--ndo-brand-teal-300));
-    background: rgb(var(--ndo-brand-teal-300));
-    color: rgb(var(--ndo-gray-950));
+    border-radius: 999px;
+    border: 0;
+    background: var(--teal);
+    color: #0b1113;
     cursor: pointer;
-    transition: var(--ndo-transition-colors);
   }
   .new:hover {
-    background: rgb(var(--ndo-brand-teal-100));
-    border-color: rgb(var(--ndo-brand-teal-100));
+    background: #5ad6ca;
   }
+  /* The original inlines `background: transparent, border: 1px solid #2a4a4a`
+     over the shared `.new` class for this one button (A.jsx `view === 'me'`);
+     inline styles win the cascade even on :hover, so its background never
+     changes. */
   .new--ghost {
     background: transparent;
-    color: rgb(var(--ndo-brand-teal-300));
-    border-color: rgb(var(--ndo-brand-teal-700));
+    color: var(--teal);
+    border: 1px solid #2a4a4a;
   }
   .new--ghost:hover {
-    background: rgb(var(--ndo-brand-teal-700) / 0.3);
-    border-color: rgb(var(--ndo-brand-teal-700));
+    background: transparent;
   }
   .new:focus-visible {
     outline: none;
@@ -111,7 +110,7 @@
     font-size: 12px;
     font-weight: 600;
     margin: 0 0 10px;
-    color: rgb(var(--ndo-gray-400));
+    color: var(--mute);
     display: flex;
     justify-content: space-between;
   }
@@ -127,22 +126,22 @@
     height: 6px;
     margin-top: 5px;
     border-radius: 50%;
-    background: rgb(var(--ndo-violet-300));
+    background: #8b5cf6;
   }
   em {
     display: block;
     font-style: normal;
-    color: rgb(var(--ndo-gray-500));
+    color: var(--dim);
   }
   .t {
     font-size: 11px;
     white-space: nowrap;
-    color: rgb(var(--ndo-gray-500));
+    color: var(--dim);
   }
   .empty {
     margin: 0;
     font-size: 12px;
-    color: rgb(var(--ndo-gray-500));
+    color: var(--dim);
     padding: 10px 0;
   }
 </style>

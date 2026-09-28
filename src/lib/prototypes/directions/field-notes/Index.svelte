@@ -33,7 +33,7 @@
 
 <aside class="index">
   <div class="brand">
-    <img class="mark" src={paths.logoMark()} alt="" width="30" height="30" />
+    <div class="mark" style="background-image: url('{paths.logoMark()}')" aria-hidden="true"></div>
     <span class="name">Nondominium</span>
     <div class="menu">
       <FlowMenu ndo={sel} onOpen={onselect} align="left" label="Flows" />
@@ -76,12 +76,13 @@
 
 <style>
   .index {
+    /* The original's own padding, unpadded for the exit chip: App.svelte
+     * moves the chip clear of this column instead (README "Theming"). */
     display: flex;
     flex-direction: column;
     min-height: 0;
     overflow: auto;
-    /* Bottom padding keeps the footer clear of the prototype exit chip. */
-    padding: 22px 20px 64px;
+    padding: 22px 20px;
     border-right: 1px solid var(--fn-rule);
     background: var(--fn-paper2);
   }
@@ -93,17 +94,42 @@
     margin-bottom: 22px;
   }
   .mark {
-    display: block;
-    width: 30px;
-    height: 30px;
+    /* An empty div, not an image: like the original, it has no intrinsic
+     * size, so it shrinks under the brand row's flex-shrink instead of
+     * clipping the FlowMenu button (the original's own layout keeps the
+     * row inside 300px this way; the port's own defect was rendering this
+     * as a rigid <img>). */
+    flex-shrink: 1;
+    width: 34px;
+    height: 34px;
+    background-repeat: no-repeat;
+    background-size: 34px 34px;
+    background-position: center;
   }
   .name {
-    font-size: var(--ndo-text-xl);
-    font-weight: var(--ndo-weight-medium);
-    letter-spacing: -0.01em;
+    font-family: var(--fn-serif);
+    font-size: 20px;
+    font-weight: 500;
+    line-height: normal;
   }
   .menu {
+    flex-shrink: 0;
     margin-left: auto;
+  }
+  /* B Field Notes.html's own stylesheet has `.brand span{font-family:
+   * Newsreader;font-size:20px;font-weight:500}`, a plain descendant
+   * selector that reaches every <span> under `.brand`, including the ones
+   * FlowMenu renders for its own label and caret (ui.jsx's FlowMenu sets
+   * fontSize:13/fontWeight:600 on the *button*, which the label/caret spans
+   * would otherwise just inherit; a same-element rule always beats
+   * inheritance, whatever its specificity). AgentAvatar's own span sets its
+   * font-size and font-weight inline, so it is untouched either there or
+   * here. */
+  .menu :global(.trigger .label),
+  .menu :global(.trigger .caret) {
+    font-family: var(--fn-serif);
+    font-size: 20px;
+    font-weight: 500;
   }
 
   .search {
@@ -115,12 +141,8 @@
     border-radius: 0;
     background: transparent;
     color: var(--fn-ink);
-    font: italic var(--ndo-text-base) var(--ndo-font-sans);
+    font: italic 15px var(--fn-serif);
     outline: none;
-  }
-  .search:focus-visible {
-    border-bottom-color: var(--fn-teal);
-    box-shadow: 0 1px 0 var(--fn-teal);
   }
 
   .idxh {
@@ -137,6 +159,7 @@
     letter-spacing: 0.14em;
     text-transform: uppercase;
     text-align: left;
+    line-height: normal;
     cursor: pointer;
   }
   .idxh:hover {
@@ -158,8 +181,10 @@
     cursor: pointer;
   }
   .entry b {
-    font-size: var(--ndo-text-base);
-    font-weight: var(--ndo-weight-medium);
+    font-family: var(--fn-serif);
+    font-size: 16px;
+    font-weight: 500;
+    line-height: normal;
   }
   .entry b.quiet {
     color: var(--fn-mute);
@@ -174,6 +199,7 @@
   .entry small {
     grid-column: 1;
     font-size: 11px;
+    line-height: normal;
     color: var(--fn-mute);
   }
   .left {
@@ -199,6 +225,7 @@
     color: var(--fn-teal);
     font: inherit;
     font-size: 13px;
+    line-height: normal;
     text-decoration: underline;
     cursor: pointer;
   }
@@ -207,14 +234,18 @@
   }
 
   .btn {
+    display: inline-block;
+    margin-top: 14px;
     padding: 9px 14px;
     border: 0;
-    border-radius: var(--ndo-radius-sm);
-    background: rgb(var(--ndo-gray-900));
-    color: rgb(255 255 255);
+    border-radius: 2px;
+    background: var(--fn-ink);
+    color: var(--fn-paper);
     font-family: inherit;
     font-size: 13px;
-    font-weight: var(--ndo-weight-medium);
+    font-weight: 500;
+    line-height: normal;
+    text-align: center;
     white-space: nowrap;
     cursor: pointer;
   }

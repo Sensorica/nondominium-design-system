@@ -1,0 +1,4 @@
+*,*::before,*::after{box-sizing:border-box}
+body{margin:0;font-family:var(--ndo-font-sans);font-size:var(--ndo-text-base);line-height:var(--ndo-lh-base);color:var(--ndo-color-text-primary);background:var(--ndo-color-bg-app)}
+a{color:var(--ndo-color-link);text-decoration:none}
+a:hover{text-decoration:underline}

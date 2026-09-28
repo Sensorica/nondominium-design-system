@@ -5,7 +5,7 @@
   import { fmtAgo, freshness, type Trace } from '$lib/prototypes/store/logic';
   import { stageLabel } from '$lib/prototypes/plain';
   import { AgentAvatar } from '$lib/prototypes/ui';
-  import { CARD_FADE, HAPPENED_TONE } from './lanes';
+  import { CARD_FADE, HAPPENED_BG } from './lanes';
 
   let { t, onopen }: { t: Trace; onopen: (ndoId: string) => void } = $props();
 
@@ -19,7 +19,7 @@
   <button
     type="button"
     class="card"
-    style:--lane="var({HAPPENED_TONE})"
+    style:background={HAPPENED_BG}
     style:opacity={CARD_FADE[freshness(t.ago)]}
     onclick={() => onopen(t.ndo)}
   >
@@ -42,24 +42,23 @@
     text-align: left;
     font: inherit;
     color: inherit;
-    border-radius: var(--ndo-radius-xl);
+    border: 0;
+    border-radius: 14px;
     padding: 14px;
     cursor: pointer;
-    background: rgb(var(--lane) / 0.08);
-    border: 1px solid rgb(var(--lane) / 0.16);
     transition:
-      transform var(--ndo-duration-base) var(--ndo-easing),
-      var(--ndo-transition-shadow),
-      opacity 400ms var(--ndo-easing);
-    animation: in 350ms var(--ndo-easing);
+      transform 150ms ease,
+      box-shadow 150ms ease,
+      opacity 400ms;
+    animation: in 350ms ease;
   }
   .card:hover {
     transform: translateY(-2px);
-    box-shadow: var(--ndo-shadow-lg);
+    box-shadow: 0 8px 20px -10px rgba(16, 20, 24, 0.25);
   }
   .card:focus-visible {
-    outline: none;
-    box-shadow: var(--ndo-focus-ring);
+    outline: 2px solid var(--blue);
+    outline-offset: 2px;
   }
   @keyframes in {
     from {
@@ -68,10 +67,10 @@
     }
   }
   .res {
-    font-family: var(--ndo-font-mono);
+    font-family: 'DM Mono', monospace;
     font-size: 11px;
-    font-weight: var(--ndo-weight-medium);
-    color: var(--ndo-color-text-secondary);
+    font-weight: 500;
+    color: var(--ink2);
     text-transform: uppercase;
     letter-spacing: 0.04em;
   }
@@ -80,18 +79,19 @@
     gap: 8px;
     align-items: flex-start;
     margin: 6px 0;
-    font-size: var(--ndo-text-base);
-    line-height: 1.25;
-    font-weight: var(--ndo-weight-bold);
+    font-size: 18px;
+    line-height: 1.15;
+    font-weight: 700;
+    letter-spacing: -0.01em;
   }
   .meta {
+    margin: 0 0 12px;
     font-size: 13px;
-    color: var(--ndo-color-text-secondary);
+    color: var(--ink2);
   }
   .taken {
-    margin-top: 8px;
-    font-size: var(--ndo-text-xs);
-    font-weight: var(--ndo-weight-semibold);
-    color: rgb(var(--ndo-teal-700));
+    font-size: 12px;
+    font-weight: 600;
+    color: #0f7d72;
   }
 </style>

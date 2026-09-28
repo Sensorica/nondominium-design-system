@@ -43,7 +43,7 @@
     <input class="pu-input" bind:value={name} placeholder="e.g. Shared Bike Fleet" {@attach focusOnMount} />
   </Field>
   <Field label="What is it?">
-    <textarea class="pu-textarea" bind:value={desc}></textarea>
+    <textarea class="pu-textarea desc" bind:value={desc}></textarea>
   </Field>
   <Field label="Nature">
     <Choice options={ENUM.nature} value={nature} onchange={(v) => (nature = v as ResourceNature)} />
@@ -66,3 +66,11 @@
   <ErrorNote {error} />
   <ModalActions {onclose} onok={submit} label="Declare NDO" disabled={!name.trim() || !groups.length} />
 </Modal>
+
+<style>
+  /* ui.jsx's "What is it?" textarea has minHeight: 64, not .pu-textarea's
+   * shared default of 72 (which matches NoteModal's description field instead). */
+  .desc {
+    min-height: 64px;
+  }
+</style>

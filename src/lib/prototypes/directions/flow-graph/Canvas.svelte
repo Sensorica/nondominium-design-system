@@ -281,7 +281,12 @@
     border: 0;
     background: transparent;
     cursor: pointer;
-    font-family: var(--ndo-font-sans);
+    /* Plain <button> in the original: no font-family there either, so it
+       renders in the browser's UA button font. `revert` undoes both the
+       browser's own button reset and src/app.css's UnoCSS preflight, outside
+       this direction's ownership. */
+    font-family: revert;
+    line-height: revert;
     font-size: 11px;
     font-weight: var(--ndo-weight-semibold);
     letter-spacing: 0.06em;
@@ -342,13 +347,24 @@
     background: transparent;
     padding: 4px 8px;
     border-radius: var(--ndo-radius-sm);
-    font: inherit;
     font-size: 12px;
     color: rgb(var(--ndo-gray-400));
     cursor: pointer;
   }
+  /* The "Flow" legend entry is a plain <span> in the original, so it inherits
+     the legend's sans font normally. "Agents" and "Structure" are plain
+     <button>s there, which the original never gives a font-family: they show
+     the browser's own UA button font, not the design system's sans. `revert`
+     undoes both the browser's own button reset and src/app.css's UnoCSS
+     preflight (button{font-family:inherit}), outside this direction's
+     ownership. */
   span.legend__item {
+    font: inherit;
     cursor: default;
+  }
+  button.legend__item {
+    font-family: revert;
+    line-height: revert;
   }
   .legend__item--on.legend__item--on {
     color: rgb(var(--ndo-gray-900));
@@ -393,7 +409,8 @@
     height: 28px;
     border-radius: var(--ndo-radius-sm);
     cursor: pointer;
-    font-family: var(--ndo-font-sans);
+    font-family: revert;
+    line-height: revert;
     font-size: 14px;
     color: rgb(var(--ndo-gray-700));
   }

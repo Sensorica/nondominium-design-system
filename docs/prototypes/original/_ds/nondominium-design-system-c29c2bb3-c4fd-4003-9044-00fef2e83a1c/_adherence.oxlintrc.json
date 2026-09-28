@@ -1,0 +1,331 @@
+{
+  "plugins": [
+    "react",
+    "import"
+  ],
+  "rules": {
+    "react/forbid-elements": [
+      "warn",
+      {
+        "forbid": []
+      }
+    ],
+    "no-restricted-imports": [
+      "warn",
+      {
+        "patterns": [
+          {
+            "group": [
+              "components/badge/**",
+              "components/button/**",
+              "components/card/**",
+              "components/status/**",
+              "design_handoff_nondominium_ds/ui_kits/app/**",
+              "explorations/revamp/proto/**",
+              "ui_kits/app/**"
+            ],
+            "message": "Import design-system components from 'index.js', not component internals."
+          }
+        ]
+      }
+    ],
+    "no-restricted-syntax": [
+      "warn",
+      {
+        "selector": "Literal[value=/#[0-9a-fA-F]{3,8}\\b/]",
+        "message": "Raw hex color — use a design-system color token via var()."
+      },
+      {
+        "selector": "Literal[value=/\\b\\d+px\\b/]",
+        "message": "Raw px value — use a design-system spacing token via var()."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='Badge'] > JSXAttribute > JSXIdentifier[name!=/^(?:variant|label|children|style|key|ref|className|style|children)$/]",
+        "message": "<Badge> doesn't accept that prop. Declared props: variant, label, children, style."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='Button'] > JSXAttribute > JSXIdentifier[name!=/^(?:variant|disabled|href|type|onClick|children|style|key|ref|className|style|children)$/]",
+        "message": "<Button> doesn't accept that prop. Declared props: variant, disabled, href, type, onClick, children, style."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='Button'] > JSXAttribute[name.name='variant'] > Literal[value!=/^(?:primary|ghost|destructive)$/]",
+        "message": "<Button> variant must be one of 'primary' | 'ghost' | 'destructive'."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='Button'] > JSXAttribute[name.name='type'] > Literal[value!=/^(?:button|submit|reset)$/]",
+        "message": "<Button> type must be one of 'button' | 'submit' | 'reset'."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='Card'] > JSXAttribute > JSXIdentifier[name!=/^(?:name|description|hash|href|badges|onClick|style|key|ref|className|style|children)$/]",
+        "message": "<Card> doesn't accept that prop. Declared props: name, description, hash, href, badges, onClick, style."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='StatusDot'] > JSXAttribute > JSXIdentifier[name!=/^(?:status|label|style|key|ref|className|style|children)$/]",
+        "message": "<StatusDot> doesn't accept that prop. Declared props: status, label, style."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='StatusDot'] > JSXAttribute[name.name='status'] > Literal[value!=/^(?:active|inactive|pending|coming-soon)$/]",
+        "message": "<StatusDot> status must be one of 'active' | 'inactive' | 'pending' | 'coming-soon'."
+      }
+    ]
+  },
+  "overrides": [
+    {
+      "files": [
+        "**/index.js"
+      ],
+      "rules": {
+        "no-restricted-imports": "off"
+      }
+    }
+  ],
+  "x-omelette": {
+    "components": {
+      "Badge": {
+        "replaces": []
+      },
+      "Button": {
+        "replaces": []
+      },
+      "Card": {
+        "replaces": []
+      },
+      "StatusDot": {
+        "replaces": []
+      }
+    },
+    "tokens": [
+      "--ndo-amber-100",
+      "--ndo-amber-300",
+      "--ndo-amber-50",
+      "--ndo-amber-600",
+      "--ndo-amber-700",
+      "--ndo-amber-800",
+      "--ndo-blue-100",
+      "--ndo-blue-300",
+      "--ndo-blue-50",
+      "--ndo-blue-600",
+      "--ndo-blue-700",
+      "--ndo-blue-800",
+      "--ndo-color-bg-app",
+      "--ndo-color-border",
+      "--ndo-color-border-subtle",
+      "--ndo-color-card-bg",
+      "--ndo-color-link",
+      "--ndo-color-surface",
+      "--ndo-color-text-mono",
+      "--ndo-color-text-muted",
+      "--ndo-color-text-primary",
+      "--ndo-color-text-secondary",
+      "--ndo-cyan-100",
+      "--ndo-cyan-300",
+      "--ndo-cyan-700",
+      "--ndo-emerald-100",
+      "--ndo-emerald-300",
+      "--ndo-emerald-50",
+      "--ndo-emerald-700",
+      "--ndo-focus-ring",
+      "--ndo-font-mono",
+      "--ndo-font-sans",
+      "--ndo-gray-100",
+      "--ndo-gray-200",
+      "--ndo-gray-300",
+      "--ndo-gray-400",
+      "--ndo-gray-50",
+      "--ndo-gray-500",
+      "--ndo-gray-600",
+      "--ndo-gray-700",
+      "--ndo-gray-800",
+      "--ndo-gray-900",
+      "--ndo-green-100",
+      "--ndo-green-300",
+      "--ndo-green-50",
+      "--ndo-green-700",
+      "--ndo-indigo-100",
+      "--ndo-indigo-300",
+      "--ndo-indigo-700",
+      "--ndo-lh-2xl",
+      "--ndo-lh-base",
+      "--ndo-lh-lg",
+      "--ndo-lh-sm",
+      "--ndo-lh-xl",
+      "--ndo-lh-xs",
+      "--ndo-orange-100",
+      "--ndo-orange-300",
+      "--ndo-orange-50",
+      "--ndo-orange-700",
+      "--ndo-purple-100",
+      "--ndo-purple-300",
+      "--ndo-purple-700",
+      "--ndo-radius-lg",
+      "--ndo-radius-md",
+      "--ndo-radius-sm",
+      "--ndo-radius-xl",
+      "--ndo-red-100",
+      "--ndo-red-200",
+      "--ndo-red-300",
+      "--ndo-red-50",
+      "--ndo-red-600",
+      "--ndo-red-700",
+      "--ndo-rose-100",
+      "--ndo-rose-300",
+      "--ndo-rose-700",
+      "--ndo-shadow-lg",
+      "--ndo-shadow-md",
+      "--ndo-shadow-sm",
+      "--ndo-sidebar-width",
+      "--ndo-sky-100",
+      "--ndo-sky-300",
+      "--ndo-sky-700",
+      "--ndo-spacing-0-5",
+      "--ndo-spacing-1",
+      "--ndo-spacing-1-5",
+      "--ndo-spacing-2",
+      "--ndo-spacing-3",
+      "--ndo-spacing-4",
+      "--ndo-spacing-6",
+      "--ndo-spacing-8",
+      "--ndo-teal-100",
+      "--ndo-teal-300",
+      "--ndo-teal-700",
+      "--ndo-text-2xl",
+      "--ndo-text-base",
+      "--ndo-text-label",
+      "--ndo-text-lg",
+      "--ndo-text-micro",
+      "--ndo-text-sm",
+      "--ndo-text-xl",
+      "--ndo-text-xs",
+      "--ndo-tracking-caps",
+      "--ndo-transition-colors",
+      "--ndo-transition-shadow",
+      "--ndo-violet-100",
+      "--ndo-violet-300",
+      "--ndo-violet-700",
+      "--ndo-weight-bold",
+      "--ndo-weight-medium",
+      "--ndo-weight-semibold",
+      "--ndo-yellow-100",
+      "--ndo-yellow-300",
+      "--ndo-yellow-50",
+      "--ndo-yellow-700"
+    ],
+    "tokenKinds": {
+      "--ndo-gray-50": "color",
+      "--ndo-gray-100": "color",
+      "--ndo-gray-200": "color",
+      "--ndo-gray-300": "color",
+      "--ndo-gray-400": "color",
+      "--ndo-gray-500": "color",
+      "--ndo-gray-600": "color",
+      "--ndo-gray-700": "color",
+      "--ndo-gray-800": "color",
+      "--ndo-gray-900": "color",
+      "--ndo-green-50": "color",
+      "--ndo-green-100": "color",
+      "--ndo-green-700": "color",
+      "--ndo-emerald-100": "color",
+      "--ndo-emerald-700": "color",
+      "--ndo-red-50": "color",
+      "--ndo-red-100": "color",
+      "--ndo-red-200": "color",
+      "--ndo-red-700": "color",
+      "--ndo-amber-50": "color",
+      "--ndo-amber-100": "color",
+      "--ndo-amber-600": "color",
+      "--ndo-amber-700": "color",
+      "--ndo-amber-800": "color",
+      "--ndo-yellow-100": "color",
+      "--ndo-yellow-700": "color",
+      "--ndo-orange-50": "color",
+      "--ndo-orange-100": "color",
+      "--ndo-orange-700": "color",
+      "--ndo-blue-50": "color",
+      "--ndo-blue-100": "color",
+      "--ndo-blue-600": "color",
+      "--ndo-blue-700": "color",
+      "--ndo-blue-800": "color",
+      "--ndo-purple-100": "color",
+      "--ndo-purple-700": "color",
+      "--ndo-teal-100": "color",
+      "--ndo-teal-700": "color",
+      "--ndo-indigo-100": "color",
+      "--ndo-indigo-700": "color",
+      "--ndo-cyan-100": "color",
+      "--ndo-cyan-700": "color",
+      "--ndo-violet-100": "color",
+      "--ndo-violet-700": "color",
+      "--ndo-rose-100": "color",
+      "--ndo-rose-700": "color",
+      "--ndo-color-bg-app": "color",
+      "--ndo-color-surface": "color",
+      "--ndo-color-card-bg": "color",
+      "--ndo-color-border": "color",
+      "--ndo-color-border-subtle": "color",
+      "--ndo-color-text-primary": "color",
+      "--ndo-color-text-secondary": "color",
+      "--ndo-color-text-muted": "color",
+      "--ndo-color-text-mono": "color",
+      "--ndo-color-link": "color",
+      "--ndo-sky-100": "color",
+      "--ndo-sky-300": "color",
+      "--ndo-sky-700": "color",
+      "--ndo-blue-300": "color",
+      "--ndo-indigo-300": "color",
+      "--ndo-amber-300": "color",
+      "--ndo-green-300": "color",
+      "--ndo-teal-300": "color",
+      "--ndo-emerald-300": "color",
+      "--ndo-yellow-300": "color",
+      "--ndo-orange-300": "color",
+      "--ndo-red-300": "color",
+      "--ndo-purple-300": "color",
+      "--ndo-cyan-300": "color",
+      "--ndo-violet-300": "color",
+      "--ndo-rose-300": "color",
+      "--ndo-red-600": "color",
+      "--ndo-yellow-50": "color",
+      "--ndo-emerald-50": "color",
+      "--ndo-font-sans": "font",
+      "--ndo-font-mono": "font",
+      "--ndo-text-xs": "font",
+      "--ndo-text-sm": "font",
+      "--ndo-text-base": "font",
+      "--ndo-text-lg": "font",
+      "--ndo-text-xl": "font",
+      "--ndo-text-2xl": "font",
+      "--ndo-text-label": "font",
+      "--ndo-text-micro": "font",
+      "--ndo-lh-xs": "font",
+      "--ndo-lh-sm": "font",
+      "--ndo-lh-base": "font",
+      "--ndo-lh-lg": "font",
+      "--ndo-lh-xl": "font",
+      "--ndo-lh-2xl": "font",
+      "--ndo-weight-medium": "font",
+      "--ndo-weight-semibold": "font",
+      "--ndo-weight-bold": "font",
+      "--ndo-tracking-caps": "font",
+      "--ndo-spacing-0-5": "spacing",
+      "--ndo-spacing-1": "spacing",
+      "--ndo-spacing-1-5": "spacing",
+      "--ndo-spacing-2": "spacing",
+      "--ndo-spacing-3": "spacing",
+      "--ndo-spacing-4": "spacing",
+      "--ndo-spacing-6": "spacing",
+      "--ndo-spacing-8": "spacing",
+      "--ndo-radius-sm": "radius",
+      "--ndo-radius-md": "radius",
+      "--ndo-radius-lg": "radius",
+      "--ndo-radius-xl": "radius",
+      "--ndo-shadow-sm": "shadow",
+      "--ndo-shadow-md": "shadow",
+      "--ndo-shadow-lg": "shadow",
+      "--ndo-focus-ring": "shadow",
+      "--ndo-transition-shadow": "other",
+      "--ndo-transition-colors": "other",
+      "--ndo-sidebar-width": "spacing"
+    },
+    "fontFamilies": []
+  }
+}
