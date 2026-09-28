@@ -67,7 +67,7 @@
         >
         <select class="pu-select pu-select--inline" bind:value={event[i]} aria-label="Something happened">
           <option value="">Something happened…</option>
-          {#each ['Use', 'Work', 'Modify', 'Move', 'Cite'] as x (x)}<option value={x}>{plain(x)}</option>{/each}
+          {#each ['Use', 'Work', 'Modify', 'Move', 'Cite'] as x (x)}<option value={x}>{x}</option>{/each}
         </select>
         <button
           type="button"
@@ -87,14 +87,9 @@
       </div>
     </div>
   {:else}
-    <p class="pu-muted">No items yet.</p>
+    <p class="pu-muted">No resources yet.</p>
   {/each}
-  <Field
-    label="New item"
-    hint={$developer
-      ? 'create_economic_resource · starts PendingValidation with you as custodian'
-      : 'It starts waiting for approval, with you holding it.'}
-  >
+  <Field label="New resource" hint="create_economic_resource · starts PendingValidation with you as custodian">
     <div class="pu-row new">
       <input class="pu-input" bind:value={label} placeholder="e.g. Spare spindle" />
       <button

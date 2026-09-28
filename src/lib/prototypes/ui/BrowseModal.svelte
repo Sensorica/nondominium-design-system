@@ -5,7 +5,6 @@
   import { focusOnMount } from './attach';
   import { proto } from '../store/store.svelte';
   import { ENUM, STAGES } from '../store/logic';
-  import { plain } from '../plain';
 
   interface Props {
     onclose: () => void;
@@ -44,15 +43,15 @@
     </select>
     <select class="pu-select pu-select--inline" bind:value={stage} aria-label="Stage">
       <option value="">Any stage</option>
-      {#each STAGES as x (x)}<option value={x}>{plain(x)}</option>{/each}
+      {#each STAGES as x (x)}<option value={x}>{x}</option>{/each}
     </select>
-    <select class="pu-select pu-select--inline" bind:value={nature} aria-label="Type">
-      <option value="">Any type</option>
-      {#each ENUM.nature as x (x)}<option value={x}>{plain(x)}</option>{/each}
+    <select class="pu-select pu-select--inline" bind:value={nature} aria-label="Nature">
+      <option value="">Any nature</option>
+      {#each ENUM.nature as x (x)}<option value={x}>{x}</option>{/each}
     </select>
-    <select class="pu-select pu-select--inline" bind:value={regime} aria-label="Ownership">
-      <option value="">Any ownership</option>
-      {#each ENUM.regime as x (x)}<option value={x}>{plain(x)}</option>{/each}
+    <select class="pu-select pu-select--inline" bind:value={regime} aria-label="Regime">
+      <option value="">Any regime</option>
+      {#each ENUM.regime as x (x)}<option value={x}>{x}</option>{/each}
     </select>
   </div>
   <div class="pu-list">
@@ -67,11 +66,11 @@
       >
         <strong>{n.name}</strong>
         <span class="pu-muted">
-          {proto.q.group(n.group)?.name} · {plain(n.stage)} · {plain(n.regime)} · {plain(n.nature)} · {openCount(n.id)} open requests
+          {proto.q.group(n.group)?.name} · {n.stage} · {n.regime} · {n.nature} · {openCount(n.id)} open commitments
         </span>
       </button>
     {:else}
-      <p class="pu-muted">No resources match. Resources belong to groups: create or join one to see more.</p>
+      <p class="pu-muted">No NDOs match. NDOs are scoped to groups: create or join one to see more.</p>
     {/each}
   </div>
 </Modal>

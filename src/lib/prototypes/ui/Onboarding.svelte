@@ -93,7 +93,7 @@
   <div class="pu onboarding">
     <div class="column">
       <ol class="steps">
-        {#each ['Profile', 'Network', 'First resource'] as l, i (l)}
+        {#each ['Profile', 'Network', 'First NDO'] as l, i (l)}
           <li class:done={i <= index} class:now={i === index}><span></span>{i + 1} · {l}</li>
         {/each}
       </ol>
@@ -101,20 +101,20 @@
       {#if current === 'profile'}
         <header>
           <h1>Set up your profile</h1>
-          <p class="pu-muted">Your name and picture are visible to the groups you join. Private details stay on your device.</p>
+          <p class="pu-muted">Your conductor holds your agent key. The profile is public in the Lobby DHT; private data stays on your source chain.</p>
         </header>
         <Call c="zome_person::create_person → lobby::upsert_lobby_agent_profile" />
         <div class="pu-row preview">
           <Avatar id={pName || 'new'} name={pName || '?'} url={isHttpsUrl(pAvatar) ? pAvatar : null} size={72} ring={isHttpsUrl(pAvatar)} />
-          <p class="pu-muted">Without a picture, your initials show on a colour that is always the same for you.<br />Paste an https:// image link below to use your own.</p>
+          <p class="pu-muted">Default avatar: your initials on a colour derived from your agent key.<br />Paste an https:// image URL below to use your own.</p>
         </div>
         <div class="pu-grid two">
           <Field label="Name *"><input class="pu-input" bind:value={pName} placeholder="e.g. Marco" {@attach focusOnMount} /></Field>
           <Field label="Lobby handle"><input class="pu-input" bind:value={pHandle} placeholder="e.g. marco-fablab" /></Field>
         </div>
         <Field label="Bio"><input class="pu-input" bind:value={pBio} placeholder="What you do, where" /></Field>
-        <Field label="Picture URL (optional)"><input class="pu-input" bind:value={pAvatar} placeholder="https://…" /></Field>
-        <p class="pu-muted">You start as a member. Trusted roles come later, when other members confirm them.</p>
+        <Field label="Avatar URL (optional)"><input class="pu-input" bind:value={pAvatar} placeholder="https://…" /></Field>
+        <p class="pu-muted">You start as a SimpleAgent. Accountable roles come later, through peer validation.</p>
         <ErrorNote {error} />
         <div class="pu-row pu-row--between">
           <button type="button" class="pu-link" onclick={() => proto.actions.reset()}>Skip, open the example network</button>
@@ -123,7 +123,7 @@
       {:else if current === 'start'}
         <header>
           <h1>Welcome, {proto.s.profile?.name}</h1>
-          <p class="pu-muted">Resources live in groups. Start from the example network, from a blank group, or with an invite link.</p>
+          <p class="pu-muted">NDOs are scoped to groups. Start from the example network, from a blank canvas, or with an invite link.</p>
         </header>
         <div class="cards">
           <div class="pu-card card">
@@ -136,8 +136,8 @@
             <button type="button" class="pu-btn" onclick={joinExample}>Join the example network</button>
           </div>
           <div class="pu-card card">
-            <strong>Blank group</strong>
-            <p class="pu-muted">Create a new, empty group. You'll add its first resource next.</p>
+            <strong>Blank canvas</strong>
+            <p class="pu-muted">Create a new, empty group in the prototype network. You'll declare its first NDO next.</p>
             <input class="pu-input" bind:value={gName} placeholder="Group name *" aria-label="Group name" />
             <input class="pu-input" bind:value={gDesc} placeholder="Description" aria-label="Group description" />
             <Call c="zome_group::create_group" />
@@ -156,10 +156,10 @@
         <ErrorNote {error} />
       {:else}
         <header>
-          <h1>Add your first shared resource</h1>
+          <h1>Declare your first NDO</h1>
           <p class="pu-muted">
-            {newest ? newest.name + ' is ready. ' : ''}A resource starts as an idea. You started it, so only you can move it through its
-            stages.
+            {newest ? newest.name + ' is ready. ' : ''}An NDO starts in Ideation. You are its initiator, so only you can move it through its
+            lifecycle.
           </p>
         </header>
         <Call c="zome_resource::create_ndo → zome_group::create_ndo_anchor" />
@@ -172,7 +172,7 @@
         <ErrorNote {error} />
         <div class="pu-row pu-row--between">
           <button type="button" class="pu-link" onclick={() => (step = null)}>Skip for now</button>
-          <button type="button" class="pu-btn" disabled={!nName.trim()} onclick={declare}>Add resource</button>
+          <button type="button" class="pu-btn" disabled={!nName.trim()} onclick={declare}>Declare NDO</button>
         </div>
       {/if}
     </div>

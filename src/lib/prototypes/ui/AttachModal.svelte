@@ -36,15 +36,15 @@
   {onclose}
 >
   <Call c="log_economic_event(Cite) → zome_gouvernance::create_ndo_hard_link" />
-  <Field label="How they relate" hint={HINT[type]}>
+  <Field label="NdoLinkType" hint={HINT[type]}>
     <Choice options={LINK_TYPES} value={type} onchange={(v) => (type = v)} />
   </Field>
-  <Field label="Target resource">
+  <Field label="Target NDO">
     <select class="pu-select" bind:value={to}>
       {#each others as n (n.id)}<option value={n.id}>{n.name}</option>{/each}
     </select>
   </Field>
-  {#if !others.length}<p class="pu-muted">No other resource to link to yet.</p>{/if}
+  {#if !others.length}<p class="pu-muted">No other NDO to link to yet.</p>{/if}
   <ErrorNote {error} />
-  <ModalActions {onclose} onok={submit} label="Create link" disabled={!to} />
+  <ModalActions {onclose} onok={submit} label="Create hard link" disabled={!to} />
 </Modal>

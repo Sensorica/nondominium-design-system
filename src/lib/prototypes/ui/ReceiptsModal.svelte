@@ -35,7 +35,7 @@
     {#each proto.s.receipts as r (r.id)}
       <div class="row"><span>◆ {r.text}</span><span class="pu-muted">{plain(r.type) || 'Receipt'}</span></div>
     {:else}
-      <p class="pu-muted">None yet. Complete a request or pick up a suggestion.</p>
+      <p class="pu-muted">None yet. Fulfil a commitment or take up a signal.</p>
     {/each}
   </div>
 </Modal>

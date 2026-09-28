@@ -28,15 +28,15 @@
   {onclose}
 >
   <Call c="zome_group::log_work" />
-  <Field label="What did you do? *">
+  <Field label="description *">
     <textarea
       class="pu-textarea"
       bind:value={description}
-      placeholder="What did you do? What should the next person know?"
+      placeholder="What did you do? What should the next agent know?"
       {@attach focusOnMount}
     ></textarea>
   </Field>
-  <Field label="Hours *">
+  <Field label="hours *">
     <input class="pu-input" style:width="120px" type="number" min="0" step="0.5" bind:value={hours} />
   </Field>
   <ErrorNote {error} />

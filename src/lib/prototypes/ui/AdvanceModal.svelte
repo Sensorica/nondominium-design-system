@@ -11,7 +11,6 @@
   import ModalActions from './ModalActions.svelte';
   import { proto } from '../store/store.svelte';
   import { allowedStages, type Ndo } from '../store/logic';
-  import { plain } from '../plain';
 
   let { ndo, onclose }: { ndo: Ndo; onclose: () => void } = $props();
 
@@ -31,7 +30,7 @@
 
 <Modal
   title="Change stage"
-  sub={ndo.name + ' is ' + plain(ndo.stage) + '. Started by ' + proto.q.agent(ndo.initiator) + '.'}
+  sub={ndo.name + ' is ' + ndo.stage + '. Initiator: ' + proto.q.agent(ndo.initiator) + '.'}
   {onclose}
   width={420}
 >
@@ -39,21 +38,21 @@
   {#if options.length}
     <Choice {options} value={to} onchange={(v) => { to = v; error = null; }} />
   {:else}
-    <p class="pu-muted">Retired is final. No further stage changes.</p>
+    <p class="pu-muted">EndOfLife is terminal. No further transitions.</p>
   {/if}
   {#if to === 'Hibernating'}
-    <p class="pu-muted">Pauses the resource. Resuming returns it to {plain(ndo.stage)}.</p>
+    <p class="pu-muted">Suspends the NDO. Resuming returns it to {ndo.stage}.</p>
   {/if}
   {#if to === 'Deprecated'}
-    <Field label="The resource that replaces it (required)">
+    <Field label="Successor NDO (required)">
       <select class="pu-select" bind:value={successor}>
-        <option value="">Pick a successor</option>
+        <option value="">— pick a successor</option>
         {#each others as n (n.id)}<option value={n.id}>{n.name}</option>{/each}
       </select>
     </Field>
   {/if}
   <ErrorNote {error} />
   {#if options.length}
-    <ModalActions {onclose} onok={submit} label={'Move to ' + plain(to)} />
+    <ModalActions {onclose} onok={submit} label={'Move to ' + to} />
   {/if}
 </Modal>

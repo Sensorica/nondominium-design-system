@@ -37,11 +37,11 @@
       {#if c.status === 'open'}
         <button type="button" class="pu-btn pu-btn--sm" onclick={() => fulfil(c.id)}>{$developer ? 'Fulfil' : 'Mark as done'}</button>
       {:else}
-        <span class="pu-muted">done</span>
+        <span class="pu-muted">claimed</span>
       {/if}
     </div>
   {:else}
-    <p class="pu-muted">No requests yet.</p>
+    <p class="pu-muted">No commitments yet.</p>
   {/each}
   <p class="pu-muted">
     {$developer
@@ -51,7 +51,7 @@
   <ErrorNote {error} />
   {#if ndo}
     <div class="pu-row pu-row--end">
-      <button type="button" class="pu-btn pu-btn--ghost" onclick={() => modals.open({ type: 'commit', ndo: ndo.id })}>+ New request</button>
+      <button type="button" class="pu-btn pu-btn--ghost" onclick={() => modals.open({ type: 'commit', ndo: ndo.id })}>+ Propose commitment</button>
     </div>
   {/if}
 </Modal>

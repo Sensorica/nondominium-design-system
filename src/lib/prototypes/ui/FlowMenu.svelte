@@ -111,7 +111,7 @@
     type="button"
     class="trigger"
     onclick={toggle}
-    title="Everything you can do (Ctrl+K)"
+    title="Everything you can do (⌘K)"
     aria-haspopup="menu"
     aria-expanded={open}
   >
@@ -133,7 +133,7 @@
           {/each}
         </div>
       {/each}
-      <p class="tip">Tip: press Ctrl+K (⌘K on a Mac) to open this menu</p>
+      <p class="tip">Tip: press ⌘K to open this menu</p>
     </div>
   {/if}
 </div>
