@@ -139,6 +139,12 @@
 </div>
 
 <style>
+  /* ui.jsx's FlowMenu sets no font of its own: its items use font: inherit
+     from wherever a direction mounts it (C's monospace top bar, A's sans
+     header). The shared .pu class pins the direction's body font instead. */
+  .wrap {
+    font-family: inherit;
+  }
   .wrap {
     position: relative;
   }

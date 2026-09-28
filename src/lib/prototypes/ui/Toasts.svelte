@@ -28,8 +28,8 @@
 <style>
   .toasts {
     position: fixed;
-    right: var(--proto-toasts-right, 24px);
-    bottom: var(--proto-toasts-bottom, 88px);
+    right: var(--proto-toasts-right, 18px);
+    bottom: var(--proto-toasts-bottom, 18px);
     z-index: 60;
     width: 300px;
     max-width: calc(100vw - 32px);

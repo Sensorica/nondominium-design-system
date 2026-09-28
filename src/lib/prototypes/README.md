@@ -153,7 +153,7 @@ The kit reads `--proto-*` custom properties; each defaults to a design-system to
 | | `--proto-focus` | `var(--ndo-focus-ring)` |
 | | `--proto-toast-bg`, `--proto-toast-ink` | `rgb(var(--ndo-gray-900))`, white |
 | | `--proto-progress`, `--proto-queued` | teal-300, amber-600 |
-| | `--proto-toasts-right`, `--proto-toasts-bottom` | `24px`, `88px` (clear of the comments button) |
+| | `--proto-toasts-right`, `--proto-toasts-bottom` | `18px`, `18px` (ui.jsx's PToasts position in every original; a transient toast may briefly cover the comments button) |
 
 The exit chip lives in the layout, outside your root. If your own UI sits in the bottom-left corner, move it by setting `--proto-exit-left` and `--proto-exit-bottom` on `document.documentElement` in an effect, and clear them in the effect's cleanup.
 
