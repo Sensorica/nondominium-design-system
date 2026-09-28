@@ -13,13 +13,14 @@
     "build:registry": "vite build --config vite.registry.config.ts",
     "build:all": "svelte-kit sync && bun run check && bun run build:registry && bun run build",
     "preview": "vite preview",
-    "check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json && bun run check:fidelity && bun run check:prototypes",
+    "check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json && bun run check:fidelity && bun run check:prototypes && bun run check:uno",
     "lint": "prettier --check . && eslint .",
     "format": "prettier --write .",
     "check:fidelity": "bun run scripts/check-fidelity.ts",
     "check:fixture": "bun run scripts/check-fixture-keys.ts",
     "check:prototypes": "bun run scripts/check-prototype-rules.ts",
-    "compare:prototypes": "bun run scripts/compare-prototypes.ts"
+    "compare:prototypes": "bun run scripts/compare-prototypes.ts",
+    "check:uno": "bun run scripts/check-uno-collisions.ts"
   },
   "devDependencies": {
     "@fontsource-variable/bricolage-grotesque": "^5.3.0",

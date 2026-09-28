@@ -42,7 +42,7 @@
     <span class="total">{week} traces / 7 d · {traces.length} total</span>
   </div>
   <svg viewBox="0 0 900 120" preserveAspectRatio="none" aria-hidden="true">
-    <g class="grid">
+    <g class="k-grid">
       <line x1="0" y1="30" x2="900" y2="30" />
       <line x1="0" y1="60" x2="900" y2="60" />
       <line x1="0" y1="90" x2="900" y2="90" />
@@ -95,7 +95,7 @@
     width: 100%;
     height: 52px;
   }
-  .grid line {
+  .k-grid line {
     stroke: var(--grid);
   }
   .now {

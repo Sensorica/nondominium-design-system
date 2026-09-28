@@ -47,7 +47,7 @@
   <div class="bar">
     <span class="title">{dev ? 'Conductor calls' : 'Activity'}</span>
     <span>{s.log.length} this session</span>
-    <span class="grow"></span>
+    <span class="k-grow"></span>
     {#each Object.keys(CONDUCTORS) as a (a)}
       {@const on = s.online[a]}
       <button type="button" class="cond" title="Toggle this conductor's network connection" aria-pressed={on} onclick={() => ctx.B.setOnline(a, !on)}>
@@ -96,7 +96,7 @@
     letter-spacing: 0.06em;
     text-transform: uppercase;
   }
-  .grow {
+  .k-grow {
     flex: 1;
   }
   .cond.cond {

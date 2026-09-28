@@ -128,7 +128,7 @@
         <div class="cards">
           <div class="pu-card card">
             <strong>Example network</strong>
-            <p class="pu-muted grow pu-muted--relaxed">
+            <p class="pu-muted k-grow pu-muted--relaxed">
               Join Sensorica and the Open Value Network: a shared CNC machine, a cryo-EM, an artwork on tour, a light sculpture and a
               sensor design, from the documented user stories.
             </p>
@@ -145,7 +145,7 @@
           </div>
           <div class="pu-card card">
             <strong>Invite link</strong>
-            <p class="pu-muted grow pu-muted--relaxed">
+            <p class="pu-muted k-grow pu-muted--relaxed">
               Paste a link someone shared with you. Try the food basket network: <span class="pu-mono">ndo-invite:food-7k2p</span>
             </p>
             <input class="pu-input pu-mono" bind:value={code} placeholder="ndo-invite:…" aria-label="Invite link" />
@@ -256,7 +256,7 @@
   .card strong {
     font-size: 15px;
   }
-  .grow {
+  .k-grow {
     flex: 1;
   }
   @media (max-width: 560px) {

@@ -153,7 +153,7 @@
           {#if proto.dev}<small class="mono">{r.layer}</small>{/if}
         </button>
       {:else}
-        <div class="card-ring static">
+        <div class="card-ring k-static">
           <i style:border-color={RING_COLOR[r.k]}></i>
           <span><b>{r.title}</b><br /><small>{r.sub}</small></span>
           {#if proto.dev}<small class="mono">{r.layer}</small>{/if}
@@ -317,10 +317,10 @@
     cursor: pointer;
     transition: var(--ndo-transition-colors);
   }
-  .card-ring.static {
+  .card-ring.k-static {
     cursor: default;
   }
-  .card-ring:not(.static):hover,
+  .card-ring:not(.k-static):hover,
   .card-ring.on {
     background: #f3f6f8;
   }

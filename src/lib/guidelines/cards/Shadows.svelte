@@ -15,7 +15,7 @@
     <div class="n">shadow-lg</div>
   </div>
   <div>
-    <div class="ring" style="box-shadow:var(--ndo-focus-ring)"></div>
+    <div class="k-ring" style="box-shadow:var(--ndo-focus-ring)"></div>
     <div class="n ring-n">focus ring</div>
   </div>
 </div>
@@ -35,7 +35,7 @@
     border: 1px solid rgb(var(--ndo-gray-200));
     border-radius: 8px;
   }
-  .ring {
+  .k-ring {
     width: 150px;
     height: 34px;
     margin-top: 19px;

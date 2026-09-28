@@ -12,7 +12,7 @@
   ];
 </script>
 
-<div class="grid">
+<div class="k-grid">
   {#each rows as row (row.token)}
     <div class="row">
       <span class="chip" style="background:rgb(var(--ndo-{row.swatch}))"></span>
@@ -23,7 +23,7 @@
 </div>
 
 <style>
-  .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px 24px; font-size: 13px; }
+  .k-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px 24px; font-size: 13px; }
   .row { display: flex; align-items: center; gap: 8px; }
   .chip {
     width: 20px;

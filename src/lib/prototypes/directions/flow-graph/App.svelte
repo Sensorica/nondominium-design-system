@@ -301,7 +301,7 @@
       </div>
     {/if}
 
-    <div class="grow"></div>
+    <div class="k-grow"></div>
 
     <button type="button" class="dev" class:dev--on={$developer} aria-pressed={$developer} onclick={() => developer.toggle()}>
       {$developer ? 'Developer details: on' : 'Developer details: off'}
@@ -526,7 +526,7 @@
     opacity: 1;
     outline: 2px solid currentColor;
   }
-  .grow {
+  .k-grow {
     flex: 1 1 0;
     min-width: 0;
   }

@@ -1,10 +1,10 @@
 <!-- Replica of docs/prototypes/original/ds/guidelines/brand-layers.html -->
 <script lang="ts"></script>
 
-<div class="grid">
+<div class="k-grid">
   <div>
     <p class="l">Layer 0 · identity</p>
-    <span class="pill">Active</span> <span class="outline">Nondominium</span>
+    <span class="pill">Active</span> <span class="k-outline">Nondominium</span>
     <p>Filled tint = lifecycle & nature. Dashed outline = regime. Never change after creation.</p>
   </div>
   <div>
@@ -20,7 +20,7 @@
 </div>
 
 <style>
-  .grid {
+  .k-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: 16px;
@@ -42,7 +42,7 @@
     border-radius: 4px;
     font-weight: 500;
   }
-  .outline {
+  .k-outline {
     border: 1px dashed rgb(var(--ndo-blue-700));
     color: rgb(var(--ndo-blue-700));
     padding: 1px 8px;

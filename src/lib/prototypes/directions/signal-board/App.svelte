@@ -83,7 +83,7 @@
       <button type="button" class="take ghost" onclick={() => modals.open({ type: 'group', after: setScope })}>+ Group</button>
       <FlowMenu ndo={open} onOpen={setOpen} onGroup={setScope} />
     </div>
-    <div class="me">
+    <div class="k-me">
       <button
         type="button"
         class="meta mono"
@@ -267,7 +267,7 @@
     gap: 8px;
     margin-left: 12px;
   }
-  .me {
+  .k-me {
     margin-left: auto;
     display: flex;
     align-items: center;

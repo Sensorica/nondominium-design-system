@@ -51,7 +51,7 @@
   <header class="bar">
     <span class="mark" style:background-image="url({logoMark})"></span>
     <span class="nm">Nondominium</span>
-    <button type="button" class="me" title="Your profile" onclick={() => modals.open({ type: 'profile' })}>
+    <button type="button" class="k-me" title="Your profile" onclick={() => modals.open({ type: 'profile' })}>
       <AgentAvatar id={proto.me.id} size={24} />
     </button>
 
@@ -204,7 +204,7 @@
     font-weight: 600;
     letter-spacing: 0.02em;
   }
-  .me {
+  .k-me {
     display: inline-flex;
     flex-shrink: 0;
     margin-left: 8px;
