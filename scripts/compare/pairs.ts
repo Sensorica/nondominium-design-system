@@ -13,6 +13,8 @@ import holarchy from './pairs/holarchy';
 import instrument from './pairs/instrument';
 import mycelium from './pairs/mycelium';
 import signalBoard from './pairs/signal-board';
+import shared from './pairs/shared';
+import ds from './pairs/ds';
 
 export type Step =
   | { click: string }
@@ -58,5 +60,7 @@ export const PAIRS: readonly Pair[] = [
   ...instrument,
   ...signalBoard,
   ...holarchy,
-  ...flowGraph
+  ...flowGraph,
+  ...shared,
+  ...ds
 ];

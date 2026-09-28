@@ -58,7 +58,9 @@
     color: var(--_ink);
     border: 1px solid var(--_line);
     border-radius: var(--_radius);
-    box-shadow: var(--_shadow);
+    /* ui.jsx PModal's boxShadow is its own literal, distinct from FlowMenu's
+     * and PToasts', not a themed variable. */
+    box-shadow: var(--proto-modal-shadow, 0 30px 60px -20px rgba(0, 0, 0, 0.5));
   }
   header {
     padding: 18px 22px 12px;

@@ -105,12 +105,12 @@
         </header>
         <Call c="zome_person::create_person → lobby::upsert_lobby_agent_profile" />
         <div class="pu-row preview">
-          <Avatar id={pName || 'new'} name={pName || '?'} url={isHttpsUrl(pAvatar) ? pAvatar : null} size={72} ring />
+          <Avatar id={pName || 'new'} name={pName || '?'} url={isHttpsUrl(pAvatar) ? pAvatar : null} size={72} ring={isHttpsUrl(pAvatar)} />
           <p class="pu-muted">Without a picture, your initials show on a colour that is always the same for you.<br />Paste an https:// image link below to use your own.</p>
         </div>
         <div class="pu-grid two">
           <Field label="Name *"><input class="pu-input" bind:value={pName} placeholder="e.g. Marco" {@attach focusOnMount} /></Field>
-          <Field label="Handle"><input class="pu-input" bind:value={pHandle} placeholder="e.g. marco-fablab" /></Field>
+          <Field label="Lobby handle"><input class="pu-input" bind:value={pHandle} placeholder="e.g. marco-fablab" /></Field>
         </div>
         <Field label="Bio"><input class="pu-input" bind:value={pBio} placeholder="What you do, where" /></Field>
         <Field label="Picture URL (optional)"><input class="pu-input" bind:value={pAvatar} placeholder="https://…" /></Field>
@@ -165,8 +165,8 @@
         <Call c="zome_resource::create_ndo → zome_group::create_ndo_anchor" />
         <Field label="Name *"><input class="pu-input" bind:value={nName} placeholder="e.g. Shared 3D printer" {@attach focusOnMount} /></Field>
         <Field label="Description"><input class="pu-input" bind:value={nDesc} /></Field>
-        <Field label="Type"><Choice options={ENUM.nature} value={nNature} onchange={(v) => (nNature = v as ResourceNature)} /></Field>
-        <Field label="Ownership" hint={nRegime === 'Nondominium' ? 'Uncapturable: no agent can take unilateral control.' : null}>
+        <Field label="Resource Nature"><Choice options={ENUM.nature} value={nNature} onchange={(v) => (nNature = v as ResourceNature)} /></Field>
+        <Field label="Property Regime" hint={nRegime === 'Nondominium' ? 'Uncapturable: no agent can take unilateral control.' : null}>
           <Choice options={ENUM.regime} value={nRegime} onchange={(v) => (nRegime = v as PropertyRegime)} />
         </Field>
         <ErrorNote {error} />
@@ -241,7 +241,9 @@
     gap: 12px;
   }
   .card {
-    border-radius: var(--_radius);
+    /* ui.jsx's onboarding `card` style is its own literal 12, not pv.r: it
+     * does not follow a direction's --proto-radius override. */
+    border-radius: 12px;
     padding: 16px;
     display: flex;
     flex-direction: column;

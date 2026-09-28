@@ -3,10 +3,44 @@
  * Theming contract. A direction themes this kit by setting --proto-* custom
  * properties on its own root element; every shared component carries the
  * `.pu` class, which resolves each one to a design-system token by default.
- * The handoff's ui.jsx used --pb, --pi, --pm, --pl, --pa, --pac, --pr, --prb
- * and --pmono for the same job; the mapping is in src/lib/prototypes/README.md.
+ * ui.jsx read --pb, --pi, --pm, --pl, --pa, --pac, --pr, --prb and --pmono for
+ * the same job (`pv` in ui.jsx). This is the exact mapping (ISA Phase 9,
+ * claim 1) a direction builder applies by setting the right-hand property.
  *
- * No hex literals here: colours come from tokens (rgb(var(--ndo-*))).
+ *   ui.jsx  | --proto-*             | default here
+ *   --------|-----------------------|----------------------------------
+ *   --pb    | --proto-bg            | rgb(var(--ndo-color-card-bg))
+ *   --pi    | --proto-ink           | var(--ndo-color-text-primary)
+ *   --pm    | --proto-muted         | var(--ndo-color-text-secondary)
+ *   --pl    | --proto-line          | var(--ndo-color-border)
+ *   --pa    | --proto-accent        | rgb(var(--ndo-blue-600))
+ *   —       | --proto-accent-hover  | rgb(var(--ndo-blue-700))
+ *   --pac   | --proto-accent-ink    | rgb(255 255 255)
+ *   --pr    | --proto-radius        | var(--ndo-radius-xl)   (modals, menu, toasts)
+ *   --prb   | --proto-control-radius| var(--ndo-radius-md)   (buttons)
+ *   —       | --proto-field-radius  | var(--ndo-radius-md)   (inputs, cards)
+ *   —       | --proto-font          | var(--ndo-font-sans)
+ *   --pmono | --proto-mono          | var(--ndo-font-mono)
+ *   —       | --proto-overlay       | rgba(0,0,0,.45)         (ui.jsx literal)
+ *   —       | --proto-shadow        | ui.jsx FlowMenu's literal shadow; Modal
+ *           |                       | and Toasts carry their own distinct
+ *           |                       | ui.jsx literal shadows directly (below)
+ *   —       | --proto-danger       | #D8452F                 (ui.jsx PErr literal)
+ *   —       | --proto-hover         | rgb(var(--ndo-gray-500) / 0.12)
+ *   —       | --proto-focus         | var(--ndo-focus-ring)   (addition: ui.jsx has none)
+ *
+ * Everything on the right with no ui.jsx column entry is an addition this
+ * port needs (focus rings, toast colours, hover states) that ui.jsx did not
+ * expose as a variable at all — it either hardcoded a literal per component
+ * (overlay, shadows, PErr's red, the toast progress colours) or switched on a
+ * JS boolean per direction (PToasts' `dark` prop, mapped here to
+ * --proto-toast-bg / --proto-toast-ink instead). Where ui.jsx hardcoded a
+ * literal, this file and its components use that literal directly, not a
+ * design token, so the default render matches ui.jsx pixel for pixel; the
+ * --proto-* hook still lets a direction override it (mycelium already does,
+ * for --proto-danger and --proto-overlay, to keep contrast on its dark
+ * ground). The eight avatar hues in avatar.ts are the only other hex
+ * literals in this kit, for the same reason.
  */
 
 .pu {
@@ -22,12 +56,26 @@
   --_field-radius: var(--proto-field-radius, var(--ndo-radius-md));
   --_font: var(--proto-font, var(--ndo-font-sans));
   --_mono: var(--proto-mono, var(--ndo-font-mono));
-  --_overlay: var(--proto-overlay, var(--ndo-color-overlay));
-  --_shadow: var(--proto-shadow, var(--ndo-shadow-xl));
-  --_danger: var(--proto-danger, rgb(var(--ndo-red-600)));
+  /* ui.jsx PModal's backdrop is a fixed literal, not a themed variable. */
+  --_overlay: var(--proto-overlay, rgba(0, 0, 0, 0.45));
+  /* ui.jsx has no shared shadow variable: FlowMenu's dropdown shadow is the
+   * closest thing to a "default" (Modal and Toasts carry their own literal
+   * shadow directly, see Modal.svelte and Toasts.svelte). */
+  --_shadow: var(--proto-shadow, 0 20px 40px -16px rgba(0, 0, 0, 0.45));
+  /* ui.jsx PErr's red is a fixed literal (#D8452F), not a themed variable. */
+  --_danger: var(--proto-danger, #d8452f);
   --_hover: var(--proto-hover, rgb(var(--ndo-gray-500) / 0.12));
   --_focus: var(--proto-focus, var(--ndo-focus-ring));
   font-family: var(--_font);
+  /* The design system's body rule sets a fixed line-height: 1.5rem (24px),
+   * an absolute length that does not rescale for a smaller descendant's own
+   * font-size. ui.jsx never set a page-wide line-height at all, so its
+   * buttons and menu items render at the browser's normal (font-relative)
+   * line-height. `normal` here is a keyword, not a resolved length, so each
+   * descendant that does not set its own line-height (pu-btn, pu-muted and
+   * pu-err already do) computes it from ITS OWN font-size, matching ui.jsx
+   * instead of inheriting the page's 24px. */
+  line-height: normal;
 }
 
 /* ── Buttons ──
@@ -193,7 +241,8 @@
   color: var(--_danger);
   background: color-mix(in srgb, var(--_danger) 8%, transparent);
   border: 1px solid color-mix(in srgb, var(--_danger) 30%, transparent);
-  border-radius: var(--_field-radius);
+  /* ui.jsx PErr's borderRadius: 8 is a fixed literal, not pv.r. */
+  border-radius: 8px;
   padding: 8px 10px;
   margin: 0;
 }

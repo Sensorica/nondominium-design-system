@@ -43,10 +43,12 @@
     border: 0;
     background: var(--proto-toast-bg, rgb(var(--ndo-gray-900)));
     color: var(--proto-toast-ink, rgb(255 255 255));
-    border-radius: var(--_radius);
+    /* ui.jsx PToasts' borderRadius: 12 and boxShadow are fixed literals, not
+     * pv.r or a themed shadow: every direction shows the same values. */
+    border-radius: 12px;
     padding: 11px 13px;
     font-size: 13px;
-    box-shadow: var(--ndo-shadow-xl);
+    box-shadow: 0 12px 30px -10px rgba(0, 0, 0, 0.45);
     cursor: pointer;
     display: flex;
     flex-direction: column;
@@ -63,14 +65,16 @@
     flex: 1;
     height: 3px;
     border-radius: 2px;
-    background: rgb(var(--ndo-gray-500) / 0.35);
+    /* The three progress-segment colours are ui.jsx literals (idle, done,
+     * queued), fixed regardless of direction. */
+    background: rgba(127, 127, 127, 0.35);
     transition: background 300ms;
   }
   .bar i.done {
-    background: var(--proto-progress, rgb(var(--ndo-teal-300)));
+    background: #2ec4b6;
   }
   .bar i.queued {
-    background: var(--proto-queued, rgb(var(--ndo-amber-600)));
+    background: #e0a21a;
   }
   .stage {
     font-size: 11px;
