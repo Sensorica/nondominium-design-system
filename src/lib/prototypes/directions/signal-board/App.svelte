@@ -7,6 +7,11 @@
   // Views (contract: src/lib/prototypes/README.md):
   //   board    the default, bare URL; `?group=` pins the scope
   //   drawer   `?view=drawer&ndo=…` opens that resource over the board
+  // Original webfonts, self-hosted (ISA Phase 9, D9): the variable weight axis
+  // of Bricolage Grotesque and DM Mono, exactly as the original's Google Fonts
+  // link requested, never fetched from a CDN.
+  import '@fontsource-variable/bricolage-grotesque/opsz.css';
+  import '@fontsource/dm-mono';
   import { paths } from '$lib/paths';
   import { proto } from '$lib/prototypes/store/store.svelte';
   import { currentRecord, currentView, goView } from '$lib/prototypes/url.svelte';
@@ -54,17 +59,17 @@
       list: signals.filter((g) => g.lane === l.id).sort((a, b) => b.strength - a.strength)
     }))
   );
+  // D.jsx does not sort this list: it filters and slices in the traces
+  // array's own order (newest writes are prepended there, so a fresh trace
+  // still surfaces first without an explicit sort here).
   const recent = $derived(
-    proto.s.traces
-      .filter((t) => inScope(t.ndo) && t.ago < RECENT_MINUTES)
-      .sort((a, b) => a.ago - b.ago)
-      .slice(0, RECENT_MAX)
+    proto.s.traces.filter((t) => inScope(t.ndo) && t.ago < RECENT_MINUTES).slice(0, RECENT_MAX)
   );
 </script>
 
 <div class="sb">
   <header>
-    <img class="mark" src={paths.logoMark()} alt="" width="36" height="36" />
+    <img class="mark" src={paths.logoMark()} alt="" width="40" height="40" />
     <h1>Signals</h1>
     <div class="scope">
       <GroupScope value={scope} onchange={setScope} allLabel="All my groups">
@@ -104,16 +109,16 @@
   <div class="board">
     {#each lanes as l (l.id)}
       <section class="col" aria-label={l.label}>
-        <div class="ch"><span class="sw" style:background="rgb(var({l.tone}))"></span><b>{l.label}</b><span class="n">{l.list.length}</span></div>
+        <div class="ch"><span class="sw" style:background={l.tone}></span><b>{l.label}</b><span class="n">{l.list.length}</span></div>
         {#each l.list as g (g.id)}
-          <SignalCard sig={g} tone={l.tone} onopen={setOpen} />
+          <SignalCard sig={g} tone={l.tone} bg={l.bg} onopen={setOpen} />
         {:else}
           <div class="empty">Nothing here right now.</div>
         {/each}
       </section>
     {/each}
     <section class="col" aria-label="Just happened">
-      <div class="ch"><span class="sw" style:background="rgb(var({HAPPENED_TONE}))"></span><b>Just happened</b><span class="n">live</span></div>
+      <div class="ch"><span class="sw" style:background={HAPPENED_TONE}></span><b>Just happened</b><span class="n">live</span></div>
       {#each recent as t (t.id)}
         <HappenedCard {t} onopen={setOpen} />
       {:else}
@@ -132,16 +137,69 @@
 </div>
 
 <style>
+  /* Original D · Signal Board palette and webfonts (ISA Phase 9, D8/D9),
+   * scoped to this direction's root. Values are the original stylesheet's
+   * :root block, verbatim. The --proto-* lines are the mapping the shared UI
+   * kit (modals, menu, onboarding, toasts) reads, so it renders like ui.jsx:
+   * see src/lib/prototypes/README.md § Theming for the full table. */
   .sb {
-    --proto-bg: rgb(var(--ndo-color-card-bg));
-    --proto-radius: var(--ndo-radius-xl);
+    --bg: #fbfaf7;
+    --ink: #101418;
+    --ink2: #4b5258;
+    --mute: #8a9096;
+    --line: #e6e3dc;
+    --teal: #1fb5a6;
+    --tealbg: #d7f3ef;
+    --blue: #3565da;
+    --bluebg: #dde6fb;
+    --violet: #7a4de3;
+    --violetbg: #e9e1fb;
+    --amber: #e7a117;
+    --amberbg: #fbebc7;
+
+    --proto-bg: #fff;
+    --proto-ink: var(--ink);
+    --proto-muted: var(--mute);
+    --proto-line: var(--line);
+    --proto-accent: var(--ink);
+    --proto-accent-hover: var(--ink);
+    --proto-accent-ink: #fff;
+    --proto-radius: 18px;
+    --proto-control-radius: 999px;
+    --proto-field-radius: 8px;
+    --proto-font: 'Bricolage Grotesque Variable', 'Bricolage Grotesque', sans-serif;
+    --proto-mono: 'DM Mono', monospace;
+    --proto-overlay: rgba(0, 0, 0, 0.45);
+    --proto-shadow: 0 30px 60px -20px rgba(0, 0, 0, 0.5);
+    --proto-danger: #d8452f;
+    --proto-hover: rgba(127, 127, 127, 0.12);
+    --proto-toast-bg: #131a1c;
+    --proto-toast-ink: #fff;
+    --proto-progress: #2ec4b6;
+    --proto-queued: #e0a21a;
+    --proto-toasts-right: 18px;
+    --proto-toasts-bottom: 18px;
+
+    /* The design system's global reset (UnoCSS's Tailwind preflight) sets
+     * `html { line-height: 1.5 }`. The original page never set a line-height
+     * at all, so its text wraps and stacks at the browser's natural metric
+     * for this font. Restoring `normal` here, scoped to this direction's
+     * root, is what makes every unspecified line-height below match the
+     * original pixel for pixel instead of drifting taller line by line. */
+    line-height: normal;
     height: 100%;
     overflow: auto;
     display: flex;
     flex-direction: column;
-    background: var(--ndo-color-bg-app);
-    color: var(--ndo-color-text-primary);
-    font-family: var(--ndo-font-sans);
+    background: var(--bg);
+    color: var(--ink);
+    font-family: 'Bricolage Grotesque Variable', 'Bricolage Grotesque', sans-serif;
+  }
+  .sb :global(a) {
+    color: var(--blue);
+  }
+  .sb :global(a:hover) {
+    color: var(--ink);
   }
 
   /* ── Header ── */
@@ -154,12 +212,12 @@
   }
   .mark {
     display: block;
-    border-radius: var(--ndo-radius-md);
+    mix-blend-mode: multiply;
   }
   h1 {
     margin: 0;
-    font-size: var(--ndo-text-3xl);
-    font-weight: var(--ndo-weight-bold);
+    font-size: 34px;
+    font-weight: 800;
     letter-spacing: -0.03em;
   }
   .scope {
@@ -172,34 +230,36 @@
   .chip {
     font: inherit;
     font-size: 13px;
-    font-weight: var(--ndo-weight-medium);
-    padding: 6px 12px;
-    border-radius: var(--ndo-radius-pill);
-    border: 1px solid var(--ndo-color-border-strong);
+    font-weight: 500;
+    padding: 7px 12px;
+    border-radius: 999px;
+    border: 1.5px solid var(--line);
     background: transparent;
     color: inherit;
     cursor: pointer;
     white-space: nowrap;
-    transition: var(--ndo-transition-colors);
   }
   .chip:hover {
-    border-color: var(--ndo-color-text-primary);
+    border-color: var(--ink);
   }
   .chip.on {
-    background: var(--ndo-color-text-primary);
-    border-color: var(--ndo-color-text-primary);
-    color: rgb(var(--ndo-color-text-inverse));
+    background: var(--ink);
+    border-color: var(--ink);
+    color: #fff;
   }
   .chip:focus-visible {
-    outline: none;
-    box-shadow: var(--ndo-focus-ring);
+    outline: 2px solid var(--blue);
+    outline-offset: 2px;
   }
   /* The "+N more groups" select comes from the shared GroupScope. */
   .scope :global(select) {
-    font-size: 13px;
-    padding: 6px 10px;
-    border-radius: var(--ndo-radius-pill);
-    border: 1px dashed var(--ndo-color-border-strong);
+    font: inherit;
+    font-size: 12px;
+    background: transparent;
+    color: inherit;
+    border: 0;
+    padding: 4px 6px;
+    cursor: pointer;
   }
   .adds {
     display: flex;
@@ -221,28 +281,27 @@
     border: 0;
     background: none;
     padding: 2px 0;
-    color: var(--ndo-color-text-muted);
+    color: var(--mute);
     cursor: pointer;
-    border-radius: var(--ndo-radius-sm);
   }
   .meta:hover {
-    color: var(--ndo-color-text-primary);
+    color: var(--ink);
   }
   .meta:focus-visible {
-    outline: none;
-    box-shadow: var(--ndo-focus-ring);
+    outline: 2px solid var(--blue);
+    outline-offset: 2px;
   }
   .meta.offline {
-    color: rgb(var(--ndo-amber-600));
+    color: var(--amber);
   }
   .mono {
-    font-family: var(--ndo-font-mono);
+    font-family: 'DM Mono', monospace;
   }
   .who {
     display: inline-flex;
     align-items: center;
     gap: 8px;
-    color: var(--ndo-color-text-primary);
+    color: var(--ink);
   }
   .reset {
     text-decoration: underline;
@@ -253,7 +312,7 @@
     padding: 0 28px 14px;
     max-width: 980px;
     font-size: 15px;
-    color: var(--ndo-color-text-secondary);
+    color: var(--ink2);
   }
 
   /* ── Board: three derived lanes and the activity column ── */
@@ -261,7 +320,8 @@
     flex: 1;
     display: grid;
     grid-template-columns: repeat(4, minmax(0, 1fr));
-    align-items: start;
+    /* No align-items: the original relies on Grid's default `stretch`, so a
+     * lane with fewer cards still shows its full-height card outline. */
     gap: 14px;
     padding: 0 28px 72px;
   }
@@ -271,10 +331,9 @@
     flex-direction: column;
     gap: 10px;
     padding: 14px;
-    background: rgb(var(--ndo-color-card-bg));
-    border: 1px solid var(--ndo-color-border);
-    border-radius: var(--ndo-radius-xl);
-    box-shadow: var(--ndo-shadow-sm);
+    background: #fff;
+    border: 1.5px solid var(--line);
+    border-radius: 18px;
   }
   .ch {
     display: flex;
@@ -284,61 +343,57 @@
   }
   .ch b {
     font-size: 17px;
-    font-weight: var(--ndo-weight-bold);
+    font-weight: 700;
     letter-spacing: -0.01em;
     white-space: nowrap;
   }
   .ch .n {
     margin-left: auto;
-    font-family: var(--ndo-font-mono);
-    font-size: var(--ndo-text-xs);
-    color: var(--ndo-color-text-muted);
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--mute);
   }
   .sw {
     width: 12px;
     height: 12px;
-    border-radius: var(--ndo-radius-sm);
+    border-radius: 4px;
   }
   .empty {
     padding: 16px 6px;
     text-align: center;
     font-size: 13px;
-    color: var(--ndo-color-text-muted);
-    border: 1px dashed var(--ndo-color-border-strong);
-    border-radius: var(--ndo-radius-xl);
+    color: var(--mute);
+    border: 1.5px dashed var(--line);
+    border-radius: 14px;
   }
 
   /* ── Buttons shared by the header, the cards and the drawer ── */
   .sb :global(.take) {
-    font: inherit;
-    font-size: 13px;
-    font-weight: var(--ndo-weight-semibold);
-    line-height: 1.2;
+    font: 700 13px 'Bricolage Grotesque Variable', 'Bricolage Grotesque', sans-serif;
     padding: 7px 12px;
-    border-radius: var(--ndo-radius-md);
-    border: 1px solid rgb(var(--ndo-blue-600));
-    background: rgb(var(--ndo-blue-600));
-    color: rgb(255 255 255);
+    border-radius: 999px;
+    background: var(--ink);
+    color: #fff;
+    border: 1.5px solid var(--ink);
     cursor: pointer;
     white-space: nowrap;
-    transition: var(--ndo-transition-colors);
   }
   .sb :global(.take:hover) {
-    background: rgb(var(--ndo-blue-700));
-    border-color: rgb(var(--ndo-blue-700));
+    background: var(--blue);
+    border-color: var(--blue);
   }
   .sb :global(.take.ghost) {
     background: transparent;
-    color: var(--ndo-color-text-primary);
-    border-color: var(--ndo-color-border-strong);
+    color: var(--ink);
+    border-color: rgba(16, 20, 24, 0.25);
   }
   .sb :global(.take.ghost:hover) {
-    background: rgb(var(--ndo-gray-500) / 0.12);
-    border-color: var(--ndo-color-text-primary);
+    border-color: var(--ink);
   }
   .sb :global(.take:focus-visible) {
-    outline: none;
-    box-shadow: var(--ndo-focus-ring);
+    outline: 2px solid var(--blue);
+    outline-offset: 2px;
   }
 
   @media (max-width: 1100px) {

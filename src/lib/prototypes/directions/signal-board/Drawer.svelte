@@ -29,9 +29,12 @@
 
   const open = (req: ModalRequest) => () => modals.open(req);
 
+  // Labels are D.jsx's own words for its dact row, verbatim (its FlowMenu
+  // entries phrase a couple of these differently; the drawer button is the
+  // source of truth here).
   const actions = $derived<{ label: string; req: ModalRequest; primary?: boolean }[]>([
     { label: 'Log work', req: { type: 'note', ndo: id }, primary: true },
-    { label: 'Link a resource', req: { type: 'attach', ndo: id } },
+    { label: 'Link NDO', req: { type: 'attach', ndo: id } },
     { label: 'Lifecycle', req: { type: 'advance', ndo: id } },
     { label: 'Items', req: { type: 'resources', ndo: id } },
     { label: 'Ask to borrow', req: { type: 'commit', ndo: id } },
@@ -54,10 +57,10 @@
       <div class="res">{group?.name ?? ''}{proto.dev ? ' · ' + n.hash : ''}</div>
       <h2>{n.name}</h2>
       <div class="pills">
-        <span class="pill tint">{plain(n.stage)}</span>
-        <span class="pill dashed">{plain(n.regime)}</span>
-        <span class="pill tint">{plain(n.nature)}</span>
-        <span class="pill tint">{plain(n.rivalry)}</span>
+        <span class="pill">{plain(n.stage)}</span>
+        <span class="pill">{plain(n.regime)}</span>
+        <span class="pill">{plain(n.nature)}</span>
+        <span class="pill">{plain(n.rivalry)}</span>
       </div>
       {#if n.desc}<p class="desc">{n.desc}</p>{/if}
       <div class="dact">
@@ -100,8 +103,6 @@
           </span>
           <span class="muted mono when">{t.status === 'validated' ? fmtAgo(t.ago) : stageLabel(t.status, proto.dev)}</span>
         </div>
-      {:else}
-        <div class="muted">Nothing yet.</div>
       {/each}
 
       <h4>Linked resources</h4>
@@ -129,7 +130,7 @@
     inset: 0;
     border: 0;
     padding: 0;
-    background: rgb(var(--ndo-gray-900) / 0.25);
+    background: rgba(16, 20, 24, 0.25);
     cursor: default;
   }
   .drawer {
@@ -141,10 +142,10 @@
     max-width: 100vw;
     overflow: auto;
     padding: 26px 26px 72px;
-    background: rgb(var(--ndo-color-card-bg));
-    color: var(--ndo-color-text-primary);
-    box-shadow: var(--ndo-shadow-xl);
-    animation: slide 250ms var(--ndo-easing);
+    background: #fff;
+    color: var(--ink);
+    box-shadow: -20px 0 40px -20px rgba(0, 0, 0, 0.3);
+    animation: slide 250ms ease;
   }
   @keyframes slide {
     from {
@@ -158,23 +159,23 @@
     top: 18px;
     border: 0;
     background: none;
-    font-size: var(--ndo-text-base);
-    color: var(--ndo-color-text-muted);
+    font-size: 16px;
+    color: var(--mute);
     cursor: pointer;
-    border-radius: var(--ndo-radius-sm);
+    border-radius: 4px;
   }
   .x:hover {
-    color: var(--ndo-color-text-primary);
+    color: var(--ink);
   }
   .x:focus-visible {
-    outline: none;
-    box-shadow: var(--ndo-focus-ring);
+    outline: 2px solid var(--blue);
+    outline-offset: 2px;
   }
   .res {
-    font-family: var(--ndo-font-mono);
+    font-family: 'DM Mono', monospace;
     font-size: 11px;
-    font-weight: var(--ndo-weight-medium);
-    color: var(--ndo-color-text-secondary);
+    font-weight: 500;
+    color: var(--ink2);
     text-transform: uppercase;
     letter-spacing: 0.04em;
     padding-right: 28px;
@@ -182,44 +183,38 @@
   }
   h2 {
     margin: 6px 0 10px;
-    font-size: var(--ndo-text-3xl);
-    line-height: 1.1;
-    font-weight: var(--ndo-weight-bold);
+    font-size: 28px;
+    line-height: 1.05;
+    font-weight: 800;
     letter-spacing: -0.02em;
   }
   .desc {
-    color: var(--ndo-color-text-secondary);
-    font-size: var(--ndo-text-sm);
+    /* The original never sets a margin on this <p>, relying on the
+     * browser's UA default (1em top and bottom). The design system's global
+     * reset (UnoCSS's Tailwind preflight) zeroes every <p>'s margin, so it
+     * has to be restored explicitly here to keep the original's spacing. */
+    margin: 1em 0;
+    color: var(--ink2);
+    font-size: 14px;
   }
   h4 {
     margin: 20px 0 8px;
-    font-size: var(--ndo-text-sm);
-    font-weight: var(--ndo-weight-bold);
+    font-size: 14px;
   }
   .pills {
     display: flex;
     flex-wrap: wrap;
     gap: 6px;
   }
-  /* Badge shape grammar: a filled tint classifies (Layer 0), a dashed
-     outline names the property regime. */
+  /* One uniform pill in the original: no per-kind tint or dashed variant. */
   .pill {
-    font-family: var(--ndo-font-mono);
-    font-size: var(--ndo-text-xs);
-    font-weight: var(--ndo-weight-medium);
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    font-weight: 500;
     padding: 4px 9px;
-    border-radius: var(--ndo-radius-pill);
-    background: var(--ndo-color-surface);
-    border: 1px solid var(--ndo-color-border);
-  }
-  .pill.tint {
-    background: rgb(var(--ndo-blue-600) / 0.08);
-    border-color: rgb(var(--ndo-blue-600) / 0.18);
-  }
-  .pill.dashed {
-    background: transparent;
-    border-style: dashed;
-    border-color: var(--ndo-color-border-strong);
+    border-radius: 999px;
+    background: var(--bg);
+    border: 1px solid var(--line);
   }
   .dact {
     display: flex;
@@ -232,7 +227,7 @@
     gap: 10px;
     align-items: center;
     padding: 8px 0;
-    border-bottom: 1px solid var(--ndo-color-border);
+    border-bottom: 1px solid var(--line);
     font-size: 13px;
   }
   .drow.done {
@@ -244,14 +239,14 @@
     align-items: flex-start;
   }
   em {
-    color: var(--ndo-color-text-secondary);
+    color: var(--ink2);
   }
   .muted {
-    color: var(--ndo-color-text-muted);
-    font-size: var(--ndo-text-xs);
+    color: var(--mute);
+    font-size: 12px;
   }
   .mono {
-    font-family: var(--ndo-font-mono);
+    font-family: 'DM Mono', monospace;
   }
   .when {
     flex-shrink: 0;

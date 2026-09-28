@@ -11,12 +11,14 @@
 
   interface Props {
     sig: Signal;
-    /** Token name of the lane colour, e.g. '--ndo-amber-600'. */
+    /** Original lane colour, e.g. 'var(--amber)'. */
     tone: string;
+    /** Original lane background tint, e.g. 'var(--amberbg)'. */
+    bg: string;
     onopen: (ndoId: string) => void;
   }
 
-  let { sig, tone, onopen }: Props = $props();
+  let { sig, tone, bg, onopen }: Props = $props();
 
   let error = $state<string | null>(null);
 
@@ -39,12 +41,17 @@
 
 {#if ndo}
   <!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_noninteractive_element_interactions -->
-  <article class="card" class:cold style:--lane="var({cold ? '--ndo-gray-500' : tone})" onclick={onCardClick}>
+  <article
+    class="card"
+    class:cold
+    style:background={cold ? '#F4F2EE' : bg}
+    onclick={onCardClick}
+  >
     <div class="res">{ndo.name}</div>
     <h3><button type="button" class="open" onclick={() => onopen(sig.ndo)}>{sig.title}</button></h3>
     <p>{sig.progress ? sig.progress[0] + ' of ' + sig.progress[1] + ' · ' : ''}{sig.sub}</p>
     <div class="foot">
-      <Strength n={sig.strength} />
+      <Strength n={sig.strength} color={cold ? 'var(--mute)' : tone} />
       <button type="button" class="take" class:ghost={cold} onclick={pickUp}>{sig.verb}</button>
     </div>
     <ErrorNote {error} />
@@ -55,23 +62,18 @@
 <style>
   .card {
     position: relative;
-    border-radius: var(--ndo-radius-xl);
+    border-radius: 14px;
     padding: 14px;
     cursor: pointer;
-    background: rgb(var(--lane) / 0.1);
-    border: 1px solid rgb(var(--lane) / 0.18);
     transition:
-      transform var(--ndo-duration-base) var(--ndo-easing),
-      var(--ndo-transition-shadow);
-    animation: in 350ms var(--ndo-easing);
+      transform 150ms ease,
+      box-shadow 150ms ease,
+      opacity 400ms;
+    animation: in 350ms ease;
   }
   .card:hover {
     transform: translateY(-2px);
-    box-shadow: var(--ndo-shadow-lg);
-  }
-  .card.cold {
-    background: rgb(var(--ndo-gray-500) / 0.08);
-    border-color: var(--ndo-color-border);
+    box-shadow: 0 8px 20px -10px rgba(16, 20, 24, 0.25);
   }
   @keyframes in {
     from {
@@ -80,18 +82,18 @@
     }
   }
   .res {
-    font-family: var(--ndo-font-mono);
+    font-family: 'DM Mono', monospace;
     font-size: 11px;
-    font-weight: var(--ndo-weight-medium);
-    color: var(--ndo-color-text-secondary);
+    font-weight: 500;
+    color: var(--ink2);
     text-transform: uppercase;
     letter-spacing: 0.04em;
   }
   h3 {
     margin: 6px 0;
-    font-size: var(--ndo-text-lg);
-    line-height: 1.2;
-    font-weight: var(--ndo-weight-bold);
+    font-size: 18px;
+    line-height: 1.15;
+    font-weight: 700;
     letter-spacing: -0.01em;
   }
   .open {
@@ -99,13 +101,14 @@
     cursor: pointer;
   }
   .open:focus-visible {
-    border-radius: var(--ndo-radius-sm);
-    box-shadow: var(--ndo-focus-ring);
+    border-radius: 4px;
+    outline: 2px solid var(--blue);
+    outline-offset: 2px;
   }
   p {
     margin: 0 0 12px;
     font-size: 13px;
-    color: var(--ndo-color-text-secondary);
+    color: var(--ink2);
   }
   .foot {
     display: flex;
@@ -121,20 +124,20 @@
     margin-top: 10px;
     padding: 8px 0 0;
     border: 0;
-    border-top: 1px dashed rgb(var(--ndo-gray-500) / 0.35);
+    border-top: 1px dashed rgba(16, 20, 24, 0.18);
     background: none;
     text-align: left;
-    font-family: var(--ndo-font-mono);
-    font-size: var(--ndo-text-xs);
-    color: var(--ndo-color-text-secondary);
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    color: var(--ink2);
     cursor: pointer;
   }
   .why:hover {
-    color: var(--ndo-color-text-primary);
+    color: var(--ink);
     text-decoration: underline;
   }
   .why:focus-visible {
-    outline: none;
-    box-shadow: var(--ndo-focus-ring);
+    outline: 2px solid var(--blue);
+    outline-offset: 2px;
   }
 </style>
