@@ -1,0 +1,28 @@
+/* Nondominium — typography. System stacks only; no webfonts shipped by the source. */
+:root{
+--ndo-font-sans:system-ui,-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
+--ndo-font-mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+--ndo-text-xs:0.75rem;/* @kind font */
+--ndo-text-sm:0.875rem;/* @kind font */
+--ndo-text-base:1rem;/* @kind font */
+--ndo-text-lg:1.125rem;/* @kind font */
+--ndo-text-xl:1.25rem;/* @kind font */
+--ndo-text-2xl:1.5rem;/* @kind font */
+
+--ndo-text-label:0.8125rem;/* @kind font */
+--ndo-text-micro:0.6875rem;/* @kind font */
+
+--ndo-lh-xs:1rem;/* @kind font */
+--ndo-lh-sm:1.25rem;/* @kind font */
+--ndo-lh-base:1.5rem;/* @kind font */
+--ndo-lh-lg:1.75rem;/* @kind font */
+--ndo-lh-xl:1.75rem;/* @kind font */
+--ndo-lh-2xl:2rem;/* @kind font */
+
+--ndo-weight-medium:500;/* @kind font */
+--ndo-weight-semibold:600;/* @kind font */
+--ndo-weight-bold:700;/* @kind font */
+
+--ndo-tracking-caps:0.05em;/* @kind font */
+
+}
