@@ -237,7 +237,6 @@
     --proto-hover: rgba(127, 127, 127, 0.12);
     --proto-toast-bg: #131a1c;
     --proto-toast-ink: #fff;
-    --proto-toasts-bottom: 96px;
 
     height: 100%;
     display: grid;

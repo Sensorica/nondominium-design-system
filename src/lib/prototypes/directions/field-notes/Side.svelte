@@ -39,6 +39,7 @@
       <div class="note">
         <b>{g.title}</b>
         <small>{g.progress ? g.progress[0] + ' of ' + g.progress[1] + ' · ' : ''}{g.sub}</small>
+        <br />
         <button type="button" class="act" onclick={() => pickUp(g)}>{g.verb} →</button>
         <button type="button" class="why" onclick={() => modals.open({ type: 'why', sig: g, ndo: g.ndo })}>why?</button>
         <ErrorNote error={errors[g.id]} />
@@ -91,8 +92,13 @@
   h3,
   .rh {
     margin: 0 0 4px;
-    font-size: var(--ndo-text-lg);
-    font-weight: var(--ndo-weight-medium);
+    font-family: var(--fn-serif);
+    font-size: 18px;
+    font-weight: 500;
+    /* Same measured, not-CSS-fixable block-heading box-height gap as
+     * Entry.svelte's .h3 (see its comment): the self-hosted variable
+     * Newsreader lays out ~6px shorter here than the original's static
+     * build, regardless of the `line-height` value set. */
   }
   .gap {
     margin-top: 26px;
@@ -103,7 +109,6 @@
     border: 0;
     background: none;
     color: var(--fn-ink);
-    font-family: inherit;
     cursor: pointer;
   }
   .rh:hover {
@@ -111,7 +116,9 @@
   }
   .sub {
     margin-bottom: 10px;
-    font-size: var(--ndo-text-xs);
+    font-family: var(--fn-sans);
+    font-size: 12px;
+    line-height: normal;
     color: var(--fn-mute);
   }
 
@@ -121,12 +128,15 @@
   }
   .note b {
     display: block;
+    font-family: var(--fn-serif);
     font-size: 15px;
-    font-weight: var(--ndo-weight-medium);
+    font-weight: 500;
+    line-height: normal;
   }
   .note small {
     display: block;
     font-size: 11px;
+    line-height: normal;
     color: var(--fn-mute);
   }
   .act {
@@ -138,8 +148,9 @@
     background: none;
     color: var(--fn-teal);
     font-family: inherit;
-    font-size: var(--ndo-text-xs);
-    font-weight: var(--ndo-weight-medium);
+    font-size: 12px;
+    font-weight: 500;
+    line-height: normal;
     cursor: pointer;
   }
   .act:hover {
@@ -154,6 +165,7 @@
     color: var(--fn-mute);
     font-family: inherit;
     font-size: 11px;
+    line-height: normal;
     text-decoration: underline dotted;
     cursor: pointer;
   }
@@ -168,6 +180,7 @@
     padding: 7px 0;
     border-bottom: 1px dotted var(--fn-rule);
     font-size: 13px;
+    line-height: normal;
   }
   .sl span:last-child {
     color: var(--fn-mute);
@@ -184,7 +197,7 @@
     flex-direction: column;
     align-items: flex-start;
     margin-top: 24px;
-    font-family: var(--ndo-font-mono);
+    font-family: var(--fn-mono);
   }
   .plain {
     padding: 0;

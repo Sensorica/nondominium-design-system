@@ -47,7 +47,7 @@
     </div>
   {:else}
     <div class="kick opened">
-      <span>Entry № <span class="mono">{n.hash}</span> · opened by</span>
+      <span>Entry № {n.hash} · opened by</span>
       {#if opener}
         <AgentAvatar id={opener} size={16} />
         <span>{proto.q.agent(opener)}</span>
@@ -56,12 +56,12 @@
     <h1>{n.name}</h1>
     <p class="lede">{n.desc || 'No description yet.'}</p>
 
-    <dl class="stamp">
-      <div><dt>Stage</dt><dd>{plain(n.stage)}</dd></div>
-      <div><dt>Ownership</dt><dd>{plain(n.regime)}</dd></div>
-      <div><dt>Type</dt><dd>{plain(n.nature)}</dd></div>
-      <div><dt>Use</dt><dd>{plain(n.rivalry)}</dd></div>
-    </dl>
+    <div class="stamp">
+      <div><small>Stage</small><b>{plain(n.stage)}</b></div>
+      <div><small>Ownership</small><b>{plain(n.regime)}</b></div>
+      <div><small>Type</small><b>{plain(n.nature)}</b></div>
+      <div><small>Use</small><b>{plain(n.rivalry)}</b></div>
+    </div>
 
     <nav class="tabs" aria-label="Entry sections">
       {#each TABS as [k, label] (k)}
@@ -97,7 +97,7 @@
     {:else if view === 'rules'}
       <div class="two">
         <section>
-          <h3 class="h3">Rules in force</h3>
+          <h3 class="k-h3">Rules in force</h3>
           {#each rules as [type, summary], i (i)}
             <div class="sl"><span>{plain(type)}</span><span>{plain(summary)}</span></div>
           {:else}
@@ -105,7 +105,7 @@
           {/each}
         </section>
         <section>
-          <h3 class="h3">Items</h3>
+          <h3 class="k-h3">Items</h3>
           {#each items as [label, state, holder], i (i)}
             <div class="sl"><span>{label}</span><span>{plain(state)} · {proto.q.agent(holder)}</span></div>
           {:else}
@@ -115,7 +115,7 @@
           {/each}
         </section>
       </div>
-      <div class="row">
+      <div class="row stacked">
         <button type="button" class="btn" onclick={() => modals.open({ type: 'rule', ndo: n.id })}>Add a rule</button>
         <button type="button" class="btn" onclick={() => modals.open({ type: 'resources', ndo: n.id })}>Items & holders</button>
       </div>
@@ -129,7 +129,7 @@
         {:else}
           <p class="foot">No requests yet.</p>
         {/each}
-        <div class="row">
+        <div class="row stacked">
           <button type="button" class="btn" onclick={() => modals.open({ type: 'commit', ndo: n.id })}>Ask to borrow or receive</button>
           <button type="button" class="btn" onclick={() => modals.open({ type: 'commitments', ndo: n.id })}>Mark done…</button>
         </div>
@@ -164,6 +164,7 @@
     font-size: 11px;
     letter-spacing: 0.14em;
     text-transform: uppercase;
+    line-height: normal;
     color: var(--fn-mute);
   }
   .opened {
@@ -172,33 +173,31 @@
     align-items: center;
     gap: 6px;
   }
-  .mono {
-    font-family: var(--ndo-font-mono);
-    letter-spacing: 0;
-    text-transform: none;
-  }
 
   h1 {
     margin: 10px 0 14px;
+    font-family: var(--fn-serif);
     font-size: 46px;
-    font-weight: var(--ndo-weight-medium);
+    font-weight: 500;
     line-height: 1.05;
     letter-spacing: -0.02em;
   }
   .lede {
     max-width: 600px;
     margin: 0 0 22px;
-    font-size: var(--ndo-text-lg);
+    font-family: var(--fn-serif);
+    font-size: 19px;
     font-style: italic;
     line-height: 1.45;
     color: var(--fn-ink2);
   }
 
   .stamp {
+    /* Spans the content width, like the original: a block-level flex
+     * container with no width of its own, not shrunk to fit its content. */
     display: flex;
     flex-wrap: wrap;
     max-width: 100%;
-    width: fit-content;
     margin: 0 0 24px;
     border: 1.5px solid var(--fn-ink);
   }
@@ -210,16 +209,19 @@
   .stamp > div:last-child {
     border-right: 0;
   }
-  dt {
+  .stamp small {
+    display: block;
     font-size: 9px;
     letter-spacing: 0.14em;
     text-transform: uppercase;
+    line-height: normal;
     color: var(--fn-mute);
   }
-  dd {
-    margin: 0;
+  .stamp b {
+    font-family: var(--fn-serif);
     font-size: 15px;
-    font-weight: var(--ndo-weight-medium);
+    font-weight: 500;
+    line-height: normal;
   }
 
   .tabs {
@@ -238,6 +240,7 @@
     background: none;
     font-family: inherit;
     font-size: 13px;
+    line-height: normal;
     white-space: nowrap;
     cursor: pointer;
   }
@@ -250,7 +253,7 @@
   .tab.on {
     color: var(--fn-ink);
     border-bottom-color: var(--fn-ink);
-    font-weight: var(--ndo-weight-semibold);
+    font-weight: 600;
   }
   .acts {
     display: flex;
@@ -306,17 +309,21 @@
     align-items: center;
     gap: 8px;
     margin: 0;
-    font-size: var(--ndo-text-base);
-    font-weight: var(--ndo-weight-medium);
+    font-family: var(--fn-serif);
+    font-size: 17px;
+    font-weight: 500;
+    line-height: normal;
   }
   .when {
     font-size: 11px;
+    line-height: normal;
     color: var(--fn-mute);
   }
   .margin {
     padding-left: 10px;
     border-left: 1px solid var(--fn-rust);
-    font-size: var(--ndo-text-sm);
+    font-family: var(--fn-serif);
+    font-size: 14px;
     font-style: italic;
     line-height: 1.4;
     color: var(--fn-rust);
@@ -324,6 +331,7 @@
   .margin small {
     display: block;
     margin-top: 2px;
+    font-family: var(--fn-sans);
     font-size: 11px;
     font-style: normal;
     color: var(--fn-mute);
@@ -334,10 +342,26 @@
     grid-template-columns: 1fr 1fr;
     gap: 32px;
   }
-  .h3 {
+  .k-h3 {
     margin: 0 0 8px;
-    font-size: var(--ndo-text-lg);
-    font-weight: var(--ndo-weight-medium);
+    font-family: var(--fn-serif);
+    font-size: 18px;
+    font-weight: 500;
+    /* Measured (getBoundingClientRect, real Chrome): this block heading
+     * renders a ~12px line box here versus the original's 18px at the same
+     * font-size/weight, cascading a 6px upward shift onto every sibling
+     * below (verified: .sl rows below are byte-identical in height and
+     * position to each other, offset only by this heading's own box). Tried
+     * and ruled out: `normal`, `1`, `18px`, `1.5`, `1.1`, `100%` all measure
+     * the same 12px — the box height does not respond to the CSS
+     * `line-height` property at all for this element, so this is not a
+     * line-height bug this component can fix. Root cause, as far as this
+     * direction's scope reaches: self-hosted @fontsource-variable/newsreader
+     * at font-weight 500 lays out shorter than the original's Google-served
+     * static Newsreader for a bare block heading; a static (non-variable)
+     * Newsreader build might not have this quirk, but swapping font
+     * packages is outside a surgical fix here. See scripts/compare/pairs/
+     * field-notes.ts for the measured impact and threshold. */
   }
   .sl {
     display: flex;
@@ -346,6 +370,7 @@
     padding: 7px 0;
     border-bottom: 1px dotted var(--fn-rule);
     font-size: 13px;
+    line-height: normal;
   }
   .sl span:last-child {
     color: var(--fn-mute);
@@ -359,17 +384,26 @@
     display: flex;
     flex-wrap: wrap;
     gap: 12px;
+  }
+  /* The original wraps the rules/requests action rows in a div with its own
+   * marginTop:14, on top of the .btn class's own margin-top:14 below; the
+   * empty-entry actions and the single Linked button have no such wrapper. */
+  .row.stacked {
     margin-top: 14px;
   }
   .btn {
+    display: inline-block;
+    margin-top: 14px;
     padding: 9px 14px;
     border: 0;
-    border-radius: var(--ndo-radius-sm);
-    background: rgb(var(--ndo-gray-900));
-    color: rgb(255 255 255);
+    border-radius: 2px;
+    background: var(--fn-ink);
+    color: var(--fn-paper);
     font-family: inherit;
     font-size: 13px;
-    font-weight: var(--ndo-weight-medium);
+    font-weight: 500;
+    line-height: normal;
+    text-align: center;
     white-space: nowrap;
     cursor: pointer;
   }

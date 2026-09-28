@@ -255,7 +255,7 @@ See the `core.jsx` store actions section above for `updateRule` and `hardRuleVio
 - **Onboarding steps 2 and 3** (network / first-NDO) — reaching them from a cold `?fresh=1` load requires a successful step-1 form submit first, which the compare harness's step model supports but this pass did not spend on; confirmed instead by direct code comparison against `ui.jsx`'s `Onboarding` (see the Onboarding section above and the copy fixes made).
 - **`GroupModal`'s "invite created" screen**, **`WhyModal`'s opened technical-details panel**, **`RuleModal`'s "change an existing rule" branch** — each reached by an extra fill/click the pairs above do not yet chain; verified by code inspection against `ui.jsx` and, for the rule-author case, by `bun run check:prototypes`.
 - **`ndo-invite:food-7k2p`** — see the functional-checks table above; logic-level match only.
-- **Field Notes (B)** — `src/lib/prototypes/directions/field-notes/App.svelte` does not mount `<FlowMenu />` at all, so none of the shared modals are reachable from that direction today. Flagged to the field-notes builder; not a shared-layer defect (the component itself works correctly everywhere it is mounted).
+- **Field Notes (B)**: mounts `<FlowMenu />` in `Index.svelte` (label "Flows", aligned left), as the original B does, so every shared modal is reachable from B; verified by `.local/verify/field-notes.mjs` and the field-notes compare pairs.
 
 ## Report row count
 
