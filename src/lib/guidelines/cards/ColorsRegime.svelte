@@ -1,12 +1,15 @@
 <!--
   Replica of docs/prototypes/original/ds/guidelines/colors-regime.html.
 
-  NOTE (report this, do not silently fix): this card documents a per-regime
-  dashed outline colour that neither this repo's ndo-badge `regime-*` variant
-  (registry/ndo-badge.svelte, always dashed gray-400 / gray-700, colour lives
-  only in the `-filter` variants) nor the shipped app's NdoCard.svelte
-  (`border-dashed border-gray-400 ... text-gray-700`, uniform for every
-  regime) actually renders. See the report for the full comparison.
+  This card documents a per-regime dashed outline colour. Until 2026-09-28,
+  neither this repo's ndo-badge `regime-*` variant (registry/ndo-badge.svelte)
+  nor the shipped app's NdoCard.svelte (`border-dashed border-gray-400 ...
+  text-gray-700`, uniform for every regime) actually rendered it. Soushi
+  ratified Claude Design as this repo's fidelity source that evening, so
+  registry/ndo-badge.svelte's `regime-*` variant now renders exactly this
+  per-hue outline (see that file's own comment on the regime block). The
+  shipped app's NdoCard.svelte is a separate codebase and still renders every
+  regime uniformly gray; that disagreement is real but outside this repo.
 -->
 <script lang="ts">
   const regimes = [

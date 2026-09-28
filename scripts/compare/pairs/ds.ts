@@ -32,12 +32,14 @@ const pairs: Pair[] = [
     slug,
     name: 'brand-logo',
     original: { path: guideline('brand-logo') },
-    port: { path: port('brand-logo') },
-    threshold: 0.031,
-    note:
-      "Different bitmap by design: the original's 1024x1024 nondominium_logo.png does not exist in this repo; " +
-      'this card renders static/assets/nondominium-logo.png (696x536, a different crop, no off-white background ' +
-      'inset) via paths.logo(). Reported for a decision, not silently swapped for a pixel match.'
+    port: { path: port('brand-logo') }
+    // Until 2026-09-28 this rendered static/assets/nondominium-logo.png (696x536, a
+    // different crop from the original's 1024x1024), because the original's own
+    // PNG was believed absent from this repo. It is not: A's instrument direction
+    // already committed the identical file (sha256-verified) at
+    // src/lib/prototypes/directions/instrument/nondominium_logo.png, which is
+    // under src/ and so importable under `vite dev`. BrandLogo.svelte now imports
+    // it directly; the pair matches at 0%.
   },
   {
     slug,
@@ -53,12 +55,15 @@ const pairs: Pair[] = [
     slug,
     name: 'brand-layers',
     original: { path: guideline('brand-layers') },
-    port: { path: port('brand-layers') },
-    threshold: 0.017,
-    note:
-      'Sub-pixel text anti-aliasing across the three columns of prose (same system-ui stack both sides; the diff ' +
-      'is a one-pixel-wide outline around glyphs, never a wrong colour or a layout shift) — the same category of ' +
-      'residual documented in pairs/instrument.ts and pairs/field-notes.ts for font rendering.'
+    port: { path: port('brand-layers') }
+    // Was misdiagnosed as sub-pixel font anti-aliasing and given a 1.7% ceiling.
+    // The real cause, found under ISA Phase 9's review: the isolated Frame every
+    // guideline card mounts in did not carry the original's fixed
+    // `line-height: var(--ndo-lh-base)` (1.5rem, absolute), so UnoCSS's unitless
+    // `line-height: 1.5` preflight recomputed per element's own font-size instead,
+    // drifting the three stacked prose columns down a little more with every row.
+    // Frame.svelte now sets the same fixed line-height the original's body does;
+    // the pair sits at 0.71%, under the default 1% ceiling.
   },
 
   // ── Colors ──
@@ -87,13 +92,13 @@ const pairs: Pair[] = [
     port: { path: port('colors-nature') }
   },
   // This card is a literal copy of the original's inline HTML/CSS (it does not
-  // use the ndo-badge custom element), so it matches at 0%. The interesting
-  // fact it documents — Claude Design outlines each PropertyRegime in its own
-  // hue, where registry/ndo-badge.svelte's `regime-*` variant and the shipped
-  // app's NdoCard.svelte both render every regime with a uniform gray-400
-  // dashed border — is a registry/app vs Claude Design disagreement, reported
-  // in ColorsRegime.svelte's own comment and in the report, not something this
-  // pair needs a raised threshold for.
+  // use the ndo-badge custom element), so it matches at 0%. Until 2026-09-28 it
+  // documented a registry/app vs Claude Design disagreement (Claude Design
+  // outlines each PropertyRegime in its own hue; registry/ndo-badge.svelte and
+  // the shipped app's NdoCard.svelte both rendered every regime with a uniform
+  // gray-400 dashed border). registry/ndo-badge.svelte's `regime-*` variant now
+  // matches Claude Design's per-hue outline (see its own comment); the shipped
+  // app's NdoCard.svelte, a separate codebase, still renders uniform gray.
   {
     slug,
     name: 'colors-regime',
@@ -145,12 +150,13 @@ const pairs: Pair[] = [
     slug,
     name: 'layout-shell',
     original: { path: guideline('layout-shell') },
-    port: { path: port('layout-shell') },
-    threshold: 0.022,
-    note:
-      "Confirmed by pixel-row analysis: the diff is two ~8px bands at the .card box's top and bottom edges " +
-      "(box-shadow + border), each ~1150px wide — a one-pixel vertical rounding difference in that box's " +
-      'position between the two page loads, not a layout or colour bug.'
+    port: { path: port('layout-shell') }
+    // Was misdiagnosed as a one-pixel rounding difference in the .card box's
+    // shadow/border bands and given a 2.2% ceiling. The real cause was the same
+    // missing fixed line-height documented on brand-layers above: the sidebar's
+    // GROUPS/Sensorica rows and the main column both sat progressively lower
+    // than the original, growing with each stacked row. Frame.svelte's fix
+    // brings this pair to 0%.
   },
 
   // ── Components (the real ndo-* custom elements) ──
@@ -158,28 +164,24 @@ const pairs: Pair[] = [
     slug,
     name: 'badge',
     original: { path: component('badge') },
-    port: { path: port('badge') },
-    threshold: 0.03,
-    note:
-      "Claude Design's Badge.jsx disagrees with registry/ndo-badge.svelte on every row except Lifecycle and " +
-      'Nature: op-state is `opstate-*` there vs `op-*` here, and filled per-state colour there vs a neutral chip ' +
-      "with only the dot coloured here (a deliberate choice per the component's own comment); regime is per-hue " +
-      'dashed there vs uniform gray dashed here (matches the shipped app); rule fills a coloured background and ' +
-      'rounds the right corners there vs a square gray chip with a coloured left edge here, and two of the four ' +
-      'rules use a different hue family; rivalry is filled there vs outlined here; scope-network and scope-public ' +
-      'use different hue families. Full comparison in the report. This card intentionally uses the real custom ' +
-      "element's actual variant names and colours rather than reproducing Claude Design's, per the brief."
+    port: { path: port('badge') }
+    // Until 2026-09-28 this disagreed with Claude Design's Badge.jsx on every row
+    // except Lifecycle and Nature, and carried a 3% ceiling for it. Soushi
+    // ratified Claude Design as this repo's fidelity source that evening;
+    // registry/ndo-badge.svelte was rewritten to match Badge.jsx's colours,
+    // shapes and fills exactly (opstate-* accepted as an alias of the existing
+    // op-* names). The pair matches at 0%.
   },
   { slug, name: 'button', original: { path: component('button') }, port: { path: port('button') } },
   {
     slug,
     name: 'card',
     original: { path: component('card') },
-    port: { path: port('card') },
-    note:
-      "Card.jsx matches registry/ndo-card.svelte exactly, but it renders its badges through Claude Design's own " +
-      'Badge, so the two regime chips (Nondominium, Commons) carry the same colour disagreement as the badge ' +
-      'pair above, at small area.'
+    port: { path: port('card') }
+    // Card.jsx matches registry/ndo-card.svelte exactly; until 2026-09-28 its two
+    // regime chips (Nondominium, Commons) carried the badge pair's colour
+    // disagreement at small area. Fixed alongside the badge pair above; matches
+    // at 0%.
   },
   { slug, name: 'status', original: { path: component('status') }, port: { path: port('status') } }
 ];

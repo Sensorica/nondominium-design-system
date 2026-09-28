@@ -4,12 +4,13 @@
   which renders its badges through `<ndo-badge>` internally, exactly as
   Claude Design's Card.jsx renders through its own Badge.
 
-  NOTE: the two `regime-*` badges below (Nondominium, Commons) inherit the
-  Badge disagreement documented in BadgeCard.svelte's note: this card will
-  show a small colour mismatch on those two chips (Claude Design outlines
-  them blue-700 / cyan-700; ours is uniformly dashed gray). Everything else
-  on the card (name, description, hash, lifecycle and nature badges, shadow,
-  radius, background) matches Claude Design's Card.jsx byte for byte.
+  Until 2026-09-28, the two `regime-*` badges below (Nondominium, Commons)
+  showed a small colour mismatch against Claude Design's Card.jsx (which
+  outlines them blue-700 / cyan-700; the registry rendered uniformly dashed
+  gray). registry/ndo-badge.svelte's `regime-*` variant now matches Claude
+  Design's per-hue outline exactly, so this card matches Card.jsx byte for
+  byte: name, description, hash, lifecycle, nature and regime badges, shadow,
+  radius, background.
 -->
 <script lang="ts">
   import { paths } from '$lib/paths';

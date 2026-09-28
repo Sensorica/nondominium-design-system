@@ -40,6 +40,16 @@
     | 'op-in-maintenance'
     | 'op-in-use'
     | 'op-pending-validation'
+    // Claude Design's Badge.jsx names these `opstate-*`, not `op-*`. Both
+    // names are accepted and render identically (see the op-state block
+    // below); `op-*` stays the documented, canonical name in the playbook.
+    | 'opstate-available'
+    | 'opstate-reserved'
+    | 'opstate-in-transit'
+    | 'opstate-in-storage'
+    | 'opstate-in-maintenance'
+    | 'opstate-in-use'
+    | 'opstate-pending-validation'
     | 'rivalry-rivalrous'
     | 'rivalry-non-rivalrous'
     | 'scope-project'
@@ -94,7 +104,14 @@
   .badge.nature-hybrid      { background: rgb(var(--ndo-teal-100));   color: rgb(var(--ndo-teal-700)); }
   .badge.nature-information { background: rgb(var(--ndo-indigo-100)); color: rgb(var(--ndo-indigo-700)); }
 
-  /* Property regime on cards — dashed gray (hApp NdoCard) */
+  /* Property regime on cards — per-hue dashed outline (Claude Design's
+     Badge.jsx `regime()` helper: transparent fill, `1px dashed <hue>-700`,
+     text the same hue). Until 2026-09-28 this rendered every regime in a
+     single uniform gray-400 dashed outline, matching the shipped app's own
+     NdoCard.svelte rather than Claude Design; Soushi ratified Claude Design
+     as the fidelity source for this repo's guideline pages, so this now
+     matches Badge.jsx exactly. `regime-public`, below, has no Claude Design
+     counterpart and keeps its previous gray treatment. */
   .badge.regime-nondominium,
   .badge.regime-commons,
   .badge.regime-collective,
@@ -103,9 +120,15 @@
   .badge.regime-private,
   .badge.regime-public {
     background: transparent;
-    border: 1px dashed rgb(var(--ndo-gray-400));
-    color: rgb(var(--ndo-gray-700));
   }
+  .badge.regime-nondominium  { border: 1px dashed rgb(var(--ndo-blue-700));   color: rgb(var(--ndo-blue-700)); }
+  .badge.regime-commons      { border: 1px dashed rgb(var(--ndo-cyan-700));   color: rgb(var(--ndo-cyan-700)); }
+  .badge.regime-collective   { border: 1px dashed rgb(var(--ndo-violet-700)); color: rgb(var(--ndo-violet-700)); }
+  .badge.regime-pool         { border: 1px dashed rgb(var(--ndo-teal-700));   color: rgb(var(--ndo-teal-700)); }
+  .badge.regime-common-pool  { border: 1px dashed rgb(var(--ndo-rose-700));   color: rgb(var(--ndo-rose-700)); }
+  .badge.regime-private      { border: 1px dashed rgb(var(--ndo-gray-700));   color: rgb(var(--ndo-gray-700)); }
+  /* No Claude Design equivalent for `public`; unchanged from before. */
+  .badge.regime-public       { border: 1px dashed rgb(var(--ndo-gray-400));   color: rgb(var(--ndo-gray-700)); }
 
   /* Property regime filter chips — filled colors (hApp NdoBrowser) */
   .badge.regime-private-filter {
@@ -146,86 +169,85 @@
   }
 
   /* ── Operational state (Layer 2) ──────────────────────────────────────────
-     A DIFFERENT SHAPE, not a different colour, and the difference is the point.
+     Matches Claude Design's Badge.jsx exactly as of 2026-09-28: a filled pill
+     (its own hue per state, `--ndo-radius-xl`, extra left padding) with a
+     leading dot in `currentColor` (so the dot always matches that state's own
+     text colour, never a separate palette).
 
-     OperationalState and LifecycleStage are orthogonal axes: a resource under
-     repair is LifecycleStage.Active and OperationalState.InMaintenance at the
-     same time. PR #132 spent a whole type splitting them apart, and the kit used
-     to weld them back together by rendering `available` inside
-     `variant="lifecycle-stable"`. Giving operational state its own colours would
-     not fix that, because a second family of filled pastel pills still reads as
-     "another lifecycle". So these are not pills. They are neutral chips with a
-     coloured status dot, and the colour lives only in the dot. No lifecycle badge
-     has a dot; no operational chip has a coloured background. The two cannot be
-     confused at a glance, which is the only test that matters here. */
-  .badge[class*='op-'] {
-    background: rgb(var(--ndo-gray-50));
-    border: 1px solid rgb(var(--ndo-gray-200));
-    color: rgb(var(--ndo-gray-700));
-    gap: var(--ndo-spacing-1-5);
+     Until 2026-09-28 this rendered a neutral gray-50 chip with only the dot
+     coloured, on purpose: OperationalState and LifecycleStage are orthogonal
+     axes (a resource under repair is LifecycleStage.Active AND
+     OperationalState.InMaintenance at once — PR #132 split the type apart for
+     exactly this), and a second family of filled pastel pills reads as
+     "another lifecycle" at a glance, confusing the two. That design concern is
+     still real; it is just no longer what this component renders, because
+     Soushi ratified Claude Design as this repo's fidelity source and
+     Badge.jsx fills every op-state pill. The two axes stay visually
+     distinguishable by shape, not colour restraint: no lifecycle badge has a
+     leading dot, every op-state badge does, and its border-radius is the
+     `-xl` pill Claude Design gives it while lifecycle stays `-sm`. */
+  .badge[class*='op-'],
+  .badge[class*='opstate-'] {
+    border-radius: var(--ndo-radius-xl);
+    padding-left: var(--ndo-spacing-1-5);
   }
-  .badge[class*='op-']::before {
+  .badge[class*='op-']::before,
+  .badge[class*='opstate-']::before {
     content: '';
-    width: 0.5rem;
-    height: 0.5rem;
+    display: inline-block;
+    width: 0.375rem;
+    height: 0.375rem;
     border-radius: 50%;
     flex: none;
-    background: rgb(var(--ndo-gray-400));
+    margin-right: var(--ndo-spacing-1-5);
+    background: currentColor;
   }
-  .badge.op-available::before          { background: rgb(var(--ndo-green-600)); }
-  .badge.op-reserved::before           { background: rgb(var(--ndo-blue-600)); }
-  .badge.op-in-transit::before         { background: rgb(var(--ndo-indigo-700)); }
-  .badge.op-in-storage::before         { background: rgb(var(--ndo-teal-700)); }
-  .badge.op-in-maintenance::before     { background: rgb(var(--ndo-amber-600)); }
-  .badge.op-in-use::before             { background: rgb(var(--ndo-violet-700)); }
-  .badge.op-pending-validation::before { background: rgb(var(--ndo-gray-400)); }
+  .badge.op-available,          .badge.opstate-available          { background: rgb(var(--ndo-green-50));   color: rgb(var(--ndo-green-700)); }
+  .badge.op-reserved,            .badge.opstate-reserved            { background: rgb(var(--ndo-amber-50));   color: rgb(var(--ndo-amber-700)); }
+  .badge.op-in-transit,          .badge.opstate-in-transit          { background: rgb(var(--ndo-blue-50));    color: rgb(var(--ndo-blue-700)); }
+  .badge.op-in-storage,          .badge.opstate-in-storage          { background: rgb(var(--ndo-indigo-100)); color: rgb(var(--ndo-indigo-700)); }
+  .badge.op-in-maintenance,      .badge.opstate-in-maintenance      { background: rgb(var(--ndo-orange-100)); color: rgb(var(--ndo-orange-700)); }
+  .badge.op-in-use,              .badge.opstate-in-use              { background: rgb(var(--ndo-teal-100));   color: rgb(var(--ndo-teal-700)); }
+  .badge.op-pending-validation,  .badge.opstate-pending-validation  { background: rgb(var(--ndo-gray-100));   color: rgb(var(--ndo-gray-600)); }
 
   /* ── Rivalry and scope (classification facets) ────────────────────────────
-     These two ARE Layer 0 and Layer 1 classification, so they are pills like
-     nature and regime. Rivalry borrows the regime card treatment (outlined, no
-     fill) because it qualifies a regime rather than standing beside it: the
-     effective rivalry of a resource is its nature's default unless the regime's
-     creator overrode it. */
-  .badge.rivalry-rivalrous,
-  .badge.rivalry-non-rivalrous {
-    background: transparent;
-    border: 1px solid rgb(var(--ndo-gray-300));
-    color: rgb(var(--ndo-gray-700));
-    font-variant: small-caps;
-  }
-  .badge.rivalry-rivalrous     { border-color: rgb(var(--ndo-orange-600)); color: rgb(var(--ndo-orange-700)); }
-  .badge.rivalry-non-rivalrous { border-color: rgb(var(--ndo-cyan-300));   color: rgb(var(--ndo-cyan-700)); }
+     These two ARE Layer 0 and Layer 1 classification, so they are filled
+     pills like nature, matching Claude Design's Badge.jsx `fill()` variants
+     exactly. Until 2026-09-28 rivalry borrowed the regime card's outlined,
+     small-caps treatment instead; Badge.jsx fills it like any other
+     classification pill, so this now matches. */
+  .badge.rivalry-rivalrous     { background: rgb(var(--ndo-rose-100)); color: rgb(var(--ndo-rose-700)); }
+  .badge.rivalry-non-rivalrous { background: rgb(var(--ndo-cyan-100)); color: rgb(var(--ndo-cyan-700)); }
 
   .badge.scope-project { background: rgb(var(--ndo-gray-100)); color: rgb(var(--ndo-gray-700)); }
-  .badge.scope-network { background: rgb(var(--ndo-sky-100));  color: rgb(var(--ndo-sky-700)); }
-  .badge.scope-public  { background: rgb(var(--ndo-teal-100)); color: rgb(var(--ndo-teal-700)); }
+  .badge.scope-network { background: rgb(var(--ndo-blue-100));  color: rgb(var(--ndo-blue-700)); }
+  .badge.scope-public  { background: rgb(var(--ndo-green-100)); color: rgb(var(--ndo-green-700)); }
 
   /* ── Governance rules (Layer 1) ───────────────────────────────────────────
      Rules are not a fourth classification facet and must never read as one. A
      classification says what a resource IS; a rule says what an agent MAY do,
      and it carries a typed payload. So rule badges leave the pill language
-     entirely: square corners, monospace, a left accent bar. The 2026-08-18 parity
-     plan asked for exactly this, and the reason has since sharpened: `RuleData`
-     is a tagged union whose discriminant sits at a different layer from
-     PropertyRegime and ResourceNature, and a typed rule that looks like a
-     classification teaches the wrong model to whoever designs the rule surface.
+     entirely: monospace, a left accent bar, rounded only on the right (Claude
+     Design's Badge.jsx `rule()` helper). The 2026-08-18 parity plan asked for
+     exactly this shape; until 2026-09-28 this component filled it with a flat
+     gray-50 chip and square corners throughout, rather than Badge.jsx's own
+     per-rule fill and right-rounded corner, which it now matches exactly
+     (fidelity ratified by Soushi 2026-09-28). `RuleData` is still a tagged
+     union whose discriminant sits at a different layer from PropertyRegime
+     and ResourceNature, which is the reason this stays out of the pill
+     language rather than a claim about which fill colour it gets.
 
      The four names below are the real Rust variants. The kit previously shipped
      `AccessControl` and `TransferPolicy`, which exist in no zome. */
   .badge[class*='rule-'] {
-    border-radius: 0;
+    border-radius: 0 var(--ndo-radius-sm) var(--ndo-radius-sm) 0;
     font-family: var(--ndo-font-mono, ui-monospace, monospace);
-    font-size: calc(var(--ndo-text-xs) * 0.95);
-    letter-spacing: 0.01em;
-    background: rgb(var(--ndo-gray-50));
-    border: 1px solid rgb(var(--ndo-gray-200));
-    border-left-width: 3px;
-    color: rgb(var(--ndo-gray-800));
+    border: 1px solid transparent;
   }
-  .badge.rule-access-requirement   { border-left-color: rgb(var(--ndo-blue-600)); }
-  .badge.rule-usage-limit          { border-left-color: rgb(var(--ndo-amber-600)); }
-  .badge.rule-transfer-condition   { border-left-color: rgb(var(--ndo-rose-700)); }
-  .badge.rule-maintenance-schedule { border-left-color: rgb(var(--ndo-teal-700)); }
+  .badge.rule-access-requirement   { background: rgb(var(--ndo-blue-50));    color: rgb(var(--ndo-blue-700));  border-left: 3px solid rgb(var(--ndo-blue-700)); }
+  .badge.rule-usage-limit          { background: rgb(var(--ndo-amber-50));   color: rgb(var(--ndo-amber-800)); border-left: 3px solid rgb(var(--ndo-amber-700)); }
+  .badge.rule-transfer-condition   { background: rgb(var(--ndo-violet-100)); color: rgb(var(--ndo-violet-700)); border-left: 3px solid rgb(var(--ndo-violet-700)); }
+  .badge.rule-maintenance-schedule { background: rgb(var(--ndo-orange-50)); color: rgb(var(--ndo-orange-700)); border-left: 3px solid rgb(var(--ndo-orange-700)); }
 
   /* Special */
   .badge.coming-soon { background: rgb(var(--ndo-amber-50)); color: rgb(var(--ndo-amber-600)); }

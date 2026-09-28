@@ -7,5 +7,4 @@ Fundamental UI prototypes for the Nondominium v0.1 release. Open `prototypes/ind
   - `F Flow Graph.dc.html` is a ValueFlows lanes graph inspired by the hREA Playground. It runs on `ndo-backend.js`, a mock that uses the real zome function names.
   - `BACKEND.md` maps each UI action to its zome call. It also lists backend gaps and the A–E features that have no backend yet.
   - `assets/nondominium_logo.png`
-- `export/`: standalone offline builds, one file per prototype. Rebuild them from `prototypes/` after edits.
 - `_ds/`: the bound Nondominium and hREA design systems. Do not edit.

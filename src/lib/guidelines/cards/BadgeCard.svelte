@@ -3,33 +3,18 @@
   built on the real `<ndo-badge>` custom element (registry/ndo-badge.svelte),
   not a reimplementation.
 
-  NOTE (report this, do not silently fix): the Claude Design Badge.jsx
-  component this card was authored against disagrees with our own
-  `ndo-badge` on every row below except Lifecycle and Nature. Using our own
-  component (as this builder was told to) means this card will show those
-  disagreements as real pixel differences rather than paper over them. Full
-  comparison in the report:
-    - variant prefix: Claude Design's op-state variants are `opstate-*`; ours
-      are `op-*`. Names below use ours, since that is what the custom element
-      actually accepts.
-    - op-state colour: Claude Design fills each state's own hue (green/amber/
-      blue/indigo/orange/teal/gray backgrounds); ours is a neutral gray chip
-      with only the leading dot coloured, by deliberate design (see the
-      comment block above `.badge[class*='op-']` in registry/ndo-badge.svelte).
-    - regime: Claude Design outlines each regime in its own hue (blue/cyan/
-      violet/teal/rose/gray); ours is uniformly dashed gray-400 / gray-700 for
-      every regime in card style (colour lives only in the `-filter` variants,
-      which this card does not demonstrate). The shipped app's own
-      NdoCard.svelte also renders regimes uniformly gray, so this is Claude
-      Design diverging from the app, not the registry.
-    - rule: same four names on both sides, but Claude Design fills a coloured
-      background per rule and rounds only the right corners; ours is a square
-      gray-50 chip with a coloured left edge only (transfer-condition is rose
-      here, violet there; maintenance-schedule is teal here, orange there).
-    - rivalry: Claude Design fills rose/cyan; ours outlines orange/cyan with
-      small-caps text.
-    - scope: `scope-project` matches (gray/gray); `scope-network` is sky here
-      vs blue there; `scope-public` is teal here vs green there.
+  Until 2026-09-28, this card disagreed with Claude Design's Badge.jsx on
+  every row below except Lifecycle and Nature (op-state colour and variant
+  prefix, regime hue, rule shape and hue, rivalry fill vs outline, two scope
+  hues) — real pixel differences from using the registry's own component
+  rather than reimplementing Claude Design's. Soushi ratified Claude Design as
+  this repo's fidelity source that evening, so `registry/ndo-badge.svelte` was
+  rewritten to match Badge.jsx's colours, shapes and fills exactly, keeping
+  its existing variant names as the canonical ones and accepting Claude
+  Design's `opstate-*` names as aliases for `op-*` (see that file's own
+  comments for the per-block history and reasoning). This card's rows below
+  still use the registry's own `op-*` names; they now render identically to
+  Claude Design's `opstate-*` rows.
 -->
 <script lang="ts">
   import { paths } from '$lib/paths';

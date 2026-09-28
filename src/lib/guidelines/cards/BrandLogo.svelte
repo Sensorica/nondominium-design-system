@@ -1,29 +1,27 @@
 <!--
-  Replica of docs/prototypes/original/ds/guidelines/brand-logo.html — content
-  and layout, not the exact bitmap.
+  Replica of docs/prototypes/original/ds/guidelines/brand-logo.html.
 
-  NOTE (report this, do not silently fix): the original card shows a 1024x1024
-  PNG (docs/prototypes/original/ds/assets/nondominium_logo.png) that does not
-  exist anywhere in this repo. Importing it directly as a Vite asset (the
-  pattern src/lib/prototypes/directions/instrument/App.svelte uses for a
-  prototype logo) builds fine but 403s under `vite dev`: SvelteKit's dev
-  server restricts `server.fs.allow` to src/, .svelte-kit/ and node_modules/,
-  and `docs/` is outside it in every mode this repo runs (changing
-  `vite.config.ts` is outside this builder's ownership). Since the compare
-  instrument's port side runs against the dev server, that 403 would show up
-  as a broken image and two console errors on every run, not as a passing
-  card with a footnote. So this card renders on the repo's OWN brand asset,
-  `static/assets/nondominium-logo.png` (via paths.logo()), which is a
-  different file: 696x536 versus 1024x1024, a different crop, no visible
-  off-white background inset. The resulting pixel mismatch is real and
-  reported, not hidden by a raised threshold on a broken image.
+  The original card shows a 1024x1024 PNG
+  (docs/prototypes/original/ds/assets/nondominium_logo.png). That exact file
+  is already committed under src/, at
+  src/lib/prototypes/directions/instrument/nondominium_logo.png — sha256
+  identical (verified: 900cf2317dbe1235555029752dbd6aa128bf39a9c9ddf9622f2f9d737880b486
+  on both sides), because A's own instrument direction imports it as its
+  prototype logo (see App.svelte's `import logoMark from
+  './nondominium_logo.png'`). Importing THAT copy here works under `vite dev`
+  because it is under src/, inside SvelteKit's `server.fs.allow`; the
+  original's own copy under docs/ is outside it and 403s (see
+  BrandFavicon.svelte for the same constraint on the favicon, which has no
+  such src/ copy to borrow). So this card now renders the identical bitmap the
+  original does, not the repo's own static/assets/nondominium-logo.png
+  (696x536, a different crop) used previously.
 -->
 <script lang="ts">
-  import { paths } from '$lib/paths';
+  import logo from '$lib/prototypes/directions/instrument/nondominium_logo.png';
 </script>
 
 <div class="row">
-  <img src={paths.logo()} alt="" height="220" />
+  <img src={logo} alt="" height="220" />
   <div class="copy">
     Raster PNG (1024²) with light off-white background. Used in the repo README at 200px width. Teal
     → blue → violet link-chain "N". In-app chrome does <b>not</b> show the logo.
