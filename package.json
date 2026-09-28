@@ -20,7 +20,8 @@
     "check:fixture": "bun run scripts/check-fixture-keys.ts",
     "check:prototypes": "bun run scripts/check-prototype-rules.ts",
     "compare:prototypes": "bun run scripts/compare-prototypes.ts",
-    "check:uno": "bun run scripts/check-uno-collisions.ts"
+    "check:uno": "bun run scripts/check-uno-collisions.ts",
+    "verify:prototypes": "bun run scripts/verify/run-all.ts"
   },
   "devDependencies": {
     "@fontsource-variable/bricolage-grotesque": "^5.3.0",

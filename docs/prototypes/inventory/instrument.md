@@ -5,7 +5,7 @@ Every interactive control in the handoff's `C.jsx` (`InstrumentApp`, `InSpec`, `
 Two verification paths are used, both under `.worktrees/feat-claude-design-fidelity`:
 
 - **compare pair**: a pair in `scripts/compare/pairs/instrument.ts`, run with `ORIG_PORT=8794 bun run compare:prototypes instrument`. Confirms the control exists and renders identically; it does not exercise a click, so pairs with a `click`/`hover` step also confirm the resulting state renders correctly.
-- **functional check**: `.local/instrument-check/functional.mjs` (`bun .local/instrument-check/functional.mjs`, dev server on `:5180`), a Playwright script that clicks each control against the live port and asserts the resulting modal title, URL or store value. 22/22 assertions pass as of this report.
+- **functional check**: `scripts/verify/instrument.mjs` (`bun scripts/verify/instrument.mjs`, dev server on `:5180`), a Playwright script that clicks each control against the live port and asserts the resulting modal title, URL or store value. 22/22 assertions pass as of this report.
 
 | # | Control (C.jsx) | Original effect | Port counterpart | Verified |
 |---|---|---|---|---|

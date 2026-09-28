@@ -1,6 +1,6 @@
 # Holarchy (E) — control inventory
 
-Every interactive control in `docs/prototypes/original/prototypes/E.jsx`, what it does in the original, its counterpart in the port (`src/lib/prototypes/directions/holarchy/`), and how it was verified. "Verified" means one of: a compare pair in `scripts/compare/pairs/holarchy.ts` (pixel fidelity), a check in `.local/verify/holarchy.mjs` (a headless Playwright run against the live port), or, where the control is a shared UI-kit component this direction does not own, code inspection confirming the same props are wired through.
+Every interactive control in `docs/prototypes/original/prototypes/E.jsx`, what it does in the original, its counterpart in the port (`src/lib/prototypes/directions/holarchy/`), and how it was verified. "Verified" means one of: a compare pair in `scripts/compare/pairs/holarchy.ts` (pixel fidelity), a check in `scripts/verify/holarchy.mjs` (a headless Playwright run against the live port), or, where the control is a shared UI-kit component this direction does not own, code inspection confirming the same props are wired through.
 
 Shared-store actions (`pickUp`, `advance`, `addRule`, `transferCustody`, and so on) and the modal components they open (`CreateNdoModal`, `AttachModal`, `AdvanceModal`, `RuleModal`, `ResourcesModal`, `CommitModal`, `CommitmentsModal`, `ReceiptsModal`, `WhyModal`, `HelpModal`, `BrowseModal`, `ProfileModal`, `GroupModal`, `JoinModal`, ...) live in `$lib/prototypes/store` and `$lib/prototypes/ui`, owned by the shared-layer builder. This direction only owns getting the reader *to* those modals with the right arguments; their own fields are not re-inventoried here.
 
@@ -11,7 +11,7 @@ Shared-store actions (`pickUp`, `advance`, `addRule`, `transferCustody`, and so 
 | "Lobby" breadcrumb | Goes to the lobby (`go({})`) | `toLobby` → `goView('holarchy','lobby')` | Compare pairs `lobby`, `zoom-out-to-lobby`; functional check "lobby group disc opens the group" (reached via the same crumb path) |
 | Group-name breadcrumb (e.g. "Sensorica") | Goes to that group, dropping the entered NDO (`go({group:at.group})`) | `toGroup` | Compare pairs `group`, `group-selected`, `zoom-out-to-group`, and every modal pair that starts by navigating there |
 | NDO-name breadcrumb (current) | Read-only "you are here" pill; the original gives it no `onClick` at all | `<button class="on" aria-current="location">`, no `onclick` | Code inspection (both sides: current-page indicator only) |
-| Menu (avatar + "Menu" + ▾) | Opens `FlowMenu`: profile, groups, resources, prototype actions, and (when an NDO is in focus or selected) that NDO's own actions | `<FlowMenu ndo={loc.at.ndo ?? loc.sel} onOpen={toNdo} onGroup={toGroup} />` | `.local/verify/holarchy.mjs`: "Ask to borrow or receive", "How this works", "Find resources", "Your profile" all open from it |
+| Menu (avatar + "Menu" + ▾) | Opens `FlowMenu`: profile, groups, resources, prototype actions, and (when an NDO is in focus or selected) that NDO's own actions | `<FlowMenu ndo={loc.at.ndo ?? loc.sel} onOpen={toNdo} onGroup={toGroup} />` | `scripts/verify/holarchy.mjs`: "Ask to borrow or receive", "How this works", "Find resources", "Your profile" all open from it |
 | "scroll down to go back up · &lt;level&gt;" | Read-only zoom hint; text changes with depth | Static `<p class="zoom">`, `LEVEL[depth]` | Compare pairs (present in every view pair) |
 
 ## Lobby level (depth 1)
@@ -52,7 +52,7 @@ Shared-store actions (`pickUp`, `advance`, `addRule`, `transferCustody`, and so 
 | "+ Add resource" | Opens `CreateNdoModal` | `createNdo()` | Compare pair `modal-create` |
 | "+ New group" (Lobby only) | Opens `GroupModal` | `modals.open({type:'group', after: ongroup})` | Compare pair `modal-group` |
 | "→ Join group" (Lobby only) | Opens `JoinModal` | `modals.open({type:'join', after: ongroup})` | Compare pair `modal-join` |
-| "⎘ Copy invite link" (group, unselected, only) | Copies the group's invite string to the clipboard; the label itself never changes in the original | `copyInvite()`; the port additionally flips the label to "✓ Copied" for 1.6s (a harmless, discoverable addition over the original's silent copy) | `.local/verify/holarchy.mjs`: "copy invite link flips to 'Copied'" |
+| "⎘ Copy invite link" (group, unselected, only) | Copies the group's invite string to the clipboard; the label itself never changes in the original | `copyInvite()`; the port additionally flips the label to "✓ Copied" for 1.6s (a harmless, discoverable addition over the original's silent copy) | `scripts/verify/holarchy.mjs`: "copy invite link flips to 'Copied'" |
 | Intro copy ("Click an NDO once...", "Each circle is a group DHT...") | Read-only | Static `<p class="p">` | **Fixed to the original's exact strings**, see below |
 
 ### An NDO selected or entered
@@ -65,7 +65,7 @@ Shared-store actions (`pickUp`, `advance`, `addRule`, `transferCustody`, and so 
 | "Needs attention" pick-up button (amber pill) | Runs `P.actions.pickUp(sig)`; a rejection is silently dropped by the original (no inline error surfaced) | `pickUp(g)`; the port additionally shows `ErrorNote` on failure (a harmless, discoverable addition — the original gives no feedback at all when a pick-up is rejected) | Code inspection; the store action itself is shared and out of scope here |
 | "Needs attention" "?" button | Opens `WhyModal` | `modals.open({type:'why', sig, ndo: n.id})` | Compare pair `modal-why` |
 | "Link resource" (entered) / "Enter this holon" (selected only) | Opens `AttachModal` / enters the NDO | Same | Compare pair `modal-create`'s sibling states; functional checks "card CTA … opens its modal" and "group: second click enters" |
-| "Log work" | Opens `NoteModal` | `modals.open({type:'note', ndo:n.id})` | `.local/verify/holarchy.mjs` |
+| "Log work" | Opens `NoteModal` | `modals.open({type:'note', ndo:n.id})` | `scripts/verify/holarchy.mjs` |
 | "Lifecycle" (entered only) | Opens `AdvanceModal` | `modals.open({type:'advance', ndo:n.id})` | Compare pair `modal-advance` |
 | "Items" (entered only) | Opens `ResourcesModal` | `modals.open({type:'resources', ndo:n.id})` | Compare pair `modal-resources` |
 | "Requests" (entered only) | Opens `CommitmentsModal` | `modals.open({type:'commitments', ndo:n.id})` | Compare pair `modal-commitments` |
@@ -77,9 +77,9 @@ Shared-store actions (`pickUp`, `advance`, `addRule`, `transferCustody`, and so 
 | Control | Original behaviour | Port counterpart | Verified |
 |---|---|---|---|
 | Legend (colour key) | Read-only | Static `<ul class="legend">` | Every compare pair |
-| Offline toggle ("● N peers hold this holon" / "○ offline...") | Toggles `proto.actions.toggleOffline()`; the "●"/"○" glyph is part of the string itself | Same action; **fixed** — see below (the glyph had been dropped in favour of a separate coloured dot) | `.local/verify/holarchy.mjs`: "offline toggle changes the peers label" |
-| "◆ N receipts" | Opens `ReceiptsModal` | `modals.open({type:'receipts'})`; **fixed** the missing "◆" glyph, see below | `.local/verify/holarchy.mjs`: "receipts button opens the receipts modal" |
-| "reset" | Reseeds the mock back to the example network | `proto.actions.reset()` | `.local/verify/holarchy.mjs`: "reset reseeds the example network" |
+| Offline toggle ("● N peers hold this holon" / "○ offline...") | Toggles `proto.actions.toggleOffline()`; the "●"/"○" glyph is part of the string itself | Same action; **fixed** — see below (the glyph had been dropped in favour of a separate coloured dot) | `scripts/verify/holarchy.mjs`: "offline toggle changes the peers label" |
+| "◆ N receipts" | Opens `ReceiptsModal` | `modals.open({type:'receipts'})`; **fixed** the missing "◆" glyph, see below | `scripts/verify/holarchy.mjs`: "receipts button opens the receipts modal" |
+| "reset" | Reseeds the mock back to the example network | `proto.actions.reset()` | `scripts/verify/holarchy.mjs`: "reset reseeds the example network" |
 
 ## Onboarding, toasts, modal host
 
@@ -102,8 +102,7 @@ None of these needed a `--proto-*`/theme change; all were structure or copy, fou
 
 ## Shared-layer discrepancies (not this direction's to fix)
 
-- **`RuleModal`'s field labels are the plain-language translation, not the original's raw technical labels.** `ui.jsx`'s `RuleModal` always shows literal field names ("RuleData", "accessibility", "required_role") and a raw enum preview line ("AccessRequirement · Credentialed · AccountableAgent"), with no Developer-details gate on the labels themselves (only `PCall`'s zome-call line is gated). The shared `RuleModal.svelte` instead renders "Save as" / "Kind of rule" / "Who can access" / "Required role" and a plain-language preview ("Who can access · Needs a role · Trusted member"). This is the real content mismatch behind the `modal-rule` compare pair; with the direction's own bugs fixed the pair now measures 0.40%, comfortably under the 1% default even with this content difference still present, so it carries no threshold override any more (the pair only proves this direction reaches the modal with the right NDO).
-- **`ResourcesModal`'s "New resource" hint is likewise the plain-language paraphrase, not the original's literal string.** `ui.jsx` always shows `create_economic_resource · starts PendingValidation with you as custodian`, unconditional; the shared `ResourcesModal.svelte` shows "It starts waiting for approval, with you holding it." instead. The `modal-resources` pair now measures 0.62%, also under the 1% default without a threshold override.
-- **`CreateNdoModal`, the shared kit's group-create modal, and `JoinModal` (behind `modal-create`, `modal-group`, `modal-join`) still carry a spacing residual** (1.02-1.04%, just over the 1% default) from a field/pill spacing pass in progress in `src/lib/prototypes/ui/**` at time of writing. These three keep a `threshold` in `holarchy.ts`, noted `shared modal, pending shared spacing sweep`, per ISA Phase 9 D11.
+- **`RuleModal` and `ResourcesModal` now show the original's raw labels.** `ui.jsx`'s `RuleModal` always shows literal field names ("RuleData", "accessibility", "required_role") and a raw enum preview line, with no Developer-details gate on the labels themselves; `ui.jsx`'s `ResourcesModal` hint is always the literal `create_economic_resource · starts PendingValidation with you as custodian`. Both were once plain-language paraphrases in the shared kit; commit 24db13a put them back on `ui.jsx`'s own fields and copy. The `modal-rule` pair measures 0.40% and `modal-resources` 0.62%, both under the 1% default, neither carrying a threshold override.
+- **`CreateNdoModal`, the shared kit's group-create modal, and `JoinModal` (behind `modal-create`, `modal-group`, `modal-join`) no longer carry a spacing residual.** The field/pill spacing pass (commit 4e4d299) and the shared autofocus focus-ring fix (ISA Phase 9 finding 6, `src/lib/prototypes/ui/proto.css`) have both landed; all three now measure 0.77-0.78%, under the 1% default, and no longer carry a `threshold` override in `holarchy.ts`.
 - The shared `paths.logoMark()` asset is a slightly different crop of the network glyph than the original's `background-position` crop of its full logo file; every A to E direction uses the same asset.
 - `FlowMenu`, `ModalHost`, `Onboarding`, `Toasts` and every modal's own fields (`AdvanceModal`'s stage picker, `ResourcesModal`'s per-item controls, and so on) are shared UI-kit components; this inventory only verifies that this direction reaches them with the right arguments, not their own internals.

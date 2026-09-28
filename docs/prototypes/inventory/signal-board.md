@@ -1,6 +1,6 @@
 # Signal Board (D) — control inventory
 
-Every interactive control in `docs/prototypes/original/prototypes/D.jsx`, what it does in the original, its counterpart in the port (`src/lib/prototypes/directions/signal-board/`), and how it was verified. "Verified" means one of: a compare pair in `scripts/compare/pairs/signal-board.ts` (pixel fidelity), a check in `.local/verify/signal-board.mjs` (a headless Playwright run against the live port), or, where the control is a shared UI-kit component this direction does not own, code inspection confirming the same props are wired through.
+Every interactive control in `docs/prototypes/original/prototypes/D.jsx`, what it does in the original, its counterpart in the port (`src/lib/prototypes/directions/signal-board/`), and how it was verified. "Verified" means one of: a compare pair in `scripts/compare/pairs/signal-board.ts` (pixel fidelity), a check in `scripts/verify/signal-board.mjs` (a headless Playwright run against the live port), or, where the control is a shared UI-kit component this direction does not own, code inspection confirming the same props are wired through.
 
 Shared-store actions (`pickUp`, `advance`, `addRule`, `transferCustody`, and so on) and the modal components they open (`CreateNdoModal`, `AttachModal`, `ProfileModal`, ...) live in `$lib/prototypes/store` and `$lib/prototypes/ui`, owned by the shared-layer builder. This board only owns getting the user *to* those modals with the right arguments; their own fields are not re-inventoried here.
 

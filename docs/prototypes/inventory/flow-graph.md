@@ -1,6 +1,6 @@
 # Flow Graph (F) — control inventory
 
-Every interactive control in `docs/prototypes/original/prototypes/F Flow Graph.dc.html`, what it does in the original, its counterpart in the port (`src/lib/prototypes/directions/flow-graph/`), and how it was verified. "Verified" means one of: a compare pair in `scripts/compare/pairs/flow-graph.ts` (pixel fidelity), a check in `.local/verify/flow-graph.mjs` (a headless Chrome run against the live port, 28/28 passing, zero console errors), or code inspection against the original's own `<script type="text/x-dc">` block.
+Every interactive control in `docs/prototypes/original/prototypes/F Flow Graph.dc.html`, what it does in the original, its counterpart in the port (`src/lib/prototypes/directions/flow-graph/`), and how it was verified. "Verified" means one of: a compare pair in `scripts/compare/pairs/flow-graph.ts` (pixel fidelity), a check in `scripts/verify/flow-graph.mjs` (a headless Chrome run against the live port, 28/28 passing, zero console errors), or code inspection against the original's own `<script type="text/x-dc">` block.
 
 F runs on its own mock of the real zome calls (`backend.ts`, ported from the original's `ndo-backend.js`), not the shared A–E store, and its word map is its own (`words.ts`), not the shared `$lib/prototypes/plain`.
 
@@ -96,7 +96,7 @@ F runs on its own mock of the real zome calls (`backend.ts`, ported from the ori
 
 ## Scenario list and the fresh-start capability (ISA criterion 3)
 
-The scenario picker (`VISIBLE_SCENARIOS` in `Panel.svelte`) lists exactly the original's three: equipment, science, art — same order, same titles. `blank` (the "Start from nothing: a new person" scenario, ISA claim 34) is not a fourth button; it is reached only through `?fresh=1`, exactly as the constraint asks. Verified: `.local/verify/flow-graph.mjs` navigates to `flow-graph?fresh=1` and confirms the panel shows "Start from nothing: a new person" with zero console errors, and separately confirms the visible scenario list still has exactly three entries.
+The scenario picker (`VISIBLE_SCENARIOS` in `Panel.svelte`) lists exactly the original's three: equipment, science, art — same order, same titles. `blank` (the "Start from nothing: a new person" scenario, ISA claim 34) is not a fourth button; it is reached only through `?fresh=1`, exactly as the constraint asks. Verified: `scripts/verify/flow-graph.mjs` navigates to `flow-graph?fresh=1` and confirms the panel shows "Start from nothing: a new person" with zero console errors, and separately confirms the visible scenario list still has exactly three entries.
 
 The one gap: F's `views` array in `src/lib/prototypes/directions.ts` (network / conductor-a / conductor-b) has no fourth entry for the fresh-start screen, so `$lib/screen-map.svelte.ts` — which builds its keys only from `d.views` — never lists a "fresh" key for F, and the `m` screen map cannot jump to it directly today. This is not fixed here: `directions.ts` is shared across all six directions and owned outside this task (only F's `typeNote` field there is this direction's to edit), and no other file this direction owns can add a screen-map entry. Reaching it still works (the link, `paths.protoFresh('flow-graph')`, is wired on the directions index page for every direction, F included), it just is not also keyed into the map's search.
 
@@ -138,7 +138,7 @@ The original's own `F_ERR` entry `[/already a member/, 'You are already in this 
 
 ## The "Hide panel" / "Clear selection" corner
 
-`.hide` (top-right, `position:absolute`, `z-index:1`) and `.close` (the `✕` at the end of `.insp-head`, normal flow, no `z-index`) occupy overlapping screen space in both the original and the port: `.insp-head`'s own comment notes the original reserves no padding for `.hide`, and measuring both buttons' `getBoundingClientRect()` on the live port confirms a real overlap (`.hide` at `x:1400-1428,y:64-92`, `.close` at `x:1394.6-1420,y:72.5-95.5`). A real mouse click at the center of `.close` lands on `.hide` instead, on both sides — inherited from the original's geometry, not introduced here. `.local/verify/flow-graph.mjs` dispatches `.close`'s click via `element.click()` rather than a coordinate-based click to route around it; a person using either app would need to aim slightly left of that corner.
+`.hide` (top-right, `position:absolute`, `z-index:1`) and `.close` (the `✕` at the end of `.insp-head`, normal flow, no `z-index`) occupy overlapping screen space in both the original and the port: `.insp-head`'s own comment notes the original reserves no padding for `.hide`, and measuring both buttons' `getBoundingClientRect()` on the live port confirms a real overlap (`.hide` at `x:1400-1428,y:64-92`, `.close` at `x:1394.6-1420,y:72.5-95.5`). A real mouse click at the center of `.close` lands on `.hide` instead, on both sides — inherited from the original's geometry, not introduced here. `scripts/verify/flow-graph.mjs` dispatches `.close`'s click via `element.click()` rather than a coordinate-based click to route around it; a person using either app would need to aim slightly left of that corner.
 
 ## Not this direction's to fix
 
