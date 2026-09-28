@@ -62,8 +62,9 @@
     two are orthogonal: a resource under repair is <code class="font-mono text-xs">LifecycleStage.Active</code>
     and <code class="font-mono text-xs">OperationalState.InMaintenance</code> at the same time. The kit used to
     render <code class="font-mono text-xs">available</code> inside <code class="font-mono text-xs">variant="lifecycle-stable"</code>,
-    which welded the two axes back together after PR #132 spent a type separating them. These carry no coloured
-    background at all: the colour is in the dot, and no lifecycle badge has a dot.
+    which welded the two axes back together after PR #132 spent a type separating them. Each state is a filled pill
+    in its own colour with a leading dot, as Claude Design draws Layer 2; no lifecycle badge has a dot, so the two
+    never read as the same axis.
   </p>
   <div class="specimen-grid">
     {#each ['available', 'reserved', 'in-transit', 'in-storage', 'in-maintenance', 'in-use', 'pending-validation'] as op}
