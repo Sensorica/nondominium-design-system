@@ -299,7 +299,7 @@ export const SEED: ProtoState = {
     // Each rule's author is its NDO's initiator.
     sol: [['AccessRequirement', 'Credentialed · Transport', 'sar'], ['TransferCondition', 'Custody · validated', 'sar'], ['UsageLimit', '336 h / 30 d', 'sar']],
     las: [['AccessRequirement', 'Gated · AccountableAgent', 'che'], ['UsageLimit', '80 h / 14 d', 'che'], ['MaintenanceSchedule', '30 d · Repair', 'che']],
-    cnc: [['AccessRequirement', 'Credentialed · AccountableAgent', 'may'], ['UsageLimit', 'no hour limit / 90 d', 'may'], ['TransferCondition', 'Custody · validated', 'may']],
+    cnc: [['AccessRequirement', 'Credentialed · AccountableAgent', 'may'], ['UsageLimit', '— / 90 d', 'may'], ['TransferCondition', 'Custody · validated', 'may']],
     fw: [['MaintenanceSchedule', '14 d · Repair', 'vas']]
   },
   instances: {
@@ -860,7 +860,7 @@ export function addRule(s: ProtoState, ctx: Ctx, ndo: string, type: string, summ
   const bad = hardRuleViolation(n.regime, type, summary);
   if (bad) return fail(bad);
   const d = leave(s, ctx, ndo, 'rule', 'added rule ' + type, null, (x) => ({
-    rules: { ...x.rules, [ndo]: [...(x.rules[ndo] ?? []), [type as RuleType, summary || 'none', ctx.me]] }
+    rules: { ...x.rules, [ndo]: [...(x.rules[ndo] ?? []), [type as RuleType, summary || '—', ctx.me]] }
   }));
   return plainDone(d, undefined);
 }
@@ -880,7 +880,7 @@ export function updateRule(s: ProtoState, ctx: Ctx, ndo: string, i: number, type
   const bad = hardRuleViolation(n.regime, type, summary);
   if (bad) return fail(bad);
   const d = leave(s, ctx, ndo, 'rule', 'changed rule ' + type, null, (x) => ({
-    rules: { ...x.rules, [ndo]: x.rules[ndo].map((q, j): Rule => (j === i ? [type as RuleType, summary || 'none', q[2]] : q)) }
+    rules: { ...x.rules, [ndo]: x.rules[ndo].map((q, j): Rule => (j === i ? [type as RuleType, summary || '—', q[2]] : q)) }
   }));
   return plainDone(d, undefined);
 }

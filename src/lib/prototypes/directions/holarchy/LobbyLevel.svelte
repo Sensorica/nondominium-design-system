@@ -91,28 +91,28 @@
     outline: none;
   }
   .disc {
-    fill: rgb(var(--ndo-color-card-bg));
-    stroke: var(--ndo-color-border);
+    fill: #fff;
+    stroke: #dde4eb;
     stroke-width: 2;
     transition: stroke var(--ndo-duration-fast);
   }
   .group:hover .disc,
   .group:focus-visible .disc {
-    stroke: var(--ndo-color-text-secondary);
+    stroke: #48566a;
   }
   .dot {
-    fill: var(--ndo-color-surface);
+    fill: #f3f6f8;
     stroke-width: 2;
   }
   .name {
-    fill: var(--ndo-color-text-primary);
+    fill: #0f1a2a;
     font-weight: var(--ndo-weight-bold);
   }
   .count {
-    fill: var(--ndo-color-text-muted);
+    fill: #8592a3;
   }
   .empty {
-    fill: var(--ndo-color-text-muted);
+    fill: #8592a3;
     font-size: 14px;
   }
 </style>

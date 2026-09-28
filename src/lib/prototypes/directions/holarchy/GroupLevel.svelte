@@ -46,7 +46,7 @@
 <g>
   <circle class="field" cx="480" cy="420" r="340" />
   <text class="title" x="480" y="102" text-anchor="middle">
-    {(group?.name ?? '').toUpperCase()} · {proto.dev ? 'GROUP DHT' : 'GROUP'}
+    {(group?.name ?? '').toUpperCase()} · GROUP DHT
   </text>
   {#each nodes as c (c.n.id)}
     <g
@@ -104,11 +104,11 @@
 
 <style>
   .field {
-    fill: rgb(var(--ndo-color-card-bg));
-    stroke: var(--ndo-color-border);
+    fill: #fff;
+    stroke: #dde4eb;
   }
   .title {
-    fill: var(--ndo-color-text-muted);
+    fill: #8592a3;
     font-size: 12px;
     font-weight: var(--ndo-weight-bold);
     letter-spacing: 1.5px;
@@ -119,8 +119,8 @@
     outline: none;
   }
   .body {
-    fill: var(--ndo-color-surface);
-    stroke: var(--ndo-color-border);
+    fill: #f3f6f8;
+    stroke: #dde4eb;
     stroke-width: 1;
     transition: stroke var(--ndo-duration-fast);
   }
@@ -129,11 +129,11 @@
   }
   .ndo:hover .body,
   .ndo:focus-visible .body {
-    stroke: var(--ndo-color-text-secondary);
+    stroke: #48566a;
   }
   .ndo.on .body {
-    fill: rgb(var(--ndo-teal-300) / 0.2);
-    stroke: var(--ndo-color-text-primary);
+    fill: #eaf7f5;
+    stroke: #0f1a2a;
     stroke-width: 2;
   }
   .core {
@@ -141,24 +141,24 @@
     stroke-width: 3;
   }
   .label {
-    fill: var(--ndo-color-text-primary);
+    fill: #0f1a2a;
     font-weight: var(--ndo-weight-bold);
   }
   .sub {
-    fill: var(--ndo-color-text-muted);
+    fill: #8592a3;
   }
   .add circle {
-    fill: rgb(var(--ndo-color-card-bg));
-    stroke: var(--ndo-color-text-muted);
+    fill: #fff;
+    stroke: #8592a3;
     stroke-dasharray: 3 4;
   }
   .add text {
-    fill: var(--ndo-color-text-muted);
+    fill: #8592a3;
     font-size: 12px;
     font-weight: var(--ndo-weight-bold);
   }
   .add:hover circle,
   .add:focus-visible circle {
-    stroke: var(--ndo-color-text-primary);
+    stroke: #0f1a2a;
   }
 </style>

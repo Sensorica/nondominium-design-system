@@ -3,6 +3,9 @@
   // attaches to it (its group listing, typed rules, items, requests and hard
   // links), plus one open socket to link another resource. Under it, the
   // 30-day activity chart.
+  //
+  // Colours below are literal, from C.jsx's IN_COL/LED maps and its inline
+  // SVG styles (ISA Phase 9 D8: A to E carry the handoff's own palette).
   import { proto } from '$lib/prototypes/store/store.svelte';
   import { plain } from '$lib/prototypes/plain';
   import { modals } from '$lib/prototypes/ui';
@@ -176,10 +179,10 @@
   .bench {
     position: relative;
     overflow: hidden;
-    background-color: var(--ndo-color-bg-app);
+    background-color: var(--bg);
     background-image:
-      linear-gradient(var(--ndo-color-border) 1px, transparent 1px),
-      linear-gradient(90deg, var(--ndo-color-border) 1px, transparent 1px);
+      linear-gradient(var(--grid) 1px, transparent 1px),
+      linear-gradient(90deg, var(--grid) 1px, transparent 1px);
     background-size: 24px 24px;
   }
 
@@ -192,43 +195,32 @@
     display: flex;
     align-items: center;
     gap: 10px;
+    flex-wrap: wrap;
   }
   .chip {
-    flex-shrink: 1;
-    min-width: 0;
+    margin-right: auto;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-    margin-right: auto;
-    font-family: var(--ndo-font-mono);
-    font-size: 11px;
+    font: 11px 'Space Mono', monospace;
+    background: #fff;
+    border: 1px solid var(--grid);
     padding: 4px 8px;
-    background: rgb(var(--ndo-color-card-bg));
-    border: 1px solid var(--ndo-color-border);
-    border-radius: var(--ndo-radius-sm);
+    border-radius: 4px;
   }
-  .btn.btn {
+  .btn {
     flex-shrink: 0;
-    font-family: var(--ndo-font-sans);
-    font-size: 11px;
-    font-weight: var(--ndo-weight-semibold);
+    font: 600 11px 'Space Grotesk', sans-serif;
+    background: var(--ink);
+    color: #fff;
     padding: 6px 10px;
-    border: 1px solid rgb(var(--ndo-primary-600));
-    border-radius: var(--ndo-radius-sm);
-    background: rgb(var(--ndo-primary-600));
-    color: rgb(var(--ndo-color-text-inverse));
+    border: none;
+    border-radius: 4px;
     cursor: pointer;
     white-space: nowrap;
-    transition: var(--ndo-transition-colors);
   }
-  .btn.btn:hover {
-    background: rgb(var(--ndo-primary-700));
-    border-color: rgb(var(--ndo-primary-700));
-  }
-  .btn.btn:focus-visible,
-  .lnk.lnk:focus-visible {
-    outline: none;
-    box-shadow: var(--ndo-focus-ring);
+  .btn:hover {
+    background: var(--teal);
   }
 
   .diagram {
@@ -237,49 +229,52 @@
     top: 60px;
     width: 100%;
     height: calc(100% - 196px);
-    font-family: var(--ndo-font-mono);
+  }
+  /* svg text{font-family:'Space Mono'}: every label in the diagram, the
+     resource's own name included, is set in the mono face. */
+  .diagram :global(text) {
+    font-family: 'Space Mono', monospace;
   }
 
-  .wires path {
+  .wires :global(path) {
     fill: none;
-    stroke: rgb(var(--ndo-gray-700));
+    stroke: var(--ink);
     stroke-width: 1.5;
   }
-  .wires path.open {
-    stroke: rgb(var(--ndo-gray-400));
+  .wires :global(path.open) {
+    stroke: var(--mute);
     stroke-dasharray: 4 4;
   }
-  .wires path.on {
-    stroke: rgb(var(--ndo-primary-600));
+  .wires :global(path.on) {
+    stroke: var(--teal);
     stroke-width: 2.5;
   }
 
   .core {
-    fill: rgb(var(--ndo-color-card-bg));
-    stroke: rgb(var(--ndo-gray-900));
+    fill: #fff;
+    stroke: var(--ink);
     stroke-width: 2;
   }
   .core-inner {
     fill: none;
-    stroke: rgb(var(--ndo-gray-200));
+    stroke: var(--grid);
   }
   .core-kicker,
   .core-hash {
     font-size: 10px;
-    fill: rgb(var(--ndo-gray-500));
+    fill: var(--mute);
   }
   .core-name {
-    font-family: var(--ndo-font-sans);
     font-size: 14px;
-    font-weight: var(--ndo-weight-bold);
-    fill: rgb(var(--ndo-gray-900));
+    font-weight: 700;
+    fill: var(--ink);
   }
   .pulse {
-    fill: rgb(var(--ndo-green-600));
+    fill: var(--teal);
     animation: pulse 1.6s ease-in-out infinite;
   }
   .pulse.busy {
-    fill: rgb(var(--ndo-amber-600));
+    fill: #e0a21a;
   }
   @keyframes pulse {
     0%,
@@ -296,45 +291,36 @@
     outline: none;
   }
   .socket rect {
-    fill: rgb(var(--ndo-color-card-bg));
-    stroke: rgb(var(--ndo-gray-900));
+    fill: #fff;
+    stroke: var(--ink);
   }
   .socket circle {
-    fill: rgb(var(--ndo-gray-900));
+    fill: var(--ink);
   }
   .socket .t {
     font-size: 11px;
-    font-weight: var(--ndo-weight-bold);
-    fill: rgb(var(--ndo-gray-900));
+    font-weight: 700;
+    fill: var(--ink);
   }
   .socket .s {
     font-size: 11px;
-    fill: rgb(var(--ndo-gray-500));
-  }
-  .socket:hover rect,
-  .socket:focus-visible rect {
-    stroke: rgb(var(--ndo-primary-600));
-    stroke-width: 2;
+    fill: var(--mute);
   }
   .socket.on rect {
-    fill: rgb(var(--ndo-primary-50));
-    stroke: rgb(var(--ndo-primary-600));
-  }
-  .socket.on circle {
-    fill: rgb(var(--ndo-primary-600));
+    fill: #e6f5f3;
   }
   .socket--open rect {
-    fill: var(--ndo-color-surface);
-    stroke: rgb(var(--ndo-gray-400));
+    fill: #f7f9f8;
+    stroke: var(--mute);
     stroke-dasharray: 4 4;
   }
   .socket--open circle {
-    fill: rgb(var(--ndo-color-card-bg));
-    stroke: rgb(var(--ndo-gray-400));
+    fill: #fff;
+    stroke: var(--mute);
   }
   .socket--open .t,
   .socket--open .s {
-    fill: rgb(var(--ndo-gray-500));
+    fill: var(--mute);
   }
 
   .pop {
@@ -346,33 +332,26 @@
     display: flex;
     align-items: center;
     gap: 14px;
-    max-width: calc(100% - 40px);
+    background: #fff;
+    border: 1.5px solid var(--ink);
+    border-radius: 6px;
     padding: 10px 14px;
-    font-size: var(--ndo-text-xs);
+    font-size: 12px;
+    box-shadow: 4px 4px 0 var(--ink);
     white-space: nowrap;
-    background: rgb(var(--ndo-color-card-bg));
-    border: 1.5px solid rgb(var(--ndo-gray-900));
-    border-radius: var(--ndo-radius-md);
-    box-shadow: 4px 4px 0 rgb(var(--ndo-gray-900));
   }
   .pop span {
-    overflow: hidden;
-    text-overflow: ellipsis;
-    font-family: var(--ndo-font-mono);
-    font-size: 11px;
-    color: var(--ndo-color-text-muted);
+    color: var(--mute);
+    font: 11px 'Space Mono', monospace;
   }
-  .pop code {
-    font-family: var(--ndo-font-mono);
-  }
-  .lnk.lnk {
+  .lnk {
+    font: 11px 'Space Mono', monospace;
+    color: var(--teal);
+    cursor: pointer;
+    text-decoration: underline;
+    margin-left: 4px;
     padding: 0;
     border: none;
     background: none;
-    font-family: var(--ndo-font-mono);
-    font-size: 11px;
-    color: var(--ndo-color-link);
-    text-decoration: underline;
-    cursor: pointer;
   }
 </style>
