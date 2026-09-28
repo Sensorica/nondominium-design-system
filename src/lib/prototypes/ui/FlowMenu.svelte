@@ -116,7 +116,7 @@
     aria-expanded={open}
   >
     <AgentAvatar id={proto.me.id} size={22} />
-    <span>{label}</span>
+    <span class="label">{label}</span>
     <span class="caret">▾</span>
   </button>
 

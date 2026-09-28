@@ -163,12 +163,11 @@
   box-sizing: border-box;
   outline: none;
 }
-.pu-input:focus,
-.pu-select:focus,
-.pu-textarea:focus {
-  border-color: var(--_accent);
-  box-shadow: var(--_focus);
-}
+/* ui.jsx's pInput sets only `outline:'none'` inline and defines no `:focus`
+ * rule anywhere in any direction's own stylesheet: the original shows no
+ * focus indicator on any text field, autofocused or not (ISA Phase 9,
+ * mycelium.ts modal-browse). A border-color + box-shadow ring here was this
+ * shared layer's own addition. */
 .pu-select {
   appearance: auto;
 }

@@ -173,10 +173,13 @@ const pairs: Pair[] = [
     name: 'modal-browse',
     original: { path: original, steps: [{ click: 'text=Menu' }, { click: 'text=Find resources' }] },
     port: { path: port, steps: [{ click: 'text=Menu' }, { click: 'text=Find resources' }] },
-    threshold: 0.012,
-    note:
-      TEXT_NOTE +
-      ' Additionally, a real (not stale) shared-layer difference: BrowseModal’s search input autofocuses on both sides (matching ui.jsx’s own `autoFocus`), but proto.css’s `.pu-input:focus` (src/lib/prototypes/ui/proto.css, out of this direction’s scope) draws a visible border-color + box-shadow focus ring, while ui.jsx’s inline `pInput` sets `outline:’none’` with no `:focus` rule at all — the original never shows a focus indicator on any autofocused field. Reported, not fixed here.'
+    note: TEXT_NOTE
+    // The shared-layer focus-ring difference this pair used to carry at a
+    // 1.2% ceiling (proto.css's `.pu-input:focus` drew a border-color +
+    // box-shadow ring on BrowseModal's autofocused search input; ui.jsx's
+    // pInput sets only `outline:'none'`, no `:focus` rule anywhere) is fixed
+    // (src/lib/prototypes/ui/proto.css, ISA Phase 9 finding 6). Measured
+    // 0.65% across two consecutive runs, back under the 1% default.
   },
   {
     slug,

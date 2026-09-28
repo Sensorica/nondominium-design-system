@@ -63,21 +63,40 @@ const pairs: Pair[] = [
     name: 'ndo-cnc',
     original: { path: original, steps: [{ click: 'text=Urban Rhythms' }] },
     port: { path: port, steps: [{ click: 'text=Urban Rhythms' }] }
-    // "Usage limit" reads "no hour limit / 90 d" here against the
-    // original's "— / 90 d": a data bug in the shared seed store, not this
-    // direction's markup (src/lib/prototypes/store/logic.ts:302, `cnc`'s
-    // `UsageLimit` rule literal). Reported, not fixed here: that file isn't
-    // owned by this direction, and the original's own data
-    // (docs/prototypes/original/prototypes/core.jsx:84) confirms the
-    // literal value is meant to be the em dash. It's small enough on its
-    // own (a handful of characters at 11px) that it doesn't push this pair
-    // over the default 1% threshold even unmasked.
+    // The shared seed store's `cnc` UsageLimit literal was fixed in e39236b
+    // (src/lib/prototypes/store/logic.ts:302 now reads '— / 90 d', the
+    // original's own em dash), so this pair carries no note or threshold.
   },
   {
     slug,
     name: 'ndo-fw',
     original: { path: original, steps: [{ click: 'text=Urban Canopy' }] },
     port: { path: port, steps: [{ click: 'text=Urban Canopy' }] }
+  },
+  // Declaring an NDO defaults to the Nondominium regime (CreateNdoModal.svelte
+  // and ui.jsx's own CreateNdoModal both seed `regime` as 'Nondominium'), so
+  // this is the pair that reaches SpecSheet.svelte's ownership row with that
+  // regime and proves the original's " · uncapturable" suffix is rendered
+  // (ISA Phase 9 finding: the suffix was dropped entirely).
+  {
+    slug,
+    name: 'create-nondominium',
+    original: {
+      path: original,
+      steps: [
+        { click: 'text=+ new' },
+        { fill: ['input[placeholder="e.g. Shared Bike Fleet"]', 'Community Toolshed'] },
+        { click: 'text=Declare NDO' }
+      ]
+    },
+    port: {
+      path: port,
+      steps: [
+        { click: 'text=+ new' },
+        { fill: ['input[placeholder="e.g. Shared Bike Fleet"]', 'Community Toolshed'] },
+        { click: 'text=Declare NDO' }
+      ]
+    }
   },
   // A capability socket picked: the centre popover, and the highlighted
   // (teal) wire and box for that socket.

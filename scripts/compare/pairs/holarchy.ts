@@ -24,18 +24,18 @@
 // a ~2.6px space) and the avatar itself shifted up by ~2.5px (flex-start
 // versus the original's inline, roughly-centred flow). Removing the flex
 // styling (below) made every row match exactly. With that fixed, every pair
-// here measures 0.3-0.8%, well inside the 1% default, except three lobby
+// here measures 0.3-0.8%, well inside the 1% default: the three lobby
 // modals whose content lives in the shared `src/lib/prototypes/ui/**` kit
-// (CreateNdoModal, GroupModal, JoinModal), not in this direction: those keep
-// their threshold, noted as shared-modal residuals pending that sweep.
+// (CreateNdoModal, GroupModal, JoinModal) used to keep a 1.6% ceiling
+// pending a shared spacing sweep; that sweep (commit 4e4d299) and the
+// shared autofocus focus-ring fix (ISA Phase 9 finding 6) have both landed,
+// and all three now measure under 1% too (see each pair's own note).
 import type { Pair } from '../pairs';
 
 const slug = 'holarchy';
 const original = 'E%20Holarchy.html';
 const port = '/prototypes/holarchy';
 const FONT_WAIT = 1000;
-
-const SHARED_MODAL_NOTE = 'shared modal, pending shared spacing sweep';
 
 const pairs: Pair[] = [
   // ── Views (ISA claim 39): the three levels, and the states a reviewer
@@ -140,41 +140,40 @@ const pairs: Pair[] = [
     slug,
     name: 'modal-create',
     // Content is `src/lib/prototypes/ui/CreateNdoModal.svelte` (shared kit,
-    // not owned by this direction): the field/pill spacing sweep in
-    // progress there is what's left of this pair's residual.
+    // not owned by this direction). The field/pill spacing sweep this pair
+    // was pending (commit 4e4d299) has landed, and the autofocus focus-ring
+    // difference every shared-modal pair also carried (proto.css's
+    // `.pu-input:focus`, ISA Phase 9 finding 6) is fixed too. Measured 0.78%
+    // across two consecutive runs, back under the 1% default.
     original: {
       path: original,
       steps: [{ click: 'text=Lobby' }, { click: 'text=+ Add resource' }]
     },
-    port: { path: `${port}?view=lobby`, steps: [{ click: 'text=+ Add resource' }] },
-    threshold: 0.016,
-    note: SHARED_MODAL_NOTE
+    port: { path: `${port}?view=lobby`, steps: [{ click: 'text=+ Add resource' }] }
   },
   {
     slug,
     name: 'modal-group',
     // Content is the shared kit's group-create modal (ModalHost's `'group'`
-    // branch), not owned by this direction.
+    // branch), not owned by this direction. Same fixes as modal-create above
+    // apply here; measured 0.78% across two consecutive runs.
     original: {
       path: original,
       steps: [{ click: 'text=Lobby' }, { click: 'text=+ New group' }]
     },
-    port: { path: `${port}?view=lobby`, steps: [{ click: 'text=+ New group' }] },
-    threshold: 0.016,
-    note: SHARED_MODAL_NOTE
+    port: { path: `${port}?view=lobby`, steps: [{ click: 'text=+ New group' }] }
   },
   {
     slug,
     name: 'modal-join',
     // Content is `src/lib/prototypes/ui/JoinModal.svelte` (shared kit, not
-    // owned by this direction).
+    // owned by this direction). Same fixes as modal-create above apply here;
+    // measured 0.77% across two consecutive runs.
     original: {
       path: original,
       steps: [{ click: 'text=Lobby' }, { click: 'text=Join group' }]
     },
-    port: { path: `${port}?view=lobby`, steps: [{ click: 'text=Join group' }] },
-    threshold: 0.016,
-    note: SHARED_MODAL_NOTE
+    port: { path: `${port}?view=lobby`, steps: [{ click: 'text=Join group' }] }
   },
   {
     slug,
@@ -188,27 +187,22 @@ const pairs: Pair[] = [
     // The original's own CTA is a <span>, not a <button>; ".cta" scopes past
     // the legend's unrelated "items" label.
     //
-    // Shared-layer content mismatch, reported not fixed (not owned by this
-    // direction, and under the 1% default regardless): ui.jsx's
-    // ResourcesModal hint is the literal "create_economic_resource · starts
-    // PendingValidation with you as custodian", unconditional; the shared
-    // ResourcesModal.svelte instead shows a plain-language paraphrase ("It
-    // starts waiting for approval, with you holding it."). See
-    // docs/prototypes/inventory/holarchy.md.
+    // Shared kit, not owned by this direction: ResourcesModal.svelte's hint
+    // is ui.jsx's own literal "create_economic_resource · starts
+    // PendingValidation with you as custodian" (commit 24db13a put it back
+    // after a plain-language-paraphrase regression). Measures 0.62%, under
+    // the 1% default. See docs/prototypes/inventory/holarchy.md.
     original: { path: original, steps: [{ click: '.cta >> text=Items' }] },
     port: { path: port, steps: [{ click: '.cta >> text=Items' }] }
   },
   {
     slug,
     name: 'modal-rule',
-    // Shared-layer content mismatch, reported not fixed (not owned by this
-    // direction, and under the 1% default regardless): ui.jsx's RuleModal
-    // always shows its raw technical field labels ("RuleData",
-    // "accessibility", "required_role") and a raw enum preview line,
-    // ungated by Developer details; the shared RuleModal.svelte instead
-    // renders plain-language labels ("Save as", "Kind of rule", "Who can
-    // access") and a plain-language preview. This pair only proves the
-    // direction reaches the modal with the right NDO. See
+    // Shared kit, not owned by this direction: RuleModal.svelte shows
+    // ui.jsx's own raw technical field labels ("RuleData", "accessibility",
+    // "required_role") and raw enum preview line, ungated by Developer
+    // details (commit 24db13a put it back after a plain-language-label
+    // regression). Measures 0.40%, under the 1% default. See
     // docs/prototypes/inventory/holarchy.md.
     original: { path: original, steps: [{ click: 'text=+ Rule' }] },
     port: { path: port, steps: [{ click: 'text=+ Rule' }] }

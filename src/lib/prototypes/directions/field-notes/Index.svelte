@@ -116,6 +116,21 @@
     flex-shrink: 0;
     margin-left: auto;
   }
+  /* B Field Notes.html's own stylesheet has `.brand span{font-family:
+   * Newsreader;font-size:20px;font-weight:500}`, a plain descendant
+   * selector that reaches every <span> under `.brand`, including the ones
+   * FlowMenu renders for its own label and caret (ui.jsx's FlowMenu sets
+   * fontSize:13/fontWeight:600 on the *button*, which the label/caret spans
+   * would otherwise just inherit; a same-element rule always beats
+   * inheritance, whatever its specificity). AgentAvatar's own span sets its
+   * font-size and font-weight inline, so it is untouched either there or
+   * here. */
+  .menu :global(.trigger .label),
+  .menu :global(.trigger .caret) {
+    font-family: var(--fn-serif);
+    font-size: 20px;
+    font-weight: 500;
+  }
 
   .search {
     width: 100%;

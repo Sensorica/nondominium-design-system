@@ -86,7 +86,7 @@
             </div>
             <div>
               {#if t.note}
-                <div class="margin">“{t.note}”<small>{proto.q.agent(t.agent)}, note on this trace</small></div>
+                <div class="margin">“{t.note}”<small>— {proto.q.agent(t.agent)}, note on this trace</small></div>
               {/if}
             </div>
           </div>

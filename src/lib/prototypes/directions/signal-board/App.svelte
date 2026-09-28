@@ -78,11 +78,13 @@
         {/snippet}
       </GroupScope>
     </div>
-    <div class="adds">
-      <button type="button" class="take ghost" onclick={() => modals.open({ type: 'create', after: setOpen })}>+ Add resource</button>
-      <button type="button" class="take ghost" onclick={() => modals.open({ type: 'group', after: setScope })}>+ Group</button>
-      <FlowMenu ndo={open} onOpen={setOpen} onGroup={setScope} />
-    </div>
+    <button
+      type="button"
+      class="take ghost first"
+      onclick={() => modals.open({ type: 'create', after: setOpen })}>+ Add resource</button
+    >
+    <button type="button" class="take ghost" onclick={() => modals.open({ type: 'group', after: setScope })}>+ Group</button>
+    <FlowMenu ndo={open} onOpen={setOpen} onGroup={setScope} />
     <div class="k-me">
       <button
         type="button"
@@ -261,10 +263,10 @@
     padding: 4px 6px;
     cursor: pointer;
   }
-  .adds {
-    display: flex;
-    align-items: center;
-    gap: 8px;
+  /* D.jsx's "+ Add resource" button carries an inline marginLeft:12 on top
+   * of header's own 16px gap; this class is that same offset, scoped so it
+   * never collides with a UnoCSS utility name (D12). */
+  .first {
     margin-left: 12px;
   }
   .k-me {
@@ -412,7 +414,7 @@
       padding: 0 16px 72px;
     }
     .scope,
-    .adds {
+    .first {
       margin-left: 0;
     }
   }

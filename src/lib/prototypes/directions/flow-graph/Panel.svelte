@@ -180,6 +180,19 @@
   // reached only through `?fresh=1` / the design-system screen map, never
   // through this list.
   const VISIBLE_SCENARIOS = ['equipment', 'science', 'art'] as const;
+
+  // CONDUCTORS is a plain module object backend.ts mutates in place on every
+  // scenario switch (setConductors): Svelte 5 never tracks that write, so a
+  // bare `Object.values(CONDUCTORS)` in the template freezes at whatever the
+  // agents were on first render. Reading `s.scenario` here (already reactive:
+  // it flows through ctx from the backend's `rev` counter) forces this to
+  // recompute exactly when setConductors has just repopulated CONDUCTORS.
+  const conductorsLine = $derived.by(() => {
+    void s.scenario;
+    return Object.values(CONDUCTORS)
+      .map((a) => a.name + ' · ' + a.org)
+      .join('  ·  ');
+  });
 </script>
 
 <aside class="panel">
@@ -190,7 +203,7 @@
       <div class="kicker">{perspTitle}</div>
       <div class="h">{sc.title}</div>
       <p class="p">{sc.summary}</p>
-      <div class="small">{Object.values(CONDUCTORS).map((a) => a.name + ' · ' + a.org).join('  ·  ')}</div>
+      <div class="small">{conductorsLine}</div>
       {#if sc.story}
         <div class="small">From <span class="mono">documentation/Applications/user-story/{sc.story}</span></div>
       {/if}

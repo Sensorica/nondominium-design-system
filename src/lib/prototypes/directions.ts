@@ -36,11 +36,12 @@ export interface Direction {
   store: StoreKind;
   views: readonly DirectionView[];
   status: DirectionStatus;
-  /** What the port lost from the handoff's look. The handoff asked for A to E
-   *  to be restyled onto the design system ("tokens only"), so each direction's
-   *  own webfonts were replaced by the design-system sans and mono. Shown on
-   *  the index, so a reviewer comparing directions knows the type is not the
-   *  handoff's. */
+  /** How this direction's type compares to the handoff's. A to E once
+   *  restyled onto the design system's own sans and mono ("tokens only");
+   *  that decision is reversed (ISA Phase 9, D8), so A to E now self-host the
+   *  handoff's own webfonts, scoped to each direction's root, same as F
+   *  always did. Shown on the index, so a reviewer comparing directions
+   *  knows what type each one actually renders in. */
   typeNote: string;
 }
 
@@ -140,7 +141,7 @@ export const DIRECTIONS = [
       { id: 'lobby', label: 'Lobby level' }
     ],
     typeNote:
-      'Handoff type: Manrope and Fira Code. Here: the design-system sans and mono (tokens only), so the lettering is not the handoff\'s.',
+      'Handoff type: Manrope and Fira Code. Here: the same two families, self-hosted, and the handoff\'s own palette, scoped to this direction.',
     status: 'candidate'
   },
   {

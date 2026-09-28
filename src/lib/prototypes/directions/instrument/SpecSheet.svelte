@@ -52,7 +52,7 @@
         <td>stage</td>
         <td><span class="led"></span><b>{plain(n.stage)}</b> <button type="button" class="lnk" onclick={() => modals.open({ type: 'advance', ndo: id })}>change</button></td>
       </tr>
-      <tr><td>ownership</td><td><b>{plain(n.regime)}</b></td></tr>
+      <tr><td>ownership</td><td><b>{plain(n.regime)}</b>{n.regime === 'Nondominium' ? ' · uncapturable' : ''}</td></tr>
       <tr><td>type</td><td><b>{plain(n.nature)}</b></td></tr>
       <tr><td>use</td><td>{plain(n.rivalry)}</td></tr>
     </tbody>

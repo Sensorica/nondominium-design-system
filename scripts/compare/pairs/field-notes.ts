@@ -40,29 +40,13 @@ const TEXT_NOTE =
 // only reads it there.
 const HEADER_NOTE = TEXT_NOTE;
 
-// Two pairs (rules, and the modal-rule/modal-resources pairs that render the
-// rules view behind their modal) render Entry.svelte's `.h3` section
-// headings ("Rules in force", "Items") and Side.svelte's `h3`/`.rh`
-// ("Left here for you", "Your receipts →"). Measured with
-// getBoundingClientRect() in real Chrome (.local/verify/bbox-proof.ts): the
-// self-hosted @fontsource-variable/newsreader at weight 500 lays out that
-// block heading's own box at ~12px tall versus the original's Google-served
-// static Newsreader at 18px, a 6px gap that does not respond to the CSS
-// `line-height` property at all (tried `normal`, `1`, `18px`, `1.5`, `1.1`,
-// `100%` inline on the live element: all five measured the same 12px), so it
-// is not a line-height bug this component can fix. It cascades a uniform 6px
-// upward shift onto every sibling below the heading (verified: the `.sl`
-// rule/item rows below are byte-identical in height and position to each
-// other on both sides, offset only by this heading's own box). This does
-// NOT clear D11's bar (the same texts do not sit within 1px — they sit 6px
-// apart); it is recorded here as a named, precisely located, tried-and-not-
-// CSS-fixable gap rather than papered over as generic font noise. A static
-// (non-variable) Newsreader build might not have this quirk, but adding a
-// second Newsreader font package is outside a surgical fix to this
-// direction's own files.
-const H3_NOTE =
-  TEXT_NOTE +
-  ' Additionally, Entry.svelte’s `.h3` / Side.svelte’s `h3` block headings lay out ~6px shorter under the self-hosted variable Newsreader than the original’s static build (measured, not a line-height bug — see this file’s header comment), shifting the rules list and receipts link up by that amount. Does not clear D11’s within-1px bar; recorded as a named, unresolved gap rather than a raised default.';
+// Entry.svelte's block headings ("Rules in force", "Items") and Side.svelte's
+// `h3`/`.rh` ("Left here for you", "Your receipts →") once sat 6px too high:
+// not the variable-Newsreader line-height quirk a prior pass here blamed, but
+// a class literally named `.h3` colliding with UnoCSS's own `.h3` utility
+// (`height: 0.75rem`, a 12px box no `line-height` could move — see ISA Phase
+// 9, D12). Fixed by renaming it (commit 7059025); `rules`, `modal-rule` and
+// `modal-resources` no longer carry a note about it.
 
 const pairs: Pair[] = [
   // ── Views (ISA claim 39) ──
@@ -78,7 +62,7 @@ const pairs: Pair[] = [
     name: 'rules',
     original: { path: original, steps: [{ click: 'text=Rules & items' }], mask: ['.mark'] },
     port: { path: `${port}?view=rules`, mask: ['.mark'] },
-    note: H3_NOTE
+    note: HEADER_NOTE
   },
   {
     slug,
@@ -135,8 +119,7 @@ const pairs: Pair[] = [
       path: original,
       steps: [{ click: 'text=Rules & items' }, { click: 'text=Add a rule' }]
     },
-    port: { path: `${port}?view=rules`, steps: [{ click: 'text=Add a rule' }] },
-    note: H3_NOTE
+    port: { path: `${port}?view=rules`, steps: [{ click: 'text=Add a rule' }] }
   },
   {
     slug,
@@ -145,8 +128,7 @@ const pairs: Pair[] = [
       path: original,
       steps: [{ click: 'text=Rules & items' }, { click: 'text=Items & holders' }]
     },
-    port: { path: `${port}?view=rules`, steps: [{ click: 'text=Items & holders' }] },
-    note: H3_NOTE
+    port: { path: `${port}?view=rules`, steps: [{ click: 'text=Items & holders' }] }
   },
   {
     slug,

@@ -199,6 +199,41 @@ const pairs: Pair[] = [
       path: '/prototypes/flow-graph',
       steps: [{ click: `text="${NDO_TITLE}"` }, { click: 'text="Reset"' }]
     }
+  },
+
+  // Scenario switch (ISA Phase 9 finding 2): Panel.svelte's `CONDUCTORS`
+  // read used to be a bare `Object.values(CONDUCTORS)` with no reactive
+  // dependency, so Svelte 5 never re-ran it after backend.ts's
+  // `setConductors` repopulated the module object on a scenario switch — the
+  // Guide's agents line stayed "Sarah · Sensorica · Marco · FabLab Montréal"
+  // (the equipment scenario's own agents) no matter which scenario was
+  // picked. Fixed with a `$derived` keyed on the reactive `s.scenario`. A
+  // pixel ratio alone cannot catch one wrong line of text at this scale
+  // (both scenarios), so `scripts/verify/flow-graph-scenario-agents.ts` also
+  // asserts the agents line's actual text on both sides.
+  {
+    slug,
+    name: 'scenario-science',
+    original: {
+      path: original,
+      steps: [{ click: 'text=Open science: shared laboratory equipment' }]
+    },
+    port: {
+      path: '/prototypes/flow-graph',
+      steps: [{ click: 'text=Open science: shared laboratory equipment' }]
+    }
+  },
+  {
+    slug,
+    name: 'scenario-art',
+    original: {
+      path: original,
+      steps: [{ click: 'text=ArtCoin: artwork circulating through venues' }]
+    },
+    port: {
+      path: '/prototypes/flow-graph',
+      steps: [{ click: 'text=ArtCoin: artwork circulating through venues' }]
+    }
   }
 ];
 
