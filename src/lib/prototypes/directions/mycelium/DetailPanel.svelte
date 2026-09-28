@@ -13,11 +13,9 @@
     id: string;
     decay: number;
     onclose: () => void;
-    /** Opens another resource (a linked one). */
-    onopen: (ndoId: string) => void;
   }
 
-  let { id, decay, onclose, onopen }: Props = $props();
+  let { id, decay, onclose }: Props = $props();
 
   const n = $derived(proto.q.ndo(id)!);
   const traces = $derived(proto.q.tracesOf(id));
@@ -82,9 +80,7 @@
     <h3>Linked resources <span>{links.length}</span></h3>
     <div class="slots">
       {#each links as h, i (i)}
-        <button type="button" class="slot" onclick={() => onopen(other(h))}>
-          {plain(h.type)} {h.from === id ? '→' : '←'} {proto.q.ndo(other(h))?.name ?? ''}
-        </button>
+        <span class="slot">{plain(h.type)} {h.from === id ? '→' : '←'} {proto.q.ndo(other(h))?.name ?? ''}</span>
       {/each}
       <button type="button" class="slot slot--add" onclick={() => modals.open({ type: 'attach', ndo: id })}>+ link resource</button>
     </div>
@@ -93,8 +89,8 @@
 
 <style>
   .panel {
-    border-left: 1px solid rgb(var(--ndo-gray-800));
-    background: rgb(var(--ndo-gray-900));
+    border-left: 1px solid var(--line);
+    background: var(--bg2);
     overflow: auto;
     padding: 22px;
     min-height: 0;
@@ -107,19 +103,18 @@
     font-size: 11px;
     letter-spacing: 0.08em;
     text-transform: uppercase;
-    color: rgb(var(--ndo-gray-500));
+    color: var(--dim);
   }
   .x {
     margin-left: auto;
     background: none;
     border: 0;
-    color: rgb(var(--ndo-gray-500));
+    color: var(--dim);
     cursor: pointer;
     font-size: 14px;
-    border-radius: var(--ndo-radius-sm);
   }
   .x:hover {
-    color: rgb(var(--ndo-gray-50));
+    color: var(--ink);
   }
   h1 {
     font-size: 24px;
@@ -129,8 +124,9 @@
     letter-spacing: -0.01em;
   }
 
-  /* Badge shape grammar: filled tint for the Layer 0 stage, dashed outline for
-     the ownership model, plain outline for the rest. */
+  /* A.jsx's own .tag / .tag.l / .tag.r, verbatim: filled teal tint for the
+     Layer 0 stage, dashed blue outline for the ownership model, plain
+     outline for the rest. */
   .tags {
     display: flex;
     flex-wrap: wrap;
@@ -140,24 +136,24 @@
   .tag {
     font-size: 11px;
     padding: 3px 8px;
-    border-radius: var(--ndo-radius-pill);
-    border: 1px solid rgb(var(--ndo-gray-700));
-    color: rgb(var(--ndo-gray-400));
+    border-radius: 999px;
+    border: 1px solid var(--line);
+    color: var(--mute);
     white-space: nowrap;
   }
   .tag--stage {
-    color: rgb(var(--ndo-brand-teal-300));
-    border-color: rgb(var(--ndo-brand-teal-700));
-    background: rgb(var(--ndo-brand-teal-700) / 0.25);
+    color: var(--teal);
+    border-color: #1f4a47;
+    background: #0f2826;
   }
   .tag--regime {
     border-style: dashed;
-    color: rgb(var(--ndo-brand-blue-300));
-    border-color: rgb(var(--ndo-brand-blue-700));
+    color: #8fb0ff;
+    border-color: #35508a;
   }
   .desc {
     font-size: 13px;
-    color: rgb(var(--ndo-gray-400));
+    color: var(--mute);
     margin: 0 0 14px;
     line-height: 1.5;
   }
@@ -171,7 +167,7 @@
   }
   .strength span {
     flex: 1;
-    background: rgb(var(--ndo-brand-teal-300));
+    background: var(--teal);
     border-radius: 2px 2px 0 0;
     transition: height 500ms;
   }
@@ -179,7 +175,7 @@
     display: flex;
     justify-content: space-between;
     font-size: 11px;
-    color: rgb(var(--ndo-gray-500));
+    color: var(--dim);
   }
 
   .acts {
@@ -189,20 +185,17 @@
     flex-wrap: wrap;
   }
   .acts button {
-    font: inherit;
-    font-size: 12px;
-    font-weight: 500;
+    font: 500 12px 'Instrument Sans', sans-serif;
     white-space: nowrap;
     padding: 6px 12px;
-    border-radius: var(--ndo-radius-pill);
-    border: 1px solid rgb(var(--ndo-brand-teal-700));
+    border-radius: 999px;
+    border: 1px solid #2a4a4a;
     background: transparent;
-    color: rgb(var(--ndo-brand-teal-300));
+    color: var(--teal);
     cursor: pointer;
-    transition: var(--ndo-transition-colors);
   }
   .acts button:hover {
-    background: rgb(var(--ndo-brand-teal-700) / 0.3);
+    background: #12302e;
   }
 
   .sec {
@@ -212,14 +205,14 @@
     font-size: 12px;
     font-weight: 600;
     margin: 0 0 10px;
-    color: rgb(var(--ndo-gray-400));
+    color: var(--mute);
     display: flex;
     justify-content: space-between;
   }
   .empty {
     margin: 0;
     font-size: 12px;
-    color: rgb(var(--ndo-gray-500));
+    color: var(--dim);
     padding: 10px 0;
   }
 
@@ -232,24 +225,19 @@
     font: inherit;
     font-size: 11px;
     padding: 5px 9px;
-    border-radius: var(--ndo-radius-md);
-    background: rgb(var(--ndo-gray-950) / 0.6);
-    border: 1px solid rgb(var(--ndo-gray-800));
-    color: rgb(var(--ndo-gray-400));
-    cursor: pointer;
+    border-radius: 6px;
+    background: #0e1618;
+    border: 1px solid var(--line);
+    color: var(--mute);
     text-align: left;
-  }
-  .slot:hover {
-    color: rgb(var(--ndo-gray-50));
-    border-color: rgb(var(--ndo-gray-600));
   }
   .slot--add {
     border-style: dashed;
-    color: rgb(var(--ndo-gray-500));
+    color: var(--dim);
   }
   .slot--add:hover {
-    color: rgb(var(--ndo-brand-teal-300));
-    border-color: rgb(var(--ndo-brand-teal-300));
+    color: var(--teal);
+    border-color: var(--teal);
   }
   button:focus-visible {
     outline: none;

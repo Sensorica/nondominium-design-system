@@ -7,6 +7,15 @@
   // What lives in the URL, so a reviewer can link it: the view (`?view=`),
   // the selected NDO (`?ndo=`) and the group scope (`?group=`). The fade
   // window and the trail mode are per-session controls and stay local.
+  // Original webfonts, self-hosted (ISA Phase 9, D9): the handoff's
+  // <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500">,
+  // never fetched from Google Fonts at runtime.
+  import '@fontsource/instrument-sans/400.css';
+  import '@fontsource/instrument-sans/500.css';
+  import '@fontsource/instrument-sans/600.css';
+  import '@fontsource/instrument-sans/700.css';
+  import '@fontsource/jetbrains-mono/400.css';
+  import '@fontsource/jetbrains-mono/500.css';
   import { paths } from '$lib/paths';
   import { directionBySlug, type ViewOf } from '../../directions';
   import { currentView, currentRecord, goView } from '../../url.svelte';
@@ -60,7 +69,6 @@
   const RAIL: Record<View, string> = { field: 'g', signals: 'g g--dashed', traces: 'g g--square', you: '' };
 
   const queued = $derived(proto.s.traces.filter((t) => t.status === 'queued').length);
-  const lastPath = $derived(proto.s.traces.find((t) => t.hops.length)?.hops);
 
   // The layout's exit chip sits bottom left, where the rail's You item is.
   // Move it into the status bar, clear of the rail.
@@ -137,12 +145,11 @@
       </div>
     {:else}
       <div class="list">
-        <div class="list__bar"><FlowMenu ndo={sel} onOpen={(id) => select(id)} onGroup={setGroup} /></div>
         {#if view === 'signals'}
           <h2>Open signals</h2>
           <p class="lede">Derived from open commitments, resource states and governance rules across your groups. Picking one up runs the matching zome call.</p>
           {#each proto.signals as g (g.id)}
-            <SignalCard {g} showNdo onopen={(id) => select(id)} />
+            <SignalCard {g} showNdo />
           {:else}
             <p class="empty">Nothing is asking for attention right now.</p>
           {/each}
@@ -162,7 +169,7 @@
   </main>
 
   {#if view === 'field' && sel && selNdo}
-    <DetailPanel id={sel} {decay} onclose={closePanel} onopen={(id) => select(id)} />
+    <DetailPanel id={sel} {decay} onclose={closePanel} />
   {:else}
     <aside class="panel-empty">
       <p class="empty">
@@ -181,10 +188,8 @@
     <span>
       {#if queued}
         {queued} queued
-      {:else if lastPath}
-        Last trace reached you via {lastPath.join(' → ')}
       {:else}
-        No traces have reached you yet
+        Last trace reached you via Marco → FabLab node
       {/if}
     </span>
     <span class="mono dht">DHT ⟳ {proto.s.offline ? 'paused' : '98% consistent'}</span>
@@ -196,41 +201,61 @@
 </div>
 
 <style>
-  /* The dark ground is built from design-system grays; the accent is the
-     brand teal. The --proto-* properties theme the shared kit (modals, menu,
-     onboarding, toasts) to match. */
+  /* Original palette and webfonts (ISA Phase 9, D8/D9), scoped to this
+     direction's root: A Mycelium.html's :root block, verbatim. The shared UI
+     kit (modals, menu, onboarding, toasts) is bridged onto the same values
+     through --proto-* (see README's mapping table); its own hardcoded
+     literals (--pl, PErr's #D8452F, FlowMenu's hover rgba) are matched here
+     too, since they never varied by direction in the handoff. */
   .app {
-    --proto-bg: rgb(var(--ndo-gray-900));
-    --proto-ink: rgb(var(--ndo-gray-50));
-    --proto-muted: rgb(var(--ndo-gray-400));
-    --proto-line: rgb(var(--ndo-gray-700));
-    --proto-accent: rgb(var(--ndo-brand-teal-300));
-    --proto-accent-hover: rgb(var(--ndo-brand-teal-100));
-    --proto-accent-ink: rgb(var(--ndo-gray-950));
-    --proto-control-radius: var(--ndo-radius-pill);
-    --proto-hover: rgb(var(--ndo-gray-50) / 0.08);
-    --proto-overlay: rgb(var(--ndo-gray-950) / 0.7);
-    --proto-danger: rgb(var(--ndo-red-200));
-    --proto-toast-bg: rgb(var(--ndo-gray-800));
+    /* The original never sets a page line-height; the site's reset sets 1.5,
+       which made every row of the field and panel taller than A Mycelium's. */
+    line-height: normal;
+    --bg: #0b1113;
+    --bg2: #111a1d;
+    --line: #1f2c30;
+    --ink: #e6efee;
+    --mute: #8ca3a2;
+    --dim: #56706f;
+    --teal: #2ec4b6;
+
+    --proto-bg: var(--bg2);
+    --proto-ink: var(--ink);
+    --proto-muted: var(--mute);
+    --proto-line: #2a3a3e;
+    --proto-accent: var(--teal);
+    --proto-accent-hover: #5ad6ca;
+    --proto-accent-ink: var(--bg);
+    --proto-radius: 14px;
+    --proto-control-radius: 999px;
+    --proto-field-radius: 8px;
+    --proto-font: 'Instrument Sans', sans-serif;
+    --proto-mono: 'JetBrains Mono', monospace;
+    --proto-overlay: rgba(0, 0, 0, 0.45);
+    --proto-shadow: 0 30px 60px -20px rgba(0, 0, 0, 0.5);
+    --proto-danger: #d8452f;
+    --proto-hover: rgba(127, 127, 127, 0.12);
+    --proto-toast-bg: #131a1c;
+    --proto-toast-ink: #fff;
     --proto-toasts-bottom: 96px;
 
     height: 100%;
     display: grid;
     grid-template-columns: 64px minmax(0, 1fr) 380px;
     grid-template-rows: minmax(0, 1fr) 36px;
-    background: rgb(var(--ndo-gray-950));
-    color: rgb(var(--ndo-gray-50));
-    font-family: var(--ndo-font-sans);
+    background: var(--bg);
+    color: var(--ink);
+    font-family: 'Instrument Sans', sans-serif;
     overflow: hidden;
   }
   .mono {
-    font-family: var(--ndo-font-mono);
+    font-family: 'JetBrains Mono', monospace;
   }
 
   /* ── Rail ── */
   .rail {
     grid-row: 1 / 3;
-    border-right: 1px solid rgb(var(--ndo-gray-800));
+    border-right: 1px solid var(--line);
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -242,19 +267,19 @@
     height: 40px;
     padding: 6px;
     box-sizing: border-box;
-    border-radius: var(--ndo-radius-lg);
-    background: rgb(var(--ndo-gray-50));
+    border-radius: 10px;
+    background: #f4f5f5;
     margin-bottom: 14px;
   }
   .ri {
     position: relative;
     width: 48px;
     padding: 8px 0;
-    border-radius: var(--ndo-radius-md);
+    border-radius: 8px;
     text-align: center;
     font: inherit;
     font-size: 10px;
-    color: rgb(var(--ndo-gray-500));
+    color: var(--dim);
     background: none;
     border: 0;
     cursor: pointer;
@@ -265,11 +290,11 @@
     transition: var(--ndo-transition-colors);
   }
   .ri:hover {
-    color: rgb(var(--ndo-gray-50));
+    color: var(--ink);
   }
   .ri.on {
-    color: rgb(var(--ndo-brand-teal-300));
-    background: rgb(var(--ndo-brand-teal-700) / 0.22);
+    color: var(--teal);
+    background: #12262a;
   }
   .ri:focus-visible {
     outline: none;
@@ -295,11 +320,11 @@
     top: 2px;
     right: 4px;
     font-style: normal;
-    background: rgb(var(--ndo-amber-600));
-    color: rgb(var(--ndo-gray-950));
+    background: #f2b84b;
+    color: #0b1113;
     font-size: 9px;
     font-weight: 700;
-    border-radius: var(--ndo-radius-pill);
+    border-radius: 999px;
     padding: 1px 5px;
   }
 
@@ -323,12 +348,12 @@
   .seg {
     display: flex;
     align-items: center;
-    background: rgb(var(--ndo-gray-900));
-    border: 1px solid rgb(var(--ndo-gray-800));
-    border-radius: var(--ndo-radius-pill);
+    background: var(--bg2);
+    border: 1px solid var(--line);
+    border-radius: 999px;
     padding: 3px;
     font-size: 12px;
-    color: rgb(var(--ndo-gray-400));
+    color: var(--mute);
   }
   .seg--push {
     margin-left: auto;
@@ -338,19 +363,19 @@
     font-size: 12px;
     padding: 5px 12px;
     border: 0;
-    border-radius: var(--ndo-radius-pill);
+    border-radius: 999px;
     background: transparent;
-    color: rgb(var(--ndo-gray-400));
+    color: var(--mute);
     cursor: pointer;
     white-space: nowrap;
     transition: var(--ndo-transition-colors);
   }
   .seg button:hover {
-    color: rgb(var(--ndo-gray-50));
+    color: var(--ink);
   }
   .seg button.on {
-    background: rgb(var(--ndo-brand-teal-700) / 0.35);
-    color: rgb(var(--ndo-brand-teal-300));
+    background: #1b3236;
+    color: var(--teal);
   }
   .seg button:focus-visible,
   .new:focus-visible,
@@ -359,20 +384,18 @@
     box-shadow: var(--ndo-focus-ring);
   }
   .new {
-    font: inherit;
-    font-size: 12px;
-    font-weight: 600;
-    background: rgb(var(--ndo-brand-teal-300));
-    color: rgb(var(--ndo-gray-950));
+    font: 600 12px 'Instrument Sans', sans-serif;
+    background: var(--teal);
+    color: #0b1113;
     border: 0;
-    border-radius: var(--ndo-radius-pill);
+    border-radius: 999px;
     padding: 8px 14px;
     cursor: pointer;
     white-space: nowrap;
     transition: var(--ndo-transition-colors);
   }
   .new:hover {
-    background: rgb(var(--ndo-brand-teal-100));
+    background: #5ad6ca;
   }
 
   .foot {
@@ -391,7 +414,7 @@
     flex-wrap: wrap;
     gap: 18px;
     font-size: 11px;
-    color: rgb(var(--ndo-gray-400));
+    color: var(--mute);
   }
   .legend > span {
     white-space: nowrap;
@@ -405,19 +428,19 @@
     vertical-align: middle;
   }
   .k--use {
-    background: rgb(var(--ndo-brand-teal-300));
+    background: var(--teal);
   }
   .k--cite {
-    background: rgb(var(--ndo-violet-300));
+    background: #8b5cf6;
   }
   .k--hard {
-    background: repeating-linear-gradient(90deg, rgb(var(--ndo-brand-blue-300)) 0 2px, transparent 2px 8px);
+    background: repeating-linear-gradient(90deg, #4c7be0 0 2px, transparent 2px 8px);
   }
   .k--sig {
     width: 8px;
     height: 8px;
     border-radius: 50%;
-    background: rgb(var(--ndo-amber-600));
+    background: #f2b84b;
   }
   .decay {
     margin-left: auto;
@@ -425,11 +448,11 @@
     align-items: center;
     gap: 10px;
     font-size: 11px;
-    color: rgb(var(--ndo-gray-400));
+    color: var(--mute);
     white-space: nowrap;
   }
   .decay input {
-    accent-color: rgb(var(--ndo-brand-teal-300));
+    accent-color: var(--teal);
     width: 140px;
   }
 
@@ -441,11 +464,6 @@
     padding: 28px 36px;
     max-width: 760px;
   }
-  .list__bar {
-    display: flex;
-    justify-content: flex-end;
-    margin-bottom: 8px;
-  }
   .list h2 {
     font-size: 26px;
     margin: 0 0 6px;
@@ -453,21 +471,21 @@
     letter-spacing: -0.01em;
   }
   .lede {
-    color: rgb(var(--ndo-gray-400));
+    color: var(--mute);
     font-size: 14px;
     margin: 0 0 18px;
   }
   .empty {
     margin: 0;
     font-size: 12px;
-    color: rgb(var(--ndo-gray-500));
+    color: var(--dim);
     padding: 10px 0;
   }
 
   /* ── Empty panel ── */
   .panel-empty {
-    border-left: 1px solid rgb(var(--ndo-gray-800));
-    background: rgb(var(--ndo-gray-900));
+    border-left: 1px solid var(--line);
+    background: var(--bg2);
     display: grid;
     place-items: center;
     padding: 22px;
@@ -477,14 +495,16 @@
   /* ── Status bar ── */
   .status {
     grid-column: 2 / 4;
-    border-top: 1px solid rgb(var(--ndo-gray-800));
+    border-top: 1px solid var(--line);
     display: flex;
     align-items: center;
     gap: 22px;
-    /* Left: clear of the exit chip. Right: clear of the comments button. */
+    /* The handoff's own rule is `padding: 0 20px`; this direction's status
+       bar clears the exit chip (moved here, see the effect above) and the
+       comments button (design-system chrome, ISA claim 41). */
     padding: 0 88px 0 228px;
     font-size: 11px;
-    color: rgb(var(--ndo-gray-400));
+    color: var(--mute);
     white-space: nowrap;
     overflow: hidden;
   }
@@ -494,11 +514,11 @@
     background: none;
     border: 0;
     padding: 2px 4px;
-    border-radius: var(--ndo-radius-sm);
+    border-radius: 4px;
     cursor: pointer;
   }
   .node:hover {
-    color: rgb(var(--ndo-gray-50));
+    color: var(--ink);
   }
   .ok {
     width: 7px;
@@ -506,10 +526,10 @@
     border-radius: 50%;
     display: inline-block;
     margin-right: 6px;
-    background: rgb(var(--ndo-brand-teal-300));
+    background: var(--teal);
   }
   .ok.off {
-    background: rgb(var(--ndo-amber-600));
+    background: #f2b84b;
   }
   .dht {
     margin-left: auto;
