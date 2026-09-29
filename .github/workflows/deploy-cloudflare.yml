@@ -1,0 +1,45 @@
+name: Deploy to Cloudflare Pages
+
+# design.sensorica.co: the same site as the GitHub Pages deploy, built for the
+# root of its own domain. The Pages project `nondominium-design` exists already
+# (classic Pages, not Workers: sensorica.co stays at GoDaddy, and only Pages
+# accepts a custom domain whose zone is outside Cloudflare, through a CNAME to
+# nondominium-design.pages.dev).
+#
+# Needs two repository secrets: CLOUDFLARE_API_TOKEN (Account, Cloudflare
+# Pages: Edit) and CLOUDFLARE_ACCOUNT_ID.
+
+on:
+  push:
+    branches: [master]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: cf-pages
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+      - name: Install dependencies
+        run: bun install
+      # svelte.config.js reads BASE_PATH; empty serves the site at the root of
+      # design.sensorica.co instead of under /nondominium-design-system.
+      - name: Build site (registry bundle first)
+        run: bun run build
+        env:
+          BASE_PATH: ""
+      - name: Deploy to Cloudflare Pages
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: pages deploy build --project-name nondominium-design --branch master
