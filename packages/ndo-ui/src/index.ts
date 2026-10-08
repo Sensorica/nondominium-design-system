@@ -12,6 +12,8 @@ export * from './domain/wizard-state.js';
 export * from './domain/governance-templates.js';
 export * from './domain/spec-profiles.js';
 export * from './domain/ndo-associations.js';
+export * from './domain/coming-next.js';
+export * from './domain/resource-perspective.js';
 
 // Fixtures
 export * from './fixtures/index.js';
@@ -21,6 +23,8 @@ export { default as Modal } from './components/primitives/Modal.svelte';
 export { default as NdoBadge } from './components/primitives/NdoBadge.svelte';
 export { default as NdoButton } from './components/primitives/NdoButton.svelte';
 export { default as NdoCard } from './components/primitives/NdoCard.svelte';
+export { default as ComingNextPopup } from './components/primitives/ComingNextPopup.svelte';
+export { default as SoonBadge } from './components/primitives/SoonBadge.svelte';
 
 // Shell
 export { default as AppShell } from './components/patterns/shell/AppShell.svelte';
@@ -60,3 +64,12 @@ export { default as SpecificationEditor } from './components/patterns/ndo/Specif
 export { default as GovernanceTemplatePicker } from './components/patterns/ndo/GovernanceTemplatePicker.svelte';
 export { default as SourceProfilePanel } from './components/patterns/ndo/SourceProfilePanel.svelte';
 export { default as EcologicalValueVector } from './components/patterns/ndo/EcologicalValueVector.svelte';
+
+// Perspectives (Layer 0: Resource live; Agent / Intelligence / Work placeholders)
+export { default as PerspectiveSwitcher } from './components/patterns/perspectives/PerspectiveSwitcher.svelte';
+export { default as Breadcrumb } from './components/patterns/perspectives/Breadcrumb.svelte';
+export type { BreadcrumbItem } from './components/patterns/perspectives/Breadcrumb.svelte';
+export { default as ResourcePerspective } from './components/patterns/perspectives/ResourcePerspective.svelte';
+export { default as NdoActionRow } from './components/patterns/perspectives/NdoActionRow.svelte';
+export { default as ResourceNdoView } from './components/patterns/perspectives/ResourceNdoView.svelte';
+export { default as GroupPerspectivesView } from './components/patterns/perspectives/GroupPerspectivesView.svelte';

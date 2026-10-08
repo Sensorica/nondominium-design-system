@@ -115,6 +115,7 @@ export const paths = {
   scenarioGroupCollaboration: () => scenarios('/group-collaboration'),
   scenarioAgentIdentity: () => scenarios('/agent-identity'),
   scenarioGovernanceReview: () => scenarios('/governance-review'),
+  scenarioResourcePerspective: () => scenarios('/resource-perspective'),
 
   // ── Prototype directions (the v0.1 UI handoff; registry in prototypes/directions.ts) ──
   /** The index of the six directions, inside the design-system chrome. */

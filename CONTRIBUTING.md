@@ -1,6 +1,6 @@
 # Contributing to the Nondominium Design System
 
-This repo is the design system and prototype playground for the [Nondominium](https://github.com/Sensorica/nondominium) hApp. It ships five things: the tokens, the pattern sheets at `/patterns`, the `@nondominium/ndo-ui` library at `/playbook` and `/ui-kit`, six composed scenarios, and a navigable prototype of every screen the app has.
+This repo is the design system and prototype playground for the [Nondominium](https://github.com/Sensorica/nondominium) hApp. It ships five things: the tokens, the pattern sheets at `/patterns`, the `@nondominium/ndo-ui` library at `/playbook` and `/ui-kit`, seven composed scenarios, and a navigable prototype of every screen the app has.
 
 ## What is in this repo
 

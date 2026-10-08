@@ -17,6 +17,11 @@
     isInitiator?: boolean;
     ontransitionclick?: () => void;
     onrefresh?: () => void;
+    /** Non-initiators see the transition button disabled; clicking explains why. */
+    lockedTransition?: boolean;
+    onlockedtransitionclick?: () => void;
+    /** When set, the initiator name is a jump point (e.g. to the Agent Perspective). */
+    oninitiatorclick?: () => void;
   }
 
   let {
@@ -26,7 +31,10 @@
     transitionHistory = [],
     isInitiator = false,
     ontransitionclick,
-    onrefresh
+    onrefresh,
+    lockedTransition = false,
+    onlockedtransitionclick,
+    oninitiatorclick
   }: Props = $props();
 
   function badgeClass(map: Record<string, string>, value: string | null): string {
@@ -36,6 +44,12 @@
   const formattedDate = $derived(formatTimestamp(descriptor?.created_at));
   const showTransition = $derived(
     isInitiator && descriptor != null && canTransition(descriptor.lifecycle_stage)
+  );
+  const showLockedTransition = $derived(
+    lockedTransition &&
+      !isInitiator &&
+      descriptor != null &&
+      canTransition(descriptor.lifecycle_stage)
   );
 </script>
 
@@ -81,7 +95,15 @@
         {#if descriptor.initiator}
           <span>
             By
-            {#if initiatorName && initiatorHref}
+            {#if initiatorName && oninitiatorclick}
+              <button
+                type="button"
+                data-testid="jump-initiator"
+                title="Open this agent in the Agent Perspective (coming next)"
+                onclick={() => oninitiatorclick?.()}
+                class="font-medium text-blue-600 hover:underline">{initiatorName} ↗</button
+              >
+            {:else if initiatorName && initiatorHref}
               <a href={initiatorHref} class="font-medium text-blue-600 hover:underline"
                 >{initiatorName}</a
               >
@@ -105,6 +127,19 @@
             class="rounded border border-blue-300 bg-blue-50 px-2.5 py-1 text-xs font-medium text-blue-700 hover:bg-blue-100"
           >
             {descriptor.lifecycle_stage === 'Active' ? 'Suspend (Hibernate) →' : 'Advance stage →'}
+          </button>
+        {/if}
+
+        {#if showLockedTransition}
+          <button
+            type="button"
+            data-testid="transition-locked"
+            aria-disabled="true"
+            title="Only the creator can advance the stage today. Governed transitions are coming next."
+            onclick={() => onlockedtransitionclick?.()}
+            class="cursor-not-allowed rounded border border-gray-200 bg-gray-100 px-2.5 py-1 text-xs font-medium text-gray-400"
+          >
+            🔒 {descriptor.lifecycle_stage === 'Active' ? 'Suspend (Hibernate) →' : 'Advance stage →'}
           </button>
         {/if}
       </div>

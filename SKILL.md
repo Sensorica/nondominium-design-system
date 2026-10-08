@@ -14,7 +14,7 @@ designsystem:
   capabilities:
     playbook:      { routes: /patterns, categories: 7 }
     ndo-ui:        { routes: [/playbook, /ui-kit], package: packages/ndo-ui, owner: external }
-    scenarios:     { routes: /scenarios, count: 6 }
+    scenarios:     { routes: /scenarios, count: 7 }
     surface-keys:  { module: src/lib/surface-keys.ts, namespaces: [screen, scenario] }
     mock-state:    { module: src/lib/replica/stores.svelte.ts }
     prototype-app: { routes: /app, screens: 44, groups: [app, connection], mode: replica, data-states: 'src/lib/replica/stores.svelte.ts' }

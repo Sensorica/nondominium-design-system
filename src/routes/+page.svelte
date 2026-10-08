@@ -23,7 +23,7 @@
     {
       href: paths.scenarios(),
       title: 'Scenarios',
-      body: 'Six composed pages, each arguing one open design question.',
+      body: 'Seven composed pages, each arguing one open design question.',
     },
     {
       href: paths.appHome(),

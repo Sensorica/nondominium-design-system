@@ -35,7 +35,7 @@ bun run dev
 | `/tokens` | The palette and scale the app uses, rendered live |
 | `/patterns` | Seven categories of pattern the app writes today, each citing its source file |
 | `/playbook`, `/ui-kit` | `@nondominium/ndo-ui`: component sheets, and screens composed from them |
-| `/scenarios` | Six composed pages, each arguing one design question |
+| `/scenarios` | Seven composed pages, each arguing one design question |
 | `/app` | **The replica**: 44 keyed states of the real app, on mock data |
 
 ---
