@@ -204,9 +204,6 @@
   const settledCount = $derived(openBlocks.filter((b) => isOn(b.id, b.type === 'item' && !!b.recorded)).length);
   let ownerFilter = $state('');
 
-  function reset() {
-    st = blank();
-  }
   function grow(e: Event) {
     const t = e.currentTarget as HTMLTextAreaElement;
     t.style.height = 'auto';
@@ -218,8 +215,6 @@
 
 <div class="bar">
   <a class="back" href={paths.meetings()}>← Meetings</a>
-  <span class="grow"></span>
-  <button onclick={reset}>reset</button>
 </div>
 
 <div class="wrap">
@@ -380,10 +375,7 @@
 <style>
   /* Colours are the design system's own tokens; nothing here is a R&O hue. */
   .bar { position: sticky; top: 0; z-index: 5; display: flex; gap: var(--ndo-spacing-3); align-items: center; flex-wrap: wrap; padding: var(--ndo-spacing-3) var(--ndo-spacing-6); background: var(--ndo-color-surface); border-bottom: 1px solid var(--ndo-color-border); font-size: var(--ndo-text-sm); font-weight: var(--ndo-weight-medium); color: var(--ndo-color-text-secondary); }
-  .bar .grow { flex: 1; }
   .bar .back { color: var(--ndo-color-link); text-decoration: none; font-weight: var(--ndo-weight-semibold); }
-  .bar button { font: inherit; color: var(--ndo-color-text-primary); background: rgb(var(--ndo-color-card-bg)); border: 1px solid var(--ndo-color-border); border-radius: var(--ndo-radius-md); padding: 4px 10px; }
-  .bar button { cursor: pointer; }
   .bar .primary { background: rgb(var(--ndo-primary-600)); border-color: rgb(var(--ndo-primary-600)); color: rgb(var(--ndo-color-text-inverse)); }
 
   .wrap { display: grid; grid-template-columns: 220px minmax(0, 720px); gap: 48px; justify-content: center; padding: var(--ndo-spacing-8) var(--ndo-spacing-6) 6rem; }
