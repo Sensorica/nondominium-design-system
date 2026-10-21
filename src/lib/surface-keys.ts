@@ -247,10 +247,21 @@ export function screenKeyForUrl(url: URL): string {
 export function surfaceKeyForUrl(url: URL): string {
   const scenario = SCENARIO_KEY[url.pathname];
   if (scenario) return scenario;
+  // One thread per meeting journal, whichever paragraph a comment points at.
+  // Keyed on the slug (`meeting:2026-10-20-dev`), so the thread follows the
+  // journal rather than the URL. The index at /meetings has no thread.
+  if (url.pathname.startsWith(paths.meetings() + '/')) {
+    const slug = url.pathname.split('/').filter(Boolean).pop();
+    return slug ? `${MEETING_KEY_PREFIX}${slug}` : '';
+  }
   return screenKeyForUrl(url);
 }
 
+export const MEETING_KEY_PREFIX = 'meeting:';
+
 /** Label for a resolved key; falls back to the key itself. */
 export function labelForKey(key: string): string {
+  // `meeting:2026-10-20-dev` -> "Meeting of 2026-10-20".
+  if (key.startsWith(MEETING_KEY_PREFIX)) return `Meeting of ${key.slice(MEETING_KEY_PREFIX.length, MEETING_KEY_PREFIX.length + 10)}`;
   return KEY_LABEL[key] ?? key;
 }

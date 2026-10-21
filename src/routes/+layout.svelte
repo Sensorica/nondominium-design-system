@@ -136,6 +136,12 @@
             <a class="item" href={link.href} class:item--on={current === link.href}>{link.label}</a>
           {/each}
         </div>
+
+        <div class="group">
+          <a class="grouphead" href={paths.meetings()} class:on={current.startsWith(paths.meetings())}>
+            Meetings
+          </a>
+        </div>
       </nav>
 
       <p class="version">v0.2.0 · press <kbd>c</kbd> to comment</p>

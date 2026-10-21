@@ -8,6 +8,7 @@
   import { currentUrl } from '$lib/replica/url-state.svelte';
   import { comments, clearToken } from '$lib/comments/comments.svelte';
   import { findDiscussion, validateToken } from '$lib/comments/github-client';
+  import { isFollowMark } from '$lib/comments/follow';
   import { surfaceKeyForUrl, labelForKey } from '$lib/surface-keys';
   import CommentsSetup from './CommentsSetup.svelte';
   import CommentsList from './CommentsList.svelte';
@@ -19,7 +20,10 @@
   // must follow the surface on screen.
   const currentKey = $derived(surfaceKeyForUrl(browser ? currentUrl() : page.url));
   const label = $derived(currentKey ? labelForKey(currentKey) : '');
-  const count = $derived(comments.thread?.comments.length ?? 0);
+  // Follow-up marks (meeting ticks, follow.ts) ride on the thread as comments but
+  // are state, not conversation: kept out of the list and the count.
+  const visible = $derived((comments.thread?.comments ?? []).filter((c) => !isFollowMark(c.body)));
+  const count = $derived(visible.length);
 
   // Validate a stored token on mount, so a returning reviewer never sees the
   // setup card twice.
@@ -131,7 +135,7 @@
         </p>
         <CommentsSetup />
       {:else}
-        <CommentsList comments={comments.thread?.comments ?? []} token={comments.token}>
+        <CommentsList comments={visible} token={comments.token}>
           {#snippet replyForm({ parentId })}
             <CommentsCompose
               surfaceKey={currentKey}
