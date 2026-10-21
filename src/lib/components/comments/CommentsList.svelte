@@ -5,6 +5,8 @@
   import type { Snippet } from 'svelte';
   import type { Comment, ReactionContent } from '$lib/comments/comments-types';
   import { toggleReaction } from '$lib/comments/github-client';
+  import { TIME_MARKER, decodeTime, seekTo } from '$lib/comments/timecode';
+  import { ABOUT_MARKER, decodeAbout, showAbout } from '$lib/comments/about';
 
   let {
     comments: list,
@@ -41,6 +43,54 @@
     }
   }
 
+  /**
+   * Upgrade a meeting comment's pointer lines into buttons once GitHub's HTML is
+   * in the DOM: "⏱ at 62:00" shows the paragraph covering that minute, and
+   * "📍 on ..." scrolls to the paragraph. An action, not a handler in the markup,
+   * because nothing inside {@html} can carry a Svelte listener. The page does the
+   * showing (it listens for SEEK_EVENT and ABOUT_EVENT); off a meeting page the
+   * events go unheard and the line stays inert.
+   */
+  function revealLink(node: HTMLElement, comment: Comment) {
+    let current = comment;
+
+    function wire() {
+      for (const p of Array.from(node.querySelectorAll('p'))) {
+        if (p.dataset.dsReveal !== undefined) continue;
+        const text = p.textContent?.trimStart() ?? '';
+        const isTime = text.startsWith(TIME_MARKER);
+        if (!isTime && !text.startsWith(ABOUT_MARKER)) continue;
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.textContent = p.textContent?.trim() ?? '';
+        btn.addEventListener('click', () => {
+          if (isTime) {
+            const t = decodeTime(current.body);
+            if (t !== null) seekTo(t);
+          } else {
+            const a = decodeAbout(current.body);
+            if (a) showAbout(a.id);
+          }
+        });
+        p.dataset.dsReveal = '';
+        p.classList.add('points-at');
+        p.replaceChildren(btn);
+      }
+    }
+
+    // Immediately, and again after the current tick, since {@html} content can land
+    // either side of the action running. Re-entry is a no-op: the dataset marks it.
+    wire();
+    queueMicrotask(wire);
+
+    return {
+      update(next: Comment) {
+        current = next;
+        queueMicrotask(wire);
+      }
+    };
+  }
+
   function timeAgo(iso: string): string {
     const d = new Date(iso);
     const hours = Math.floor((Date.now() - d.getTime()) / 36e5);
@@ -65,7 +115,7 @@
             <a href={c.author.url} target="_blank" rel="noreferrer" class="login">@{c.author.login}</a>
             <span class="ndo-field__hint">{timeAgo(c.createdAt)}</span>
           </div>
-          <div class="html">{@html c.bodyHTML}</div>
+          <div class="html" use:revealLink={c}>{@html c.bodyHTML}</div>
           <div class="reactions">
             {#each c.reactions as r (r.content)}
               <button
@@ -112,6 +162,18 @@
     overflow-wrap: break-word;
   }
   .html :global(p:last-child) { margin-bottom: 0; }
+  .html :global(p.points-at button) {
+    font: inherit;
+    font-size: var(--ndo-text-xs);
+    color: rgb(var(--ndo-primary-700));
+    background: rgb(var(--ndo-primary-50));
+    border: 1px solid rgb(var(--ndo-primary-200));
+    border-radius: var(--ndo-radius-pill);
+    padding: 1px 8px;
+    cursor: pointer;
+    text-align: left;
+  }
+  .html :global(p.points-at button:hover) { background: rgb(var(--ndo-primary-100)); }
   .html :global(code) {
     font-family: var(--ndo-font-mono);
     font-size: var(--ndo-text-xs);

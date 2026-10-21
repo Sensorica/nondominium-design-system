@@ -6,6 +6,7 @@
 // `localStorage` does not exist on the server.
 
 import type { CommentsError, Discussion } from './comments-types';
+import type { About } from './about';
 
 const TOKEN_KEY = 'ndo_ds_comments_token';
 
@@ -24,6 +25,16 @@ export const comments = $state({
   error: null as CommentsError | null,
   /** The current surface's discussion, or null. */
   thread: null as Discussion | null,
+  /**
+   * A moment a page has asked the next comment to be about, such as a meeting
+   * paragraph's first minute. The top-level compose box takes it and clears it.
+   */
+  stamp: null as { t: number; quote?: string } | null,
+  /**
+   * A paragraph a page has asked the next comment to point at (about.ts). The
+   * top-level compose box takes it and clears it.
+   */
+  about: null as About | null,
 });
 
 export function setToken(t: string): void {
