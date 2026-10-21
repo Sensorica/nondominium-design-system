@@ -1,4 +1,4 @@
-import { meetings } from '$lib/meetings';
+import { meetings, originalBySlug } from '$lib/meetings';
 
 // The index needs a summary of each meeting, not its whole text.
 export const load = () => ({
@@ -12,5 +12,6 @@ export const load = () => ({
     attendees: m.attendees,
     tldr: m.tldr,
     counts: m.counts,
+    originalLang: originalBySlug(m.slug)?.lang ?? null,
   })),
 });

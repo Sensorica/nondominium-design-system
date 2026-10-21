@@ -6,6 +6,8 @@
 
 Drop the journal into `content/meetings/` as `YYYY-MM-DD-<kind>.md`, where kind is `lab` (a meeting at the Sensorica lab), `dev` or `team`, and set the same `kind:` in its frontmatter. The build picks it up; nothing else to register. Labels for the kinds live in `src/lib/meetings/labels.ts`; an unknown kind still renders, under the generic label "Meeting". With no journals the list shows its empty message.
 
+**English is the default.** A meeting held in French is published twice: its English translation as `YYYY-MM-DD-<kind>.md`, and the French original beside it as `YYYY-MM-DD-<kind>.fr.md`. The page opens in English and offers **Original (français)** in its header (`?lang=fr` links straight to it); the list marks such meetings "original: français". A translation keeps the original's skeleton exactly (same sections, paragraphs, bullets, figures and minute spans, in the same order), because French section headings map to the English section ids: both versions share every block id, so ticks, notes and pinned comments hold across the switch. A journal with only a `.fr.md` file still renders, in French.
+
 The journal is the markdown the Transcribe workflow writes after a call, in English or French. Its shape is fixed: frontmatter, `# Title`, the date, attendees and context lines, then TL;DR, updates, discussion, decisions, discussed-not-decided, actions, outstanding and corrections sections. Older journals vary (wrapped lines, `###` subsections, numbered lists, an actions table) and still render: anything the parser does not recognise is shown as prose, so no text is dropped.
 
 | | English | French |

@@ -17,7 +17,21 @@
   import MermaidFigure from '$lib/components/meetings/MermaidFigure.svelte';
 
   let { data } = $props();
-  const m = $derived(data.meeting);
+  // English is the default; a journal recorded in French keeps its original one click away.
+  // `?lang=fr` opens on the original (read on mount: the page is prerendered). Both versions
+  // share block ids, so ticks, notes and pinned comments hold across the switch.
+  let showOriginal = $state(false);
+  $effect(() => {
+    showOriginal = !!data.original && new URLSearchParams(location.search).get('lang') === data.original.lang;
+  });
+  function setOriginal(on: boolean) {
+    showOriginal = on;
+    const u = new URL(location.href);
+    if (on && data.original) u.searchParams.set('lang', data.original.lang);
+    else u.searchParams.delete('lang');
+    history.replaceState(history.state, '', u);
+  }
+  const m = $derived(showOriginal && data.original ? data.original : data.meeting);
   const fr = $derived(m.lang === 'fr');
 
   // ── Reader state, per meeting, in this browser ──
@@ -296,6 +310,12 @@
       <h1>{m.title}</h1>
       <div class="meta">
         <span>{m.dateLine}</span>
+        {#if data.original}
+          <span class="langs" role="group" aria-label="Language">
+            <button type="button" class:on={!showOriginal} aria-pressed={!showOriginal} onclick={() => setOriginal(false)}>English</button>
+            <button type="button" class:on={showOriginal} aria-pressed={showOriginal} onclick={() => setOriginal(true)} lang={data.original.lang}>Original (français)</button>
+          </span>
+        {/if}
       </div>
       {#if m.attendees}<p class="attendees"><strong>{fr ? 'Participants' : 'Attendees'}.</strong> {@html m.attendees}</p>{/if}
       {#if m.context}<p class="context">{@html m.context}</p>{/if}
@@ -442,6 +462,9 @@
   kbd { font-family: var(--ndo-font-mono); font-size: 11px; border: 1px solid var(--ndo-color-border); border-radius: 3px; padding: 0 4px; }
 
   main { color: var(--ndo-color-text-primary); font-size: var(--ndo-text-base); line-height: 1.7; }
+  .langs { display: inline-flex; margin-left: var(--ndo-spacing-3); border: 1px solid var(--ndo-color-border); border-radius: var(--ndo-radius-pill); overflow: hidden; vertical-align: middle; }
+  .langs button { font: inherit; font-size: var(--ndo-text-xs); padding: 2px 10px; border: 0; background: none; color: var(--ndo-color-text-muted); cursor: pointer; }
+  .langs button.on { background: rgb(var(--ndo-primary-50)); color: rgb(var(--ndo-primary-700)); font-weight: var(--ndo-weight-bold); }
   .kicker { font-size: var(--ndo-text-xs); line-height: var(--ndo-lh-xs); font-weight: var(--ndo-weight-bold); letter-spacing: 0.1em; text-transform: uppercase; color: var(--ndo-color-link); }
   h1 { font-size: var(--ndo-text-3xl); line-height: var(--ndo-lh-3xl); font-weight: var(--ndo-weight-bold); margin: 6px 0 10px; }
   .meta { color: var(--ndo-color-text-secondary); font-size: var(--ndo-text-sm); }
