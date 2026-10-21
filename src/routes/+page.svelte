@@ -21,19 +21,14 @@
       body: 'The component library the app is meant to move to: sheets per component, and screens composed from them.',
     },
     {
-      href: paths.scenarios(),
-      title: 'Scenarios',
-      body: 'Seven composed pages, each arguing one open design question.',
-    },
-    {
       href: paths.appHome(),
       title: 'Current app',
       body: 'A replica of the app: thirty-nine states, the same markup and classes, on mock data.',
     },
     {
       href: paths.prototypes(),
-      title: 'Prototype directions',
-      body: 'Six UI directions for v0.1, from the prototype handoff, side by side. One gets chosen and implemented against the hApp.',
+      title: 'Prototypes',
+      body: 'The Layer 0 app — Lobby, Group, Resource Perspective — and six earlier UI directions kept beside it.',
     },
   ];
 </script>
@@ -66,7 +61,7 @@
     </div>
     <div class="ndo-panel__body flex flex-col gap-3">
       <p class="ndo-small">
-        Every state of the current app and every scenario carries a comment thread. Press <kbd>c</kbd> or
+        Every state of the current app and every prototype view carries a comment thread. Press <kbd>c</kbd> or
         use the floating button to open the drawer; threads live as GitHub Discussions in a private
         Sensorica repository, so the site stays static and the review history stays with the org.
       </p>

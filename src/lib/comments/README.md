@@ -11,7 +11,7 @@ Threaded review comments on every prototype screen and every scenario, stored as
 | GraphQL client | `github-client.ts` |
 | Drawer, list, compose, setup | `src/lib/components/comments/` |
 
-1. The drawer resolves the current pathname to a **surface key** (`ndo-detail`, `scenario:lobby-browse`).
+1. The drawer resolves the current URL to a **surface key** (`ndo-detail`, `proto:resource-perspective:group`).
 2. It looks for a Discussion whose **title** equals that key.
 3. Posting the first comment on a surface creates the Discussion lazily. Browsing creates nothing.
 

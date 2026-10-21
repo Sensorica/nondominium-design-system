@@ -1,8 +1,8 @@
 <script lang="ts">
   // The comments overlay: a right-side drawer plus a floating trigger.
-  // Mounted ONCE at the true root so it covers the prototype app, the
-  // scenarios, and the playbook alike. Scenarios carry no uniform chrome, so
-  // the floating button is the single entry point; there is no per-page wiring.
+  // Mounted ONCE at the true root so it covers the replica, the prototypes,
+  // and the playbook alike. The floating button is the single entry point;
+  // there is no per-page wiring.
   import { browser } from '$app/environment';
   import { page } from '$app/state';
   import { currentUrl } from '$lib/replica/url-state.svelte';
@@ -117,7 +117,7 @@
         <CommentsSetup />
       {:else if !currentKey}
         <p class="ndo-small" style="color:var(--ndo-color-text-muted)">
-          This page has no surface key. Open an app screen or a scenario.
+          This page has no surface key. Open an app screen or a prototype.
         </p>
       {:else if comments.loading}
         <p class="ndo-small">⏳ Loading…</p>
