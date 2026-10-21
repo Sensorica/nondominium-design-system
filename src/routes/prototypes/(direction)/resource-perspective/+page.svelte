@@ -150,6 +150,25 @@
         transitionHistory={historyFor(descriptor.hash)}
         oncreatendo={group ? () => goto(createUrl(group.id)) : undefined}
       />
+    {:else if view === 'ndo'}
+      <div class="rp-missing">
+        <Breadcrumb
+          items={[
+            { label: 'Lobby', href: lobbyUrl },
+            ...(group ? [{ label: group.name, href: groupUrl(group.id) }] : []),
+            { label: 'Unknown NDO' }
+          ]}
+        />
+        <h1>This NDO is not in the session</h1>
+        <p>
+          No resource matches this link.
+          {#if group}
+            <a href={groupUrl(group.id)}>Back to {group.name}</a>.
+          {:else}
+            <a href={lobbyUrl}>Back to the lobby</a>.
+          {/if}
+        </p>
+      </div>
     {:else if view === 'group' && group}
       <GroupPerspectivesView
         {group}
