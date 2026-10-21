@@ -154,6 +154,10 @@ export const paths = {
    *  and backgrounded exactly like the original's own `<body>`. */
   guidelineCard: (id: string) => `${base}/guidelines/${id}`,
 
+  // ── Meetings: the journals in content/meetings/, one Niceboard each ──
+  meetings: () => `${base}/meetings`,
+  meeting: (slug: string) => `${base}/meetings/${encodeURIComponent(slug)}`,
+
   // ── Patterns (this rewrite's playbook: the app's own classes) ──
   patterns: () => patterns(),
   patternsButtons: () => patterns('/buttons'),

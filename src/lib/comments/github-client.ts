@@ -226,6 +226,31 @@ export async function addReply(
   return { ok: true, value: mapComment(r.value.addDiscussionComment.comment) };
 }
 
+// ── updateComment ───────────────────────────────────────────────────────────
+// Rewrite a comment's body in place. Follow-up marks (follow.ts) use it: one
+// comment per reader, replaced when they change something.
+const UPDATE_COMMENT_Q = `mutation($c:ID!,$b:String!){
+  updateDiscussionComment(input:{commentId:$c,body:$b}){ comment {
+    id body bodyHTML createdAt
+    author{ login avatarUrl url }
+    reactions(first:10){ totalCount nodes{ content } }
+  } }
+}`;
+
+export async function updateComment(
+  commentId: string,
+  body: string,
+  token: string
+): Promise<Result<Comment>> {
+  const r = await gql<{ updateDiscussionComment: { comment: RawComment } }>(
+    UPDATE_COMMENT_Q,
+    { c: commentId, b: body },
+    token
+  );
+  if (!r.ok) return r;
+  return { ok: true, value: mapComment(r.value.updateDiscussionComment.comment) };
+}
+
 // ── Reactions ───────────────────────────────────────────────────────────────
 const ADD_REACTION_Q = `mutation($s:ID!,$c:ReactionContent!){
   addReaction(input:{subjectId:$s,content:$c}){ reaction { content } }
