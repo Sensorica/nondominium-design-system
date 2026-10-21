@@ -22,7 +22,7 @@ The journal is the markdown the Transcribe workflow writes after a call, in Engl
 A journal committed here is published with the site, so treat it as public. It covers Sensorica and Nondominium only.
 
 - Strip anything about other projects (hAppenings, Requests & Offers, EvoluData and the like) before the journal goes in `content/meetings/`, whether it is a paragraph, a bullet or a clause. Keep what the Nondominium work needs to be understood.
-- No local machine path. Remove the `source:` and `recording:` frontmatter lines when they point at a file on someone's disk.
+- No local machine path. Remove the `source:` and `recording:` frontmatter lines when they point at a file on someone's disk. An https `recording:` link to the published, privacy-cut recording is kept (see Recordings).
 - No credentials, private addresses or anything a participant asked to keep off the record.
 
 ## What the page does with it
@@ -68,4 +68,16 @@ A page mark is keyed by the item's position in its section (`actions-3`), so an 
 
 ## Recordings
 
-Not on the site. A recording runs tens of megabytes and a static asset is capped, so audio would need a low-bitrate re-encode or a bucket behind the same access gate. The minute chips are already there for a player to seek.
+A journal may point at the meeting's audio. The file is hosted elsewhere (a bucket or media server) and the site only links to it, so nothing heavy is committed here.
+
+```yaml
+recording: https://media.alternef.org/k3f9x2/2026-09-08-dev.opus
+recording_cuts: [[120, 185], [610, 640]]
+```
+
+- **`recording:`** is an **https** URL. Any other value (a local path such as `~/Téléchargements/call.opus`, `http:`, `file:`) is ignored and never rendered. The host must serve the file with `Range` support (so seeking works) and `Access-Control-Allow-Origin: *`. The `.fr.md` original and its English translation may both carry it; the page uses the version on screen and falls back to the other one.
+- **`recording_cuts:`** (optional) lists the passages silenced in the audio for privacy, as `[start, end]` pairs in seconds, either inline as above or as a block list (`- [120, 185]` per line). A pair is kept only when both ends are non-negative numbers and start is before end; a malformed pair is dropped without hiding the others. The audio's cuts must match what the journal stripped: if a passage was cut from the text, it is silenced in the file, and the other way round.
+
+With a recording, the meeting page shows an `<audio controls preload="metadata">` player in its sticky top bar. Every minute chip (`[62 to 67m]`) seeks the player to that minute and plays, and `#t=3720` in the URL seeks on load (it seeks only: browsers do not autoplay without a click). Each cut is marked in the header as "removed for privacy, mm:ss to mm:ss" (French: "retiré pour confidentialité, de mm:ss à mm:ss") and as a hatched block on the timeline. Without a recording, the page is unchanged and the chips only link.
+
+Parsing and formatting live in `src/lib/meetings/recording.ts`, with tests in `tests/meetings-recording.test.ts` (`bun test`).
