@@ -69,6 +69,7 @@
           <div class="body">
             <div class="top">
               <span class="badge">{KIND_LABEL[m.kind] ?? m.kind}</span>
+              {#if m.originalLang}<span class="badge orig" title="English translation; the original journal is in French">original: français</span>{/if}
               {#if m.durationMin}<span class="dur">{hm(m.durationMin)}</span>{/if}
             </div>
             <div class="title">{headline(m.tldr)}</div>

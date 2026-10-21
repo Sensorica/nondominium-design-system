@@ -111,6 +111,19 @@ function slugify(s: string): string {
   return s.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
 }
 
+// French headings map to the English section ids, so a translated journal and its original
+// share every block id (`updates-3`): a tick, a reaction or a pinned comment holds in both.
+const FR_SECTION_ID: Record<string, string> = {
+  'depuis-la-derni-re-rencontre': 'since-last-meeting',
+  'mises-jour': 'updates',
+  'nouvelles': 'updates',
+  'd-cisions': 'decisions',
+  'discut-non-tranch': 'discussed-not-decided',
+  'discut-non-d-cid': 'discussed-not-decided',
+  'en-suspens': 'outstanding',
+  'corrections-apr-s-la-rencontre': 'corrections-after-the-meeting',
+};
+
 function sectionKind(title: string): SectionKind {
   // Accents are dropped so "Décisions" and "decisions" are one heading.
   const t = title.toLowerCase().normalize('NFD').replace(/\p{Diacritic}/gu, '');
@@ -188,7 +201,9 @@ function splitCaption(source: string): { source: string; caption: string } {
 const words = (s: string) => plain(s).split(/\s+/).filter(Boolean).length;
 
 export function parseMeeting(file: string, src: string): Meeting {
-  const slug = file.replace(/^.*\//, '').replace(/\.md$/, '');
+  // `YYYY-MM-DD-<kind>.md` is the English journal, the default; `YYYY-MM-DD-<kind>.fr.md` is
+  // the French original beside it. Both share the slug, so they are one meeting.
+  const slug = file.replace(/^.*\//, '').replace(/\.md$/, '').replace(/\.fr$/, '');
   const fm: Record<string, string> = {};
   const body = src.replace(/^---\n([\s\S]*?)\n---\n/, (_, block: string) => {
     for (const line of block.split('\n')) {
@@ -218,7 +233,8 @@ export function parseMeeting(file: string, src: string): Meeting {
     const nl = part.indexOf('\n');
     const titleText = part.slice(0, nl).trim();
     const kind = sectionKind(titleText);
-    const id = slugify(titleText) || `s${sections.length + 1}`;
+    const raw = slugify(titleText);
+    const id = FR_SECTION_ID[raw] ?? (raw || `s${sections.length + 1}`);
     const section: Section = { id, title: titleText, kind, lede: '', blocks: [] };
     let n = 0;
     for (const c of chunks(part.slice(nl + 1))) {
