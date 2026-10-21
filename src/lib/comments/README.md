@@ -63,7 +63,7 @@ Created once, by an owner of the `Sensorica` organisation:
 - Callback URL: `https://design.sensorica.co/api/auth/callback`.
 - User-to-server token expiry left on (eight hours, with refresh tokens).
 
-The client ID is public. It is the constant `CLIENT_ID` in `auth.ts`, `functions/api/auth/callback.js` and `functions/api/auth/refresh.js`, currently the placeholder `REPLACE_WITH_SENSORICA_APP_CLIENT_ID`. Replace all three together (`grep -rn REPLACE_WITH_SENSORICA_APP_CLIENT_ID functions src`).
+The client ID is public. It is the constant `CLIENT_ID` in `auth.ts`, `functions/api/auth/callback.js` and `functions/api/auth/refresh.js`, set to the Sensorica App. Change all three together if the App is ever replaced (`grep -rn Iv23liFgsr9Y22WKGQm1 functions src`).
 
 The client secret is never in the repo. Set it as a Pages secret on the `nondominium-design` project, for production (and preview if you want sign-in on preview deploys, though the callback URL above only matches the production hostname):
 

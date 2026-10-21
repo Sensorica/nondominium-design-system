@@ -15,8 +15,8 @@ import { base } from '$app/paths';
 import { setSession, clearToken, comments } from './comments.svelte';
 
 // Public by design. Keep in step with CLIENT_ID in functions/api/auth/callback.js
-// and functions/api/auth/refresh.js. Grep for REPLACE_WITH_SENSORICA_APP_CLIENT_ID.
-const CLIENT_ID = 'REPLACE_WITH_SENSORICA_APP_CLIENT_ID';
+// and functions/api/auth/refresh.js. Grep for Iv23liFgsr9Y22WKGQm1.
+const CLIENT_ID = 'Iv23liFgsr9Y22WKGQm1';
 const AUTHORIZE_URL = 'https://github.com/login/oauth/authorize';
 const CALLBACK_PATH = '/api/auth/callback';
 const REFRESH_PATH = '/api/auth/refresh';

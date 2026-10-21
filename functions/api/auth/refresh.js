@@ -5,8 +5,8 @@
 // Stateless: takes a refresh token, returns a fresh pair, stores nothing.
 
 // Public by design. Keep in step with CLIENT_ID in functions/api/auth/callback.js
-// and src/lib/comments/auth.ts. Grep for REPLACE_WITH_SENSORICA_APP_CLIENT_ID.
-const CLIENT_ID = 'REPLACE_WITH_SENSORICA_APP_CLIENT_ID';
+// and src/lib/comments/auth.ts. Grep for Iv23liFgsr9Y22WKGQm1.
+const CLIENT_ID = 'Iv23liFgsr9Y22WKGQm1';
 const TOKEN_URL = 'https://github.com/login/oauth/access_token';
 
 export async function onRequestPost({ request, env }) {
