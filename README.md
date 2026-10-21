@@ -104,7 +104,7 @@ Every prototype state and every scenario can receive threaded comments, hosted i
 - Click the floating button (bottom right) or press **`c`**.
 - A thread is keyed to the surface you are viewing, not its URL, so a route change never orphans a review thread. Threads are created lazily — browsing leaves no trace.
 
-You need a fine-grained GitHub token from a member of the `Sensorica` organisation, scoped to `nondominium-design-review` with **Discussions: Read and write**. It is stored only in your browser. See [`src/lib/comments/README.md`](src/lib/comments/README.md).
+On `design.sensorica.co`, press the button and choose **Sign in with GitHub**: a GitHub App (Sensorica org, Discussions read and write, installed on `nondominium-design-review` only) signs you in through two Cloudflare Pages Functions in `functions/api/auth/`, which need the Pages secret `GITHUB_APP_CLIENT_SECRET`. On the GitHub Pages copy, which has no Functions, paste a fine-grained token from a member of the `Sensorica` organisation instead (scoped to `nondominium-design-review` with **Discussions: Read and write**); the same paste route stays behind a link on `design.sensorica.co`. Tokens are stored only in your browser. See [`src/lib/comments/README.md`](src/lib/comments/README.md).
 
 ## The screen map 🗺️
 
@@ -160,7 +160,7 @@ Two non-obvious constraints, both real: Svelte's `customElement` option is incom
 
 ## Deployment
 
-Builds to `build/`, deploys to GitHub Pages on every push to `master`, and to Cloudflare Pages (project `nondominium-design`, served at `https://design.sensorica.co`) from `.github/workflows/deploy-cloudflare.yml`, built with `BASE_PATH=""` so the site sits at the domain root there. Cloudflare Pages also serves `404.html` as the fallback for the `/app` deep links. The SPA fallback is `404.html`, because Pages honours only a custom 404 page as its fallback, and that is what serves the client-rendered `/app/ndo/[hash]` routes on a deep-link reload.
+Builds to `build/`, deploys to GitHub Pages on every push to `master`, and to Cloudflare Pages (project `nondominium-design`, served at `https://design.sensorica.co`) from `.github/workflows/deploy-cloudflare.yml`, built with `BASE_PATH=""` so the site sits at the domain root there. Cloudflare Pages also serves `404.html` as the fallback for the `/app` deep links. The SPA fallback is `404.html`, because Pages honours only a custom 404 page as its fallback, and that is what serves the client-rendered `/app/ndo/[hash]` routes on a deep-link reload. `wrangler pages deploy build` also bundles the `functions/` directory at the repo root (the GitHub sign-in endpoints under `/api/auth/`), which only the Cloudflare deploy runs; the Pages project needs the secret `GITHUB_APP_CLIENT_SECRET` (`bunx wrangler pages secret put GITHUB_APP_CLIENT_SECRET --project-name nondominium-design`).
 
 ---
 
