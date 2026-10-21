@@ -2,8 +2,8 @@
   // A Meeting Niceboard: the journal read as a page, with the interaction around
   // it. Comments go to the shared drawer (one thread per meeting, each comment
   // pointing at its paragraph and carrying its minute). Ticks, reactions and
-  // answers stay in this browser until the reader copies them out; signed in,
-  // ticks on actions and settled questions are shared through the thread.
+  // notes stay in this browser; signed in, ticks on actions and settled
+  // questions are shared through the thread.
   import { page } from '$app/state';
   import { paths } from '$lib/paths';
   import { comments } from '$lib/comments/comments.svelte';
@@ -123,7 +123,6 @@
   const toc = $derived([
     ...(m.tldr ? [{ id: 'tldr', label: 'TL;DR' }] : []),
     ...m.sections.filter((s) => s.kind !== 'tldr').map((s) => ({ id: s.id, label: s.title })),
-    { id: 'anything-else', label: fr ? 'Autre chose' : 'Anything else' },
   ]);
   let active = $state('');
   $effect(() => {
@@ -205,57 +204,6 @@
   const settledCount = $derived(openBlocks.filter((b) => isOn(b.id, b.type === 'item' && !!b.recorded)).length);
   let ownerFilter = $state('');
 
-  // ── Export: only what this reader did ──
-  let toast = $state('');
-  function answers(): string {
-    const L = [`# Answers on ${m.title}, ${m.date}${st.reader ? `, from ${st.reader}` : ''}`, ''];
-    const byId = new Map(textBlocks.map((b) => [b.id, b] as const));
-    const label = (id: string) => {
-      const b = byId.get(id);
-      return b ? b.lead || b.html.replace(/<[^>]+>/g, '').slice(0, 60) : id;
-    };
-    const reacted = Object.entries(st.react);
-    if (reacted.length) {
-      L.push('## Decided');
-      for (const [id, v] of reacted) L.push(`- **${label(id)}**: ${v}${st.notes[id]?.trim() ? `. ${st.notes[id].trim()}` : ''}`);
-      L.push('');
-    }
-    const opens = openBlocks.filter((b) => st.notes[b.id]?.trim());
-    if (opens.length) {
-      L.push('## Still open');
-      for (const b of opens) L.push(`- **${label(b.id)}**: ${st.notes[b.id].trim()}`);
-      L.push('');
-    }
-    // Signed in, ticks are already shared; the export carries the notes. Signed out, it carries both.
-    const acts = m.actions.filter((a) => (!signedIn && st.done[a.id]) || st.notes[a.id]?.trim());
-    if (acts.length) {
-      L.push('## Actions');
-      for (const a of acts) L.push(`- [${isOn(a.id, a.recorded) ? 'x' : ' '}] ${a.owner}: ${a.text}${st.notes[a.id]?.trim() ? ` (note: ${st.notes[a.id].trim()})` : ''}`);
-      L.push('');
-    }
-    if (st.other.trim()) L.push('## Anything else', st.other.trim(), '');
-    return L.length > 2 ? L.join('\n') : '';
-  }
-  async function copy() {
-    const text = answers();
-    if (!text) return say('Nothing changed yet');
-    try {
-      await navigator.clipboard.writeText(text);
-      say('Answers copied');
-    } catch {
-      say('The browser blocked the clipboard');
-    }
-  }
-  function say(t: string) {
-    toast = t;
-    setTimeout(() => (toast = ''), 1800);
-  }
-  function onKey(e: KeyboardEvent) {
-    if (e.ctrlKey && e.shiftKey && e.key === 'Enter') {
-      e.preventDefault();
-      copy();
-    }
-  }
   function reset() {
     st = blank();
   }
@@ -267,16 +215,11 @@
 </script>
 
 <svelte:head><title>{m.date} {KIND_LABEL[m.kind] ?? 'Meeting'} — Nondominium Design System</title></svelte:head>
-<svelte:window onkeydown={onKey} />
 
 <div class="bar">
   <a class="back" href={paths.meetings()}>← Meetings</a>
   <span class="grow"></span>
-  <label>reading as
-    <input class="reader" type="text" placeholder="your name" bind:value={st.reader} />
-  </label>
   <button onclick={reset}>reset</button>
-  <button class="primary" onclick={copy} title="Ctrl+Shift+Enter">copy my answers</button>
 </div>
 
 <div class="wrap">
@@ -430,21 +373,16 @@
         {/each}
       {/if}
     {/each}
-
-    <h2 id="anything-else">{fr ? 'Autre chose' : 'Anything else'}</h2>
-    <textarea class="other" rows="3" placeholder="General comments on the meeting or this resume…" bind:value={st.other} oninput={grow}></textarea>
   </main>
 </div>
 
-{#if toast}<div class="toast">{toast}</div>{/if}
 
 <style>
   /* Colours are the design system's own tokens; nothing here is a R&O hue. */
   .bar { position: sticky; top: 0; z-index: 5; display: flex; gap: var(--ndo-spacing-3); align-items: center; flex-wrap: wrap; padding: var(--ndo-spacing-3) var(--ndo-spacing-6); background: var(--ndo-color-surface); border-bottom: 1px solid var(--ndo-color-border); font-size: var(--ndo-text-sm); font-weight: var(--ndo-weight-medium); color: var(--ndo-color-text-secondary); }
   .bar .grow { flex: 1; }
   .bar .back { color: var(--ndo-color-link); text-decoration: none; font-weight: var(--ndo-weight-semibold); }
-  .bar .reader, .bar button { font: inherit; color: var(--ndo-color-text-primary); background: rgb(var(--ndo-color-card-bg)); border: 1px solid var(--ndo-color-border); border-radius: var(--ndo-radius-md); padding: 4px 10px; }
-  .bar .reader { width: 9rem; }
+  .bar button { font: inherit; color: var(--ndo-color-text-primary); background: rgb(var(--ndo-color-card-bg)); border: 1px solid var(--ndo-color-border); border-radius: var(--ndo-radius-md); padding: 4px 10px; }
   .bar button { cursor: pointer; }
   .bar .primary { background: rgb(var(--ndo-primary-600)); border-color: rgb(var(--ndo-primary-600)); color: rgb(var(--ndo-color-text-inverse)); }
 
@@ -522,7 +460,6 @@
   .react button:disabled { cursor: default; opacity: 0.8; }
 
   textarea, .act-note { width: 100%; box-sizing: border-box; font: inherit; font-size: var(--ndo-text-sm); line-height: var(--ndo-lh-sm); color: var(--ndo-color-text-primary); background: rgb(var(--ndo-color-card-bg)); border: 1px solid var(--ndo-color-border); border-radius: var(--ndo-radius-md); padding: 6px 10px; resize: vertical; }
-  .other { min-height: 80px; }
 
   .filter { display: flex; flex-wrap: wrap; gap: 6px; margin: 4px 0 12px; }
   .filter button.on { background: var(--ndo-color-text-primary); color: var(--ndo-color-bg-app); }
@@ -536,7 +473,6 @@
   .act-note { margin-top: 4px; padding: 2px 8px; font-size: var(--ndo-text-xs); opacity: 0; }
   .act:hover .act-note, .act-note:focus, .act-note:not(:placeholder-shown) { opacity: 1; }
 
-  .toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); background: var(--ndo-color-text-primary); color: var(--ndo-color-bg-app); padding: 8px 16px; border-radius: var(--ndo-radius-md); font-size: var(--ndo-text-sm); z-index: 20; }
 
   @media (max-width: 960px) {
     .wrap { grid-template-columns: 1fr; gap: 16px; }
