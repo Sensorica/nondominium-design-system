@@ -55,7 +55,7 @@ The diagram is drawn in the browser by the `mermaid` package, loaded only on a p
 
 Comments use the site's drawer (`src/lib/comments/`): one GitHub Discussion per meeting, keyed `meeting:<slug>`. The 💬 button on a paragraph, decision or card opens the drawer with the comment already pointing at it. Once posted, the comment carries the paragraph's id (`<!-- ds-about ... -->`, `about.ts`) and, when the paragraph has one, its first minute (`timecode.ts`), so everyone sees a count beside that paragraph. In the drawer, the "on ..." line scrolls to the paragraph and the minute line shows the paragraph covering it; on github.com, the minute link (`/meetings/<slug>#t=3720`) opens the page there.
 
-Ticks, reactions and notes stay in the reader's browser (`ds-meeting:<slug>:v1` in localStorage). **copy my answers**, or Ctrl+Shift+Enter, puts only what the reader changed on the clipboard as markdown, headed with the name typed in "reading as", ready to paste back to whoever keeps the record.
+Ticks, reactions and notes stay in the reader's browser (`ds-meeting:<slug>:v1` in localStorage); anything meant for the team goes through a comment (💬), which is shared. The page has no answer export and no general comments box: a published meeting is read and commented on, not answered back.
 
 ## Follow-up: done actions and settled questions
 
