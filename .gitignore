@@ -12,3 +12,6 @@ static/registry/bundle.js
 
 # Dogfooding artifacts: runs, screenshots, reports.
 .local/
+
+# Wrangler local state
+.wrangler/
