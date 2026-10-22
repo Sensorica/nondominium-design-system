@@ -99,7 +99,7 @@
               <button
                 type="button"
                 data-testid="jump-initiator"
-                title="Open this agent in the Agent Perspective (coming next)"
+                title="Open this agent in the Agent Perspective"
                 onclick={() => oninitiatorclick?.()}
                 class="font-medium text-blue-600 hover:underline">{initiatorName} ↗</button
               >

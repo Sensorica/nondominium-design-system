@@ -11,18 +11,61 @@ export const MOCK_AGENT_NAMES = {
 
 export type MockAgentId = keyof typeof MOCK_AGENT_NAMES;
 
+/** Stable mock agent pubkeys. Lynn matches the Resource Perspective session `MY_KEY`. */
+export const MOCK_AGENT_KEYS: Record<MockAgentId, string> = {
+  lynn: 'uhCAk5vMp8X3nRwsQzLtYd4uJcFe7gHiKoNbPmVe',
+  bob: 'uhCAk9Rp7Yq2mNwsQzLtYd4uJcFe7gHiKoNbPmVb',
+  bauwens: 'uhCAk4vMp8X3nRwsQzLtYd4uJcFe7gHiKoNbPmVd',
+  tibi: 'uhCAk2vMp8X3nRwsQzLtYd4uJcFe7gHiKoNbPmVa',
+  /** Mill Creek Watershed initiator in the name map; distinct from Tibi’s key on Community Solar. */
+  sacha: 'uhCAk3vMp8X3nRwsQzLtYd4uJcFe7gHiKoNbPmVc'
+};
+
 export interface MockAgent {
   id: MockAgentId;
   name: string;
   nickname: string;
+  bio: string;
+  /** Declared interests — not validated roles, not a reputation score. */
+  skills: string[];
 }
 
 export const MOCK_AGENTS: MockAgent[] = [
-  { id: 'lynn', name: MOCK_AGENT_NAMES.lynn, nickname: MOCK_AGENT_NAMES.lynn },
-  { id: 'bob', name: MOCK_AGENT_NAMES.bob, nickname: MOCK_AGENT_NAMES.bob },
-  { id: 'bauwens', name: MOCK_AGENT_NAMES.bauwens, nickname: MOCK_AGENT_NAMES.bauwens },
-  { id: 'tibi', name: MOCK_AGENT_NAMES.tibi, nickname: MOCK_AGENT_NAMES.tibi },
-  { id: 'sacha', name: MOCK_AGENT_NAMES.sacha, nickname: MOCK_AGENT_NAMES.sacha }
+  {
+    id: 'lynn',
+    name: MOCK_AGENT_NAMES.lynn,
+    nickname: MOCK_AGENT_NAMES.lynn,
+    bio: 'Commons-oriented contributor working across Sensorica and WaterFrance.',
+    skills: ['coordination', 'fabrication', 'monitoring']
+  },
+  {
+    id: 'bob',
+    name: MOCK_AGENT_NAMES.bob,
+    nickname: MOCK_AGENT_NAMES.bob,
+    bio: 'Open hardware fabricator who keeps shared tools running.',
+    skills: ['fabrication', 'repair']
+  },
+  {
+    id: 'bauwens',
+    name: MOCK_AGENT_NAMES.bauwens,
+    nickname: MOCK_AGENT_NAMES.bauwens,
+    bio: 'Peer-production researcher bridging theory and workshop practice.',
+    skills: ['coordination', 'documentation']
+  },
+  {
+    id: 'tibi',
+    name: MOCK_AGENT_NAMES.tibi,
+    nickname: MOCK_AGENT_NAMES.tibi,
+    bio: 'Sensorica initiator focused on shared energy infrastructure.',
+    skills: ['monitoring', 'fabrication', 'coordination']
+  },
+  {
+    id: 'sacha',
+    name: MOCK_AGENT_NAMES.sacha,
+    nickname: MOCK_AGENT_NAMES.sacha,
+    bio: 'Watershed steward for WaterFrance; tracks flow and stewardship obligations.',
+    skills: ['monitoring', 'stewardship']
+  }
 ];
 
 export const MOCK_CURRENT_AGENT_ID: MockAgentId = 'lynn';
@@ -47,6 +90,28 @@ export const MOCK_NDO_INITIATOR_NAMES: Record<string, string> = {
 
 export function getMockInitiatorName(ndoHash: string): string | null {
   return MOCK_NDO_INITIATOR_NAMES[ndoHash] ?? null;
+}
+
+export function getMockAgent(id: string): MockAgent | null {
+  return MOCK_AGENTS.find((a) => a.id === id) ?? null;
+}
+
+export function agentIdFromName(name: string | null | undefined): MockAgentId | null {
+  if (!name) return null;
+  const found = MOCK_AGENTS.find((a) => a.name === name || a.nickname === name);
+  return found?.id ?? null;
+}
+
+export function agentIdFromKey(key: string | null | undefined): MockAgentId | null {
+  if (!key) return null;
+  const entry = (Object.entries(MOCK_AGENT_KEYS) as [MockAgentId, string][]).find(
+    ([, k]) => k === key
+  );
+  return entry?.[0] ?? null;
+}
+
+export function agentKeyForId(id: string): string | null {
+  return MOCK_AGENT_KEYS[id as MockAgentId] ?? null;
 }
 
 export const MOCK_GROUP_MEMBERS: Record<string, GroupMember[]> = {

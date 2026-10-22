@@ -35,7 +35,7 @@ bun run dev
 | `/tokens` | The palette and scale the app uses, rendered live |
 | `/patterns` | Seven categories of pattern the app writes today, each citing its source file |
 | `/playbook`, `/ui-kit` | `@nondominium/ndo-ui`: component sheets, and screens composed from them |
-| `/prototypes/resource-perspective` | **The Layer 0 app**: Lobby, Group, Resource Perspective, on mock data |
+| `/prototypes/resource-perspective` | **The working prototype**: Lobby, Group, Resource (Layer 1 specs) and Agent Perspectives, on mock data |
 | `/app` | **The replica**: 44 keyed states of the real app, on mock data |
 
 ---
@@ -112,7 +112,7 @@ Inside `/app` and inside any prototype, press **`m`**: every keyed state, groupe
 
 ## Prototypes
 
-`/prototypes/resource-perspective` is the working app: Lobby, then a group as a Perspective host, then one NDO in the Resource Perspective. Layer 0 is live (browse, create, join, associate, the creator’s lifecycle transition). Agent, Intelligence, Work, and the later tabs are on screen with a Soon badge and an explanation, never a half-built form. Session edits persist until reload. Press `m` for its screen map and `c` to comment. The chip at the bottom left returns to the index.
+`/prototypes/resource-perspective` is the working app: Lobby, then a group as a Perspective host, then Resource or Agent. Resource is live (browse, create, join, associate, lifecycle, Layer 1 specifications on the Resources tab). Agent is live (directory, profile, derived connections, jumps with a return trail). Intelligence, Work, and the remaining NDO tabs (Governance, Composition, Activity) stay on screen with a Soon badge and an explanation. Session edits persist until reload. Press `m` for its screen map and `c` to comment. The chip at the bottom left returns to the index.
 
 The same index also holds six UI directions for the v0.1 release, from the prototype handoff (`docs/prototypes/HANDOFF.md`). Each covers the whole journey: profile, group (create, join by invite link, or the example network), declaring a shared resource, and managing it. The audience is people new to resource sharing, so the default UI uses everyday words; a **Developer details** switch adds zome calls, hashes and rule chains. A to E carry it in their shared menu (Ctrl/Cmd+K); F has no such menu and carries it, a scenario picker and a Reset button in its header.
 
@@ -226,7 +226,7 @@ Entirely in UnoCSS utility classes written inline. `app.css` is one line (the Ta
 - **Action** blue: `blue-600` fill with white text, `blue-700` on hover. `blue-300` borders and `blue-50` hovers for the secondary variant. `blue-500` for focus borders.
 - **Canvas**: `gray-100` page, `gray-50` sidebar and table headers, white cards, `gray-200` borders, `gray-100` hairlines.
 - **Text**: `gray-900` headings, `gray-800` values, `gray-700` labels, `gray-600` body, `gray-500` hints, `gray-400` monospace and italics.
-- **Domain colour** is the only decorative colour, and it always uses a 100/700 pair: lifecycle stage (gray, blue, indigo, amber, green, teal, emerald, yellow, orange, red), resource nature (blue, purple, orange, teal, indigo), property regime (gray, cyan, emerald, rose).
+- **Domain colour** is the only decorative colour, and it always uses a 100/700 pair: lifecycle stage (gray, blue, indigo, amber, green, teal, emerald, yellow, orange, red), resource nature (Physical blue, Digital purple, Hybrid teal), property regime (gray, cyan, emerald, rose).
 - **Semantic**: `red-50/200/600/700` for errors, `amber-50/100/600/700/800` for "not built yet", `yellow-50/700` and `orange-50/700` for the hibernating and deprecated strips, `green-600` for a confirmed selection.
 - No dark mode.
 

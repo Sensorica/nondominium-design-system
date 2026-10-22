@@ -1,7 +1,6 @@
 <script lang="ts">
-  // Layer 0, full-bleed. Lobby, then a group as a Perspective host, then one
-  // NDO in the Resource Perspective. State lives in the module singleton so
-  // edits survive moving between these views.
+  // Lobby, then a group as a Perspective host (Resource + Agent), then one
+  // NDO. State lives in the module singleton so edits survive navigation.
   import { goto } from '$app/navigation';
   import { page } from '$app/state';
   import { paths } from '$lib/paths';
@@ -10,8 +9,10 @@
     applyPatch,
     associate,
     clearFilters,
+    clearTrail,
     createGroup,
     createNdo,
+    createSpecification,
     groupIdFromInvite,
     hasGroup,
     historyFor,
@@ -20,31 +21,49 @@
     MOCK_NDOS,
     MY_KEY,
     OPERATIONAL,
+    popTrail,
+    pushTrail,
     rp,
     saveProfile,
-    setFilters
+    setFilters,
+    specsFor,
+    trailTop,
+    updateSpecification
   } from '$lib/prototypes/resource-perspective/state.svelte';
   import {
     AppShell,
     Breadcrumb,
+    agentIdFromName,
     getAssociatedGroupIds,
+    getMockAgent,
     getMockGroupMembers,
     getMockInitiatorName,
     MOCK_AGENT_NAMES,
     GroupPerspectivesView,
     NdoBrowser,
+    NdoButton,
     ResourceNdoView,
     UserProfileForm,
     applyNdoFilters,
-    type NdoInput
+    type GroupMember,
+    type NdoInput,
+    type PerspectiveId,
+    type ResourceSpecificationInput
   } from '@nondominium/ndo-ui';
 
   let profileOpen = $state(false);
 
   const here = paths.protoResource();
   const lobbyUrl = here;
-  const groupUrl = (id: string) => paths.protoResourceGroup(id);
-  const ndoUrl = (hash: string, id?: string | null) => paths.protoResourceNdo(hash, id);
+  const groupUrl = (
+    id: string,
+    opts?: { perspective?: 'resource' | 'agent'; agent?: string | null }
+  ) => paths.protoResourceGroup(id, opts);
+  const ndoUrl = (
+    hash: string,
+    id?: string | null,
+    opts?: { tab?: 'overview' | 'resources' }
+  ) => paths.protoResourceNdo(hash, id, opts);
   const createUrl = (id: string) => paths.protoResourceCreate(id);
   const absolute = (path: string) => `${page.url.origin}${path}`;
 
@@ -52,10 +71,17 @@
   const groupId = $derived(page.url.searchParams.get('group'));
   const ndoHash = $derived(page.url.searchParams.get('ndo'));
   const view = $derived(page.url.searchParams.get('view'));
+  const perspectiveParam = $derived(page.url.searchParams.get('perspective'));
+  const agentParam = $derived(page.url.searchParams.get('agent'));
+  const tabParam = $derived(page.url.searchParams.get('tab'));
+  const activePerspective = $derived<PerspectiveId>(
+    perspectiveParam === 'agent' ? 'agent' : 'resource'
+  );
   const group = $derived(rp.groups.find((g) => g.id === groupId) ?? null);
   const descriptor = $derived(
     view === 'ndo' ? (allNdos.find((d) => d.hash === ndoHash) ?? null) : null
   );
+  const ndoSpecs = $derived(descriptor ? specsFor(descriptor.hash) : []);
   const groupNdos = $derived(allNdos.filter((d) => group?.ndoHashes?.includes(d.hash)));
   const lobbyNdos = $derived(
     applyNdoFilters(
@@ -64,12 +90,36 @@
     )
   );
 
+  const SEEDED_GROUPS = new Set(['grp_sensorica', 'grp_opensourceecology', 'grp_waterfrance']);
+
+  function membersOf(id: string, createdBy?: string) {
+    if (!SEEDED_GROUPS.has(id)) {
+      return [{ id: 'lynn', name: createdBy ?? MOCK_AGENT_NAMES.lynn, role: 'Creator' }];
+    }
+    return getMockGroupMembers(id, createdBy);
+  }
+
+  const agentLabel = $derived(
+    agentParam ? (getMockAgent(agentParam)?.name ?? agentParam) : null
+  );
+  const navBack = $derived(trailTop());
+
   const groupBreadcrumb = $derived(
     group
       ? [
           { label: 'Lobby', href: lobbyUrl },
           { label: group.name, href: groupUrl(group.id) },
-          { label: 'Resource' }
+          ...(activePerspective === 'agent'
+            ? [
+                {
+                  label: 'Agent',
+                  href: agentParam
+                    ? groupUrl(group.id, { perspective: 'agent' })
+                    : undefined
+                },
+                ...(agentLabel ? [{ label: agentLabel }] : [])
+              ]
+            : [{ label: 'Resource' }])
         ]
       : []
   );
@@ -84,13 +134,72 @@
       : []
   );
 
-  const SEEDED_GROUPS = new Set(['grp_sensorica', 'grp_opensourceecology', 'grp_waterfrance']);
+  function currentHref(): string {
+    return `${page.url.pathname}${page.url.search}`;
+  }
 
-  function membersOf(id: string, createdBy?: string) {
-    if (!SEEDED_GROUPS.has(id)) {
-      return [{ id: 'lynn', name: createdBy ?? MOCK_AGENT_NAMES.lynn, role: 'Creator' }];
+  function currentLabel(): string {
+    if (descriptor) return descriptor.name;
+    if (agentLabel) return agentLabel;
+    if (activePerspective === 'agent') return 'Agent';
+    if (group) return group.name;
+    return 'Lobby';
+  }
+
+  function jumpToAgent(agentId: string, inGroupId?: string | null) {
+    const gid = inGroupId ?? groupId;
+    if (!gid) return;
+    pushTrail({ label: currentLabel(), href: currentHref() });
+    goto(groupUrl(gid, { perspective: 'agent', agent: agentId }));
+  }
+
+  function handlePerspectiveSelect(id: PerspectiveId) {
+    if (!group) return;
+    clearTrail();
+    if (id === 'agent') {
+      goto(groupUrl(group.id, { perspective: 'agent' }));
+    } else {
+      goto(groupUrl(group.id));
     }
-    return getMockGroupMembers(id, createdBy);
+  }
+
+  function handleSelectAgent(id: string) {
+    if (!group) return;
+    if (agentParam) {
+      pushTrail({ label: currentLabel(), href: currentHref() });
+    }
+    goto(groupUrl(group.id, { perspective: 'agent', agent: id }));
+  }
+
+  function handleSelectGroup(id: string) {
+    clearTrail();
+    goto(groupUrl(id, { perspective: 'agent' }));
+  }
+
+  function handleResources(id: string) {
+    clearTrail();
+    goto(groupUrl(id));
+  }
+
+  function handleClearAgent() {
+    if (!group) return;
+    goto(groupUrl(group.id, { perspective: 'agent' }));
+  }
+
+  function handleBack() {
+    const top = popTrail();
+    if (top) goto(top.href);
+    else handleClearAgent();
+  }
+
+  function handleMemberJump(m: GroupMember) {
+    jumpToAgent(m.id, groupId);
+  }
+
+  function handleInitiatorJump(name: string) {
+    const id = agentIdFromName(name);
+    if (!id) return;
+    jumpToAgent(id, groupId);
   }
 
   function handleCreate(input: NdoInput) {
@@ -109,6 +218,14 @@
     if (!id || !hasGroup(id)) throw new Error('Unknown group');
     await goto(groupUrl(id));
   }
+
+  const agentNdoHref = (hash: string, tab?: 'resources') =>
+    ndoUrl(hash, groupId, tab === 'resources' ? { tab: 'resources' } : undefined);
+
+  function handleSelectNdo(hash: string, tab?: 'resources') {
+    pushTrail({ label: currentLabel(), href: currentHref() });
+    goto(ndoUrl(hash, groupId, tab === 'resources' ? { tab: 'resources' } : undefined));
+  }
 </script>
 
 <svelte:head>
@@ -126,30 +243,49 @@
     activePath={group ? groupUrl(group.id) : lobbyUrl}
     profileNickname={rp.profile.nickname}
     browseHref={lobbyUrl}
-    groupHref={groupUrl}
+    groupHref={(id) => groupUrl(id)}
     oncreategroup={handleCreateGroup}
     onjoingroup={handleJoinGroup}
     onprofileclick={() => (profileOpen = true)}
   >
     {#if descriptor}
-      <ResourceNdoView
-        {descriptor}
-        breadcrumb={ndoBreadcrumb}
-        initiatorName={initiatorName(descriptor, getMockInitiatorName(descriptor.hash))}
-        isInitiator={descriptor.initiator === MY_KEY}
-        members={rp.members[descriptor.hash] ?? []}
-        joined={rp.joined.includes(descriptor.hash)}
-        onjoin={() => joinNdo(descriptor.hash)}
-        groups={rp.groups}
-        associatedGroupIds={getAssociatedGroupIds(rp.groups, descriptor.hash)}
-        onassociate={(ids) => associate(descriptor.hash, ids)}
-        onlifecycleconfirm={(payload) => advanceStage(descriptor.hash, descriptor, payload)}
-        candidateNdos={allNdos}
-        ndoLink={absolute(ndoUrl(descriptor.hash, groupId))}
-        operationalState={OPERATIONAL[descriptor.hash] ?? null}
-        transitionHistory={historyFor(descriptor.hash)}
-        oncreatendo={group ? () => goto(createUrl(group.id)) : undefined}
-      />
+      <div class="rp-ndo">
+        {#if navBack}
+          <div class="rp-ndo__back">
+            <NdoButton variant="ghost" class="px-0 text-sm" onclick={handleBack}>
+              ← Back to {navBack.label}
+            </NdoButton>
+          </div>
+        {/if}
+        <ResourceNdoView
+          {descriptor}
+          breadcrumb={ndoBreadcrumb}
+          initiatorName={initiatorName(descriptor, getMockInitiatorName(descriptor.hash))}
+          isInitiator={descriptor.initiator === MY_KEY}
+          members={rp.members[descriptor.hash] ?? []}
+          joined={rp.joined.includes(descriptor.hash)}
+          onjoin={() => joinNdo(descriptor.hash)}
+          groups={rp.groups}
+          associatedGroupIds={getAssociatedGroupIds(rp.groups, descriptor.hash)}
+          onassociate={(ids) => associate(descriptor.hash, ids)}
+          onlifecycleconfirm={(payload) => advanceStage(descriptor.hash, descriptor, payload)}
+          candidateNdos={allNdos}
+          ndoLink={absolute(ndoUrl(descriptor.hash, groupId))}
+          operationalState={OPERATIONAL[descriptor.hash] ?? null}
+          transitionHistory={historyFor(descriptor.hash)}
+          oncreatendo={group ? () => goto(createUrl(group.id)) : undefined}
+          specifications={ndoSpecs}
+          oncreatespec={(input: ResourceSpecificationInput) => {
+            createSpecification(descriptor, input);
+          }}
+          onupdatespec={(actionHash, input) => {
+            updateSpecification(descriptor.hash, actionHash, input, descriptor.property_regime);
+          }}
+          initialTab={tabParam === 'resources' ? 'resources' : 'overview'}
+          oninitiatorjump={handleInitiatorJump}
+          onmemberjump={handleMemberJump}
+        />
+      </div>
     {:else if view === 'ndo'}
       <div class="rp-missing">
         <Breadcrumb
@@ -183,6 +319,24 @@
         ndoHref={(hash) => ndoUrl(hash, group.id)}
         ndoLink={(hash) => absolute(ndoUrl(hash, group.id))}
         oncreatendo={handleCreate}
+        {activePerspective}
+        agentId={agentParam}
+        allGroups={rp.groups}
+        {allNdos}
+        membersByGroup={membersOf}
+        membersByNdo={rp.members}
+        specsByNdo={rp.specs}
+        currentAgentId="lynn"
+        trailTop={navBack}
+        {agentNdoHref}
+        onselectndo={handleSelectNdo}
+        onactive={handlePerspectiveSelect}
+        onselectagent={handleSelectAgent}
+        onselectgroup={handleSelectGroup}
+        onresources={handleResources}
+        onclearagent={handleClearAgent}
+        onback={handleBack}
+        onmemberjump={handleMemberJump}
       />
     {:else if view === 'group'}
       <div class="rp-missing">
@@ -251,5 +405,8 @@
     margin: 0;
     font-size: 0.875rem;
     color: #4b5563;
+  }
+  .rp-ndo__back {
+    padding: 16px 24px 0;
   }
 </style>

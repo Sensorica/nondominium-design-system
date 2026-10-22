@@ -360,6 +360,8 @@ Phases 1 to 5 built the replica and proved it against the app on 2026-08-11. Sin
 
 **Claim 19 closed.** All six classification enums in `src/lib/replica/types.ts` match `crates/shared/src/types.rs` at `20adb11` exactly: LifecycleStage 10, PropertyRegime 7, ResourceNature 5, Rivalry 2, ResourceScope 3, OperationalState 7. `RuleData`'s four discriminants and their payload structs match `crates/shared/src/rule_data.rs`.
 
+The protocol `ResourceNature` is `Physical`, `Digital`, and `Hybrid`. `Digital` includes designs, data, documents, datasets, and methods. A service is a ValueFlows flow. The prototype identity step, filters, and nature chips use these three.
+
 **Claim 20 closed, and the 2026-08-18 defects with it.** The three defects that plan recorded are gone at the type level: the invented rule names (`AccessControl`, `TransferPolicy`) are replaced by the four real `RuleData` variants, `OperationalState` is a separate seven-value axis rather than a lifecycle badge, and `Rivalry` and `ResourceScope` both exist. What is not yet done is the badge layer: the registry and playbook still need variants for them, and the old governance-review scenario asserted in prose that `rule_data` is an untyped JSON string, which stopped being true at #132. That scenarios section has since been removed; the assertion went with it.
 
 **Claim 16 is open at 3 errors, down from 25.** `bunx svelte-check` fell from 25 to 3 as the types landed, and every error it raised was a real replica-versus-app gap rather than a type-level nuisance: three property regimes missing from two filter maps, a dropped rivalry override field, a two-field `Person`. Two of the remaining three are in the `ndo/` half; the third is the governance-review scenario above.

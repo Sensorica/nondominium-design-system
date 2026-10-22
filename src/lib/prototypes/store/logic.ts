@@ -38,7 +38,7 @@ export type LifecycleStage = (typeof STAGES)[number];
 
 export const ENUM = {
   regime: ['Nondominium', 'Commons', 'Collective', 'Pool', 'CommonPool', 'Public', 'Private'],
-  nature: ['Physical', 'Digital', 'Service', 'Hybrid', 'Information'],
+  nature: ['Physical', 'Digital', 'Hybrid'],
   opstate: ['Available', 'Reserved', 'InTransit', 'InStorage', 'InMaintenance', 'InUse', 'PendingValidation'],
   role: ['SimpleAgent', 'AccountableAgent', 'PrimaryAccountableAgent', 'Transport', 'Repair', 'Storage'],
   rule: ['AccessRequirement', 'UsageLimit', 'TransferCondition', 'MaintenanceSchedule'],
@@ -755,7 +755,7 @@ export function createNdo(s: ProtoState, ctx: Ctx, f: NdoForm): Outcome<string> 
   const id = ctx.id('n');
   const n: Ndo = {
     id, name: f.name.trim(), group, stage: 'Ideation', regime: f.regime, nature: f.nature,
-    rivalry: ['Digital', 'Information', 'Service'].includes(f.nature) ? 'NonRivalrous' : 'Rivalrous',
+    rivalry: f.nature === 'Digital' ? 'NonRivalrous' : 'Rivalrous',
     initiator: ctx.me, desc: f.desc || '', hash: ctx.hash()
   };
   const d = leave(s, ctx, id, 'work', 'declared this NDO', null, { ndos: [...s.ndos, n] }, [{ text: 'declared ' + n.name, ndo: id, type: 'ResourceCreation' }]);

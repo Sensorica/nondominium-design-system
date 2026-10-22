@@ -3,12 +3,15 @@
     GroupDescriptor,
     GroupMember,
     NdoDescriptor,
-    NdoTransitionHistoryEvent
+    NdoTransitionHistoryEvent,
+    ResourceSpecification,
+    ResourceSpecificationInput
   } from '../../../domain/types.js';
   import { getComingNext, type OperationalStateLabel } from '../../../domain/coming-next.js';
   import { formatDate, truncateHash } from '../../../domain/format.js';
   import Breadcrumb, { type BreadcrumbItem } from './Breadcrumb.svelte';
   import NdoActionRow from './NdoActionRow.svelte';
+  import ResourcesPanel from './ResourcesPanel.svelte';
   import NdoIdentityPanel from '../ndo/NdoIdentityPanel.svelte';
   import ForkNdoModal from '../ndo/ForkNdoModal.svelte';
   import AssociateNdoModal from '../ndo/AssociateNdoModal.svelte';
@@ -43,6 +46,19 @@
     operationalState?: OperationalStateLabel | null;
     /** The Create NDO shortcut offered from the Offer popup. */
     oncreatendo?: () => void;
+    /** Layer 1 specifications for this NDO (session or service). */
+    specifications?: ResourceSpecification[];
+    oncreatespec?: (input: ResourceSpecificationInput) => void | Promise<void>;
+    onupdatespec?: (
+      actionHash: string,
+      input: ResourceSpecificationInput
+    ) => void | Promise<void>;
+    /** Open on Resources when the URL carries `tab=resources`. */
+    initialTab?: TabId;
+    /** Jump to Agent Perspective for the initiator (display name). */
+    oninitiatorjump?: (name: string) => void;
+    /** Jump to Agent Perspective for a member. */
+    onmemberjump?: (member: GroupMember) => void;
   }
 
   let {
@@ -61,10 +77,22 @@
     candidateNdos = [],
     ndoLink,
     operationalState = null,
-    oncreatendo
+    oncreatendo,
+    specifications = [],
+    oncreatespec,
+    onupdatespec,
+    initialTab = 'overview',
+    oninitiatorjump,
+    onmemberjump
   }: Props = $props();
 
-  let tab = $state<TabId>('overview');
+  let tab = $state<TabId>(initialTab);
+
+  $effect(() => {
+    if (initialTab === 'resources' || initialTab === 'overview') {
+      tab = initialTab;
+    }
+  });
   let showFork = $state(false);
   let showAssociate = $state(false);
   let showTransition = $state(false);
@@ -75,7 +103,7 @@
 
   const tabs: { id: TabId; label: string; soonId?: string }[] = [
     { id: 'overview', label: 'Overview' },
-    { id: 'resources', label: 'Resources', soonId: 'tab-resources' },
+    { id: 'resources', label: 'Resources' },
     { id: 'governance', label: 'Governance', soonId: 'tab-governance' },
     { id: 'composition', label: 'Composition', soonId: 'tab-composition' },
     { id: 'activity', label: 'Activity', soonId: 'tab-activity' }
@@ -273,8 +301,9 @@
       </div>
       <MemberList
         {members}
-        onmemberclick={() => {
-          soonId = 'jump-agent';
+        onmemberclick={(m) => {
+          if (onmemberjump) onmemberjump(m);
+          else soonId = 'jump-agent';
         }}
       />
     </div>
@@ -288,8 +317,22 @@
     lockedTransition
     ontransitionclick={() => (showTransition = true)}
     onlockedtransitionclick={() => (soonId = 'governed-transitions')}
-    oninitiatorclick={() => (soonId = 'jump-agent')}
+    oninitiatorclick={() => {
+      if (initiatorName && oninitiatorjump) oninitiatorjump(initiatorName);
+      else soonId = 'jump-agent';
+    }}
   />
+
+  {#if tab === 'resources' && descriptor}
+    <div class="mx-6 mt-4 rounded-lg border border-gray-200 bg-gray-50 p-5">
+      <ResourcesPanel
+        {descriptor}
+        {specifications}
+        oncreate={oncreatespec}
+        onupdate={onupdatespec}
+      />
+    </div>
+  {/if}
 
   <div class="p-6">
     <NdoActionRow {oncreatendo} />

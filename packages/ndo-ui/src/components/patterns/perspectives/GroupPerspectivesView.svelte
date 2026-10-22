@@ -3,23 +3,29 @@
     GroupDescriptor,
     GroupMember,
     NdoDescriptor,
-    NdoInput
+    NdoInput,
+    ResourceSpecification
   } from '../../../domain/types.js';
   import type { PerspectiveId } from '../../../domain/coming-next.js';
   import Breadcrumb, { type BreadcrumbItem } from './Breadcrumb.svelte';
   import PerspectiveSwitcher from './PerspectiveSwitcher.svelte';
   import ResourcePerspective from './ResourcePerspective.svelte';
+  import AgentPerspective from './AgentPerspective.svelte';
+  import AgentProfile from './AgentProfile.svelte';
   import NdoCreateModal from '../group/NdoCreateModal.svelte';
   import MemberList from '../group/MemberList.svelte';
   import NdoButton from '../../primitives/NdoButton.svelte';
   import ComingNextPopup from '../../primitives/ComingNextPopup.svelte';
 
   /**
-   * The Group page with Perspectives. Lobby stays the outermost layer (the
-   * shell, outside this component) and Groups the second; this is the middle
-   * layer, now a Perspective host. At Layer 0 every Perspective is scoped to
-   * the current group and only Resource is live.
+   * The Group page with Perspectives. Lobby stays the outermost layer;
+   * Resource and Agent are live; Intelligence and Work stay Soon.
    */
+  interface TrailEntry {
+    label: string;
+    href: string;
+  }
+
   interface Props {
     group: GroupDescriptor | null;
     groupId: string;
@@ -35,7 +41,25 @@
     ndoHref?: (hash: string) => string;
     ndoLink?: (hash: string) => string;
     oncreatendo?: (input: NdoInput) => void | Promise<void>;
+    /** Controlled perspective from the URL; defaults to resource. */
+    activePerspective?: PerspectiveId;
+    agentId?: string | null;
+    allGroups?: GroupDescriptor[];
+    allNdos?: NdoDescriptor[];
+    membersByGroup?: (groupId: string, createdBy?: string) => GroupMember[];
+    membersByNdo?: Record<string, GroupMember[]>;
+    specsByNdo?: Record<string, ResourceSpecification[]>;
+    currentAgentId?: string | null;
+    trailTop?: TrailEntry | null;
+    agentNdoHref?: (hash: string, tab?: 'resources') => string;
+    onselectndo?: (hash: string, tab?: 'resources') => void;
     onactive?: (id: PerspectiveId) => void;
+    onselectagent?: (agentId: string) => void;
+    onselectgroup?: (groupId: string) => void;
+    onresources?: (groupId: string) => void;
+    onclearagent?: () => void;
+    onback?: () => void;
+    onmemberjump?: (member: GroupMember) => void;
   }
 
   let {
@@ -53,10 +77,26 @@
     ndoHref,
     ndoLink,
     oncreatendo,
-    onactive
+    activePerspective = 'resource',
+    agentId = null,
+    allGroups = [],
+    allNdos = [],
+    membersByGroup = () => [],
+    membersByNdo = {},
+    specsByNdo = {},
+    currentAgentId = null,
+    trailTop = null,
+    agentNdoHref,
+    onselectndo,
+    onactive,
+    onselectagent,
+    onselectgroup,
+    onresources,
+    onclearagent,
+    onback,
+    onmemberjump
   }: Props = $props();
 
-  let active = $state<PerspectiveId>('resource');
   let showCreate = $state(false);
   let inviteCopied = $state(false);
   let soonId = $state<string | null>(null);
@@ -116,11 +156,8 @@
 
   <div class="mb-4">
     <PerspectiveSwitcher
-      {active}
-      onselect={(id) => {
-        active = id;
-        onactive?.(id);
-      }}
+      active={activePerspective}
+      onselect={(id) => onactive?.(id)}
     />
   </div>
 
@@ -130,20 +167,53 @@
     </p>
   {/if}
 
-  <ResourcePerspective
-    {ndos}
-    {myAgentKey}
-    {joinedHashes}
-    {isLoading}
-    {ndoHref}
-    {ndoLink}
-    oncreateclick={() => (showCreate = true)}
-  />
+  {#if activePerspective === 'agent'}
+    {#if agentId}
+      <AgentProfile
+        {agentId}
+        {groupId}
+        groups={allGroups.length ? allGroups : group ? [group] : []}
+        ndos={allNdos.length ? allNdos : ndos}
+        {membersByGroup}
+        {membersByNdo}
+        {specsByNdo}
+        {joinedHashes}
+        {currentAgentId}
+        {trailTop}
+        ndoHref={agentNdoHref}
+        onselectndo={(hash, tab) => onselectndo?.(hash, tab)}
+        onselectagent={(id) => onselectagent?.(id)}
+        onselectgroup={(id) => onselectgroup?.(id)}
+        onback={() => (trailTop ? onback?.() : onclearagent?.())}
+      />
+    {:else}
+      <AgentPerspective
+        {groupId}
+        groupName={group?.name}
+        {members}
+        groups={allGroups.length ? allGroups : group ? [group] : []}
+        onselectagent={(id) => onselectagent?.(id)}
+        onselectgroup={(id) => onselectgroup?.(id)}
+        onresources={(id) => onresources?.(id)}
+      />
+    {/if}
+  {:else}
+    <ResourcePerspective
+      {ndos}
+      {myAgentKey}
+      {joinedHashes}
+      {isLoading}
+      {ndoHref}
+      {ndoLink}
+      oncreateclick={() => (showCreate = true)}
+    />
 
-  <MemberList
-    {members}
-    onmemberclick={() => {
-      soonId = 'jump-agent';
-    }}
-  />
+    <MemberList
+      {members}
+      onmemberclick={(m) => {
+        if (onmemberjump) onmemberjump(m);
+        else soonId = 'jump-agent';
+      }}
+    />
+  {/if}
 </div>

@@ -53,6 +53,8 @@ const PROCESS_COMMON = [
 
 export const COMING_NEXT: Record<string, ComingNextFeature> = {
   // ── Perspectives ─────────────────────────────────────────────────────────
+  // Retired as the switcher popup — Agent is live in the Resource Perspective
+  // prototype. Kept so any leftover Soft control can still resolve copy.
   'perspective-agent': {
     id: 'perspective-agent',
     group: 'perspective',
@@ -60,11 +62,11 @@ export const COMING_NEXT: Record<string, ComingNextFeature> = {
     title: 'Agent Perspective',
     tooltip: 'Find agents by skill and explore their connections.',
     summary:
-      'An agent-centric view of the network. Find agents with specific skills, open a profile to see communities, projects, skills and reputation, then hop from link to link through the relationship graph. Groups appear here too, since a group is a kind of agent.',
+      'Live in the Resource Perspective prototype: directory, profiles, derived connections, and jumps with a return trail. Reputation, collaborate invites, map, and chat remain Soon.',
     details: [
-      'Ask someone to collaborate on a project.',
-      'Find groups and decide whether to join them.',
-      'Map and chat tools can be opened from here.'
+      'Ask someone to collaborate on a project (Soon).',
+      'Find groups and open their Agent or Resource views.',
+      'Map and chat tools can be opened from here (Soon).'
     ],
     docRef: 'ui_design.md § Agent Perspective'
   },
@@ -298,6 +300,46 @@ export const COMING_NEXT: Record<string, ComingNextFeature> = {
     ],
     docRef: 'ui_design.md § Cross-Perspective Navigation'
   },
+  'agent-reputation': {
+    id: 'agent-reputation',
+    group: 'navigation',
+    icon: '⭐',
+    title: 'Reputation summary',
+    tooltip: 'Derived from private participation receipts.',
+    summary:
+      'An agent can derive a reputation summary from their private participation receipts and choose what to share. Receipts stay private by default; there is no global score.',
+    docRef: 'requirements.md § REQ-PPR-11'
+  },
+  'agent-invite': {
+    id: 'agent-invite',
+    group: 'navigation',
+    icon: '✉️',
+    title: 'Ask to collaborate',
+    tooltip: 'Invite this agent onto a project or resource.',
+    summary:
+      'From a profile you will be able to invite an agent to collaborate on a project or join work on a resource. That flow lands in the Work Perspective once it is live.',
+    docRef: 'ui_design.md § Agent Perspective'
+  },
+  'tool-map': {
+    id: 'tool-map',
+    group: 'navigation',
+    icon: '🗺️',
+    title: 'Geographic map',
+    tooltip: 'Map agents, resources or projects.',
+    summary:
+      'A map tool can be opened from any Perspective. From Agent it shows people; from Resource it shows NDOs; from Intelligence it shows opportunities.',
+    docRef: 'ui_design.md § Tools'
+  },
+  'tool-chat': {
+    id: 'tool-chat',
+    group: 'navigation',
+    icon: '💬',
+    title: 'Chat',
+    tooltip: 'Contact an agent directly.',
+    summary:
+      'Direct contact with an agent, possibly through the Capability Surface. Available from several Perspectives once wired.',
+    docRef: 'ui_design.md § Tools'
+  },
 
   // ── Fork ─────────────────────────────────────────────────────────────────
   'fork-unyt-stake': {
@@ -367,8 +409,7 @@ export const PERSPECTIVES: PerspectiveMeta[] = [
     label: 'Agent',
     icon: '👥',
     question: 'Who can I connect or collaborate with?',
-    live: false,
-    comingNextId: 'perspective-agent'
+    live: true
   },
   {
     id: 'intelligence',
