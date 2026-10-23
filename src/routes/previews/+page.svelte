@@ -65,7 +65,7 @@
       {/each}
     </ul>
     <p class="note">
-      A branch pushed before branch previews existed has no preview until its next push. A pull request from a fork has no preview, because its branch lives on the fork.
+      A branch cut before branch previews existed has no preview until it is rebased onto master, so its link stays empty until then. A pull request from a fork has no preview, because its branch lives on the fork.
     </p>
   {/if}
 </main>

@@ -15,7 +15,7 @@ Cloudflare lowercases the branch name and turns every character that is not a le
 
 ## What is and is not covered
 
-- A branch pushed before previews existed has no preview until its next push.
+- A branch cut before this workflow existed carries the old copy, which deploys `master` only, so it gets no preview until it is rebased onto (or merges) `master`. Never run that old copy by hand with **Run workflow** on such a branch: it passes `--branch master` and would publish the branch as production.
 
 - A pull request from a fork gets no preview: the workflow needs the repo's Cloudflare secrets, which GitHub does not hand to forks.
 
