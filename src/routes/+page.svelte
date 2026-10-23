@@ -35,6 +35,11 @@
       title: 'Prototype directions',
       body: 'Six UI directions for v0.1, from the prototype handoff, side by side. One gets chosen and implemented against the hApp.',
     },
+    {
+      href: paths.previews(),
+      title: 'Branch previews',
+      body: 'Every branch pushed to the repo, live on its own address, so work in progress can be opened and compared before it is merged.',
+    },
   ];
 </script>
 
