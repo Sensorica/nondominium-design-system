@@ -23,6 +23,7 @@ designsystem:
     review:        { backend: github-discussions, repo: Sensorica/nondominium-design-review, category_id: DIC_kwDOT06gls4DDH2j }
     static-deploy: { target: gh-pages, base: /nondominium-design-system }
     meetings:      { routes: [/meetings, '/meetings/{slug}'], content: content/meetings, module: src/lib/meetings, kinds: [lab, dev, team], thread: 'meeting:{slug}', docs: docs/MEETINGS.md }
+    previews:      { route: /previews, module: src/lib/previews.ts, workflow: .github/workflows/deploy-cloudflare.yml, docs: docs/PREVIEWS.md }
     registry:      { format: .svelte, status: active }
     parity:        { source: ../nondominium/ui, isa: ISA.md }
     prototypes:    { routes: [/prototypes, '/prototypes/{slug}'], directions: 6, registry: src/lib/prototypes/directions.ts, contract: src/lib/prototypes/README.md, store: src/lib/prototypes/store/store.svelte.ts, words: src/lib/prototypes/plain.ts, ui: src/lib/prototypes/ui, check: 'bun run check:prototypes', docs: docs/prototypes, source: 'handoff v0.1 against nondominium@3cbebf0' }
