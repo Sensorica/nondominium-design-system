@@ -35,7 +35,7 @@ bun run dev
 | `/tokens` | The palette and scale the app uses, rendered live |
 | `/patterns` | Seven categories of pattern the app writes today, each citing its source file |
 | `/playbook`, `/ui-kit` | `@nondominium/ndo-ui`: component sheets, and screens composed from them |
-| `/prototypes/resource-perspective` | **The working prototype**: Lobby, Group, Resource (Layer 1 specs) and Agent Perspectives, on mock data |
+| `/scenarios` | Six composed pages, each arguing one design question |
 | `/app` | **The replica**: 44 keyed states of the real app, on mock data |
 
 ---
@@ -88,7 +88,7 @@ The replica components never see the param. They read `lobbyStore.isLoading` and
 
 ### What the replica does not have
 
-No conductor, no DHT, no gossip. Everything eventually consistent in production is immediate here.
+No conductor, no DHT, no gossip. Everything eventually consistent in production is immediate here — which is exactly the gap the group-collaboration scenario exists to discuss.
 
 ### What the app has that this does not
 
@@ -97,24 +97,22 @@ No conductor, no DHT, no gossip. Everything eventually consistent in production 
 
 ---
 
-## Comments on screens 💬
+## Comments on screens and scenarios 💬
 
-Every replica state and every prototype view can receive threaded comments, hosted in a **private GitHub Discussions repo**. The site stays fully static: comments are read and written straight from the browser.
+Every prototype state and every scenario can receive threaded comments, hosted in a **private GitHub Discussions repo**. The site stays fully static: comments are read and written straight from the browser.
 
 - Click the floating button (bottom right) or press **`c`**.
 - A thread is keyed to the surface you are viewing, not its URL, so a route change never orphans a review thread. Threads are created lazily — browsing leaves no trace.
 
-You need a fine-grained GitHub token from a member of the `Sensorica` organisation, scoped to `nondominium-design-review` with **Discussions: Read and write**. It is stored only in your browser. See [`src/lib/comments/README.md`](src/lib/comments/README.md).
+On `design.sensorica.co`, press the button and choose **Sign in with GitHub**: a GitHub App (Sensorica org, Discussions read and write, installed on `nondominium-design-review` only) signs you in through two Cloudflare Pages Functions in `functions/api/auth/`, which need the Pages secret `GITHUB_APP_CLIENT_SECRET`. On the GitHub Pages copy, which has no Functions, paste a fine-grained token from a member of the `Sensorica` organisation instead (scoped to `nondominium-design-review` with **Discussions: Read and write**); the same paste route stays behind a link on `design.sensorica.co`. Tokens are stored only in your browser. See [`src/lib/comments/README.md`](src/lib/comments/README.md).
 
 ## The screen map 🗺️
 
-Inside `/app` and inside any prototype, press **`m`**: every keyed state, grouped, one click away — including the three connection states nobody can reach in a running app.
+Inside `/app`, press **`m`**: every keyed state, grouped, one click away — including the three connection states nobody can reach in a running app.
 
-## Prototypes
+## Prototype directions
 
-`/prototypes/resource-perspective` is the working app: Lobby, then a group as a Perspective host, then Resource or Agent. Resource is live (browse, create, join, associate, lifecycle, Layer 1 specifications on the Resources tab). Agent is live (directory, profile, derived connections, jumps with a return trail). Intelligence, Work, and the remaining NDO tabs (Governance, Composition, Activity) stay on screen with a Soon badge and an explanation. Session edits persist until reload. Press `m` for its screen map and `c` to comment. The chip at the bottom left returns to the index.
-
-The same index also holds six UI directions for the v0.1 release, from the prototype handoff (`docs/prototypes/HANDOFF.md`). Each covers the whole journey: profile, group (create, join by invite link, or the example network), declaring a shared resource, and managing it. The audience is people new to resource sharing, so the default UI uses everyday words; a **Developer details** switch adds zome calls, hashes and rule chains. A to E carry it in their shared menu (Ctrl/Cmd+K); F has no such menu and carries it, a scenario picker and a Reset button in its header.
+`/prototypes` holds six working UI directions for the v0.1 release, from the prototype handoff (`docs/prototypes/HANDOFF.md`). Each covers the whole journey: profile, group (create, join by invite link, or the example network), declaring a shared resource, and managing it. The audience is people new to resource sharing, so the default UI uses everyday words; a **Developer details** switch adds zome calls, hashes and rule chains. A to E carry it in their shared menu (Ctrl/Cmd+K); F has no such menu and carries it, a scenario picker and a Reset button in its header.
 
 - **A to E** are mid-fidelity explorations restyled onto this system's tokens, as the handoff asked. Tokens only means the handoff's own typefaces are gone (B's serif notebook, the distinct sans and mono of A, C, D and E): all six are set in the design-system sans and mono, which the index and each registry entry say. They run on one shared mock store (`src/lib/prototypes/store/`), so what you do in one shows up in the others.
 - **F Flow Graph** is high fidelity, already built on this system, and runs on its own mock of the real zome calls.
@@ -162,7 +160,7 @@ Two non-obvious constraints, both real: Svelte's `customElement` option is incom
 
 ## Deployment
 
-Builds to `build/`, deploys to GitHub Pages on every push to `master`, and to Cloudflare Pages (project `nondominium-design`, served at `https://design.sensorica.co`) from `.github/workflows/deploy-cloudflare.yml`, built with `BASE_PATH=""` so the site sits at the domain root there. Cloudflare Pages also serves `404.html` as the fallback for the `/app` deep links. The SPA fallback is `404.html`, because Pages honours only a custom 404 page as its fallback, and that is what serves the client-rendered `/app/ndo/[hash]` routes on a deep-link reload.
+Builds to `build/`, deploys to GitHub Pages on every push to `master`, and to Cloudflare Pages (project `nondominium-design`, served at `https://design.sensorica.co`) from `.github/workflows/deploy-cloudflare.yml`, which also deploys every other branch as a preview at `<branch>.nondominium-design.pages.dev`, listed at `/previews` (see [docs/PREVIEWS.md](docs/PREVIEWS.md)). The Cloudflare build is made with `BASE_PATH=""` so the site sits at the domain root there. Cloudflare Pages also serves `404.html` as the fallback for the `/app` deep links. The SPA fallback is `404.html`, because Pages honours only a custom 404 page as its fallback, and that is what serves the client-rendered `/app/ndo/[hash]` routes on a deep-link reload. `wrangler pages deploy build` also bundles the `functions/` directory at the repo root (the GitHub sign-in endpoints under `/api/auth/`), which only the Cloudflare deploy runs; the Pages project needs the secret `GITHUB_APP_CLIENT_SECRET` (`bunx wrangler pages secret put GITHUB_APP_CLIENT_SECRET --project-name nondominium-design`).
 
 ---
 
@@ -226,7 +224,7 @@ Entirely in UnoCSS utility classes written inline. `app.css` is one line (the Ta
 - **Action** blue: `blue-600` fill with white text, `blue-700` on hover. `blue-300` borders and `blue-50` hovers for the secondary variant. `blue-500` for focus borders.
 - **Canvas**: `gray-100` page, `gray-50` sidebar and table headers, white cards, `gray-200` borders, `gray-100` hairlines.
 - **Text**: `gray-900` headings, `gray-800` values, `gray-700` labels, `gray-600` body, `gray-500` hints, `gray-400` monospace and italics.
-- **Domain colour** is the only decorative colour, and it always uses a 100/700 pair: lifecycle stage (gray, blue, indigo, amber, green, teal, emerald, yellow, orange, red), resource nature (Physical blue, Digital purple, Hybrid teal), property regime (gray, cyan, emerald, rose).
+- **Domain colour** is the only decorative colour, and it always uses a 100/700 pair: lifecycle stage (gray, blue, indigo, amber, green, teal, emerald, yellow, orange, red), resource nature (blue, purple, orange, teal, indigo), property regime (gray, cyan, emerald, rose).
 - **Semantic**: `red-50/200/600/700` for errors, `amber-50/100/600/700/800` for "not built yet", `yellow-50/700` and `orange-50/700` for the hibernating and deprecated strips, `green-600` for a confirmed selection.
 - No dark mode.
 

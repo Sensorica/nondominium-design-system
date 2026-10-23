@@ -7,6 +7,7 @@
   import { page } from '$app/state';
   import { currentUrl } from '$lib/replica/url-state.svelte';
   import { comments, clearToken } from '$lib/comments/comments.svelte';
+  import { ensureFreshToken } from '$lib/comments/auth';
   import { findDiscussion, validateToken } from '$lib/comments/github-client';
   import { isFollowMark } from '$lib/comments/follow';
   import { surfaceKeyForUrl, labelForKey } from '$lib/surface-keys';
@@ -41,6 +42,20 @@
       }
     });
     return () => { cancelled = true; };
+  });
+
+  // Refresh a near-expired token when the drawer opens, so a reviewer who left a
+  // tab open overnight does not meet an auth error mid-sentence. No-op for a pasted
+  // token, which has no recorded expiry. A refresh that restores a session the
+  // mount check had rejected also needs the login back, which the meeting ticks use.
+  $effect(() => {
+    if (!comments.open) return;
+    void ensureFreshToken().then((ok) => {
+      if (!ok || !comments.enabled || comments.viewerLogin) return;
+      validateToken(comments.token).then((r) => {
+        if (r.ok) comments.viewerLogin = r.value;
+      });
+    });
   });
 
   // Load the thread whenever the surface changes.

@@ -30,6 +30,11 @@
       title: 'Prototypes',
       body: 'The Layer 0 app — Lobby, Group, Resource Perspective — and six earlier UI directions kept beside it.',
     },
+    {
+      href: paths.previews(),
+      title: 'Branch previews',
+      body: 'Every branch pushed to the repo, live on its own address, so work in progress can be opened and compared before it is merged.',
+    },
   ];
 </script>
 
