@@ -14,6 +14,7 @@
     "build:all": "svelte-kit sync && bun run check && bun run build:registry && bun run build",
     "preview": "vite preview",
     "check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json && bun run check:fidelity && bun run check:prototypes && bun run check:uno",
+    "test": "bun test",
     "lint": "prettier --check . && eslint .",
     "format": "prettier --write .",
     "check:fidelity": "bun run scripts/check-fidelity.ts",
