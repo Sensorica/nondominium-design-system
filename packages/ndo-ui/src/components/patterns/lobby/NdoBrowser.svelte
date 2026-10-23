@@ -1,4 +1,5 @@
 <script lang="ts">
+  import type { Snippet } from 'svelte';
   import type { ActiveFilters, LifecycleStage, NdoDescriptor, PropertyRegime, ResourceNature } from '../../../domain/types.js';
   import {
     ALL_LIFECYCLE_STAGES,
@@ -21,6 +22,10 @@
     ndoHref?: (hash: string) => string;
     onfilterchange?: (partial: Partial<ActiveFilters>) => void;
     onclearfilters?: () => void;
+    /** Optional overlay rendered on each card (e.g. a copy-link button). */
+    cardAction?: Snippet<[NdoDescriptor]>;
+    /** Overrides the empty-state sentence when no filter is active. */
+    emptyMessage?: string;
   }
 
   let {
@@ -30,7 +35,9 @@
     activeFilters = { stages: [], natures: [], regimes: [] },
     ndoHref = (hash) => `/ndo/${encodeURIComponent(hash)}`,
     onfilterchange,
-    onclearfilters
+    onclearfilters,
+    cardAction,
+    emptyMessage
   }: Props = $props();
 
   function toggleStage(s: LifecycleStage) {
@@ -137,13 +144,14 @@
       <p class="text-sm text-gray-500">
         {filtersActive
           ? 'No NDOs match the selected filters.'
-          : 'No NDOs yet. Create one from within a group.'}
+          : (emptyMessage ?? 'No NDOs yet. Create one from within a group.')}
       </p>
     {:else}
       <ul class="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
         {#each descriptors as d (d.hash)}
-          <li>
+          <li class="relative">
             <NdoCard descriptor={d} href={ndoHref(d.hash)} />
+            {@render cardAction?.(d)}
           </li>
         {/each}
       </ul>

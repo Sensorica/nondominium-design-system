@@ -48,7 +48,7 @@
   --ndo-yellow-100: 254 249 195;
   --ndo-yellow-700: 161  98   7;
 
-  /* Orange — Deprecated, Service resource nature */
+  /* Orange — Deprecated */
   --ndo-orange-50:  255 247 237;
   --ndo-orange-100: 255 237 213;
   --ndo-orange-700: 194  65  12;
@@ -71,7 +71,7 @@
   --ndo-teal-100: 204 251 241;
   --ndo-teal-700:  15 118 110;
 
-  /* Indigo — Information, Development stage */
+  /* Indigo — Development stage */
   --ndo-indigo-100: 224 231 255;
   --ndo-indigo-700:  67  56 202;
 

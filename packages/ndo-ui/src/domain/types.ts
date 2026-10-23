@@ -1,6 +1,7 @@
 export type PropertyRegime = 'Private' | 'Commons' | 'Nondominium' | 'CommonPool';
 
-export type ResourceNature = 'Physical' | 'Digital' | 'Service' | 'Hybrid' | 'Information';
+/** Layer 0 nature. Digital includes designs, data, documents, datasets, and methods. */
+export type ResourceNature = 'Physical' | 'Digital' | 'Hybrid';
 
 export type LifecycleStage =
   | 'Ideation'
@@ -15,6 +16,9 @@ export type LifecycleStage =
   | 'EndOfLife';
 
 export type Rivalry = 'Rivalrous' | 'NonRivalrous';
+
+/** How a rivalrous resource subtracts. A usage rule, not a second rivalry value. */
+export type SubtractionKind = 'unit' | 'capacity' | 'consumable';
 
 export type ResourceScope = 'Project' | 'Network' | 'Public';
 
@@ -133,6 +137,8 @@ export interface WizardKernelState {
 export interface WizardRefinementState {
   property_regime: PropertyRegime;
   rivalry: Rivalry | null;
+  /** Set for Physical and Hybrid. Null for Digital. */
+  subtraction?: SubtractionKind | null;
   scope: ResourceScope | null;
   source: ResourceSource | null;
   transferability: Transferability | null;
@@ -151,6 +157,42 @@ export interface NdoSpecificationDraft {
   tags?: string[];
   fields: SpecFieldValue[];
   governance_rule_ids: string[];
+}
+
+/**
+ * Layer 1 ResourceSpecification — mirrors the Rust entry in zome_resource.
+ * Linked from Layer 0 via NdoToSpecification; does not modify NondominiumIdentity.
+ */
+export interface ResourceSpecification {
+  /** Original create action hash (stable identity for this spec). */
+  action_hash: string;
+  name: string;
+  description: string;
+  category: string;
+  image_url: string | null;
+  tags: string[];
+  is_active: boolean;
+  scope: ResourceScope;
+  /** Immutable pointer to the Layer 0 NDO action hash. */
+  ndo_identity_hash: string;
+  /**
+   * Lifecycle stage observed when Layer 1 was activated
+   * (mock equivalent of Rust `ndo_state_hash`).
+   */
+  activated_at_stage: LifecycleStage | string;
+  /** Author agent key; updates are author-only. */
+  author: string;
+  created_at: number;
+}
+
+/** Mutable fields accepted when creating or updating a Layer 1 specification. */
+export interface ResourceSpecificationInput {
+  name: string;
+  description: string;
+  category?: string;
+  image_url?: string | null;
+  tags?: string[];
+  scope: ResourceScope;
 }
 
 export interface WizardResult {

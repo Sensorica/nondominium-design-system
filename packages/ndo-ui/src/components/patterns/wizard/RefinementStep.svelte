@@ -1,21 +1,23 @@
 <script lang="ts">
   import {
     ACCESS_CONTROL_QUESTION,
-    RIVALRY_QUESTION,
-    SCOPE_OPTIONS
+    RIVALRY_STATEMENT,
+    SCOPE_OPTIONS,
+    SOURCE_ARRANGEMENTS,
+    SOURCE_RIVALRY_STATEMENT,
+    SUBTRACTION_OPTIONS,
+    accessOptionsForNature,
+    regimesForNature,
+    rivalryForNature,
+    scopePermitted,
+    withCoherentScope
   } from '../../../domain/wizard-questions.js';
   import { getArchetype } from '../../../domain/wizard-archetypes.js';
-  import {
-    SOURCE_REGIME_STATE_OPTIONS,
-    SOURCE_TYPE_OPTIONS
-  } from '../../../domain/spec-profiles.js';
-  import { MVP_REGIMES } from '../../../domain/enums.js';
+  import { SOURCE_REGIME_STATE_OPTIONS } from '../../../domain/spec-profiles.js';
   import type {
-    PropertyRegime,
     ResourceScope,
-    Rivalry,
     SourceRegimeState,
-    SourceType,
+    SubtractionKind,
     WizardKernelState,
     WizardRefinementState
   } from '../../../domain/types.js';
@@ -30,29 +32,38 @@
   let { kernel, refinement, onchange }: Props = $props();
 
   const archetype = $derived(getArchetype(kernel.archetype));
-  const allowedRegimes = $derived(archetype.allowedRegimes ?? MVP_REGIMES);
-
-  let rivalryAnswer = $state<Rivalry>(refinement.rivalry ?? 'Rivalrous');
-
-  $effect(() => {
-    rivalryAnswer = refinement.rivalry ?? 'Rivalrous';
-  });
-
-  function handleRivalry(rivalry: Rivalry) {
-    rivalryAnswer = rivalry;
-    onchange({ ...refinement, rivalry });
-  }
+  const natureRivalry = $derived(rivalryForNature(kernel.resource_nature));
+  const rivalryStatement = $derived(
+    (archetype.isSourceNdo ? SOURCE_RIVALRY_STATEMENT : RIVALRY_STATEMENT)[natureRivalry]
+  );
+  const sourceArrangements = $derived(
+    SOURCE_ARRANGEMENTS.filter((option) => natureRegimes.includes(option.regime))
+  );
+  const natureRegimes = $derived(regimesForNature(kernel.resource_nature, archetype.allowedRegimes));
+  const accessOptions = $derived(accessOptionsForNature(kernel.resource_nature, archetype.allowedRegimes));
+  const scopeOptions = $derived(
+    SCOPE_OPTIONS.filter((opt) => scopePermitted(refinement.property_regime, opt.id))
+  );
 
   function handleAccess(accessId: (typeof ACCESS_CONTROL_QUESTION.options)[number]['id']) {
-    onchange(applyAccessAnswer(refinement, accessId, rivalryAnswer));
+    onchange(applyAccessAnswer(refinement, accessId, natureRivalry));
   }
 
   function handleNotSure() {
-    onchange({
-      ...refinement,
-      regime_not_sure: true,
-      property_regime: archetype.defaultRegime ?? 'Commons'
-    });
+    const preferred = archetype.defaultRegime ?? 'Commons';
+    const fallback = natureRegimes.includes(preferred) ? preferred : natureRegimes[0];
+    if (!fallback) return;
+    onchange(
+      withCoherentScope({
+        ...refinement,
+        regime_not_sure: true,
+        property_regime: fallback
+      })
+    );
+  }
+
+  function handleSubtraction(kind: SubtractionKind) {
+    onchange({ ...refinement, subtraction: kind });
   }
 
   function updateSourceField<K extends keyof NonNullable<WizardRefinementState['source_profile']>>(
@@ -83,35 +94,51 @@
 
 <div class="space-y-5">
   <p class="rounded border border-blue-100 bg-blue-50 px-3 py-2 text-xs text-blue-800">
-    There is no wrong answer here. These choices shape governance — you can refine Layer 1
-    specification after creation.
+    These choices shape governance. Layer 1 specification can be refined after creation.
   </p>
 
+  <div>
+    <p class="text-sm font-medium text-gray-900">
+      {archetype.isSourceNdo
+        ? 'When someone draws from this, is there less left for others?'
+        : 'When someone uses this, can others use it at the same time?'}
+    </p>
+    <p class="mt-2">
+      <span
+        class="inline-flex rounded-full border border-blue-500 bg-blue-100 px-3 py-1 text-xs font-medium text-blue-800"
+      >
+        {rivalryStatement.label}
+      </span>
+    </p>
+    <p class="mt-1 text-xs text-gray-500">{rivalryStatement.detail}</p>
+  </div>
+
   {#if !archetype.isSourceNdo}
-    <div>
-      <p class="text-sm font-medium text-gray-900">{RIVALRY_QUESTION.question}</p>
-      <div class="mt-2 space-y-2">
-        {#each RIVALRY_QUESTION.options as opt}
-          <button
-            type="button"
-            class="w-full rounded-lg border px-3 py-2 text-left text-sm {rivalryAnswer === opt.id
-              ? 'border-blue-500 bg-blue-50'
-              : 'border-gray-200 hover:bg-gray-50'}"
-            onclick={() => handleRivalry(opt.id)}
-          >
-            <span class="font-medium">{opt.label}</span>
-            {#if opt.description}
+    {#if natureRivalry === 'Rivalrous'}
+      <div>
+        <p class="text-sm font-medium text-gray-900">How does use run out?</p>
+        <div class="mt-2 space-y-2">
+          {#each SUBTRACTION_OPTIONS as opt}
+            <button
+              type="button"
+              class="w-full rounded-lg border px-3 py-2 text-left text-sm {refinement.subtraction ===
+              opt.id
+                ? 'border-blue-500 bg-blue-50'
+                : 'border-gray-200 hover:bg-gray-50'}"
+              onclick={() => handleSubtraction(opt.id)}
+            >
+              <span class="font-medium">{opt.label}</span>
               <p class="text-xs text-gray-500">{opt.description}</p>
-            {/if}
-          </button>
-        {/each}
+            </button>
+          {/each}
+        </div>
       </div>
-    </div>
+    {/if}
 
     <div>
       <p class="text-sm font-medium text-gray-900">{ACCESS_CONTROL_QUESTION.question}</p>
       <div class="mt-2 space-y-2">
-        {#each ACCESS_CONTROL_QUESTION.options.filter( (o) => allowedRegimes.includes(o.suggestedRegime) ) as opt}
+        {#each accessOptions as opt}
           <button
             type="button"
             class="w-full rounded-lg border px-3 py-2 text-left text-sm {refinement.property_regime ===
@@ -136,60 +163,46 @@
     </div>
   {:else}
     <div>
-      <p class="text-sm font-medium text-gray-900">Property arrangement for this source</p>
-      <div class="mt-2 flex gap-2">
-        {#each allowedRegimes as regime}
+      <p class="text-sm font-medium text-gray-900">How is this source held?</p>
+      <div class="mt-2 space-y-2">
+        {#each sourceArrangements as option}
           <button
             type="button"
-            class="rounded-lg border px-3 py-2 text-sm {refinement.property_regime === regime
+            class="w-full rounded-lg border px-3 py-2 text-left text-sm {refinement.property_regime ===
+            option.regime
               ? 'border-teal-500 bg-teal-50'
-              : 'border-gray-200'}"
+              : 'border-gray-200 hover:bg-gray-50'}"
             onclick={() =>
-              onchange({
-                ...refinement,
-                property_regime: regime as PropertyRegime,
-                transferability: 'Shareable',
-                source_profile: refinement.source_profile ?? {
-                  source_type: 'Hydrological',
-                  regime_state: 'Stable',
-                  stewarded_by: [],
-                  complex_interior: true
-                }
-              })}
+              onchange(
+                withCoherentScope({
+                  ...refinement,
+                  property_regime: option.regime,
+                  transferability: 'Shareable',
+                  source_profile: refinement.source_profile ?? {
+                    source_type: 'Hydrological',
+                    regime_state: 'Stable',
+                    stewarded_by: [],
+                    complex_interior: true
+                  }
+                })
+              )}
           >
-            {regime}
+            <span class="font-medium">{option.label}</span>
+            <p class="text-xs text-gray-500">{option.description}</p>
           </button>
         {/each}
       </div>
-      <p class="mt-1 text-xs text-gray-500">
-        Sources use stewardship, not ownership. No primary accountable agent.
-      </p>
     </div>
 
     {#if refinement.source_profile}
       <div class="space-y-4 rounded-lg border border-teal-200 bg-teal-50/40 p-4">
-        <p class="text-sm font-medium text-teal-900">Source profile</p>
+        <p class="text-sm font-medium text-teal-900">Who carries it, and what is known so far</p>
+        <p class="text-xs text-gray-600">
+          Stewards monitor and care for the source. They do not own it. Stock and flux can wait.
+        </p>
 
         <div>
-          <p class="text-xs font-medium text-gray-700">Source type</p>
-          <div class="mt-1 flex flex-wrap gap-2">
-            {#each SOURCE_TYPE_OPTIONS as opt}
-              <button
-                type="button"
-                class="rounded border px-2 py-1 text-xs {refinement.source_profile.source_type ===
-                opt.id
-                  ? 'border-teal-600 bg-teal-100'
-                  : 'border-gray-200 bg-white'}"
-                onclick={() => updateSourceField('source_type', opt.id as SourceType)}
-              >
-                {opt.label}
-              </button>
-            {/each}
-          </div>
-        </div>
-
-        <div>
-          <p class="text-xs font-medium text-gray-700">Current regime state</p>
+          <p class="text-xs font-medium text-gray-700">Initial condition <span class="font-normal text-gray-400">(optional)</span></p>
           <select
             class="mt-1 w-full rounded border border-gray-300 px-2 py-1.5 text-sm"
             value={refinement.source_profile.regime_state}
@@ -205,6 +218,7 @@
         <div>
           <p class="text-xs font-medium text-gray-700">
             Stewards <span class="text-red-500">*</span>
+            <span class="font-normal text-gray-400">— obligations, not title</span>
           </p>
           <div class="mt-1 flex gap-2">
             <input
@@ -282,7 +296,7 @@
   <div>
     <p class="text-sm font-medium text-gray-900">Visibility scope</p>
     <div class="mt-2 flex flex-wrap gap-2">
-      {#each SCOPE_OPTIONS as opt}
+      {#each scopeOptions as opt}
         <button
           type="button"
           class="rounded-full border px-3 py-1 text-xs {refinement.scope === opt.id
@@ -294,5 +308,10 @@
         </button>
       {/each}
     </div>
+    {#if scopeOptions.length < SCOPE_OPTIONS.length}
+      <p class="mt-1 text-xs text-gray-500">
+        An uncapturable {archetype.isSourceNdo ? 'source' : 'resource'} stays publicly visible. A narrower scope would hide it.
+      </p>
+    {/if}
   </div>
 </div>

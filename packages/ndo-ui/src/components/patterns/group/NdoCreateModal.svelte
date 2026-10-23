@@ -3,11 +3,14 @@
     NdoDescriptor,
     NdoInput,
     NdoArchetypeId,
+    SourceType,
     WizardResult
   } from '../../../domain/types.js';
   import { getArchetype } from '../../../domain/wizard-archetypes.js';
   import {
     buildWizardResult,
+    alignRefinementToNature,
+    applySourceType,
     createInitialKernel,
     createInitialRefinement,
     getWizardSteps,
@@ -72,11 +75,17 @@
     refinement = createInitialRefinement(id, kernel.resource_nature);
   }
 
+  function selectSourceType(sourceType: SourceType) {
+    const next = applySourceType(kernel, refinement, sourceType, archetype.allowedRegimes);
+    kernel = next.kernel;
+    refinement = next.refinement;
+  }
+
   function patchKernel(patch: Partial<typeof kernel>) {
     const next = { ...kernel, ...patch };
     kernel = next;
-    if (patch.resource_nature && archetype.isSourceNdo) {
-      refinement = createInitialRefinement(next.archetype, patch.resource_nature);
+    if (patch.resource_nature) {
+      refinement = alignRefinementToNature(refinement, patch.resource_nature, archetype.allowedRegimes);
     }
   }
 
@@ -90,7 +99,12 @@
       }
     }
     if (currentStep === 'refinement') {
-      const err = validateRefinement(refinement, archetype.isSourceNdo);
+      const err = validateRefinement(
+        refinement,
+        archetype.isSourceNdo,
+        kernel.resource_nature,
+        archetype.allowedRegimes
+      );
       if (err) {
         localError = err;
         return;
@@ -111,7 +125,12 @@
       return;
     }
     if (archetype.showRefinement) {
-      const refineErr = validateRefinement(refinement, archetype.isSourceNdo);
+      const refineErr = validateRefinement(
+        refinement,
+        archetype.isSourceNdo,
+        kernel.resource_nature,
+        archetype.allowedRegimes
+      );
       if (refineErr) {
         localError = refineErr;
         return;
@@ -130,7 +149,13 @@
     review: 'Review and create'
   };
 
-  const stepTitle = $derived(stepTitles[currentStep as WizardStepId] ?? 'Create NDO');
+  const stepTitle = $derived(
+    currentStep === 'kernel' && archetype.isSourceNdo
+      ? 'Describe this source'
+      : currentStep === 'refinement' && archetype.isSourceNdo
+        ? 'Who stewards it'
+        : (stepTitles[currentStep as WizardStepId] ?? 'Create NDO')
+  );
 </script>
 
 <Modal title={stepTitle} subtitle="Register Layer 0 identity within {groupName}." maxWidth="2xl">
@@ -142,7 +167,13 @@
         {#if currentStep === 'archetype'}
           <ArchetypeStep selected={kernel.archetype} onselect={selectArchetype} />
         {:else if currentStep === 'kernel'}
-          <NarrativeKernelStep {kernel} {nameWarning} onchange={patchKernel} />
+          <NarrativeKernelStep
+            {kernel}
+            {nameWarning}
+            sourceType={refinement.source_profile?.source_type ?? null}
+            onchange={patchKernel}
+            onsourcetype={selectSourceType}
+          />
         {:else if currentStep === 'refinement'}
           <RefinementStep {kernel} {refinement} onchange={(r) => (refinement = r)} />
         {:else if currentStep === 'review'}

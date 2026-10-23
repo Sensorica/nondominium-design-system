@@ -4,10 +4,9 @@
 // URL: the screen-map catalogue, a comment thread, the parity inventory. URLs
 // change; keys must not.
 //
-// Three namespaces, one resolver:
-//   screen keys     'ndo-governance'          (prototype app states)
-//   scenario keys   'scenario:lobby-browse'   (composed showcase pages)
-//   direction keys  'proto:holarchy:group'    (the v0.1 UI directions)
+// Two namespaces, one resolver:
+//   screen keys     'ndo-governance'          (replica states at /app)
+//   prototype keys  'proto:holarchy:group'    (direction views and the Layer 0 app)
 //
 // Resolution is URL-aware, not pathname-aware, because in this prototype a
 // modal, a tab and a panel are query-param states of the same route. Keeping
@@ -121,8 +120,24 @@ export const SCREEN_SHAPE: Record<string, Shape> = {
 export const protoKey = (slug: string, view?: string): string =>
   view ? `proto:${slug}:${view}` : `proto:${slug}`;
 
+/** Layer 0 app. Views share one path; the `view` param (and `createNdo` for the
+ *  modal) is what splits the comment thread. Record ids are not part of the
+ *  key, so two groups do not fork the thread. */
+export const RESOURCE_PROTO_KEY = {
+  lobby: 'proto:resource-perspective',
+  group: 'proto:resource-perspective:group',
+  create: 'proto:resource-perspective:create',
+  ndo: 'proto:resource-perspective:ndo'
+} as const;
+
+const resourcePath = shapeOf(paths.protoResource()).path;
+
 export const PROTOTYPE_SHAPE: Record<string, Shape> = {
   prototypes: shapeOf(paths.prototypes()),
+  [RESOURCE_PROTO_KEY.lobby]: { path: resourcePath },
+  [RESOURCE_PROTO_KEY.group]: { path: resourcePath, params: { view: 'group' } },
+  [RESOURCE_PROTO_KEY.create]: { path: resourcePath, params: { view: 'group', createNdo: '1' } },
+  [RESOURCE_PROTO_KEY.ndo]: { path: resourcePath, params: { view: 'ndo' } },
   ...Object.fromEntries(
     DIRECTION_LIST.flatMap((d) => [
       [protoKey(d.slug), shapeOf(paths.protoDirection(d.slug as DirectionSlug))] as const,
@@ -131,16 +146,6 @@ export const PROTOTYPE_SHAPE: Record<string, Shape> = {
       )
     ])
   )
-};
-
-/** Scenario route → scenario key. Exact path match. */
-export const SCENARIO_KEY: Record<string, string> = {
-  [paths.scenarioLobbyBrowse()]: 'scenario:lobby-browse',
-  [paths.scenarioNdoCreation()]: 'scenario:ndo-creation',
-  [paths.scenarioNdoLifecycle()]: 'scenario:ndo-lifecycle',
-  [paths.scenarioGroupCollaboration()]: 'scenario:group-collaboration',
-  [paths.scenarioAgentIdentity()]: 'scenario:agent-identity',
-  [paths.scenarioGovernanceReview()]: 'scenario:governance-review'
 };
 
 /** Human labels, for drawer headers and catalogue entries. */
@@ -191,13 +196,11 @@ export const KEY_LABEL: Record<string, string> = {
   'agent-profile': 'Agent profile (not implemented in the app)',
   guidelines: 'Guidelines: Claude Design card replicas',
   'guidelines-card': 'Guidelines: a single card, isolated frame',
-  'scenario:lobby-browse': 'Lobby browse scenario',
-  'scenario:ndo-creation': 'NDO creation scenario',
-  'scenario:ndo-lifecycle': 'NDO lifecycle scenario',
-  'scenario:group-collaboration': 'Group collaboration scenario',
-  'scenario:agent-identity': 'Agent identity scenario',
-  'scenario:governance-review': 'Governance review scenario',
-  prototypes: 'Prototype directions: index',
+  prototypes: 'Prototypes: index',
+  [RESOURCE_PROTO_KEY.lobby]: 'Resource Perspective: Lobby',
+  [RESOURCE_PROTO_KEY.group]: 'Resource Perspective: Group',
+  [RESOURCE_PROTO_KEY.create]: 'Resource Perspective: Create NDO',
+  [RESOURCE_PROTO_KEY.ndo]: 'Resource Perspective: NDO',
   ...Object.fromEntries(
     DIRECTION_LIST.flatMap((d) => [
       [protoKey(d.slug), `${d.id} ${d.name}: ${d.views[0].label}`],
@@ -242,11 +245,8 @@ export function screenKeyForUrl(url: URL): string {
   return bestKey;
 }
 
-/** Unified resolver across both namespaces. Scenario paths match exactly and
- *  win, because they are the more specific namespace. */
+/** Unified resolver. Screen shapes and prototype shapes share one scorer. */
 export function surfaceKeyForUrl(url: URL): string {
-  const scenario = SCENARIO_KEY[url.pathname];
-  if (scenario) return scenario;
   // One thread per meeting journal, whichever paragraph a comment points at.
   // Keyed on the slug (`meeting:2026-10-20-dev`), so the thread follows the
   // journal rather than the URL. The index at /meetings has no thread.

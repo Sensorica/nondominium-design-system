@@ -9,8 +9,6 @@ export const REGIME_TOOLTIPS: Record<PropertyRegime, string> = {
 
 export const NATURE_TOOLTIPS: Record<ResourceNature, string> = {
   Physical: 'A tangible, material resource.',
-  Digital: 'An intangible, bit-based resource (software, data, etc.).',
-  Service: 'A time-based provision of capability or skill.',
-  Hybrid: 'A resource with both physical and digital dimensions.',
-  Information: 'Knowledge, documentation, or structured data.'
+  Digital: 'Software, data, designs, documents, datasets, and methods.',
+  Hybrid: 'A material resource with an essential digital specification.'
 };
