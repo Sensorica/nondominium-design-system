@@ -148,6 +148,9 @@ export const paths = {
   meetings: () => `${base}/meetings`,
   meeting: (slug: string) => `${base}/meetings/${encodeURIComponent(slug)}`,
 
+  // ── Branch previews: every pushed branch, linked to its Cloudflare preview ──
+  previews: () => `${base}/previews`,
+
   // ── Patterns (this rewrite's playbook: the app's own classes) ──
   patterns: () => patterns(),
   patternsButtons: () => patterns('/buttons'),

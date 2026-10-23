@@ -8,17 +8,25 @@ name: Deploy to Cloudflare Pages
 #
 # Needs two repository secrets: CLOUDFLARE_API_TOKEN (Account, Cloudflare
 # Pages: Edit) and CLOUDFLARE_ACCOUNT_ID.
+#
+# Every branch deploys. master is the project's production branch, so it serves
+# nondominium-design.pages.dev and design.sensorica.co; any other branch becomes
+# a preview at <branch>.nondominium-design.pages.dev, lowercased with every
+# non-alphanumeric character turned into a hyphen (feat/x -> feat-x). The
+# /previews page lists them. See docs/PREVIEWS.md.
 
 on:
   push:
-    branches: [master]
+    branches: ['**']
   workflow_dispatch:
 
 permissions:
   contents: read
 
+# One queue per branch: a newer push to the same branch cancels the older
+# deploy, pushes to different branches deploy side by side.
 concurrency:
-  group: cf-pages
+  group: cf-pages-${{ github.ref_name }}
   cancel-in-progress: true
 
 jobs:
@@ -42,4 +50,4 @@ jobs:
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          command: pages deploy build --project-name nondominium-design --branch master
+          command: pages deploy build --project-name nondominium-design --branch ${{ github.ref_name }}
