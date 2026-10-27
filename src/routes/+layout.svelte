@@ -13,11 +13,23 @@
   import 'virtual:uno.css';
   import '$lib/styles/app.css';
   import { page } from '$app/state';
+  import { afterNavigate } from '$app/navigation';
   import { paths } from '$lib/paths';
   import CommentsHost from '$lib/components/comments/CommentsHost.svelte';
   import { DIRECTION_LIST, type DirectionSlug } from '$lib/prototypes/directions';
 
   let { children } = $props();
+
+  // Below the 860px breakpoint the rail collapses to a top bar and the nav
+  // opens behind a hamburger. Any navigation closes it, so a tapped link lands
+  // on the page rather than on the still-open menu.
+  let navOpen = $state(false);
+  afterNavigate(() => {
+    navOpen = false;
+  });
+  function onKeydown(e: KeyboardEvent) {
+    if (navOpen && e.key === 'Escape') navOpen = false;
+  }
 
   const current = $derived(page.url.pathname);
   // Full-bleed: the replica at /app, and each prototype direction. The
@@ -67,90 +79,107 @@
   <link rel="stylesheet" href={paths.tokenSheet()} />
 </svelte:head>
 
+<svelte:window onkeydown={onKeydown} />
+
 <CommentsHost />
 
 {#if isApp}
   {@render children()}
 {:else}
   <div class="chrome">
-    <aside class="rail">
-      <a class="brand" href={paths.home()}>
-        <img class="brand__mark" src={paths.logoMark()} alt="" width="34" height="34" />
-        <span>
-          <span class="brand__title">Nondominium</span>
-          <span class="brand__sub">Design System</span>
-        </span>
-      </a>
+    <aside class="rail" class:rail--open={navOpen}>
+      <div class="railhead">
+        <a class="brand" href={paths.home()}>
+          <img class="brand__mark" src={paths.logoMark()} alt="" width="34" height="34" />
+          <span>
+            <span class="brand__title">Nondominium</span>
+            <span class="brand__sub">Design System</span>
+          </span>
+        </a>
 
-      <a class="appmode" href={paths.appHome()}>Open the current app →</a>
+        <button
+          type="button"
+          class="menutoggle"
+          aria-controls="ds-menu"
+          aria-expanded={navOpen}
+          aria-label={navOpen ? 'Close menu' : 'Open menu'}
+          onclick={() => (navOpen = !navOpen)}
+        >
+          <span class="menutoggle__bars" aria-hidden="true"></span>
+        </button>
+      </div>
 
-      <nav class="nav">
-        <div class="group">
-          <a class="grouphead" href={paths.tokens()} class:on={current === paths.tokens()}>Tokens</a>
-        </div>
+      <div class="railbody" id="ds-menu">
+        <a class="appmode" href={paths.appHome()}>Open the current app →</a>
 
-        <div class="group">
-          <a class="grouphead" href={paths.guidelines()} class:on={current === paths.guidelines()}>
-            Claude Design cards
-          </a>
-        </div>
+        <nav class="nav">
+          <div class="group">
+            <a class="grouphead" href={paths.tokens()} class:on={current === paths.tokens()}>Tokens</a>
+          </div>
 
-        <div class="group">
-          <a class="grouphead" href={paths.patterns()} class:on={current.startsWith(paths.patterns())}>
-            Patterns
-          </a>
-          {#each patternsLinks as link (link.href)}
-            <a class="item" href={link.href} class:item--on={current === link.href}>{link.label}</a>
-          {/each}
-        </div>
-
-        <div class="group">
-          <a
-            class="grouphead"
-            href={paths.ndoUiPlaybook()}
-            class:on={current.startsWith(paths.ndoUiPlaybook()) || current.startsWith(paths.uiKit())}
-          >
-            ndo-ui library
-          </a>
-          {#each ndoUiLinks as link (link.href)}
-            <a class="item" href={link.href} class:item--on={current.startsWith(link.href)}>{link.label}</a>
-          {/each}
-        </div>
-
-        <div class="group">
-          <a class="grouphead" href={paths.prototypes()} class:on={current === paths.prototypes()}>
-            Prototype directions
-          </a>
-          {#each DIRECTION_LIST as d (d.slug)}
-            <a class="item" href={paths.protoDirection(d.slug as DirectionSlug)}>
-              {d.id} {d.name}{d.status === 'target' ? ' · target' : d.status === 'archived' ? ' · archived' : ''}
+          <div class="group">
+            <a class="grouphead" href={paths.guidelines()} class:on={current === paths.guidelines()}>
+              Claude Design cards
             </a>
-          {/each}
-        </div>
+          </div>
 
-        <div class="group">
-          <a class="grouphead" href={paths.scenarios()} class:on={current.startsWith(paths.scenarios())}>
-            Scenarios
-          </a>
-          {#each scenarioLinks as link (link.href)}
-            <a class="item" href={link.href} class:item--on={current === link.href}>{link.label}</a>
-          {/each}
-        </div>
+          <div class="group">
+            <a class="grouphead" href={paths.patterns()} class:on={current.startsWith(paths.patterns())}>
+              Patterns
+            </a>
+            {#each patternsLinks as link (link.href)}
+              <a class="item" href={link.href} class:item--on={current === link.href}>{link.label}</a>
+            {/each}
+          </div>
 
-        <div class="group">
-          <a class="grouphead" href={paths.meetings()} class:on={current.startsWith(paths.meetings())}>
-            Meetings
-          </a>
-        </div>
+          <div class="group">
+            <a
+              class="grouphead"
+              href={paths.ndoUiPlaybook()}
+              class:on={current.startsWith(paths.ndoUiPlaybook()) || current.startsWith(paths.uiKit())}
+            >
+              ndo-ui library
+            </a>
+            {#each ndoUiLinks as link (link.href)}
+              <a class="item" href={link.href} class:item--on={current.startsWith(link.href)}>{link.label}</a>
+            {/each}
+          </div>
 
-        <div class="group">
-          <a class="grouphead" href={paths.previews()} class:on={current.startsWith(paths.previews())}>
-            Branch previews
-          </a>
-        </div>
-      </nav>
+          <div class="group">
+            <a class="grouphead" href={paths.prototypes()} class:on={current === paths.prototypes()}>
+              Prototype directions
+            </a>
+            {#each DIRECTION_LIST as d (d.slug)}
+              <a class="item" href={paths.protoDirection(d.slug as DirectionSlug)}>
+                {d.id} {d.name}{d.status === 'target' ? ' · target' : d.status === 'archived' ? ' · archived' : ''}
+              </a>
+            {/each}
+          </div>
 
-      <p class="version">v0.2.0 · press <kbd>c</kbd> to comment</p>
+          <div class="group">
+            <a class="grouphead" href={paths.scenarios()} class:on={current.startsWith(paths.scenarios())}>
+              Scenarios
+            </a>
+            {#each scenarioLinks as link (link.href)}
+              <a class="item" href={link.href} class:item--on={current === link.href}>{link.label}</a>
+            {/each}
+          </div>
+
+          <div class="group">
+            <a class="grouphead" href={paths.meetings()} class:on={current.startsWith(paths.meetings())}>
+              Meetings
+            </a>
+          </div>
+
+          <div class="group">
+            <a class="grouphead" href={paths.previews()} class:on={current.startsWith(paths.previews())}>
+              Branch previews
+            </a>
+          </div>
+        </nav>
+
+        <p class="version">v0.2.0 · press <kbd>c</kbd> to comment</p>
+      </div>
     </aside>
 
     <main class="main">
@@ -194,6 +223,48 @@
     width: 2px;
     background: var(--ndo-brand-gradient);
   }
+
+  .railhead { display: flex; align-items: center; justify-content: space-between; gap: var(--ndo-spacing-3); }
+  .railbody { display: flex; flex-direction: column; gap: var(--ndo-spacing-4); flex: 1; }
+
+  /* Hidden on desktop; the breakpoint below shows it. Three bars drawn in CSS,
+     not an icon: the app has no icon set (see the note in the script). */
+  .menutoggle {
+    display: none;
+    width: 40px;
+    height: 40px;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    border: 1px solid rgb(255 255 255 / 0.15);
+    border-radius: var(--ndo-radius-md);
+    background: transparent;
+    color: #fff;
+    cursor: pointer;
+    transition: var(--ndo-transition-colors);
+  }
+  .menutoggle:hover { background: rgb(255 255 255 / 0.07); }
+  .menutoggle:focus-visible { outline: 2px solid rgb(var(--ndo-brand-teal-300)); outline-offset: 2px; }
+  .menutoggle__bars,
+  .menutoggle__bars::before,
+  .menutoggle__bars::after {
+    display: block;
+    width: 18px;
+    height: 2px;
+    border-radius: 1px;
+    background: currentColor;
+    transition: transform var(--ndo-duration-base) var(--ndo-easing), background-color var(--ndo-duration-base) var(--ndo-easing);
+  }
+  .menutoggle__bars { position: relative; }
+  .menutoggle__bars::before,
+  .menutoggle__bars::after { content: ''; position: absolute; left: 0; }
+  .menutoggle__bars::before { transform: translateY(-6px); }
+  .menutoggle__bars::after { transform: translateY(6px); }
+  /* Open: the middle bar fades and the outer two cross into an X. */
+  .rail--open .menutoggle__bars { background: transparent; }
+  .rail--open .menutoggle__bars::before { transform: rotate(45deg); }
+  .rail--open .menutoggle__bars::after { transform: rotate(-45deg); }
 
   .brand { display: flex; align-items: center; gap: 10px; text-decoration: none; }
   .brand__mark { width: 34px; height: 34px; flex-shrink: 0; }
@@ -258,9 +329,36 @@
 
   .main { min-height: 100vh; background: var(--ndo-color-bg-app); }
 
+  /* Mobile: the rail becomes a sticky top bar (brand + hamburger), and the
+     rest of it drops down over the page as a scrollable panel. */
   @media (max-width: 860px) {
-    .chrome { grid-template-columns: 1fr; }
-    .rail { position: static; height: auto; }
-    .rail::after { display: none; }
+    /* minmax(0, …): a bare 1fr floors at the content's min width, so one
+       unbreakable code line widened the column past the screen and pushed
+       the hamburger off it. */
+    .chrome { grid-template-columns: minmax(0, 1fr); }
+    .main { min-width: 0; }
+    .rail {
+      height: auto;
+      overflow: visible;
+      padding: var(--ndo-spacing-2) var(--ndo-spacing-3);
+      z-index: 50;
+    }
+    /* The gradient hairline moves from the right edge to the bottom edge. */
+    .rail::after { top: auto; left: 0; width: auto; height: 2px; }
+    .menutoggle { display: inline-flex; }
+    .railbody {
+      display: none;
+      position: absolute;
+      top: 100%;
+      left: 0;
+      right: 0;
+      max-height: calc(100dvh - 100%);
+      overflow-y: auto;
+      padding: var(--ndo-spacing-4) var(--ndo-spacing-3);
+      background: rgb(var(--ndo-brand-ink));
+      box-shadow: 0 12px 24px rgb(0 0 0 / 0.35);
+    }
+    .rail--open .railbody { display: flex; }
+    .version { margin-top: var(--ndo-spacing-2); }
   }
 </style>
