@@ -17,7 +17,12 @@ import {
   NDO,
   TERMINAL_NDO
 } from './records';
-import { labelForKey, protoKey, SCREEN_SHAPE, screenKeyForUrl } from './surface-keys';
+import { labelForKey, protoKey, RESOURCE_PROTO_KEY, SCREEN_SHAPE, screenKeyForUrl } from './surface-keys';
+import {
+  RESOURCE_EXAMPLE_GROUP,
+  RESOURCE_EXAMPLE_GROUP_OF_NDO,
+  RESOURCE_EXAMPLE_NDO
+} from './prototypes/resource-perspective/examples';
 // The registry only: importing the store's logic here would pull its seed
 // into every page that shows the map, the /app replica included.
 import {
@@ -34,6 +39,10 @@ import {
  *  needs one. */
 const PROTOTYPE_KEY_TO_URL: Record<string, string> = {
   prototypes: paths.prototypes(),
+  [RESOURCE_PROTO_KEY.lobby]: paths.protoResource(),
+  [RESOURCE_PROTO_KEY.group]: paths.protoResourceGroup(RESOURCE_EXAMPLE_GROUP),
+  [RESOURCE_PROTO_KEY.create]: paths.protoResourceCreate(RESOURCE_EXAMPLE_GROUP),
+  [RESOURCE_PROTO_KEY.ndo]: paths.protoResourceNdo(RESOURCE_EXAMPLE_NDO, RESOURCE_EXAMPLE_GROUP_OF_NDO),
   ...Object.fromEntries(
     DIRECTION_LIST.flatMap((d) => {
       const slug = d.slug as DirectionSlug;
@@ -107,12 +116,12 @@ export const SCREEN_KEY_TO_URL: Record<string, string> = {
 };
 
 /** The two halves of the catalogue: the replica of the running app at /app,
- *  and the six v0.1 UI directions under /prototypes. */
+ *  and everything under /prototypes (the Layer 0 app, then the six directions). */
 export type ScreenMapSection = 'app' | 'prototypes';
 
 export const SECTION_TITLE: Record<ScreenMapSection, string> = {
   app: 'Current app',
-  prototypes: 'Prototype directions'
+  prototypes: 'Prototypes'
 };
 
 export type ScreenMapGroup = {
@@ -199,6 +208,16 @@ export const SCREEN_MAP_GROUPS: ScreenMapGroup[] = [
   },
   { title: 'Agents', section: 'app', keys: ['agent-profile'] },
   { title: 'Index', section: 'prototypes', keys: ['prototypes'] },
+  {
+    title: 'Resource Perspective',
+    section: 'prototypes',
+    keys: [
+      RESOURCE_PROTO_KEY.lobby,
+      RESOURCE_PROTO_KEY.group,
+      RESOURCE_PROTO_KEY.create,
+      RESOURCE_PROTO_KEY.ndo
+    ]
+  },
   ...DIRECTION_LIST.map(
     (d): ScreenMapGroup => ({
       title: `${d.id} ${d.name}`,

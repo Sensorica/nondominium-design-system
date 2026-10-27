@@ -23,7 +23,7 @@ export default {
       // serves the app shell for those. It must be 404.html, because GitHub
       // Pages only honours a custom 404 page as its fallback and ignores
       // 200.html. Statically prerenderable pages (hub, tokens, playbook,
-      // scenarios) still prerender as before.
+      // guidelines) still prerender as before.
       fallback: '404.html',
       precompress: false,
       strict: false

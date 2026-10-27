@@ -82,7 +82,7 @@
 <div class="exit">
   <a class="exit__home" href={paths.prototypes()}>
     <img src={paths.logoMark()} alt="" width="18" height="18" />
-    <span>Directions</span>
+    <span>Prototypes</span>
   </a>
   <button class="exit__map" onclick={() => (screenMap.open = true)} title="Screen map (m)">
     Screens <kbd>m</kbd>

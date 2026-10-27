@@ -35,7 +35,7 @@ bun run dev
 | `/tokens` | The palette and scale the app uses, rendered live |
 | `/patterns` | Seven categories of pattern the app writes today, each citing its source file |
 | `/playbook`, `/ui-kit` | `@nondominium/ndo-ui`: component sheets, and screens composed from them |
-| `/scenarios` | Seven composed pages, each arguing one design question |
+| `/prototypes/resource-perspective` | **The Layer 0 app**: Lobby, Group, Resource Perspective, on mock data |
 | `/app` | **The replica**: 44 keyed states of the real app, on mock data |
 
 ---
@@ -88,7 +88,7 @@ The replica components never see the param. They read `lobbyStore.isLoading` and
 
 ### What the replica does not have
 
-No conductor, no DHT, no gossip. Everything eventually consistent in production is immediate here — which is exactly the gap the group-collaboration scenario exists to discuss.
+No conductor, no DHT, no gossip. Everything eventually consistent in production is immediate here.
 
 ### What the app has that this does not
 
@@ -97,9 +97,9 @@ No conductor, no DHT, no gossip. Everything eventually consistent in production 
 
 ---
 
-## Comments on screens and scenarios 💬
+## Comments on screens 💬
 
-Every prototype state and every scenario can receive threaded comments, hosted in a **private GitHub Discussions repo**. The site stays fully static: comments are read and written straight from the browser.
+Every replica state and every prototype view can receive threaded comments, hosted in a **private GitHub Discussions repo**. The site stays fully static: comments are read and written straight from the browser.
 
 - Click the floating button (bottom right) or press **`c`**.
 - A thread is keyed to the surface you are viewing, not its URL, so a route change never orphans a review thread. Threads are created lazily — browsing leaves no trace.
@@ -108,11 +108,13 @@ On `design.sensorica.co`, press the button and choose **Sign in with GitHub**: a
 
 ## The screen map 🗺️
 
-Inside `/app`, press **`m`**: every keyed state, grouped, one click away — including the three connection states nobody can reach in a running app.
+Inside `/app` and inside any prototype, press **`m`**: every keyed state, grouped, one click away — including the three connection states nobody can reach in a running app.
 
-## Prototype directions
+## Prototypes
 
-`/prototypes` holds six working UI directions for the v0.1 release, from the prototype handoff (`docs/prototypes/HANDOFF.md`). Each covers the whole journey: profile, group (create, join by invite link, or the example network), declaring a shared resource, and managing it. The audience is people new to resource sharing, so the default UI uses everyday words; a **Developer details** switch adds zome calls, hashes and rule chains. A to E carry it in their shared menu (Ctrl/Cmd+K); F has no such menu and carries it, a scenario picker and a Reset button in its header.
+`/prototypes/resource-perspective` is the working app: Lobby, then a group as a Perspective host, then one NDO in the Resource Perspective. Layer 0 is live (browse, create, join, associate, the creator’s lifecycle transition). Agent, Intelligence, Work, and the later tabs are on screen with a Soon badge and an explanation, never a half-built form. Session edits persist until reload. Press `m` for its screen map and `c` to comment. The chip at the bottom left returns to the index.
+
+The same index also holds six UI directions for the v0.1 release, from the prototype handoff (`docs/prototypes/HANDOFF.md`). Each covers the whole journey: profile, group (create, join by invite link, or the example network), declaring a shared resource, and managing it. The audience is people new to resource sharing, so the default UI uses everyday words; a **Developer details** switch adds zome calls, hashes and rule chains. A to E carry it in their shared menu (Ctrl/Cmd+K); F has no such menu and carries it, a scenario picker and a Reset button in its header.
 
 - **A to E** are mid-fidelity explorations restyled onto this system's tokens, as the handoff asked. Tokens only means the handoff's own typefaces are gone (B's serif notebook, the distinct sans and mono of A, C, D and E): all six are set in the design-system sans and mono, which the index and each registry entry say. They run on one shared mock store (`src/lib/prototypes/store/`), so what you do in one shows up in the others.
 - **F Flow Graph** is high fidelity, already built on this system, and runs on its own mock of the real zome calls.

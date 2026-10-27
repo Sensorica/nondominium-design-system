@@ -1,7 +1,7 @@
 <script lang="ts">
   // The true root. Owns the token sheet, the design-system chrome, and the
-  // comments host (mounted once so it covers the playbook, the scenarios, and
-  // the prototype alike).
+  // comments host (mounted once so it covers the playbook, the prototypes, and
+  // the replica alike).
   //
   // The prototype at /app renders WITHOUT this chrome: it is meant to look like
   // the product, not like documentation about the product.
@@ -32,10 +32,11 @@
   }
 
   const current = $derived(page.url.pathname);
-  // Full-bleed: the replica at /app, and each prototype direction. The
-  // direction index at /prototypes keeps the chrome.
+  // Full-bleed: the replica at /app, the Layer 0 app, and each direction.
+  // The index at /prototypes keeps the chrome.
   const isApp = $derived(
     current.startsWith(paths.appHome()) ||
+      current === paths.protoResource() ||
       DIRECTION_LIST.some((d) => current === paths.protoDirection(d.slug as DirectionSlug)) ||
       // A guideline card's isolated frame (/guidelines/<id>) must paint only the
       // card body, same as the original's own <body> — not the index at
@@ -63,14 +64,6 @@
   const ndoUiLinks = [
     { href: paths.ndoUiPlaybook(), label: 'Component sheets' },
     { href: paths.uiKit(), label: 'Screen compositions' },
-  ];
-  const scenarioLinks = [
-    { href: paths.scenarioLobbyBrowse(), label: 'Lobby browse' },
-    { href: paths.scenarioNdoCreation(), label: 'NDO creation' },
-    { href: paths.scenarioNdoLifecycle(), label: 'NDO lifecycle' },
-    { href: paths.scenarioGroupCollaboration(), label: 'Group collaboration' },
-    { href: paths.scenarioAgentIdentity(), label: 'Agent identity' },
-    { href: paths.scenarioGovernanceReview(), label: 'Governance review' },
   ];
 </script>
 
@@ -117,6 +110,7 @@
             <a class="grouphead" href={paths.tokens()} class:on={current === paths.tokens()}>Tokens</a>
           </div>
 
+<<<<<<< HEAD
           <div class="group">
             <a class="grouphead" href={paths.guidelines()} class:on={current === paths.guidelines()}>
               Claude Design cards
@@ -131,6 +125,42 @@
               <a class="item" href={link.href} class:item--on={current === link.href}>{link.label}</a>
             {/each}
           </div>
+=======
+        <div class="group">
+          <a class="grouphead" href={paths.patterns()} class:on={current.startsWith(paths.patterns())}>
+            Patterns
+          </a>
+          {#each patternsLinks as link (link.href)}
+            <a class="item" href={link.href} class:item--on={current === link.href}>{link.label}</a>
+          {/each}
+        </div>
+
+        <div class="group">
+          <a
+            class="grouphead"
+            href={paths.ndoUiPlaybook()}
+            class:on={current.startsWith(paths.ndoUiPlaybook()) || current.startsWith(paths.uiKit())}
+          >
+            ndo-ui library
+          </a>
+          {#each ndoUiLinks as link (link.href)}
+            <a class="item" href={link.href} class:item--on={current.startsWith(link.href)}>{link.label}</a>
+          {/each}
+        </div>
+
+        <div class="group">
+          <a class="grouphead" href={paths.prototypes()} class:on={current === paths.prototypes()}>
+            Prototypes
+          </a>
+          <a class="item" href={paths.protoResource()}>Resource Perspective</a>
+          {#each DIRECTION_LIST as d (d.slug)}
+            <a class="item" href={paths.protoDirection(d.slug as DirectionSlug)}>
+              {d.id} {d.name}{d.status === 'target' ? ' · target' : d.status === 'archived' ? ' · archived' : ''}
+            </a>
+          {/each}
+        </div>
+      </nav>
+>>>>>>> 9b73e92 (refactor(docs): update contributing guidelines, README, and remove scenarios)
 
           <div class="group">
             <a
