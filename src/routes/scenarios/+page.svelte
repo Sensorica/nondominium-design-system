@@ -41,6 +41,12 @@
       title: 'Governance review',
       body: 'Contributions, validation, and benefit redistribution on a mature NDO.',
     },
+    {
+      href: paths.scenarioResourcePerspective(),
+      icon: '📦',
+      title: 'Resource Perspective',
+      body: 'The Layer 0 middle layer: one live Perspective, three explained, and everything not yet live marked “Coming next”.',
+    },
   ];
 </script>
 
@@ -48,7 +54,7 @@
   <header>
     <h1 class="ndo-h1">🖼️ Scenarios</h1>
     <p class="ndo-p mt-2" style="max-width:62ch">
-      Six composed pages. Where the playbook shows a component in isolation, a scenario shows what
+      Seven composed pages. Where the playbook shows a component in isolation, a scenario shows what
       happens when several of them have to agree with each other.
     </p>
   </header>

@@ -140,7 +140,8 @@ export const SCENARIO_KEY: Record<string, string> = {
   [paths.scenarioNdoLifecycle()]: 'scenario:ndo-lifecycle',
   [paths.scenarioGroupCollaboration()]: 'scenario:group-collaboration',
   [paths.scenarioAgentIdentity()]: 'scenario:agent-identity',
-  [paths.scenarioGovernanceReview()]: 'scenario:governance-review'
+  [paths.scenarioGovernanceReview()]: 'scenario:governance-review',
+  [paths.scenarioResourcePerspective()]: 'scenario:resource-perspective'
 };
 
 /** Human labels, for drawer headers and catalogue entries. */
@@ -197,6 +198,7 @@ export const KEY_LABEL: Record<string, string> = {
   'scenario:group-collaboration': 'Group collaboration scenario',
   'scenario:agent-identity': 'Agent identity scenario',
   'scenario:governance-review': 'Governance review scenario',
+  'scenario:resource-perspective': 'Resource Perspective (Layer 0) scenario',
   prototypes: 'Prototype directions: index',
   ...Object.fromEntries(
     DIRECTION_LIST.flatMap((d) => [
