@@ -247,9 +247,6 @@ export function screenKeyForUrl(url: URL): string {
 
 /** Unified resolver. Screen shapes and prototype shapes share one scorer. */
 export function surfaceKeyForUrl(url: URL): string {
-<<<<<<< HEAD
-  const scenario = SCENARIO_KEY[url.pathname];
-  if (scenario) return scenario;
   // One thread per meeting journal, whichever paragraph a comment points at.
   // Keyed on the slug (`meeting:2026-10-20-dev`), so the thread follows the
   // journal rather than the URL. The index at /meetings has no thread.
@@ -257,8 +254,6 @@ export function surfaceKeyForUrl(url: URL): string {
     const slug = url.pathname.split('/').filter(Boolean).pop();
     return slug ? `${MEETING_KEY_PREFIX}${slug}` : '';
   }
-=======
->>>>>>> 9b73e92 (refactor(docs): update contributing guidelines, README, and remove scenarios)
   return screenKeyForUrl(url);
 }
 

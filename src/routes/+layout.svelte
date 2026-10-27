@@ -110,7 +110,6 @@
             <a class="grouphead" href={paths.tokens()} class:on={current === paths.tokens()}>Tokens</a>
           </div>
 
-<<<<<<< HEAD
           <div class="group">
             <a class="grouphead" href={paths.guidelines()} class:on={current === paths.guidelines()}>
               Claude Design cards
@@ -125,42 +124,6 @@
               <a class="item" href={link.href} class:item--on={current === link.href}>{link.label}</a>
             {/each}
           </div>
-=======
-        <div class="group">
-          <a class="grouphead" href={paths.patterns()} class:on={current.startsWith(paths.patterns())}>
-            Patterns
-          </a>
-          {#each patternsLinks as link (link.href)}
-            <a class="item" href={link.href} class:item--on={current === link.href}>{link.label}</a>
-          {/each}
-        </div>
-
-        <div class="group">
-          <a
-            class="grouphead"
-            href={paths.ndoUiPlaybook()}
-            class:on={current.startsWith(paths.ndoUiPlaybook()) || current.startsWith(paths.uiKit())}
-          >
-            ndo-ui library
-          </a>
-          {#each ndoUiLinks as link (link.href)}
-            <a class="item" href={link.href} class:item--on={current.startsWith(link.href)}>{link.label}</a>
-          {/each}
-        </div>
-
-        <div class="group">
-          <a class="grouphead" href={paths.prototypes()} class:on={current === paths.prototypes()}>
-            Prototypes
-          </a>
-          <a class="item" href={paths.protoResource()}>Resource Perspective</a>
-          {#each DIRECTION_LIST as d (d.slug)}
-            <a class="item" href={paths.protoDirection(d.slug as DirectionSlug)}>
-              {d.id} {d.name}{d.status === 'target' ? ' · target' : d.status === 'archived' ? ' · archived' : ''}
-            </a>
-          {/each}
-        </div>
-      </nav>
->>>>>>> 9b73e92 (refactor(docs): update contributing guidelines, README, and remove scenarios)
 
           <div class="group">
             <a
@@ -177,21 +140,13 @@
 
           <div class="group">
             <a class="grouphead" href={paths.prototypes()} class:on={current === paths.prototypes()}>
-              Prototype directions
+              Prototypes
             </a>
+            <a class="item" href={paths.protoResource()}>Resource Perspective</a>
             {#each DIRECTION_LIST as d (d.slug)}
               <a class="item" href={paths.protoDirection(d.slug as DirectionSlug)}>
                 {d.id} {d.name}{d.status === 'target' ? ' · target' : d.status === 'archived' ? ' · archived' : ''}
               </a>
-            {/each}
-          </div>
-
-          <div class="group">
-            <a class="grouphead" href={paths.scenarios()} class:on={current.startsWith(paths.scenarios())}>
-              Scenarios
-            </a>
-            {#each scenarioLinks as link (link.href)}
-              <a class="item" href={link.href} class:item--on={current === link.href}>{link.label}</a>
             {/each}
           </div>
 
@@ -362,7 +317,11 @@
   /* Mobile: the rail becomes a sticky top bar (brand + hamburger), and the
      rest of it drops down over the page as a scrollable panel. */
   @media (max-width: 860px) {
-    .chrome { grid-template-columns: 1fr; }
+    /* minmax(0, …): a bare 1fr floors at the content's min width, so one
+       unbreakable code line widened the column past the screen and pushed
+       the hamburger off it. */
+    .chrome { grid-template-columns: minmax(0, 1fr); }
+    .main { min-width: 0; }
     .rail {
       height: auto;
       overflow: visible;
