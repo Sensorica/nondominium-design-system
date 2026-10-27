@@ -1,7 +1,14 @@
 import { getArchetype } from './wizard-archetypes.js';
 import {
+  accessOptionsForNature,
   buildDefaultRefinement,
   inferRegimeFromRivalryAndAccess,
+  inferTransferability,
+  natureForSourceType,
+  regimesForNature,
+  rivalryForNature,
+  scopePermitted,
+  withCoherentScope,
   type NatureChoice
 } from './wizard-questions.js';
 import type {
@@ -34,7 +41,11 @@ export function getWizardSteps(archetypeId: NdoArchetypeId): WizardStepMeta[] {
     { id: 'kernel', label: 'Identity', shortLabel: '2' }
   ];
   if (archetype.showRefinement) {
-    steps.push({ id: 'refinement', label: 'Governance', shortLabel: '3' });
+    steps.push({
+      id: 'refinement',
+      label: archetype.isSourceNdo ? 'Stewardship' : 'Governance',
+      shortLabel: '3'
+    });
   }
   steps.push({ id: 'review', label: 'Review', shortLabel: String(steps.length + 1) });
   return steps;
@@ -66,7 +77,50 @@ export function createInitialRefinement(
     refinement.source_profile = createDefaultSourceProfile();
   }
 
-  return refinement;
+  return withCoherentScope(refinement);
+}
+
+/** Keep rivalry, and drop a regime the nature no longer allows. */
+export function alignRefinementToNature(
+  refinement: WizardRefinementState,
+  nature: ResourceNature,
+  allowedRegimes: readonly PropertyRegime[] | null
+): WizardRefinementState {
+  const rivalry = rivalryForNature(nature);
+  const regimes = regimesForNature(nature, allowedRegimes);
+  const property_regime = regimes.includes(refinement.property_regime)
+    ? refinement.property_regime
+    : (regimes[0] ?? refinement.property_regime);
+  return withCoherentScope({
+    ...refinement,
+    rivalry,
+    property_regime,
+    transferability: inferTransferability(property_regime),
+    subtraction: rivalry === 'Rivalrous' ? (refinement.subtraction ?? null) : null,
+    regime_not_sure: regimes.includes(refinement.property_regime) ? refinement.regime_not_sure : false
+  });
+}
+
+/** A source type sets Layer 0 nature: ecological sources are physical, knowledge and social commons are digital. */
+export function applySourceType(
+  kernel: WizardKernelState,
+  refinement: WizardRefinementState,
+  sourceType: SourceType,
+  allowedRegimes: readonly PropertyRegime[] | null
+): { kernel: WizardKernelState; refinement: WizardRefinementState } {
+  const nature = natureForSourceType(sourceType);
+  const source_profile = {
+    ...(refinement.source_profile ?? createDefaultSourceProfile()),
+    source_type: sourceType
+  };
+  return {
+    kernel: { ...kernel, resource_nature: nature },
+    refinement: alignRefinementToNature(
+      { ...refinement, source_profile },
+      nature,
+      allowedRegimes
+    )
+  };
 }
 
 export function createDefaultSourceProfile(): SourceProfile {
@@ -90,13 +144,13 @@ export function applyAccessAnswer(
   rivalry: Rivalry
 ): WizardRefinementState {
   const regime = inferRegimeFromRivalryAndAccess(rivalry, accessId);
-  return {
+  return withCoherentScope({
     ...refinement,
     property_regime: regime,
     rivalry,
     regime_not_sure: false,
     transferability: regime === 'Private' ? 'Transferable' : 'Shareable'
-  };
+  });
 }
 
 export function buildWizardResult(
@@ -122,13 +176,34 @@ export function buildWizardResult(
 
 export function validateKernel(kernel: WizardKernelState): string | null {
   if (!kernel.name.trim()) return 'Name is required.';
+  const archetype = getArchetype(kernel.archetype);
+  if (!(archetype.allowedLifecycleStages as readonly string[]).includes(kernel.lifecycle_stage)) {
+    return 'This intent cannot be registered at that stage.';
+  }
   return null;
 }
 
 export function validateRefinement(
   refinement: WizardRefinementState,
-  isSourceNdo: boolean
+  isSourceNdo: boolean,
+  nature: ResourceNature,
+  allowedRegimes: readonly PropertyRegime[] | null
 ): string | null {
+  if (
+    refinement.property_regime === 'Nondominium' &&
+    (refinement.scope == null || !scopePermitted(refinement.property_regime, refinement.scope))
+  ) {
+    return 'This property arrangement requires public scope.';
+  }
+  const regimes = isSourceNdo
+    ? regimesForNature(nature, allowedRegimes)
+    : accessOptionsForNature(nature, allowedRegimes).map((option) => option.suggestedRegime);
+  if (!regimes.includes(refinement.property_regime)) {
+    return 'This access arrangement does not fit the kind of resource.';
+  }
+  if (!isSourceNdo && rivalryForNature(nature) === 'Rivalrous' && !refinement.subtraction) {
+    return 'Choose how use runs out.';
+  }
   if (isSourceNdo && refinement.source_profile) {
     if (refinement.source_profile.stewarded_by.length === 0) {
       return 'At least one steward is required for a Source-NDO.';

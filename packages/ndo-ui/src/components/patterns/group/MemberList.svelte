@@ -24,7 +24,7 @@
             <button
               type="button"
               data-testid="jump-member"
-              title="Open this agent in the Agent Perspective (coming next)"
+              title="Open this agent in the Agent Perspective"
               onclick={() => onmemberclick?.(m)}
               class="font-medium text-blue-600 hover:underline">{m.name} ↗</button
             >

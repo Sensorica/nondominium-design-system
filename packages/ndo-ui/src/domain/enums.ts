@@ -15,13 +15,7 @@ export const ALL_LIFECYCLE_STAGES: LifecycleStage[] = [
 
 export const MVP_REGIMES: PropertyRegime[] = ['Private', 'Commons', 'Nondominium', 'CommonPool'];
 
-export const ALL_RESOURCE_NATURES: ResourceNature[] = [
-  'Physical',
-  'Digital',
-  'Service',
-  'Hybrid',
-  'Information'
-];
+export const ALL_RESOURCE_NATURES: ResourceNature[] = ['Physical', 'Digital', 'Hybrid'];
 
 export const CREATABLE_NDO_LIFECYCLE_STAGES = [
   'Ideation',

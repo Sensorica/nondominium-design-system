@@ -175,9 +175,7 @@
 /* Resource nature */
 .ndo-badge--nature-physical    { --b: var(--ndo-blue-100);   --f: var(--ndo-blue-700); }
 .ndo-badge--nature-digital     { --b: var(--ndo-purple-100); --f: var(--ndo-purple-700); }
-.ndo-badge--nature-service     { --b: var(--ndo-sky-100);    --f: var(--ndo-sky-700); }
 .ndo-badge--nature-hybrid      { --b: var(--ndo-teal-100);   --f: var(--ndo-teal-700); }
-.ndo-badge--nature-information { --b: var(--ndo-indigo-100); --f: var(--ndo-indigo-700); }
 
 /* Property regime */
 .ndo-badge--regime-private      { --b: var(--ndo-gray-200);    --f: var(--ndo-gray-700); }

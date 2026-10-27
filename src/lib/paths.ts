@@ -115,18 +115,34 @@ export const paths = {
   prototypes: () => prototypes(),
   /** Layer 0 app, on the lobby. */
   protoResource: () => prototypes('/resource-perspective'),
-  /** A group as a Perspective host. */
-  protoResourceGroup: (id: string) =>
-    prototypes(`/resource-perspective?view=group&group=${encodeURIComponent(id)}`),
+  /** A group as a Perspective host. Optional `perspective` / `agent` for Agent. */
+  protoResourceGroup: (
+    id: string,
+    opts?: { perspective?: 'resource' | 'agent'; agent?: string | null }
+  ) => {
+    const q = new URLSearchParams();
+    q.set('view', 'group');
+    q.set('group', id);
+    if (opts?.perspective && opts.perspective !== 'resource') {
+      q.set('perspective', opts.perspective);
+    }
+    if (opts?.agent) q.set('agent', opts.agent);
+    return prototypes(`/resource-perspective?${q}`);
+  },
   /** The create-NDO modal, open on a group. */
   protoResourceCreate: (id: string) =>
     prototypes(`/resource-perspective?view=group&group=${encodeURIComponent(id)}&createNdo=1`),
   /** One NDO inside the Resource Perspective. `group` is omitted when the NDO was opened from the lobby. */
-  protoResourceNdo: (hash: string, groupId?: string | null) => {
+  protoResourceNdo: (
+    hash: string,
+    groupId?: string | null,
+    opts?: { tab?: 'overview' | 'resources' }
+  ) => {
     const q = new URLSearchParams();
     q.set('view', 'ndo');
     if (groupId) q.set('group', groupId);
     q.set('ndo', hash);
+    if (opts?.tab && opts.tab !== 'overview') q.set('tab', opts.tab);
     return prototypes(`/resource-perspective?${q}`);
   },
   /** A direction, full-bleed, on its default view. */
