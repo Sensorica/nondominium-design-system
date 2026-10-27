@@ -332,7 +332,11 @@
   /* Mobile: the rail becomes a sticky top bar (brand + hamburger), and the
      rest of it drops down over the page as a scrollable panel. */
   @media (max-width: 860px) {
-    .chrome { grid-template-columns: 1fr; }
+    /* minmax(0, …): a bare 1fr floors at the content's min width, so one
+       unbreakable code line widened the column past the screen and pushed
+       the hamburger off it. */
+    .chrome { grid-template-columns: minmax(0, 1fr); }
+    .main { min-width: 0; }
     .rail {
       height: auto;
       overflow: visible;
