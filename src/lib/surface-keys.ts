@@ -254,14 +254,23 @@ export function surfaceKeyForUrl(url: URL): string {
     const slug = url.pathname.split('/').filter(Boolean).pop();
     return slug ? `${MEETING_KEY_PREFIX}${slug}` : '';
   }
+  // Same for a brainstorm board (`brainstorm:2026-10-27-v0-1-0-moss-release-plan`).
+  // The index at /brainstorms has no thread.
+  if (url.pathname.startsWith(paths.brainstorms() + '/')) {
+    const slug = url.pathname.split('/').filter(Boolean).pop();
+    return slug ? `${BRAINSTORM_KEY_PREFIX}${slug}` : '';
+  }
   return screenKeyForUrl(url);
 }
 
 export const MEETING_KEY_PREFIX = 'meeting:';
+export const BRAINSTORM_KEY_PREFIX = 'brainstorm:';
 
 /** Label for a resolved key; falls back to the key itself. */
 export function labelForKey(key: string): string {
   // `meeting:2026-10-20-dev` -> "Meeting of 2026-10-20".
   if (key.startsWith(MEETING_KEY_PREFIX)) return `Meeting of ${key.slice(MEETING_KEY_PREFIX.length, MEETING_KEY_PREFIX.length + 10)}`;
+  // `brainstorm:2026-10-27-...` -> "Brainstorm of 2026-10-27".
+  if (key.startsWith(BRAINSTORM_KEY_PREFIX)) return `Brainstorm of ${key.slice(BRAINSTORM_KEY_PREFIX.length, BRAINSTORM_KEY_PREFIX.length + 10)}`;
   return KEY_LABEL[key] ?? key;
 }

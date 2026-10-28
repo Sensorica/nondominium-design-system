@@ -172,6 +172,12 @@
           </div>
 
           <div class="group">
+            <a class="grouphead" href={paths.brainstorms()} class:on={current.startsWith(paths.brainstorms())}>
+              Brainstorms
+            </a>
+          </div>
+
+          <div class="group">
             <a class="grouphead" href={paths.previews()} class:on={current.startsWith(paths.previews())}>
               Branch previews
             </a>
