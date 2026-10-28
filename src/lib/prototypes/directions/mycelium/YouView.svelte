@@ -144,4 +144,17 @@
     color: var(--dim);
     padding: 10px 0;
   }
+
+  @media (max-width: 860px) {
+    .btns {
+      flex-wrap: wrap;
+    }
+    h2 {
+      font-size: 22px;
+    }
+    .receipt > :nth-child(2) {
+      min-width: 0;
+      overflow-wrap: anywhere;
+    }
+  }
 </style>

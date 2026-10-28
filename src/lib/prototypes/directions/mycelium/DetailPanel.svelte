@@ -243,4 +243,25 @@
     outline: none;
     box-shadow: var(--ndo-focus-ring);
   }
+
+  @media (max-width: 860px) {
+    .panel {
+      border-left: 0;
+      border-top: 1px solid var(--line);
+      overflow: visible;
+      padding: 18px 16px;
+    }
+    h1 {
+      font-size: 22px;
+      overflow-wrap: anywhere;
+    }
+    .acts button,
+    .slot {
+      padding-block: 9px;
+    }
+    .slot {
+      max-width: 100%;
+      overflow-wrap: anywhere;
+    }
+  }
 </style>

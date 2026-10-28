@@ -66,4 +66,12 @@
   .sidebar-link.is-active { background: rgb(var(--ndo-blue-50)); color: rgb(var(--ndo-blue-700)); font-weight: 500; }
 
   .kit-content { flex: 1; min-width: 0; overflow: auto; }
+  /* Same breakpoint as the main rail: on a phone the side list sits above the
+     page instead of taking 13rem of a 390px screen. */
+  @media (max-width: 860px) {
+    .kit-layout { flex-direction: column; min-height: 0; }
+    .kit-sidebar { width: auto; border-right: 0; border-bottom: 1px solid rgb(var(--ndo-gray-200)); }
+    .kit-sidebar nav { display: flex; flex-wrap: wrap; gap: 4px; }
+    .sidebar-link { padding: 0.25rem 0.625rem; border: 1px solid rgb(var(--ndo-gray-200)); border-radius: 999px; }
+  }
 </style>

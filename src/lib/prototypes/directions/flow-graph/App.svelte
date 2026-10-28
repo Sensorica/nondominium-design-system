@@ -685,4 +685,90 @@
     color: rgb(var(--ndo-gray-500));
     cursor: pointer;
   }
+
+  /* Phone and narrow tablet: reflow, never clip. The root stops being a fixed
+     52px / fill / auto grid and becomes one vertical scroller: header, then the
+     canvas (a fixed-height box that pans inside itself), then the panel stacked
+     below it, then the activity dock. Desktop (> 860px) is untouched. */
+  @media (max-width: 860px) {
+    .root {
+      display: flex;
+      flex-direction: column;
+      overflow-y: auto;
+      overscroll-behavior: auto;
+    }
+    .root > * {
+      flex-shrink: 0;
+      min-width: 0;
+    }
+    .top {
+      flex-wrap: wrap;
+      row-gap: 8px;
+      padding: 8px 12px;
+    }
+    .crumb {
+      flex: 1 1 100%;
+    }
+    .seg {
+      flex: 1 1 100%;
+    }
+    .seg__btn.seg__btn {
+      flex: 1 1 0;
+      min-width: 0;
+      min-height: 40px;
+      justify-content: center;
+      padding: 5px 6px;
+    }
+    .writers {
+      flex: 1 1 100%;
+      flex-wrap: wrap;
+    }
+    .writer.writer {
+      min-height: 32px;
+      padding: 2px 12px;
+    }
+    .k-grow {
+      display: none;
+    }
+    .dev.dev {
+      flex: 1 1 100%;
+      min-height: 40px;
+    }
+    .btn.btn {
+      flex: 1 1 0;
+      min-height: 40px;
+    }
+    .menu {
+      left: 12px;
+      right: 12px;
+      top: 100%;
+      width: auto;
+    }
+    .menu__item.menu__item {
+      min-height: 44px;
+    }
+    .body {
+      flex-direction: column;
+      flex: none;
+    }
+    .rail {
+      width: auto;
+      flex-direction: row;
+      justify-content: flex-start;
+      padding: 8px 12px;
+      gap: 12px;
+      border-left: 0;
+      border-top: 1px solid rgb(var(--ndo-gray-200));
+    }
+    .rail__btn.rail__btn {
+      width: 40px;
+      height: 40px;
+      transform: rotate(90deg);
+    }
+    .rail__label.rail__label {
+      writing-mode: horizontal-tb;
+      transform: none;
+      min-height: 40px;
+    }
+  }
 </style>

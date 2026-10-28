@@ -55,7 +55,7 @@
 
 <style>
   .cards { display: flex; flex-wrap: wrap; gap: var(--ndo-spacing-6); align-items: flex-start; }
-  .card { display: flex; flex-direction: column; gap: var(--ndo-spacing-1); }
+  .card { display: flex; flex-direction: column; gap: var(--ndo-spacing-1); max-width: 100%; }
   .card__title {
     font-size: var(--ndo-text-sm);
     font-weight: var(--ndo-weight-semibold);
@@ -67,7 +67,10 @@
   .card__frame {
     border: 1px solid rgb(var(--ndo-gray-200));
     border-radius: var(--ndo-radius-lg);
-    overflow: hidden;
+    /* Each card renders at its declared viewport size, so on a phone the frame
+       scrolls instead of shrinking the card. */
+    max-width: 100%;
+    overflow: auto;
     box-shadow: var(--ndo-shadow-sm);
   }
   iframe { border: 0; display: block; }

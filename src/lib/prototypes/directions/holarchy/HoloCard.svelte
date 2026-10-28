@@ -440,4 +440,27 @@
   .gbtn:hover {
     background: #dde4eb;
   }
+
+  /* Stacks under the level view at full width instead of floating over it. */
+  @media (max-width: 860px) {
+    .card {
+      position: static;
+      width: auto;
+      max-height: none;
+      overflow: visible;
+      margin: 12px 16px 0;
+      padding: 18px;
+    }
+    .card-ring,
+    .mini,
+    .cta button {
+      min-height: 40px;
+    }
+    .sgr {
+      flex-wrap: wrap;
+    }
+    .sgr > span:first-child {
+      min-width: 200px;
+    }
+  }
 </style>

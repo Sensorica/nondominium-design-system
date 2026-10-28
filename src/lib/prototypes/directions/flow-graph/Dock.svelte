@@ -204,4 +204,68 @@
     color: rgb(var(--ndo-gray-500));
     font-style: italic;
   }
+
+  /* Phone and narrow tablet: the bar wraps instead of overflowing, each log
+     row becomes a three-line card (call and status, detail, hash and time)
+     instead of a six-column grid, and the clearance for the fixed comments
+     button moves from the row ends to the bottom of the dock. */
+  @media (max-width: 860px) {
+    .dock {
+      padding-bottom: 64px;
+    }
+    .bar {
+      flex-wrap: wrap;
+      row-gap: 6px;
+      padding: 8px 12px;
+    }
+    .k-grow {
+      display: none;
+    }
+    .cond.cond {
+      min-height: 36px;
+      padding: 2px 10px;
+    }
+    .toggle.toggle {
+      min-height: 36px;
+      margin-left: auto;
+    }
+    .log {
+      height: 200px;
+    }
+    .row {
+      grid-template-columns: 22px minmax(0, 1fr) auto;
+      gap: 2px 10px;
+      padding: 8px 12px;
+    }
+    .row > :first-child {
+      grid-column: 1;
+      grid-row: 1 / span 3;
+      align-self: start;
+    }
+    .row > .call {
+      grid-column: 2;
+      grid-row: 1;
+    }
+    .row > .status {
+      grid-column: 3;
+      grid-row: 1;
+      min-width: 36px;
+    }
+    .row > .detail {
+      grid-column: 2 / 4;
+      grid-row: 2;
+    }
+    .row > :nth-child(4) {
+      grid-column: 2;
+      grid-row: 3;
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .row > :nth-child(5) {
+      grid-column: 3;
+      grid-row: 3;
+    }
+  }
 </style>

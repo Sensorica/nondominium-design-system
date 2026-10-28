@@ -368,4 +368,57 @@
        something to rely on either. */
     display: none !important;
   }
+
+  /* ── Phone and narrow tablet: stack, reflow, scroll the page ── */
+  @media (max-width: 860px) {
+    .instrument {
+      /* The desktop shell is a fixed-height flex column that clips; here the
+         page itself scrolls and the layout is allowed to grow. */
+      height: auto;
+      min-height: 100%;
+      width: 100%;
+      min-width: 0;
+      max-width: 100%;
+      overflow: visible;
+    }
+    .bar {
+      height: auto;
+      min-height: 52px;
+      flex-wrap: wrap;
+      gap: 8px 12px;
+      padding: 8px 12px;
+    }
+    .k-me {
+      margin-left: auto;
+    }
+    .strip {
+      order: 3;
+      flex: 1 1 100%;
+      margin-left: 0;
+    }
+    .peer {
+      order: 4;
+      flex: 1 1 100%;
+      margin-left: 0;
+      flex-wrap: wrap;
+      gap: 4px 16px;
+      white-space: normal;
+    }
+    .stat {
+      padding: 8px 0;
+    }
+    .wrap {
+      flex: 0 0 auto;
+      grid-template-columns: minmax(0, 1fr);
+    }
+    .wrap--empty {
+      padding: 32px 16px;
+    }
+    .empty__actions {
+      flex-wrap: wrap;
+    }
+    .btn {
+      min-height: 40px;
+    }
+  }
 </style>

@@ -293,4 +293,47 @@
     margin-right: 6px;
     background: var(--teal);
   }
+
+  /* ── Phone and narrow tablet: full-width block under the bench ── */
+  @media (max-width: 860px) {
+    .spec {
+      min-width: 0;
+      overflow: visible;
+      padding: 16px;
+      border-right: none;
+      border-top: 1px solid var(--grid);
+    }
+    /* Rule rows stack label over value so each text column gets the full
+       width instead of 42% / 58% of a phone. */
+    table,
+    tbody,
+    tr,
+    td {
+      display: block;
+    }
+    td:first-child {
+      width: auto;
+      padding-bottom: 0;
+    }
+    td + td {
+      border-top: none;
+      padding-top: 2px;
+    }
+    .sg {
+      flex-wrap: wrap;
+    }
+    .sg div {
+      flex: 1 1 240px;
+      min-width: 0;
+    }
+    .inst {
+      gap: 4px 10px;
+    }
+    .btn {
+      min-height: 40px;
+    }
+    .lnk {
+      padding: 8px 6px;
+    }
+  }
 </style>
