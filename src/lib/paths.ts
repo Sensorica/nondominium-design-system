@@ -148,6 +148,12 @@ export const paths = {
   meetings: () => `${base}/meetings`,
   meeting: (slug: string) => `${base}/meetings/${encodeURIComponent(slug)}`,
 
+  // ── Brainstorms: the Niceboard sources in content/brainstorms/, compiled to static/brainstorms/boards/ ──
+  brainstorms: () => `${base}/brainstorms`,
+  brainstorm: (slug: string) => `${base}/brainstorms/${encodeURIComponent(slug)}`,
+  /** The compiled board itself, full page, outside the site chrome. */
+  brainstormBoard: (slug: string) => `${base}/brainstorms/boards/${encodeURIComponent(slug)}.html`,
+
   // ── Branch previews: every pushed branch, linked to its Cloudflare preview ──
   previews: () => `${base}/previews`,
 
