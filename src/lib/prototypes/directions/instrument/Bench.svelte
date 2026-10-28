@@ -354,4 +354,59 @@
     border: none;
     background: none;
   }
+
+  /* ── Phone and narrow tablet ──
+   * The bench leads the stack. Its header, popover and activity scope drop
+   * out of absolute positioning into a column; the diagram keeps a readable
+   * minimum width and pans sideways inside the bench, with the header,
+   * popover and scope pinned to the left edge so they stay in view. */
+  @media (max-width: 860px) {
+    .bench {
+      order: -1;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      padding: 12px 0;
+      min-width: 0;
+      overflow-x: auto;
+      overflow-y: visible;
+    }
+    .hdr {
+      position: sticky;
+      left: 12px;
+      top: auto;
+      right: auto;
+      margin: 0 12px;
+      gap: 8px;
+    }
+    .chip {
+      flex: 1 1 100%;
+      margin-right: 0;
+      min-width: 0;
+    }
+    .btn {
+      min-height: 40px;
+      padding: 8px 12px;
+    }
+    .diagram {
+      position: static;
+      flex: 0 0 auto;
+      width: 800px;
+      max-width: none;
+      height: auto;
+    }
+    .pop {
+      position: sticky;
+      left: 12px;
+      top: auto;
+      transform: none;
+      margin: 0 12px;
+      flex-wrap: wrap;
+      gap: 6px 14px;
+      white-space: normal;
+    }
+    .lnk {
+      padding: 8px 6px;
+    }
+  }
 </style>

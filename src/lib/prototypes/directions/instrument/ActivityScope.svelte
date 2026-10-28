@@ -108,4 +108,16 @@
     font: 10px 'Space Mono', monospace;
     color: var(--mute);
   }
+
+  @media (max-width: 860px) {
+    .scope {
+      position: sticky;
+      left: 12px;
+      right: auto;
+      bottom: auto;
+      height: auto;
+      margin: 0 12px;
+      min-width: 0;
+    }
+  }
 </style>

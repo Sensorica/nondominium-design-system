@@ -74,7 +74,9 @@
   // Move it into the status bar, clear of the rail.
   $effect(() => {
     const root = document.documentElement.style;
-    root.setProperty('--proto-exit-left', '76px');
+    // On a phone the rail is a top bar, so the chip sits at the left edge.
+    const narrow = window.matchMedia('(max-width: 860px)').matches;
+    root.setProperty('--proto-exit-left', narrow ? '12px' : '76px');
     root.setProperty('--proto-exit-bottom', '3px');
     return () => {
       root.removeProperty('--proto-exit-left');
@@ -532,5 +534,120 @@
   }
   .dht {
     margin-left: auto;
+  }
+
+  /* ── Phone and narrow tablet ──
+     One column that scrolls vertically: the rail becomes a sticky top bar,
+     the field keeps its aspect ratio, the detail panel stacks under it and
+     the status bar wraps. The bottom 44px of the status bar is reserved for
+     the fixed exit chip (moved to the left edge, see the effect above) and
+     the comments button. */
+  @media (max-width: 860px) {
+    .app {
+      grid-template-columns: minmax(0, 1fr);
+      grid-template-rows: none;
+      /* max-content, not auto: in a fixed-height shell auto rows were
+         squeezed to fit and the panel ran over the status bar. */
+      grid-auto-rows: max-content;
+      overflow: auto;
+    }
+    .rail {
+      grid-row: 1;
+      position: sticky;
+      top: 0;
+      z-index: 5;
+      flex-direction: row;
+      justify-content: space-between;
+      gap: 4px;
+      padding: 8px 12px;
+      border-right: 0;
+      border-bottom: 1px solid var(--line);
+      background: var(--bg);
+    }
+    .logo {
+      width: 36px;
+      height: 36px;
+      margin-bottom: 0;
+      flex-shrink: 0;
+    }
+    .ri {
+      flex: 1 1 0;
+      max-width: 92px;
+      min-width: 56px;
+      min-height: 48px;
+      justify-content: center;
+    }
+    .ri--you {
+      margin-top: 0;
+    }
+    .cnt {
+      right: calc(50% - 26px);
+    }
+    .main {
+      grid-row: 2;
+      overflow: visible;
+      display: flex;
+      flex-direction: column;
+    }
+    .top {
+      position: static;
+      order: -1;
+      padding: 12px 16px 4px;
+      gap: 8px;
+    }
+    .seg {
+      flex-wrap: wrap;
+      max-width: 100%;
+      border-radius: 18px;
+    }
+    .seg--push {
+      margin-left: 0;
+    }
+    .seg button,
+    .new {
+      padding: 9px 14px;
+    }
+    .foot {
+      position: static;
+      padding: 8px 16px 12px;
+    }
+    .legend {
+      gap: 8px 16px;
+    }
+    .decay {
+      margin-left: 0;
+      width: 100%;
+      white-space: normal;
+    }
+    .decay input {
+      flex: 1 1 120px;
+      width: auto;
+      min-width: 0;
+    }
+    .list {
+      position: static;
+      overflow: visible;
+      max-width: none;
+      padding: 20px 16px;
+    }
+    .list h2 {
+      font-size: 22px;
+    }
+    .panel-empty {
+      border-left: 0;
+      border-top: 1px solid var(--line);
+    }
+    .status {
+      grid-column: 1;
+      grid-row: 4;
+      flex-wrap: wrap;
+      gap: 6px 16px;
+      padding: 10px 16px 44px;
+      white-space: normal;
+      overflow: visible;
+    }
+    .dht {
+      margin-left: 0;
+    }
   }
 </style>

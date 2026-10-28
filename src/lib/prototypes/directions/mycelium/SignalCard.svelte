@@ -116,4 +116,18 @@
     outline: none;
     box-shadow: var(--ndo-focus-ring);
   }
+
+  @media (max-width: 860px) {
+    .sig {
+      flex-wrap: wrap;
+    }
+    .body {
+      flex: 1 1 200px;
+      overflow-wrap: anywhere;
+    }
+    .act {
+      margin-left: 20px;
+      padding-block: 9px;
+    }
+  }
 </style>

@@ -263,4 +263,23 @@
   .meta--sig {
     fill: #f2b84b;
   }
+
+  /* The field scales down with the viewport, so the SVG labels (user units)
+     are enlarged to stay about 10-11px on screen, and the SVG leaves its
+     absolute full-bleed box to take its own height from the viewBox. */
+  @media (max-width: 860px) {
+    .field {
+      position: relative;
+      inset: auto;
+      display: block;
+      width: 100%;
+      height: auto;
+    }
+    .name {
+      font-size: 24px;
+    }
+    .meta {
+      font-size: 20px;
+    }
+  }
 </style>
