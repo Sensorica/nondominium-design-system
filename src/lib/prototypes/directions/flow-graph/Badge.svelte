@@ -13,7 +13,7 @@
   const KNOWN = new Set([
     'lifecycle-ideation', 'lifecycle-specification', 'lifecycle-development', 'lifecycle-prototype', 'lifecycle-stable',
     'lifecycle-distributed', 'lifecycle-active', 'lifecycle-hibernating', 'lifecycle-deprecated', 'lifecycle-end-of-life',
-    'nature-physical', 'nature-digital', 'nature-service', 'nature-hybrid', 'nature-information',
+    'nature-physical', 'nature-digital', 'nature-hybrid',
     'regime-nondominium', 'regime-commons', 'regime-collective', 'regime-pool', 'regime-common-pool', 'regime-private',
     'rule-access-requirement', 'rule-usage-limit', 'rule-transfer-condition', 'rule-maintenance-schedule',
     'scope-project', 'scope-network', 'scope-public',
@@ -64,9 +64,7 @@
   /* Resource nature: fill(bg, fg) */
   .nature-physical    { background: rgb(var(--ndo-blue-100));   color: rgb(var(--ndo-blue-700)); }
   .nature-digital     { background: rgb(var(--ndo-purple-100)); color: rgb(var(--ndo-purple-700)); }
-  .nature-service     { background: rgb(var(--ndo-orange-100)); color: rgb(var(--ndo-orange-700)); }
   .nature-hybrid      { background: rgb(var(--ndo-teal-100));   color: rgb(var(--ndo-teal-700)); }
-  .nature-information { background: rgb(var(--ndo-indigo-100)); color: rgb(var(--ndo-indigo-700)); }
 
   /* Property regime: regime(fg) — transparent fill, dashed border, coloured text */
   .regime-nondominium { background: transparent; border: 1px dashed rgb(var(--ndo-blue-700));   color: rgb(var(--ndo-blue-700)); }

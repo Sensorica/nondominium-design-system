@@ -27,6 +27,15 @@ const BASE_TEMPLATES: GovernanceRuleTemplate[] = [
     enforced_by: 'PrimaryAccountableAgent'
   },
   {
+    id: 'capacity_limit',
+    rule_type: 'usage_limit',
+    label: 'Capacity at one time',
+    rationale:
+      'A place stays rivalrous. Several people can use it together until the capacity is reached.',
+    rule_data: { max_concurrent_users: 8 },
+    enforced_by: 'AccountableAgent'
+  },
+  {
     id: 'quota_extraction',
     rule_type: 'usage_limit',
     label: 'Extraction quota per period',
@@ -74,44 +83,28 @@ const BASE_TEMPLATES: GovernanceRuleTemplate[] = [
     rule_data: { block_when_regime: ['Stressed', 'Degraded', 'Critical'] },
     enforced_by: 'Steward'
   },
-  {
-    id: 'service_sla',
-    rule_type: 'access_requirement',
-    label: 'Service availability SLA',
-    rationale: 'Service resources need documented availability and response expectations.',
-    rule_data: { min_uptime_percent: 95 },
-    enforced_by: 'AccountableAgent'
-  }
 ];
 
 const REGIME_NATURE_MATRIX: Record<PropertyRegime, Partial<Record<ResourceNature, string[]>>> = {
   Private: {
     Physical: ['access_accountable'],
     Digital: ['access_accountable', 'integrity_manifest'],
-    Service: ['access_accountable', 'service_sla'],
-    Hybrid: ['access_accountable', 'maintenance_schedule'],
-    Information: ['access_accountable']
+    Hybrid: ['access_accountable', 'maintenance_schedule']
   },
   Commons: {
     Physical: ['access_attribution'],
     Digital: ['access_attribution', 'integrity_manifest'],
-    Information: ['access_attribution'],
-    Hybrid: ['access_attribution'],
-    Service: ['access_attribution', 'service_sla']
+    Hybrid: ['access_attribution']
   },
   Nondominium: {
     Physical: ['no_ownership_transfer', 'access_accountable', 'maintenance_schedule'],
     Digital: ['no_ownership_transfer', 'access_attribution', 'integrity_manifest'],
-    Information: ['no_ownership_transfer', 'access_attribution'],
-    Hybrid: ['no_ownership_transfer', 'access_accountable'],
-    Service: ['no_ownership_transfer', 'service_sla']
+    Hybrid: ['no_ownership_transfer', 'access_accountable']
   },
   CommonPool: {
     Physical: ['quota_extraction', 'access_accountable', 'maintenance_schedule'],
     Digital: ['quota_extraction'],
-    Hybrid: ['quota_extraction', 'maintenance_schedule'],
-    Service: ['quota_extraction', 'service_sla'],
-    Information: ['access_attribution']
+    Hybrid: ['quota_extraction', 'maintenance_schedule']
   }
 };
 

@@ -1,7 +1,8 @@
 <script lang="ts">
   import NdoBadge from '../../primitives/NdoBadge.svelte';
   import { getArchetype } from '../../../domain/wizard-archetypes.js';
-  import { getGovernanceImplications } from '../../../domain/wizard-questions.js';
+  import { getGovernanceImplications, subtractionOption } from '../../../domain/wizard-questions.js';
+  import { SOURCE_TYPE_OPTIONS } from '../../../domain/spec-profiles.js';
   import type { WizardKernelState, WizardRefinementState } from '../../../domain/types.js';
 
   interface Props {
@@ -13,6 +14,10 @@
 
   const archetype = $derived(getArchetype(kernel.archetype));
   const implications = $derived(getGovernanceImplications(refinement, kernel.resource_nature));
+  const sourceTypeLabel = $derived(
+    SOURCE_TYPE_OPTIONS.find((option) => option.id === refinement.source_profile?.source_type)?.label ??
+      refinement.source_profile?.source_type
+  );
 </script>
 
 <div class="space-y-4">
@@ -56,6 +61,12 @@
           <dd>{refinement.rivalry}</dd>
         </div>
       {/if}
+      {#if refinement.subtraction}
+        <div class="flex justify-between">
+          <dt class="text-gray-600">Use runs out</dt>
+          <dd>{subtractionOption(refinement.subtraction)?.label}</dd>
+        </div>
+      {/if}
       {#if refinement.scope}
         <div class="flex justify-between">
           <dt class="text-gray-600">Scope</dt>
@@ -76,7 +87,7 @@
       <dl class="mt-2 space-y-1 text-sm">
         <div class="flex justify-between">
           <dt class="text-gray-600">Type</dt>
-          <dd>{refinement.source_profile.source_type}</dd>
+          <dd>{sourceTypeLabel}</dd>
         </div>
         <div class="flex justify-between">
           <dt class="text-gray-600">Regime state</dt>

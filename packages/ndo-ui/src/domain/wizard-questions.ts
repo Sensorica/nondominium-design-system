@@ -5,6 +5,8 @@ import type {
   ResourceScope,
   ResourceSource,
   Rivalry,
+  SourceType,
+  SubtractionKind,
   Transferability,
   WizardRefinementState
 } from './types.js';
@@ -32,20 +34,8 @@ export const NATURE_CHOICES: NatureChoice[] = [
   {
     id: 'Digital',
     label: 'Digital artifact',
-    description: 'Software, data files, design files — copyable at near-zero cost.',
+    description: 'Software, data, designs, documents, datasets, and methods.',
     suggestedRivalry: 'NonRivalrous'
-  },
-  {
-    id: 'Information',
-    label: 'Knowledge or documentation',
-    description: 'Methods, protocols, research, structured knowledge.',
-    suggestedRivalry: 'NonRivalrous'
-  },
-  {
-    id: 'Service',
-    label: 'Service or capability',
-    description: 'Time-based provision of skill, API access, or maintenance.',
-    suggestedRivalry: 'Rivalrous'
   },
   {
     id: 'Hybrid',
@@ -55,22 +45,94 @@ export const NATURE_CHOICES: NatureChoice[] = [
   }
 ];
 
-export const RIVALRY_QUESTION = {
-  id: 'rivalry',
-  question: 'When someone uses this, does it block others from using it at the same time?',
-  options: [
-    {
-      id: 'Rivalrous' as Rivalry,
-      label: 'Yes — use by one can exclude others',
-      description: 'Tools, machines, consumables, scheduled access.'
-    },
-    {
-      id: 'NonRivalrous' as Rivalry,
-      label: 'No — many can use it simultaneously',
-      description: 'Designs, methods, documentation, broadcast knowledge.'
-    }
-  ]
+/** Nature default. Matches `ResourceNature::default_rivalry`. */
+export function rivalryForNature(nature: ResourceNature): Rivalry {
+  return NATURE_CHOICES.find((choice) => choice.id === nature)?.suggestedRivalry ?? 'Rivalrous';
+}
+
+/** Ecological sources are physical. Knowledge and social commons are digital. */
+export function natureForSourceType(sourceType: SourceType): ResourceNature {
+  return sourceType === 'KnowledgeCommons' || sourceType === 'SocialCommons' ? 'Digital' : 'Physical';
+}
+
+/** Source-NDO meaning of the stages a registration may use. Prototype and Distributed are fabrication stages. */
+export const SOURCE_STAGE_GLOSS: Record<string, string> = {
+  Specification: 'Boundary and who is affected are named. A monitoring plan can still be a draft.',
+  Development: 'Stewards are named and monitoring is starting. Rules are still being written.',
+  Stable: 'Monitoring is running and the rules are in use.',
+  Active: 'The stewardship loop is running: events, readings, and rule revision.'
 };
+
+export const SOURCE_RIVALRY_STATEMENT: Record<Rivalry, { label: string; detail: string }> = {
+  Rivalrous: {
+    label: 'Rivalrous',
+    detail: 'What is taken leaves less for others. A quota is a usage rule.'
+  },
+  NonRivalrous: {
+    label: 'Non-rivalrous',
+    detail: 'Many people can draw on it at once. A limit on copies is an access rule.'
+  }
+};
+
+export const SOURCE_ARRANGEMENTS: {
+  regime: PropertyRegime;
+  label: string;
+  description: string;
+}[] = [
+  {
+    regime: 'Nondominium',
+    label: 'No one can own it',
+    description: 'Uncapturable. Stewards carry obligations, not title.'
+  },
+  {
+    regime: 'CommonPool',
+    label: 'A quota limits what can be taken',
+    description: 'The yield is subtractable. Extraction stays inside a limit.'
+  }
+];
+
+export const RIVALRY_STATEMENT: Record<Rivalry, { label: string; detail: string }> = {
+  Rivalrous: {
+    label: 'Rivalrous',
+    detail:
+      'Use subtracts from what is available. A shared place can hold several people until its capacity is reached. That capacity is a usage rule.'
+  },
+  NonRivalrous: {
+    label: 'Non-rivalrous',
+    detail:
+      'Many people can use this at the same time. A limit on seats or downloads is an access rule.'
+  }
+};
+
+export const SUBTRACTION_OPTIONS: {
+  id: SubtractionKind;
+  label: string;
+  description: string;
+  ruleId: string;
+}[] = [
+  {
+    id: 'unit',
+    label: 'One holder at a time',
+    description: 'A tool or machine. Scheduling and custody apply.',
+    ruleId: 'maintenance_schedule'
+  },
+  {
+    id: 'capacity',
+    label: 'Room for several people at once',
+    description: 'A place stays rivalrous. Capacity is a usage limit.',
+    ruleId: 'capacity_limit'
+  },
+  {
+    id: 'consumable',
+    label: 'It is used up',
+    description: 'Materials or stock. A quota limits how fast it is depleted.',
+    ruleId: 'quota_extraction'
+  }
+];
+
+export function subtractionOption(kind: SubtractionKind) {
+  return SUBTRACTION_OPTIONS.find((option) => option.id === kind);
+}
 
 export const ACCESS_CONTROL_QUESTION = {
   id: 'access_control',
@@ -102,6 +164,50 @@ export const ACCESS_CONTROL_QUESTION = {
     }
   ]
 };
+
+/** Access choices that fit this nature. A bounded pool is for rivalrous resources. */
+export function accessOptionsForNature(
+  nature: ResourceNature,
+  allowedRegimes: readonly PropertyRegime[] | null = null
+) {
+  const regimes = allowedRegimes ?? ACCESS_CONTROL_QUESTION.options.map((option) => option.suggestedRegime);
+  return ACCESS_CONTROL_QUESTION.options.filter((option) => {
+    if (!regimes.includes(option.suggestedRegime)) return false;
+    if (rivalryForNature(nature) === 'NonRivalrous' && option.id === 'bounded_pool') return false;
+    return true;
+  });
+}
+
+/** Regimes offered for this nature, including a source's restricted list. */
+export function regimesForNature(
+  nature: ResourceNature,
+  allowedRegimes: readonly PropertyRegime[] | null
+): PropertyRegime[] {
+  const base =
+    allowedRegimes ??
+    (['Private', 'Commons', 'Nondominium', 'CommonPool'] as PropertyRegime[]);
+  if (rivalryForNature(nature) === 'NonRivalrous') {
+    return base.filter((regime) => regime !== 'CommonPool');
+  }
+  return [...base];
+}
+
+/**
+ * Mirrors `check_scope_coherence`: a Nondominium registration implies Public
+ * scope. Narrower scope would hide an uncapturable resource from everyone
+ * outside one project or network. The wizard does not offer the Public regime.
+ */
+export function scopePermitted(regime: PropertyRegime, scope: ResourceScope): boolean {
+  return regime === 'Nondominium' ? scope === 'Public' : true;
+}
+
+export function withCoherentScope<
+  T extends { property_regime: PropertyRegime; scope: ResourceScope | null }
+>(state: T): T {
+  if (state.property_regime !== 'Nondominium') return state;
+  if (state.scope === 'Public') return state;
+  return { ...state, scope: 'Public' };
+}
 
 export const SCOPE_OPTIONS: NarrativeOption<ResourceScope>[] = [
   {
@@ -168,13 +274,13 @@ export function buildDefaultRefinement(
   regime: PropertyRegime,
   rivalry: Rivalry | null = null
 ): WizardRefinementState {
-  const resolvedRivalry =
-    rivalry ?? NATURE_CHOICES.find((c) => c.id === nature)?.suggestedRivalry ?? 'Rivalrous';
+  const resolvedRivalry = rivalry ?? rivalryForNature(nature);
 
   return {
     property_regime: regime,
     rivalry: resolvedRivalry,
-    scope: 'Network',
+    subtraction: null,
+    scope: regime === 'Nondominium' ? 'Public' : 'Network',
     source: 'Network',
     transferability: inferTransferability(regime),
     accessibility: inferAccessibility(regime, resolvedRivalry),
@@ -189,8 +295,9 @@ export function getGovernanceImplications(
 ): string[] {
   const lines: string[] = [];
 
+  const isSource = refinement.source_profile != null;
   if (refinement.property_regime === 'Nondominium') {
-    lines.push('No agent can claim ownership or enclose this resource.');
+    lines.push(`No agent can claim ownership or enclose this ${isSource ? 'source' : 'resource'}.`);
     lines.push('Access is earned through contribution and governance participation.');
   } else if (refinement.property_regime === 'Commons') {
     lines.push('Open sharing with attribution; copy-left style governance expected.');
@@ -200,16 +307,18 @@ export function getGovernanceImplications(
     lines.push('Full rights bundle; custodian controls access decisions.');
   }
 
-  if (refinement.rivalry === 'Rivalrous') {
-    lines.push('Rivalrous: access scheduling and custody tracking recommended.');
+  if (isSource) {
+    lines.push('Stewards carry obligations. No one holds title.');
+  } else if (refinement.subtraction) {
+    const chosen = subtractionOption(refinement.subtraction);
+    if (chosen) lines.push(chosen.description);
+  } else if (refinement.rivalry === 'Rivalrous') {
+    lines.push('Rivalrous: say whether use is one holder, a capacity, or a consumable.');
   } else if (refinement.rivalry === 'NonRivalrous') {
-    lines.push('Non-rivalrous: open access preferred; versioning and attribution matter.');
+    lines.push('Non-rivalrous: many people can use it at once. Limits are access rules.');
   }
 
-  if (nature === 'Physical' || nature === 'Hybrid') {
-    lines.push('Physical resources typically require maintenance and custody protocols.');
-  }
-  if (nature === 'Digital' || nature === 'Information') {
+  if (nature === 'Digital' && !isSource) {
     lines.push('Digital resources benefit from integrity manifests and license clarity.');
   }
 

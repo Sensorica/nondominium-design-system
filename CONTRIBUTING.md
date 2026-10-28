@@ -1,6 +1,6 @@
 # Contributing to the Nondominium Design System
 
-This repo is the design system and prototype playground for the [Nondominium](https://github.com/Sensorica/nondominium) hApp. It ships five things: the tokens, the pattern sheets at `/patterns`, the `@nondominium/ndo-ui` library at `/playbook` and `/ui-kit`, six composed scenarios, and a navigable prototype of every screen the app has.
+This repo is the design system and prototype playground for the [Nondominium](https://github.com/Sensorica/nondominium) hApp. It ships the tokens, the pattern sheets at `/patterns`, the `@nondominium/ndo-ui` library at `/playbook` and `/ui-kit`, the Layer 0 app at `/prototypes/resource-perspective`, the six UI directions beside it, and a navigable replica of every screen the hApp has.
 
 ## What is in this repo
 
@@ -56,9 +56,15 @@ A `/patterns` page documents a pattern that **exists in the app**. Show it with 
 
 Never invent a component and document it as though the app had it.
 
-## Adding a scenario
+## The Layer 0 app
 
-Same shape, with `SCENARIO_KEY` and `KEY_LABEL` instead, plus a `paths.scenario*` function and an entry in the scenario index. Bump `scenarios.count` in `SKILL.md`.
+`/prototypes/resource-perspective` is the standalone app to keep working in. It is built from `@nondominium/ndo-ui` and keeps its own session in `src/lib/prototypes/resource-perspective/state.svelte.ts`. It is not one of the six directions in `directions.ts`, and it is not the replica at `/app`.
+
+A new view is a query param on that one route:
+
+1. Add a URL function to `src/lib/paths.ts`.
+2. Add a shape under `RESOURCE_PROTO_KEY` in `src/lib/surface-keys.ts`, and a label in `KEY_LABEL`.
+3. Add the key to the Resource Perspective group in `SCREEN_MAP_GROUPS`, with a representative URL in `SCREEN_KEY_TO_URL`.
 
 ## Touching the lifecycle machine
 

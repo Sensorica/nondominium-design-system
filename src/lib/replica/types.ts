@@ -46,7 +46,7 @@ export type PropertyRegime =
   | 'Public'
   | 'Nondominium';
 
-export type ResourceNature = 'Physical' | 'Digital' | 'Service' | 'Hybrid' | 'Information';
+export type ResourceNature = 'Physical' | 'Digital' | 'Hybrid';
 
 /** Whether use by one agent excludes another. Decides which rules are coherent. */
 export type Rivalry = 'Rivalrous' | 'NonRivalrous';

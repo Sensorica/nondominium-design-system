@@ -7,6 +7,12 @@ export interface NdoArchetype {
   subtitle: string;
   intentQuestion: string;
   defaultLifecycleStage: CreatableNdoLifecycleStage;
+  /**
+   * Stages this intent may register. The identity step offers these and no others.
+   * A one-entry list is stated, not chosen. Hibernating and terminal stages stay
+   * transition-only.
+   */
+  allowedLifecycleStages: readonly CreatableNdoLifecycleStage[];
   tier: WizardTier;
   /** Which wizard steps to show after kernel */
   showRefinement: boolean;
@@ -25,6 +31,7 @@ export const NDO_ARCHETYPES: NdoArchetype[] = [
     subtitle: 'Register intent with minimal friction — Layer 0 only.',
     intentQuestion: 'I am capturing an idea or intention.',
     defaultLifecycleStage: 'Ideation',
+    allowedLifecycleStages: ['Ideation'],
     tier: 'Simple',
     showRefinement: false,
     showSpecificationAtCreate: false,
@@ -39,6 +46,7 @@ export const NDO_ARCHETYPES: NdoArchetype[] = [
     subtitle: 'Open design or knowledge ready to share with others.',
     intentQuestion: 'I am designing something to share.',
     defaultLifecycleStage: 'Specification',
+    allowedLifecycleStages: ['Specification', 'Development', 'Prototype'],
     tier: 'Guided',
     showRefinement: true,
     showSpecificationAtCreate: false,
@@ -53,6 +61,7 @@ export const NDO_ARCHETYPES: NdoArchetype[] = [
     subtitle: 'Mature resource entering collaborative use.',
     intentQuestion: 'I am activating an existing resource for use.',
     defaultLifecycleStage: 'Active',
+    allowedLifecycleStages: ['Stable', 'Distributed', 'Active'],
     tier: 'Expert',
     showRefinement: true,
     showSpecificationAtCreate: true,
@@ -67,6 +76,7 @@ export const NDO_ARCHETYPES: NdoArchetype[] = [
     subtitle: 'Ecological or knowledge commons that yields resources.',
     intentQuestion: 'I am registering a generative source (watershed, fishery, knowledge commons).',
     defaultLifecycleStage: 'Specification',
+    allowedLifecycleStages: ['Specification', 'Development', 'Stable', 'Active'],
     tier: 'Guided',
     showRefinement: true,
     showSpecificationAtCreate: false,
