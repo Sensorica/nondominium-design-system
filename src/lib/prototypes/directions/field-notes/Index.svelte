@@ -273,4 +273,31 @@
       grid-column: 1;
     }
   }
+
+  @media (max-width: 860px) {
+    /* The register sits on top as a capped, scrollable block so the entry
+     * below it stays within reach. */
+    .index {
+      grid-row: 1;
+      grid-column: 1;
+      max-height: 42dvh;
+      padding: 16px 18px;
+      border-right: 0;
+      border-bottom: 1px solid var(--fn-rule);
+    }
+    /* 16px keeps iOS from zooming on focus. */
+    .search {
+      font-size: 16px;
+    }
+    /* Tappable rows. */
+    .idxh {
+      padding: 8px 0;
+    }
+    .entry {
+      padding: 12px 0;
+    }
+    .link {
+      padding: 8px 0;
+    }
+  }
 </style>

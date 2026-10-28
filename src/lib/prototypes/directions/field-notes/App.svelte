@@ -63,9 +63,18 @@
   // force extra bottom padding the original does not have. Move the chip
   // into the centre page's corner instead, clear of the 300px index column.
   $effect(() => {
+    // At phone width the layout stacks into one column and the chip returns
+    // to its default corner (316px would push it past the viewport).
     const root = document.documentElement.style;
-    root.setProperty('--proto-exit-left', '316px');
+    const wide = window.matchMedia('(min-width: 861px)');
+    const sync = () => {
+      if (wide.matches) root.setProperty('--proto-exit-left', '316px');
+      else root.removeProperty('--proto-exit-left');
+    };
+    sync();
+    wide.addEventListener('change', sync);
     return () => {
+      wide.removeEventListener('change', sync);
       root.removeProperty('--proto-exit-left');
     };
   });
@@ -146,6 +155,16 @@
       grid-template-columns: 240px minmax(0, 1fr);
       grid-template-rows: auto auto;
       overflow: auto;
+    }
+  }
+
+  /* Phone: one column (register, entry, side), the whole shell scrolls. */
+  @media (max-width: 860px) {
+    .fn {
+      grid-template-columns: minmax(0, 1fr);
+      grid-template-rows: none;
+      grid-auto-rows: auto;
+      align-content: start;
     }
   }
 </style>

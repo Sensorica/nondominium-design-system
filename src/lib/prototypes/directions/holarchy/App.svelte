@@ -436,6 +436,57 @@
     text-decoration: underline;
   }
 
+  /* Phone and narrow tablet: the absolutely positioned layers become one
+   * column that scrolls inside the root (reflow, no clipping): header,
+   * the level view at full width, then the summary card, legend and peers
+   * line stacked below it. Desktop is untouched. */
+  @media (max-width: 860px) {
+    .holarchy {
+      overflow: auto;
+      /* Room under the legend for the layout's floating exit chip. */
+      padding-bottom: 72px;
+      box-sizing: border-box;
+    }
+    .top {
+      position: static;
+      padding: 16px 16px 0;
+      gap: 10px;
+    }
+    .crumbs {
+      min-width: 0;
+    }
+    .crumbs button {
+      min-height: 40px;
+      padding: 8px 14px;
+    }
+    .zoom {
+      margin: 0;
+      flex-basis: 100%;
+      white-space: normal;
+    }
+    .stage {
+      position: static;
+      display: block;
+      width: 100%;
+      height: auto;
+      aspect-ratio: 1000 / 840;
+    }
+    .legend {
+      position: static;
+      max-width: none;
+      margin: 12px 16px 0;
+    }
+    .peers {
+      position: static;
+      margin: 12px 16px 0;
+      white-space: normal;
+      line-height: 2;
+    }
+    .peers button {
+      min-height: 32px;
+    }
+  }
+
   @media (prefers-reduced-motion: reduce) {
     .zoom-in {
       animation: none;

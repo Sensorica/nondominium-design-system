@@ -431,4 +431,37 @@
     font-family: var(--ndo-font-mono);
     color: rgb(var(--ndo-gray-500));
   }
+
+  /* Phone and narrow tablet: the canvas is a fixed-height box above the
+     stacked panel. The graph inside stays larger than the screen and pans and
+     zooms within the box; the legend and zoom controls stack so they never
+     overlap each other at 390px. */
+  @media (max-width: 860px) {
+    .canvas {
+      flex: none;
+      width: 100%;
+      height: 56dvh;
+      min-height: 320px;
+    }
+    .legend {
+      left: 8px;
+      bottom: 52px;
+      max-width: calc(100% - 16px);
+      flex-wrap: wrap;
+    }
+    .zoom {
+      right: 8px;
+      bottom: 8px;
+    }
+    .zoom--clear {
+      right: 8px;
+    }
+    .zoom__btn.zoom__btn {
+      min-width: 40px;
+      height: 36px;
+    }
+    .zoom__btn--fit.zoom__btn--fit {
+      min-width: 44px;
+    }
+  }
 </style>

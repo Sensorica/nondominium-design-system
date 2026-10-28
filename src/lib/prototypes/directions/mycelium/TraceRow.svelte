@@ -75,4 +75,11 @@
   .st.queued {
     color: #f2b84b;
   }
+
+  @media (max-width: 860px) {
+    .what {
+      min-width: 0;
+      overflow-wrap: anywhere;
+    }
+  }
 </style>

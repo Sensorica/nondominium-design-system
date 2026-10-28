@@ -810,4 +810,53 @@
     border-radius: var(--ndo-radius-md);
     padding: 8px 10px;
   }
+
+  /* Phone and narrow tablet: the panel stacks under the canvas at full width
+     and grows with its content (the page scrolls, not the panel). Field keys
+     sit above their values so no text column drops below ~240px, and form
+     controls reach touch size (16px text also stops iOS zooming on focus). */
+  @media (max-width: 860px) {
+    .panel {
+      width: auto;
+      flex-shrink: 0;
+      overflow: visible;
+      border-left: 0;
+      border-top: 1px solid rgb(var(--ndo-gray-200));
+      padding: 16px 16px 20px;
+    }
+    .hide.hide {
+      width: 40px;
+      height: 40px;
+      top: 8px;
+      right: 8px;
+      transform: rotate(90deg);
+    }
+    .h {
+      padding-right: 44px;
+      overflow-wrap: anywhere;
+    }
+    .fields {
+      grid-template-columns: minmax(0, 1fr);
+      gap: 0 12px;
+    }
+    .fields__v {
+      margin-bottom: 6px;
+    }
+    .scenario.scenario,
+    .action.action,
+    .link.link,
+    .close.close {
+      min-height: 44px;
+    }
+    .control.control {
+      min-height: 44px;
+      font-size: 16px;
+    }
+    .btn.btn {
+      min-height: 44px;
+    }
+    .form__foot {
+      flex-wrap: wrap;
+    }
+  }
 </style>

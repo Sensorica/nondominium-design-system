@@ -436,4 +436,46 @@
       grid-template-columns: minmax(0, 1fr);
     }
   }
+
+  @media (max-width: 860px) {
+    .page {
+      grid-column: 1;
+      grid-row: 2;
+      padding: 24px 18px;
+    }
+    h1 {
+      font-size: 30px;
+      overflow-wrap: anywhere;
+    }
+    .lede {
+      font-size: 17px;
+    }
+    /* Two-by-two stamp instead of four cramped cells. */
+    .stamp > div {
+      flex: 1 1 45%;
+      min-width: 0;
+    }
+    .stamp > div:nth-child(2n) {
+      border-right: 0;
+    }
+    .stamp > div:nth-child(-n + 2) {
+      border-bottom: 1px solid var(--fn-ink);
+    }
+    /* Tappable tabs and actions; the actions drop to their own line. */
+    .tab,
+    .act {
+      padding: 12px 0;
+    }
+    .acts {
+      margin-left: 0;
+    }
+    h4 span,
+    .sl span {
+      min-width: 0;
+      overflow-wrap: anywhere;
+    }
+    .btn {
+      white-space: normal;
+    }
+  }
 </style>

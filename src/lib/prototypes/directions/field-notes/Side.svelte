@@ -229,4 +229,17 @@
       border-left: 0;
     }
   }
+
+  @media (max-width: 860px) {
+    .side {
+      grid-column: 1;
+      grid-row: 3;
+      /* Bottom room so the fixed exit chip never covers the last line. */
+      padding: 24px 18px 72px;
+    }
+    .act,
+    .why {
+      padding: 6px 0;
+    }
+  }
 </style>
