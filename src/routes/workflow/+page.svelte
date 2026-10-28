@@ -52,25 +52,36 @@
     axis: ((VERTEX + 0.5) / COLS) * 100,
     height: 100,
   });
+  let scroller: HTMLDivElement;
   let wrap: HTMLDivElement;
+  // The V needs NATURAL CSS px for eleven readable columns. From FIT_FROM down to
+  // that width the whole drawing is zoomed to fit the column; below FIT_FROM it
+  // keeps its size and scrolls sideways inside .vscroll.
+  const NATURAL = 1184;
+  const FIT_FROM = 880;
+  let zoom = $state(1);
 
   function measure() {
-    const box = wrap.getBoundingClientRect();
-    const cards = [...wrap.querySelectorAll<HTMLElement>('.v > li')].map((li) => li.getBoundingClientRect());
-    if (cards.length !== COLS || !box.width) return;
-    const centre = (r: DOMRect) => [r.left + r.width / 2 - box.left, r.top + r.height / 2 - box.top];
+    const avail = scroller.clientWidth;
+    zoom = avail >= NATURAL || avail < FIT_FROM ? 1 : avail / NATURAL;
+    // offset* are layout coordinates inside .vwrap, so the zoom does not skew them.
+    const ol = wrap.querySelector<HTMLElement>('.v');
+    const cards = [...wrap.querySelectorAll<HTMLElement>('.v > li')];
+    if (!ol || cards.length !== COLS || !wrap.offsetWidth) return;
+    const centre = (li: HTMLElement) => [ol.offsetLeft + li.offsetLeft + li.offsetWidth / 2, ol.offsetTop + li.offsetTop + li.offsetHeight / 2];
     line = {
-      box: `0 0 ${box.width} ${box.height}`,
+      box: `0 0 ${wrap.offsetWidth} ${wrap.offsetHeight}`,
       scale: 'xMidYMid meet',
-      points: cards.map((r) => centre(r).map((n) => n.toFixed(1)).join(',')).join(' '),
+      points: cards.map((li) => centre(li).map((n) => n.toFixed(1)).join(',')).join(' '),
       axis: centre(cards[VERTEX])[0],
-      height: box.height,
+      height: wrap.offsetHeight,
     };
   }
 
   onMount(() => {
     measure();
     const ro = new ResizeObserver(measure);
+    ro.observe(scroller);
     ro.observe(wrap);
     return () => ro.disconnect();
   });
@@ -88,8 +99,8 @@
     <p class="summary"><b>{total}</b> {total === 1 ? 'board' : 'boards'} across <b>{data.stages.filter((s) => s.boards.length).length}</b> of {data.stages.length} stages · <a href={paths.brainstorms()}>all brainstorms</a></p>
   </header>
 
-  <div class="vscroll">
-  <div class="vwrap" bind:this={wrap}>
+  <div class="vscroll" bind:this={scroller}>
+  <div class="vwrap" bind:this={wrap} style:zoom={zoom === 1 ? null : zoom}>
   <svg class="line" viewBox={line.box} preserveAspectRatio={line.scale} aria-hidden="true">
     <line class="axis" x1={line.axis} y1="0" x2={line.axis} y2={line.height} fill="none" stroke="#9ca3af" stroke-width="1.5" stroke-dasharray="6 6" vector-effect="non-scaling-stroke" />
     <polyline points={line.points} fill="none" stroke="#3b82f6" stroke-width="3" stroke-linejoin="round" vector-effect="non-scaling-stroke" />
@@ -133,7 +144,7 @@
   .summary b { color: var(--ndo-color-text-primary); }
   .summary a { color: var(--ndo-color-link); }
 
-  /* Eleven rungs need about 1200px; on a narrower screen the V scrolls sideways rather than squeezing its words. */
+  /* Eleven rungs need 1184px; between 880px and that the script zooms the V to fit, and below 880px it scrolls sideways rather than squeezing its words. */
   .vscroll { overflow-x: auto; padding-bottom: var(--ndo-spacing-2); }
   .vwrap { position: relative; min-width: calc(var(--ndo-v-col, 104px) * 11 + var(--ndo-spacing-1) * 10); }
   .v { position: relative; z-index: 1; list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(var(--cols), minmax(var(--ndo-v-col, 104px), 1fr)); grid-template-rows: repeat(var(--rows), minmax(7.5rem, auto)); gap: var(--ndo-spacing-1); }
