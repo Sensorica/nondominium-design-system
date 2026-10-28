@@ -17,6 +17,7 @@ export * from './domain/resource-perspective.js';
 export * from './domain/agent-perspective.js';
 export * from './domain/layer1.js';
 export * from './domain/spec-starters.js';
+export * from './domain/spec-inventory.js';
 
 // Fixtures
 export * from './fixtures/index.js';

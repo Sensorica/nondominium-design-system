@@ -90,6 +90,19 @@ export function getSpecProfileFields(
   return getBaseFieldsForNature(nature);
 }
 
+/** Layer 1 SourceSpecification fields only (no inventoriable Physical extras). */
+export function getSourceSpecificationFields(): SpecProfileField[] {
+  return [...SOURCE_FIELDS];
+}
+
+/** True when this descriptor is a Source-NDO specialization. */
+export function isSourceNdoDescriptor(d: {
+  ndo_archetype?: string | null;
+  source_profile?: unknown;
+} | null | undefined): boolean {
+  return d?.ndo_archetype === 'source_ndo' || !!d?.source_profile;
+}
+
 function getBaseFieldsForNature(nature: ResourceNature): SpecProfileField[] {
   switch (nature) {
     case 'Physical':

@@ -58,7 +58,10 @@ export function createInitialKernel(archetypeId: NdoArchetypeId): WizardKernelSt
     tier: archetype.tier,
     name: '',
     description: '',
-    resource_nature: archetype.isSourceNdo ? 'Physical' : 'Physical',
+    // Share-a-design defaults to Digital (not inventoriable). Source NDOs stay Physical
+    // unless KnowledgeCommons maps nature elsewhere.
+    resource_nature:
+      archetype.id === 'open_design' ? 'Digital' : 'Physical',
     lifecycle_stage: archetype.defaultLifecycleStage
   };
 }
@@ -158,12 +161,17 @@ export function buildWizardResult(
   refinement: WizardRefinementState,
   specification?: NdoSpecificationDraft | null
 ): WizardResult {
+  const isSource = kernel.archetype === 'source_ndo';
   const ndo_input: NdoInput = {
     name: kernel.name.trim(),
     property_regime: refinement.property_regime,
     resource_nature: kernel.resource_nature,
     lifecycle_stage: kernel.lifecycle_stage,
-    ...(kernel.description.trim() && { description: kernel.description.trim() })
+    ...(kernel.description.trim() && { description: kernel.description.trim() }),
+    ndo_archetype: kernel.archetype,
+    ...(isSource && refinement.source_profile
+      ? { source_profile: refinement.source_profile }
+      : {})
   };
 
   return {

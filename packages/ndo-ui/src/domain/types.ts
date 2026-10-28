@@ -107,6 +107,9 @@ export interface NdoInput {
   resource_nature: ResourceNature;
   lifecycle_stage: LifecycleStage;
   description?: string;
+  /** Prototype: carry Source / archetype metadata from the create wizard into session state. */
+  ndo_archetype?: NdoArchetypeId | null;
+  source_profile?: SourceProfile | null;
 }
 
 export interface SourceProfile {
@@ -160,6 +163,51 @@ export interface NdoSpecificationDraft {
 }
 
 /**
+ * VF-aligned inventory intent (foreshadow — not yet on Rust ResourceSpecification).
+ * @see https://www.valueflo.ws/concepts/resources/#inventory
+ */
+export type InventoryIntent = 'Inventoried' | 'NotInventoried' | 'NotApplicable';
+
+/**
+ * VF identification pattern for inventoriable kinds (foreshadow).
+ * Serialized = unique id per instance; LotControlled = batch id; Stock = count/volume.
+ * Not used for Digital — digital kinds use {@link DigitalLocatorKind} instead.
+ */
+export type IdentificationPattern = 'Serialized' | 'LotControlled' | 'Stock';
+
+/**
+ * How a digital artifact is reached (foreshadow — not shelf inventory).
+ * Digital kinds are NotApplicable for inventory; identity is by address / content hash.
+ */
+export type DigitalLocatorKind =
+  | 'ContentAddressed'
+  | 'Url'
+  | 'Repository'
+  | 'DistributedStore'
+  | 'HostedService'
+  | 'LocalHost';
+
+/** Prototype foreshadow of SourceSpecification Layer 1 fields (not on Rust yet). */
+export interface SourceSpecForeshadow {
+  boundary_description?: string | null;
+  monitoring_plan?: string | null;
+  stakeholder_map?: string | null;
+  restoration_obligations?: string | null;
+}
+
+/** Prototype-only VF foreshadow fields stored on the session spec. */
+export interface SpecForeshadow extends SourceSpecForeshadow {
+  inventory_intent: InventoryIntent;
+  identification_pattern: IdentificationPattern | null;
+  default_unit: string | null;
+  substitutable: boolean | null;
+  /** Digital only: how the artifact is located (never inventory). */
+  digital_locator_kind?: DigitalLocatorKind | null;
+  /** Digital only: address, URI, CID, repo path, host id, etc. */
+  digital_locator?: string | null;
+}
+
+/**
  * Layer 1 ResourceSpecification — mirrors the Rust entry in zome_resource.
  * Linked from Layer 0 via NdoToSpecification; does not modify NondominiumIdentity.
  */
@@ -168,8 +216,13 @@ export interface ResourceSpecification {
   action_hash: string;
   name: string;
   description: string;
+  /**
+   * Primary browse classification (Rust field name `category`).
+   * Not the kind itself — VF classification for discovery.
+   */
   category: string;
   image_url: string | null;
+  /** Additional browse classifications / facets. */
   tags: string[];
   is_active: boolean;
   scope: ResourceScope;
@@ -183,16 +236,39 @@ export interface ResourceSpecification {
   /** Author agent key; updates are author-only. */
   author: string;
   created_at: number;
+  /** Prototype foreshadow of VF inventory / identification (not on Rust yet). */
+  inventory_intent?: InventoryIntent;
+  identification_pattern?: IdentificationPattern | null;
+  default_unit?: string | null;
+  substitutable?: boolean | null;
+  digital_locator_kind?: DigitalLocatorKind | null;
+  digital_locator?: string | null;
+  /** Source-NDO Layer 1 foreshadow (SourceSpecification). */
+  boundary_description?: string | null;
+  monitoring_plan?: string | null;
+  stakeholder_map?: string | null;
+  restoration_obligations?: string | null;
 }
 
 /** Mutable fields accepted when creating or updating a Layer 1 specification. */
 export interface ResourceSpecificationInput {
   name: string;
   description: string;
+  /** Primary browse classification (maps to Rust `category`). */
   category?: string;
   image_url?: string | null;
   tags?: string[];
   scope: ResourceScope;
+  inventory_intent?: InventoryIntent;
+  identification_pattern?: IdentificationPattern | null;
+  default_unit?: string | null;
+  substitutable?: boolean | null;
+  digital_locator_kind?: DigitalLocatorKind | null;
+  digital_locator?: string | null;
+  boundary_description?: string | null;
+  monitoring_plan?: string | null;
+  stakeholder_map?: string | null;
+  restoration_obligations?: string | null;
 }
 
 export interface WizardResult {

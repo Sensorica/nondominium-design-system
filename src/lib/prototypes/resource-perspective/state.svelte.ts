@@ -12,6 +12,8 @@ import {
   MOCK_LOBBY_PROFILE,
   MOCK_NDOS,
   resolveScope,
+  isSourceNdoDescriptor,
+  validateForeshadow,
   validateSpecInput,
   type ActiveFilters,
   type GroupDescriptor,
@@ -158,7 +160,9 @@ export function createNdo(groupId: string, input: NdoInput): string {
     initiator: MY_KEY,
     created_at: Date.now() * 1000,
     successor_ndo_hash: null,
-    hibernation_origin: null
+    hibernation_origin: null,
+    ...(input.ndo_archetype ? { ndo_archetype: input.ndo_archetype } : {}),
+    ...(input.source_profile ? { source_profile: input.source_profile } : {})
   };
   rp.created = [...rp.created, d];
   rp.groups = associateNdoWithGroups(rp.groups, hash, [groupId]);
@@ -256,6 +260,26 @@ export function createSpecification(
   if (!validated.ok) {
     throw new Error(validated.error);
   }
+  const isSource = isSourceNdoDescriptor(ndo);
+  const foreshadow = validateForeshadow(
+    {
+      inventory_intent: input.inventory_intent ?? 'NotInventoried',
+      identification_pattern: input.identification_pattern ?? null,
+      default_unit: input.default_unit ?? null,
+      substitutable: input.substitutable ?? null,
+      digital_locator_kind: input.digital_locator_kind ?? null,
+      digital_locator: input.digital_locator ?? null,
+      boundary_description: input.boundary_description ?? null,
+      monitoring_plan: input.monitoring_plan ?? null,
+      stakeholder_map: input.stakeholder_map ?? null,
+      restoration_obligations: input.restoration_obligations ?? null
+    },
+    ndo.resource_nature,
+    { isSource }
+  );
+  if (!foreshadow.ok) {
+    throw new Error(foreshadow.error);
+  }
   specSeq += 1;
   const spec: ResourceSpecification = {
     action_hash: `uhC0kSpec${specSeq}Layer1DemoAbcdefghijklmn`,
@@ -269,7 +293,17 @@ export function createSpecification(
     ndo_identity_hash: ndo.hash,
     activated_at_stage: stage || 'Specification',
     author: MY_KEY,
-    created_at: Date.now() * 1000
+    created_at: Date.now() * 1000,
+    inventory_intent: foreshadow.foreshadow.inventory_intent,
+    identification_pattern: foreshadow.foreshadow.identification_pattern,
+    default_unit: foreshadow.foreshadow.default_unit,
+    substitutable: foreshadow.foreshadow.substitutable,
+    digital_locator_kind: foreshadow.foreshadow.digital_locator_kind,
+    digital_locator: foreshadow.foreshadow.digital_locator,
+    boundary_description: foreshadow.foreshadow.boundary_description,
+    monitoring_plan: foreshadow.foreshadow.monitoring_plan,
+    stakeholder_map: foreshadow.foreshadow.stakeholder_map,
+    restoration_obligations: foreshadow.foreshadow.restoration_obligations
   };
   const existing = rp.specs[ndo.hash] ?? [];
   rp.specs = { ...rp.specs, [ndo.hash]: [...existing, spec] };
@@ -284,7 +318,9 @@ export function updateSpecification(
   ndoHash: string,
   actionHash: string,
   input: ResourceSpecificationInput,
-  propertyRegime?: string | null
+  propertyRegime?: string | null,
+  resourceNature?: string | null,
+  isSourceNdo = false
 ): ResourceSpecification {
   const list = rp.specs[ndoHash] ?? [];
   const index = list.findIndex((s) => s.action_hash === actionHash);
@@ -303,6 +339,55 @@ export function updateSpecification(
   if (!validated.ok) {
     throw new Error(validated.error);
   }
+  const isSource =
+    isSourceNdo ||
+    !!original.boundary_description ||
+    !!original.monitoring_plan ||
+    !!input.boundary_description ||
+    !!input.monitoring_plan;
+  const foreshadow = validateForeshadow(
+    {
+      inventory_intent:
+        input.inventory_intent ?? original.inventory_intent ?? 'NotInventoried',
+      identification_pattern:
+        input.identification_pattern !== undefined
+          ? input.identification_pattern
+          : (original.identification_pattern ?? null),
+      default_unit:
+        input.default_unit !== undefined ? input.default_unit : (original.default_unit ?? null),
+      substitutable:
+        input.substitutable !== undefined ? input.substitutable : (original.substitutable ?? null),
+      digital_locator_kind:
+        input.digital_locator_kind !== undefined
+          ? input.digital_locator_kind
+          : (original.digital_locator_kind ?? null),
+      digital_locator:
+        input.digital_locator !== undefined
+          ? input.digital_locator
+          : (original.digital_locator ?? null),
+      boundary_description:
+        input.boundary_description !== undefined
+          ? input.boundary_description
+          : (original.boundary_description ?? null),
+      monitoring_plan:
+        input.monitoring_plan !== undefined
+          ? input.monitoring_plan
+          : (original.monitoring_plan ?? null),
+      stakeholder_map:
+        input.stakeholder_map !== undefined
+          ? input.stakeholder_map
+          : (original.stakeholder_map ?? null),
+      restoration_obligations:
+        input.restoration_obligations !== undefined
+          ? input.restoration_obligations
+          : (original.restoration_obligations ?? null)
+    },
+    resourceNature,
+    { isSource }
+  );
+  if (!foreshadow.ok) {
+    throw new Error(foreshadow.error);
+  }
   const updated: ResourceSpecification = {
     ...original,
     name: validated.input.name,
@@ -310,7 +395,17 @@ export function updateSpecification(
     category: validated.input.category,
     image_url: validated.input.image_url,
     tags: validated.input.tags,
-    scope: validated.input.scope
+    scope: validated.input.scope,
+    inventory_intent: foreshadow.foreshadow.inventory_intent,
+    identification_pattern: foreshadow.foreshadow.identification_pattern,
+    default_unit: foreshadow.foreshadow.default_unit,
+    substitutable: foreshadow.foreshadow.substitutable,
+    digital_locator_kind: foreshadow.foreshadow.digital_locator_kind,
+    digital_locator: foreshadow.foreshadow.digital_locator,
+    boundary_description: foreshadow.foreshadow.boundary_description,
+    monitoring_plan: foreshadow.foreshadow.monitoring_plan,
+    stakeholder_map: foreshadow.foreshadow.stakeholder_map,
+    restoration_obligations: foreshadow.foreshadow.restoration_obligations
   };
   const next = [...list];
   next[index] = updated;

@@ -279,7 +279,14 @@
             createSpecification(descriptor, input);
           }}
           onupdatespec={(actionHash, input) => {
-            updateSpecification(descriptor.hash, actionHash, input, descriptor.property_regime);
+            updateSpecification(
+              descriptor.hash,
+              actionHash,
+              input,
+              descriptor.property_regime,
+              descriptor.resource_nature,
+              descriptor.ndo_archetype === 'source_ndo' || !!descriptor.source_profile
+            );
           }}
           initialTab={tabParam === 'resources' ? 'resources' : 'overview'}
           oninitiatorjump={handleInitiatorJump}
