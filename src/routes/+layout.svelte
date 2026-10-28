@@ -178,6 +178,12 @@
           </div>
 
           <div class="group">
+            <a class="grouphead" href={paths.workflow()} class:on={current.startsWith(paths.workflow())}>
+              Workflow
+            </a>
+          </div>
+
+          <div class="group">
             <a class="grouphead" href={paths.previews()} class:on={current.startsWith(paths.previews())}>
               Branch previews
             </a>
