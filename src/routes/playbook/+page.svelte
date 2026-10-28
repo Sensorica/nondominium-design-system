@@ -44,7 +44,7 @@
   .component-grid {
     display: grid;
     gap: 1rem;
-    grid-template-columns: repeat(auto-fill, minmax(14rem, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(min(14rem, 100%), 1fr));
   }
 
   .component-card {

@@ -105,4 +105,12 @@
   .sidebar-link.is-active { background: rgb(var(--ndo-blue-50)); color: rgb(var(--ndo-blue-700)); font-weight: 500; }
 
   .playbook-content { flex: 1; padding: 2rem 1.5rem; min-width: 0; }
+  /* Same breakpoint as the main rail: on a phone the side list sits above the
+     page instead of taking 13rem of a 390px screen. */
+  @media (max-width: 860px) {
+    .playbook-layout { flex-direction: column; min-height: 0; }
+    .playbook-sidebar { width: auto; border-right: 0; border-bottom: 1px solid rgb(var(--ndo-gray-200)); }
+    .playbook-sidebar nav { display: flex; flex-wrap: wrap; gap: 4px; }
+    .sidebar-link { padding: 0.25rem 0.625rem; border: 1px solid rgb(var(--ndo-gray-200)); border-radius: 999px; }
+  }
 </style>
