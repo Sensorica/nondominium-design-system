@@ -55,6 +55,6 @@
 <style>
   .specimen-section { margin-bottom: 2rem; }
   .specimen-heading { font-size: 0.8125rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: rgb(var(--ndo-gray-500)); margin: 0 0 0.75rem; }
-  .card-grid { display: grid; gap: 0.75rem; grid-template-columns: repeat(auto-fill, minmax(17rem, 1fr)); }
+  .card-grid { display: grid; gap: 0.75rem; grid-template-columns: repeat(auto-fill, minmax(min(17rem, 100%), 1fr)); }
   .code-block { background: rgb(var(--ndo-gray-50)); border: 1px solid rgb(var(--ndo-gray-200)); border-radius: 0.5rem; padding: 1rem; font-size: 0.8125rem; font-family: var(--ndo-font-mono); overflow-x: auto; white-space: pre; }
 </style>

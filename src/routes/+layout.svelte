@@ -328,6 +328,9 @@
   }
 
   .main { min-height: 100vh; background: var(--ndo-color-bg-app); }
+  /* File paths and package names in running text break rather than widen the
+     page; a code block keeps white-space: pre and scrolls. */
+  .main :global(code) { overflow-wrap: break-word; }
 
   /* Mobile: the rail becomes a sticky top bar (brand + hamburger), and the
      rest of it drops down over the page as a scrollable panel. */
@@ -337,6 +340,8 @@
        the hamburger off it. */
     .chrome { grid-template-columns: minmax(0, 1fr); }
     .main { min-width: 0; }
+    /* Token tables keep their columns and scroll sideways. */
+    .main :global(table.token-table) { display: block; overflow-x: auto; }
     .rail {
       height: auto;
       overflow: visible;

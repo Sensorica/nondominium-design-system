@@ -31,6 +31,9 @@
     border: 1px dashed var(--ndo-color-border);
     border-radius: var(--ndo-radius-lg);
     background: var(--ndo-color-surface);
+    /* A specimen copies the app's markup as is; when it is wider than a phone
+       it scrolls inside the stage rather than widening the page. */
+    overflow-x: auto;
   }
   .code {
     margin: 0;
