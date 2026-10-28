@@ -6,6 +6,7 @@
   // requirements, integration proofs the architecture, unit proofs the
   // interfaces, and review and merge face project management. Under 860px the V
   // becomes a vertical list in the same order.
+  import { onMount } from 'svelte';
   import { paths } from '$lib/paths';
   import { STAGE_LABEL, STATUS_LABEL, LANG_LABEL } from '$lib/brainstorms/labels';
 
@@ -40,8 +41,50 @@
   const COLS = RUNGS.length;
   const boardsAt = $derived(Object.fromEntries(data.stages.map((s) => [s.stage, s.boards])));
   // The V line through the centre of every rung cell, in a 0..100 box.
-  const points = RUNGS.map((r, i) => `${((i + 0.5) / COLS) * 100},${((r.depth + 0.5) / ROWS) * 100}`).join(' ');
-  const axis = ((RUNGS.findIndex((r) => r.side === 'vertex') + 0.5) / COLS) * 100;
+  // Before layout: the V through the centre of every grid cell, in a 0..100 box.
+  // Rows are not equal (a rung with many boards is taller), so once the page is
+  // laid out the line is redrawn through the measured centre of each card.
+  const VERTEX = RUNGS.findIndex((r) => r.side === 'vertex');
+  let line = $state({
+    box: '0 0 100 100',
+    scale: 'none',
+    points: RUNGS.map((r, i) => `${((i + 0.5) / COLS) * 100},${((r.depth + 0.5) / ROWS) * 100}`).join(' '),
+    axis: ((VERTEX + 0.5) / COLS) * 100,
+    height: 100,
+  });
+  let scroller: HTMLDivElement;
+  let wrap: HTMLDivElement;
+  // The V needs NATURAL CSS px for eleven readable columns. From FIT_FROM down to
+  // that width the whole drawing is zoomed to fit the column; below FIT_FROM it
+  // keeps its size and scrolls sideways inside .vscroll.
+  const NATURAL = 1184;
+  const FIT_FROM = 880;
+  let zoom = $state(1);
+
+  function measure() {
+    const avail = scroller.clientWidth;
+    zoom = avail >= NATURAL || avail < FIT_FROM ? 1 : avail / NATURAL;
+    // offset* are layout coordinates inside .vwrap, so the zoom does not skew them.
+    const ol = wrap.querySelector<HTMLElement>('.v');
+    const cards = [...wrap.querySelectorAll<HTMLElement>('.v > li')];
+    if (!ol || cards.length !== COLS || !wrap.offsetWidth) return;
+    const centre = (li: HTMLElement) => [ol.offsetLeft + li.offsetLeft + li.offsetWidth / 2, ol.offsetTop + li.offsetTop + li.offsetHeight / 2];
+    line = {
+      box: `0 0 ${wrap.offsetWidth} ${wrap.offsetHeight}`,
+      scale: 'xMidYMid meet',
+      points: cards.map((li) => centre(li).map((n) => n.toFixed(1)).join(',')).join(' '),
+      axis: centre(cards[VERTEX])[0],
+      height: wrap.offsetHeight,
+    };
+  }
+
+  onMount(() => {
+    measure();
+    const ro = new ResizeObserver(measure);
+    ro.observe(scroller);
+    ro.observe(wrap);
+    return () => ro.disconnect();
+  });
   const total = $derived(data.stages.reduce((t, s) => t + s.boards.length, 0));
 </script>
 
@@ -56,10 +99,11 @@
     <p class="summary"><b>{total}</b> {total === 1 ? 'board' : 'boards'} across <b>{data.stages.filter((s) => s.boards.length).length}</b> of {data.stages.length} stages · <a href={paths.brainstorms()}>all brainstorms</a></p>
   </header>
 
-  <div class="vwrap">
-  <svg class="line" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
-    <line class="axis" x1={axis} y1="0" x2={axis} y2="100" fill="none" stroke="#9ca3af" stroke-width="1.5" stroke-dasharray="6 6" vector-effect="non-scaling-stroke" />
-    <polyline {points} fill="none" stroke="#3b82f6" stroke-width="3" stroke-linejoin="round" vector-effect="non-scaling-stroke" />
+  <div class="vscroll" bind:this={scroller}>
+  <div class="vwrap" bind:this={wrap} style:zoom={zoom === 1 ? null : zoom}>
+  <svg class="line" viewBox={line.box} preserveAspectRatio={line.scale} aria-hidden="true">
+    <line class="axis" x1={line.axis} y1="0" x2={line.axis} y2={line.height} fill="none" stroke="#9ca3af" stroke-width="1.5" stroke-dasharray="6 6" vector-effect="non-scaling-stroke" />
+    <polyline points={line.points} fill="none" stroke="#3b82f6" stroke-width="3" stroke-linejoin="round" vector-effect="non-scaling-stroke" />
   </svg>
   <ol class="v" style="--cols:{COLS};--rows:{ROWS}" aria-label="The rungs of the V, in order">
     {#each RUNGS as r, i (r.key)}
@@ -89,17 +133,21 @@
     {/each}
   </ol>
   </div>
+  </div>
 </main>
 
 <style>
-  .workflow { max-width: 1440px; margin: 0 auto; padding: var(--ndo-spacing-8) var(--ndo-spacing-6) 5rem; color: var(--ndo-color-text-primary); font-size: var(--ndo-text-base); line-height: var(--ndo-lh-base); }
+  /* contain: the layout's main column is a bare 1fr, so without it the V's width would widen the page instead of scrolling inside .vscroll. */
+  .workflow { contain: inline-size; max-width: 1440px; margin: 0 auto; padding: var(--ndo-spacing-8) var(--ndo-spacing-6) 5rem; color: var(--ndo-color-text-primary); font-size: var(--ndo-text-base); line-height: var(--ndo-lh-base); }
   .lede { color: var(--ndo-color-text-secondary); max-width: 720px; margin: var(--ndo-spacing-1) 0 var(--ndo-spacing-3); }
   .summary { color: var(--ndo-color-text-secondary); font-size: var(--ndo-text-sm); margin: 0 0 var(--ndo-spacing-6); }
   .summary b { color: var(--ndo-color-text-primary); }
   .summary a { color: var(--ndo-color-link); }
 
-  .vwrap { position: relative; }
-  .v { position: relative; z-index: 1; list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(var(--cols), minmax(0, 1fr)); grid-template-rows: repeat(var(--rows), minmax(7.5rem, auto)); gap: var(--ndo-spacing-1); }
+  /* Eleven rungs need 1184px; between 880px and that the script zooms the V to fit, and below 880px it scrolls sideways rather than squeezing its words. */
+  .vscroll { overflow-x: auto; padding-bottom: var(--ndo-spacing-2); }
+  .vwrap { position: relative; min-width: calc(var(--ndo-v-col, 104px) * 11 + var(--ndo-spacing-1) * 10); }
+  .v { position: relative; z-index: 1; list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(var(--cols), minmax(var(--ndo-v-col, 104px), 1fr)); grid-template-rows: repeat(var(--rows), minmax(7.5rem, auto)); gap: var(--ndo-spacing-1); }
   .line { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0; }
   .line polyline { stroke: rgb(var(--ndo-primary-500)); opacity: 0.55; }
   .line .axis { stroke: var(--ndo-color-border-strong); }
@@ -112,11 +160,11 @@
   .note { margin: var(--ndo-spacing-2) 0 0; font-size: var(--ndo-text-xs); line-height: var(--ndo-lh-xs); color: var(--ndo-color-text-secondary); }
   .head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0 var(--ndo-spacing-1-5); }
   .n { flex-basis: 100%; font-family: var(--ndo-font-mono); font-size: var(--ndo-text-xs); color: var(--ndo-color-text-muted); }
-  h2 { margin: 0; font-size: var(--ndo-text-xs); line-height: var(--ndo-lh-xs); font-weight: var(--ndo-weight-bold); overflow-wrap: normal; word-break: normal; hyphens: auto; min-width: 0; }
+  h2 { margin: 0; font-size: var(--ndo-text-xs); line-height: var(--ndo-lh-xs); font-weight: var(--ndo-weight-bold); overflow-wrap: normal; word-break: normal; hyphens: manual; min-width: 0; }
   .sub { display: block; font-weight: var(--ndo-weight-medium); color: var(--ndo-color-text-secondary); }
   .count { margin-left: auto; align-self: center; font-size: var(--ndo-text-xs); font-weight: var(--ndo-weight-bold); color: rgb(var(--ndo-color-text-inverse)); background: rgb(var(--ndo-primary-600)); border-radius: var(--ndo-radius-pill); padding: 0 7px; }
   .boards { list-style: none; margin: var(--ndo-spacing-2) 0 0; padding: 0; display: flex; flex-direction: column; gap: var(--ndo-spacing-2); }
-  .boards a { display: block; color: var(--ndo-color-link); font-size: var(--ndo-text-xs); line-height: var(--ndo-lh-xs); font-weight: var(--ndo-weight-semibold); text-decoration: none; overflow-wrap: break-word; hyphens: auto; }
+  .boards a { display: block; color: var(--ndo-color-link); font-size: var(--ndo-text-xs); line-height: var(--ndo-lh-xs); font-weight: var(--ndo-weight-semibold); text-decoration: none; overflow-wrap: normal; word-break: normal; hyphens: manual; }
   .boards a:hover { text-decoration: underline; }
   .meta { display: block; font-size: 0.6875rem; color: var(--ndo-color-text-muted); font-family: var(--ndo-font-mono); }
   .empty { margin: var(--ndo-spacing-2) 0 0; font-size: var(--ndo-text-xs); color: var(--ndo-color-text-muted); font-style: italic; }
@@ -124,6 +172,8 @@
 
   /* Narrow: the V becomes the ordered list it is, read top to bottom. */
   @media (max-width: 860px) {
+    .vwrap { min-width: 0; }
+    .vscroll { overflow-x: visible; padding-bottom: 0; }
     .workflow { padding: var(--ndo-spacing-6) var(--ndo-spacing-4) 4rem; }
     .v { display: flex; flex-direction: column; gap: var(--ndo-spacing-3); padding-left: var(--ndo-spacing-4); border-left: 3px solid rgb(var(--ndo-primary-500) / 0.55); }
     .line { display: none; }
