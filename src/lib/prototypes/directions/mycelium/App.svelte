@@ -546,7 +546,9 @@
     .app {
       grid-template-columns: minmax(0, 1fr);
       grid-template-rows: none;
-      grid-auto-rows: auto;
+      /* max-content, not auto: in a fixed-height shell auto rows were
+         squeezed to fit and the panel ran over the status bar. */
+      grid-auto-rows: max-content;
       overflow: auto;
     }
     .rail {

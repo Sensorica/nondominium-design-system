@@ -163,7 +163,9 @@
     .fn {
       grid-template-columns: minmax(0, 1fr);
       grid-template-rows: none;
-      grid-auto-rows: auto;
+      /* max-content, not auto: in a fixed-height shell auto rows were
+         squeezed to fit and the entry spilled over the side column. */
+      grid-auto-rows: max-content;
       align-content: start;
     }
   }
