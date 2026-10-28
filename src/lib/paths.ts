@@ -154,6 +154,9 @@ export const paths = {
   /** The compiled board itself, full page, outside the site chrome. */
   brainstormBoard: (slug: string) => `${base}/brainstorms/boards/${encodeURIComponent(slug)}.html`,
 
+  // ── Workflow: the iterative V, with the published boards at each stage ──
+  workflow: () => `${base}/workflow`,
+
   // ── Branch previews: every pushed branch, linked to its Cloudflare preview ──
   previews: () => `${base}/previews`,
 

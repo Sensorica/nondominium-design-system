@@ -59,6 +59,12 @@ The boards live in `boards/`, not beside the route, because the site prerenders 
 | `proofs` | Proofs: the tests and checks that show it works |
 | `deployments` | Deployments: where it runs |
 
+### The V on the site
+
+`/workflow` draws the V: the eight stages in order, implementation at the point and on the axis of symmetry, the design stages descending on the left, and proofs and deployments rising on the right. Proofs faces project management and deployments faces interfaces. Each stage lists the published boards whose `lifecycle:` is that stage, newest first, each linking to its page at `/brainstorms/<slug>`. A stage with no board says so. Under 860px the V becomes a vertical list in the same order.
+
+A board moves down the V as the work advances: when a brainstorm settles into requirements, change its `lifecycle:` (or publish the requirements board as its own file), recompile, and the board appears at its new stage on the next build. The stage labels come from `src/lib/brainstorms/labels.ts`, which mirrors the compiler's stage ids and order.
+
 Do not add the compiler's `lifecycle-<stage>:` sibling keys to a published board: they point at local files or a local server, which the published site cannot reach.
 
 ## What may be published
