@@ -61,7 +61,7 @@ The boards live in `boards/`, not beside the route, because the site prerenders 
 
 ### The V on the site
 
-`/workflow` draws the V: the eight stages in order, implementation at the point and on the axis of symmetry, the design stages descending on the left, and proofs and deployments rising on the right. Proofs faces project management and deployments faces interfaces. Each stage lists the published boards whose `lifecycle:` is that stage, newest first, each linking to its page at `/brainstorms/<slug>`. A stage with no board says so. Under 860px the V becomes a vertical list in the same order.
+`/workflow` draws the V with five rungs per side and implementation at the point, on the axis of symmetry. Each rung on the right checks the one it faces on the left: deployments face the brainstorm, acceptance proofs face requirements, integration proofs face architecture, unit proofs face interfaces, and review and merge faces project management. Review and merge is not a `lifecycle:` stage, since no board sits there (pull requests close the issues opened at project management), and the three proofs rungs all list the `lifecycle: proofs` boards. Each stage lists the published boards whose `lifecycle:` is that stage, newest first, each linking to its page at `/brainstorms/<slug>`. A stage with no board says so. Under 860px the V becomes a vertical list in the same order.
 
 A board moves down the V as the work advances: when a brainstorm settles into requirements, change its `lifecycle:` (or publish the requirements board as its own file), recompile, and the board appears at its new stage on the next build. The stage labels come from `src/lib/brainstorms/labels.ts`, which mirrors the compiler's stage ids and order.
 
