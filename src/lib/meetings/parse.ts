@@ -18,6 +18,7 @@
 // extended for the above.
 
 import { marked } from 'marked';
+import { parseRecordingUrl, parseCuts, type Cut } from './recording';
 
 /** Minutes into the recording, as written in the journal: [62 to 67m] or [62 à 67]. */
 export type Span = [number, number];
@@ -69,6 +70,10 @@ export interface Meeting {
   context: string;
   durationMin: number | null;
   breaks: Span[];
+  /** The https URL of the published recording, from the `recording:` frontmatter; null when absent or not https. */
+  recording: string | null;
+  /** Passages silenced in that recording for privacy, in seconds (`recording_cuts:`). */
+  recordingCuts: Cut[];
   tldr: string;
   sections: Section[];
   actions: Action[];
@@ -198,6 +203,26 @@ function splitCaption(source: string): { source: string; caption: string } {
   return { source: kept.join('\n').trim(), caption };
 }
 
+/**
+ * The `recording_cuts:` value as one JSON array string: the inline form
+ * (`recording_cuts: [[120, 185], [610, 640]]`) or a block list of pairs
+ * (`- [120, 185]` on the lines below). Empty when the key is absent.
+ */
+export function cutsSource(frontmatter: string): string {
+  const lines = frontmatter.split('\n');
+  const at = lines.findIndex((l) => /^recording_cuts:/.test(l));
+  if (at === -1) return '';
+  const inline = lines[at].replace(/^recording_cuts:\s*/, '').trim();
+  if (inline) return inline;
+  const pairs: string[] = [];
+  for (const l of lines.slice(at + 1)) {
+    const m = l.match(/^\s*-\s*(\[.*\])\s*$/);
+    if (!m) break;
+    pairs.push(m[1]);
+  }
+  return `[${pairs.join(',')}]`;
+}
+
 const words = (s: string) => plain(s).split(/\s+/).filter(Boolean).length;
 
 export function parseMeeting(file: string, src: string): Meeting {
@@ -210,6 +235,7 @@ export function parseMeeting(file: string, src: string): Meeting {
       const m = line.match(/^(\w+):\s*"?(.*?)"?$/);
       if (m) fm[m[1]] = m[2];
     }
+    fm.recording_cuts = cutsSource(block);
     return '';
   });
 
@@ -306,6 +332,8 @@ export function parseMeeting(file: string, src: string): Meeting {
     context: inline(head('Context|Contexte')),
     durationMin: durationOf(dateLine),
     breaks: breaksOf(dateLine),
+    recording: parseRecordingUrl(fm.recording),
+    recordingCuts: parseCuts(fm.recording_cuts),
     tldr: inline(tldr.replace(/\n\n/g, ' ')),
     sections,
     actions,
