@@ -20,6 +20,18 @@ export type Rivalry = 'Rivalrous' | 'NonRivalrous';
 /** How a rivalrous resource subtracts. A usage rule, not a second rivalry value. */
 export type SubtractionKind = 'unit' | 'capacity' | 'consumable';
 
+/**
+ * Layer 0 inventoriable fork for Physical / Hybrid (not Digital, not Source).
+ * Use = operate without depleting; Consume = batch/stock that depletes.
+ */
+export type EconomicMode = 'use' | 'consume';
+
+/** Under Use: one held thing vs a place with concurrent capacity. */
+export type UseKind = 'unit' | 'capacity';
+
+/** Lot vs undifferentiated stock for Consume-mode batches. */
+export type ConsumeIdentification = 'LotControlled' | 'Stock';
+
 export type ResourceScope = 'Project' | 'Network' | 'Public';
 
 export type ResourceSource = 'Network' | 'Partner' | 'Purchased' | 'Donated';
@@ -76,6 +88,11 @@ export interface NdoDescriptor {
   /** When set, this NDO is a Source-NDO specialization */
   ndo_archetype?: NdoArchetypeId | null;
   source_profile?: SourceProfile | null;
+  /** Layer 0 inventoriable fork (Physical/Hybrid). */
+  economic_mode?: EconomicMode | null;
+  use_kind?: UseKind | null;
+  /** Derived / legacy: unit | capacity | consumable */
+  subtraction?: SubtractionKind | null;
 }
 
 export interface GroupDescriptor {
@@ -110,6 +127,16 @@ export interface NdoInput {
   /** Prototype: carry Source / archetype metadata from the create wizard into session state. */
   ndo_archetype?: NdoArchetypeId | null;
   source_profile?: SourceProfile | null;
+  /** Physical/Hybrid inventoriable fork — foreshadow until DNA stores it. */
+  economic_mode?: EconomicMode | null;
+  use_kind?: UseKind | null;
+  default_unit?: string | null;
+  initial_quantity?: number | null;
+  identification_pattern?: ConsumeIdentification | 'Serialized' | null;
+  unique_id?: string | null;
+  max_concurrent_users?: number | null;
+  /** Preselected governance template ids from create/review. */
+  governance_rule_ids?: string[];
 }
 
 export interface SourceProfile {
@@ -135,6 +162,20 @@ export interface WizardKernelState {
   description: string;
   resource_nature: ResourceNature;
   lifecycle_stage: LifecycleStage;
+  /** Required for Physical/Hybrid non-Source. Null for Digital / Source. */
+  economic_mode: EconomicMode | null;
+  /** Required when economic_mode === 'use'. */
+  use_kind: UseKind | null;
+  /** Consume: unit label (kg, each, L…). */
+  default_unit: string | null;
+  /** Consume: starting quantity (>0). */
+  initial_quantity: number | null;
+  /** Consume: LotControlled or Stock. */
+  identification_pattern: ConsumeIdentification | null;
+  /** Use/unit: optional serial / QR. */
+  unique_id: string | null;
+  /** Use/capacity: required max concurrent occupants (≥2). */
+  max_concurrent_users: number | null;
 }
 
 export interface WizardRefinementState {

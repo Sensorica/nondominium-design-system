@@ -1,5 +1,5 @@
 ---
-name: nondominium-design
+name: nondominium-design-system
 description: Use this skill to generate well-branded interfaces and assets for Nondominium (the Sensorica Holochain app for resource governance without ownership), either for production or for throwaway prototypes and mocks. Contains the design tokens, brand brief, component playbook, and a navigable prototype of every screen the app has.
 user-invocable: true
 designsystem:

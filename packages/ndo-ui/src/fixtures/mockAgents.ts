@@ -85,6 +85,9 @@ export const MOCK_NDO_INITIATOR_NAMES: Record<string, string> = {
   uhC0kZyXwVuTsRqPoNmLkJiHgFeDcBa9: MOCK_AGENT_NAMES.bob,
   uhC0k1234abcdefghijklmnopqrstuvwx: MOCK_AGENT_NAMES.bauwens,
   uhC0kIdeationOnlyHashExample00001: MOCK_AGENT_NAMES.lynn,
+  uhC0kUseUnitPrinterExample00001: MOCK_AGENT_NAMES.lynn,
+  uhC0kUseCapacityBayExample00001: MOCK_AGENT_NAMES.bauwens,
+  uhC0kConsumeBatchTomatoExample01: MOCK_AGENT_NAMES.bob,
   uhC0kSourceNdoRiverExample01: MOCK_AGENT_NAMES.sacha
 };
 

@@ -130,6 +130,60 @@ export const SUBTRACTION_OPTIONS: {
   }
 ];
 
+/** Layer 0 inventoriable fork — shown on the identity step for Physical / Hybrid. */
+export const ECONOMIC_MODE_OPTIONS: {
+  id: 'use' | 'consume';
+  label: string;
+  description: string;
+}[] = [
+  {
+    id: 'use',
+    label: 'Use — operate without using it up',
+    description:
+      'Borrow, occupy, or operate a tool, machine, or place. The thing remains after use.'
+  },
+  {
+    id: 'consume',
+    label: 'Consume — a batch or stock that depletes',
+    description:
+      'This NDO is this harvest, lot, or supply. Taking units reduces what is left. A new delivery is a new NDO.'
+  }
+];
+
+export const USE_KIND_OPTIONS: {
+  id: 'unit' | 'capacity';
+  label: string;
+  description: string;
+}[] = [
+  {
+    id: 'unit',
+    label: 'One held thing',
+    description: 'A drill, printer, or artwork — unique identity (serial / QR optional).'
+  },
+  {
+    id: 'capacity',
+    label: 'A place with capacity',
+    description: 'Several people can use it together until a concurrent limit is reached.'
+  }
+];
+
+export const CONSUME_IDENTIFICATION_OPTIONS: {
+  id: 'LotControlled' | 'Stock';
+  label: string;
+  description: string;
+}[] = [
+  {
+    id: 'LotControlled',
+    label: 'Lot / batch id',
+    description: 'This delivery has a lot number or harvest date you track as a whole.'
+  },
+  {
+    id: 'Stock',
+    label: 'Undifferentiated stock',
+    description: 'Units are interchangeable by count or volume (kg, L, each).'
+  }
+];
+
 export function subtractionOption(kind: SubtractionKind) {
   return SUBTRACTION_OPTIONS.find((option) => option.id === kind);
 }

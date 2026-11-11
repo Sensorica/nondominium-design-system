@@ -5,11 +5,11 @@
     SCOPE_OPTIONS,
     SOURCE_ARRANGEMENTS,
     SOURCE_RIVALRY_STATEMENT,
-    SUBTRACTION_OPTIONS,
     accessOptionsForNature,
     regimesForNature,
     rivalryForNature,
     scopePermitted,
+    subtractionOption,
     withCoherentScope
   } from '../../../domain/wizard-questions.js';
   import { getArchetype } from '../../../domain/wizard-archetypes.js';
@@ -17,11 +17,10 @@
   import type {
     ResourceScope,
     SourceRegimeState,
-    SubtractionKind,
     WizardKernelState,
     WizardRefinementState
   } from '../../../domain/types.js';
-  import { applyAccessAnswer } from '../../../domain/wizard-state.js';
+  import { applyAccessAnswer, deriveSubtraction } from '../../../domain/wizard-state.js';
 
   interface Props {
     kernel: WizardKernelState;
@@ -62,9 +61,9 @@
     );
   }
 
-  function handleSubtraction(kind: SubtractionKind) {
-    onchange({ ...refinement, subtraction: kind });
-  }
+  const derivedSubtraction = $derived(
+    deriveSubtraction(kernel.economic_mode, kernel.use_kind) ?? refinement.subtraction
+  );
 
   function updateSourceField<K extends keyof NonNullable<WizardRefinementState['source_profile']>>(
     key: K,
@@ -114,24 +113,24 @@
   </div>
 
   {#if !archetype.isSourceNdo}
-    {#if natureRivalry === 'Rivalrous'}
-      <div>
-        <p class="text-sm font-medium text-gray-900">How does use run out?</p>
-        <div class="mt-2 space-y-2">
-          {#each SUBTRACTION_OPTIONS as opt}
-            <button
-              type="button"
-              class="w-full rounded-lg border px-3 py-2 text-left text-sm {refinement.subtraction ===
-              opt.id
-                ? 'border-blue-500 bg-blue-50'
-                : 'border-gray-200 hover:bg-gray-50'}"
-              onclick={() => handleSubtraction(opt.id)}
+    {#if derivedSubtraction}
+      <div class="rounded-lg border border-gray-100 bg-gray-50 px-3 py-2 text-sm">
+        <p class="font-medium text-gray-900">From identity step</p>
+        <p class="mt-0.5 text-gray-700">
+          {kernel.economic_mode === 'consume'
+            ? 'Consume (batch / stock)'
+            : kernel.use_kind === 'capacity'
+              ? 'Use — place with capacity'
+              : 'Use — one held thing'}
+          {#if subtractionOption(derivedSubtraction)}
+            <span class="text-gray-500">
+              · {subtractionOption(derivedSubtraction)?.label}</span
             >
-              <span class="font-medium">{opt.label}</span>
-              <p class="text-xs text-gray-500">{opt.description}</p>
-            </button>
-          {/each}
-        </div>
+          {/if}
+        </p>
+        <p class="mt-1 text-xs text-gray-500">
+          Change Use vs Consume on the previous step if needed.
+        </p>
       </div>
     {/if}
 

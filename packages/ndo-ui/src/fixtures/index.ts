@@ -17,7 +17,13 @@ export {
 export type { MockAgent, MockAgentId } from './mockAgents.js';
 export { MOCK_LOBBY_PROFILE, MOCK_EMPTY_PROFILE } from './mockProfiles.js';
 export { MOCK_SOURCE_NDO } from './mockSourceNdo.js';
-export { MOCK_SPEC_DRAFT, MOCK_SPEC_DRAFT_DIGITAL } from './mockSpecDrafts.js';
+export {
+  MOCK_SPEC_DRAFT,
+  MOCK_SPEC_DRAFT_DIGITAL,
+  MOCK_SPEC_DRAFT_USE_UNIT,
+  MOCK_SPEC_DRAFT_USE_CAPACITY,
+  MOCK_SPEC_DRAFT_CONSUME
+} from './mockSpecDrafts.js';
 export {
   getMockGroups,
   applyMockNdoGroupAssociations,

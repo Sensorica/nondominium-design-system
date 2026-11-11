@@ -8,13 +8,17 @@
     MOCK_NDOS,
     MOCK_LOBBY_PROFILE,
     MOCK_SPEC_DRAFT,
+    MOCK_SPEC_DRAFT_USE_UNIT,
+    MOCK_SPEC_DRAFT_USE_CAPACITY,
+    MOCK_SPEC_DRAFT_CONSUME,
     MOCK_SOURCE_NDO,
     type NdoSpecificationDraft,
     type SourceProfile,
     getMockInitiatorName,
     getMockGroups,
     applyMockNdoGroupAssociations,
-    getAssociatedGroupIds
+    getAssociatedGroupIds,
+    defaultSpecificationDraftForDescriptor
   } from '@nondominium/ndo-ui';
 
   const hash = $derived(
@@ -30,7 +34,24 @@
   let groups = $state(getMockGroups());
   const associatedGroupIds = $derived(getAssociatedGroupIds(groups, descriptor.hash));
 
-  let specDraft = $state<NdoSpecificationDraft>({ ...MOCK_SPEC_DRAFT });
+  function draftForDescriptor(): NdoSpecificationDraft {
+    if (descriptor.ndo_archetype === 'source_ndo' || descriptor.source_profile) {
+      return { ...MOCK_SPEC_DRAFT };
+    }
+    if (descriptor.economic_mode === 'consume') {
+      return { ...MOCK_SPEC_DRAFT_CONSUME };
+    }
+    if (descriptor.economic_mode === 'use' && descriptor.use_kind === 'capacity') {
+      return { ...MOCK_SPEC_DRAFT_USE_CAPACITY };
+    }
+    if (descriptor.economic_mode === 'use') {
+      return { ...MOCK_SPEC_DRAFT_USE_UNIT };
+    }
+    // Empty draft → preselect pack from descriptor classification.
+    return defaultSpecificationDraftForDescriptor(descriptor);
+  }
+
+  let specDraft = $state<NdoSpecificationDraft>(draftForDescriptor());
   let sourceProfile = $state<SourceProfile | null>(
     descriptor.source_profile ? { ...descriptor.source_profile } : null
   );
@@ -38,10 +59,8 @@
 
   $effect(() => {
     sourceProfile = descriptor.source_profile ? { ...descriptor.source_profile } : null;
-    specDraft =
-      descriptor.ndo_archetype === 'source_ndo' || descriptor.source_profile
-        ? { ...MOCK_SPEC_DRAFT }
-        : { category: '', tags: [], fields: [], governance_rule_ids: [] };
+    specDraft = draftForDescriptor();
+    saved = false;
   });
 </script>
 
@@ -60,8 +79,32 @@
       Layer 1 enrichment editor — profile-driven specification + governance template picker.
       {#if descriptor.ndo_archetype === 'source_ndo'}
         <span class="font-medium text-teal-800">Source-NDO walkthrough.</span>
+      {:else if descriptor.economic_mode === 'consume'}
+        <span class="font-medium text-indigo-800">Consume batch fixture.</span>
+      {:else if descriptor.economic_mode === 'use' && descriptor.use_kind === 'capacity'}
+        <span class="font-medium text-indigo-800">Use/capacity fixture.</span>
+      {:else if descriptor.economic_mode === 'use'}
+        <span class="font-medium text-indigo-800">Use/unit fixture.</span>
       {/if}
     </p>
+    <div class="mt-2 flex flex-wrap gap-2 text-xs">
+      <a
+        href="{base}/ui-kit/ndo-enrich?hash=uhC0kUseUnitPrinterExample00001"
+        class="text-blue-600 hover:underline">Use/unit</a
+      >
+      <a
+        href="{base}/ui-kit/ndo-enrich?hash=uhC0kUseCapacityBayExample00001"
+        class="text-blue-600 hover:underline">Use/capacity</a
+      >
+      <a
+        href="{base}/ui-kit/ndo-enrich?hash=uhC0kConsumeBatchTomatoExample01"
+        class="text-blue-600 hover:underline">Consume</a
+      >
+      <a
+        href="{base}/ui-kit/ndo-enrich?hash={MOCK_SOURCE_NDO.hash}"
+        class="text-blue-600 hover:underline">Source</a
+      >
+    </div>
     {#if saved}
       <p class="mt-1 text-sm text-emerald-700">Specification saved (mock).</p>
     {/if}

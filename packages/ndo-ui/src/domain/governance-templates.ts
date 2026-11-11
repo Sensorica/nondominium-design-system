@@ -1,4 +1,10 @@
-import type { GovernanceRuleTemplate, PropertyRegime, ResourceNature } from './types.js';
+import type {
+  EconomicMode,
+  GovernanceRuleTemplate,
+  PropertyRegime,
+  ResourceNature,
+  UseKind
+} from './types.js';
 
 const BASE_TEMPLATES: GovernanceRuleTemplate[] = [
   {
@@ -44,6 +50,14 @@ const BASE_TEMPLATES: GovernanceRuleTemplate[] = [
     enforced_by: 'AccountableAgent'
   },
   {
+    id: 'max_per_agent',
+    rule_type: 'usage_limit',
+    label: 'Max items per agent',
+    rationale: 'Caps how many units one agent may take from a depleting batch at a time.',
+    rule_data: { max_quantity_per_agent: 3 },
+    enforced_by: 'AccountableAgent'
+  },
+  {
     id: 'maintenance_schedule',
     rule_type: 'access_requirement',
     label: 'Maintenance obligation',
@@ -82,9 +96,10 @@ const BASE_TEMPLATES: GovernanceRuleTemplate[] = [
     rationale: 'Blocks high-impact events when source regime is Stressed or worse.',
     rule_data: { block_when_regime: ['Stressed', 'Degraded', 'Critical'] },
     enforced_by: 'Steward'
-  },
+  }
 ];
 
+/** Legacy regime × nature matrix — used for Digital and as regime accents. */
 const REGIME_NATURE_MATRIX: Record<PropertyRegime, Partial<Record<ResourceNature, string[]>>> = {
   Private: {
     Physical: ['access_accountable'],
@@ -115,20 +130,122 @@ export const SOURCE_NDO_TEMPLATE_IDS = [
   'no_ownership_transfer'
 ];
 
-export function getGovernanceTemplatesForNdo(
-  regime: PropertyRegime,
-  nature: ResourceNature,
-  isSourceNdo = false
-): GovernanceRuleTemplate[] {
-  if (isSourceNdo) {
-    return SOURCE_NDO_TEMPLATE_IDS.map((id) => getTemplateById(id)).filter(
-      Boolean
-    ) as GovernanceRuleTemplate[];
+export interface GovernanceTemplateQuery {
+  regime: PropertyRegime;
+  nature: ResourceNature;
+  isSourceNdo?: boolean;
+  economicMode?: EconomicMode | null;
+  useKind?: UseKind | null;
+  /** Override capacity_limit rule_data when known from the wizard. */
+  maxConcurrentUsers?: number | null;
+}
+
+function uniqueIds(ids: string[]): string[] {
+  return [...new Set(ids)];
+}
+
+function resolveIds(query: GovernanceTemplateQuery): string[] {
+  if (query.isSourceNdo) {
+    return [...SOURCE_NDO_TEMPLATE_IDS];
   }
 
-  const ids =
-    REGIME_NATURE_MATRIX[regime]?.[nature] ?? REGIME_NATURE_MATRIX[regime]?.Physical ?? [];
-  return ids.map((id) => getTemplateById(id)).filter(Boolean) as GovernanceRuleTemplate[];
+  if (query.nature === 'Digital') {
+    return (
+      REGIME_NATURE_MATRIX[query.regime]?.Digital ??
+      REGIME_NATURE_MATRIX[query.regime]?.Physical ??
+      []
+    );
+  }
+
+  if (query.economicMode === 'consume') {
+    const ids = ['quota_extraction', 'max_per_agent'];
+    if (query.regime === 'Private' || query.regime === 'Nondominium' || query.regime === 'CommonPool') {
+      ids.push('access_accountable');
+    }
+    if (query.regime === 'Commons') {
+      ids.push('access_attribution');
+    }
+    if (query.regime === 'Nondominium') {
+      ids.push('no_ownership_transfer');
+    }
+    if (query.regime === 'CommonPool') {
+      ids.push('maintenance_schedule');
+    }
+    return uniqueIds(ids);
+  }
+
+  if (query.economicMode === 'use' && query.useKind === 'capacity') {
+    const ids = ['capacity_limit', 'access_accountable'];
+    if (query.regime === 'Commons') {
+      return uniqueIds(['capacity_limit', 'access_attribution']);
+    }
+    if (query.regime === 'Nondominium') {
+      ids.push('no_ownership_transfer');
+    }
+    return uniqueIds(ids);
+  }
+
+  if (query.economicMode === 'use') {
+    // use + unit (default)
+    if (query.regime === 'Commons') {
+      return uniqueIds(['access_attribution', 'maintenance_schedule']);
+    }
+    const ids = ['access_accountable', 'maintenance_schedule'];
+    if (query.regime === 'Nondominium') {
+      ids.unshift('no_ownership_transfer');
+    }
+    return uniqueIds(ids);
+  }
+
+  // Fallback: legacy regime × nature (no economic mode yet)
+  return (
+    REGIME_NATURE_MATRIX[query.regime]?.[query.nature] ??
+    REGIME_NATURE_MATRIX[query.regime]?.Physical ??
+    []
+  );
+}
+
+function materialize(
+  ids: string[],
+  query: GovernanceTemplateQuery
+): GovernanceRuleTemplate[] {
+  return ids
+    .map((id) => getTemplateById(id))
+    .filter(Boolean)
+    .map((t) => {
+      const template = t as GovernanceRuleTemplate;
+      if (
+        template.id === 'capacity_limit' &&
+        query.maxConcurrentUsers != null &&
+        query.maxConcurrentUsers >= 2
+      ) {
+        return {
+          ...template,
+          rule_data: {
+            ...template.rule_data,
+            max_concurrent_users: query.maxConcurrentUsers
+          }
+        };
+      }
+      return template;
+    });
+}
+
+/**
+ * Recommended governance templates for an NDO.
+ * Prefer the object form; the legacy (regime, nature, isSourceNdo) signature remains.
+ */
+export function getGovernanceTemplatesForNdo(
+  regimeOrQuery: PropertyRegime | GovernanceTemplateQuery,
+  nature?: ResourceNature,
+  isSourceNdo = false
+): GovernanceRuleTemplate[] {
+  const query: GovernanceTemplateQuery =
+    typeof regimeOrQuery === 'string'
+      ? { regime: regimeOrQuery, nature: nature!, isSourceNdo }
+      : regimeOrQuery;
+
+  return materialize(resolveIds(query), query);
 }
 
 export function getTemplateById(id: string): GovernanceRuleTemplate | undefined {

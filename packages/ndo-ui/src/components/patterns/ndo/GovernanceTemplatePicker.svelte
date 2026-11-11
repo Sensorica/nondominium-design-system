@@ -1,29 +1,50 @@
 <script lang="ts">
   import { getGovernanceTemplatesForNdo } from '../../../domain/governance-templates.js';
-  import type { GovernanceRuleTemplate, NdoDescriptor } from '../../../domain/types.js';
+  import type {
+    EconomicMode,
+    GovernanceRuleTemplate,
+    NdoDescriptor,
+    UseKind
+  } from '../../../domain/types.js';
   import NdoButton from '../../primitives/NdoButton.svelte';
 
   interface Props {
     descriptor: NdoDescriptor;
     selectedRuleIds?: string[];
+    economicMode?: EconomicMode | null;
+    useKind?: UseKind | null;
+    maxConcurrentUsers?: number | null;
     onchange?: (ruleIds: string[]) => void;
   }
 
-  let { descriptor, selectedRuleIds = [], onchange }: Props = $props();
+  let {
+    descriptor,
+    selectedRuleIds = [],
+    economicMode = null,
+    useKind = null,
+    maxConcurrentUsers = null,
+    onchange
+  }: Props = $props();
 
   const isSourceNdo = $derived(
     descriptor.ndo_archetype === 'source_ndo' ||
       (descriptor.property_regime === 'Nondominium' && !!descriptor.source_profile)
   );
 
+  const resolvedMode = $derived(economicMode ?? descriptor.economic_mode ?? null);
+  const resolvedUseKind = $derived(useKind ?? descriptor.use_kind ?? null);
+
   const recommended = $derived(
-    getGovernanceTemplatesForNdo(
-      (descriptor.property_regime ??
+    getGovernanceTemplatesForNdo({
+      regime: (descriptor.property_regime ??
         'Commons') as import('../../../domain/types.js').PropertyRegime,
-      (descriptor.resource_nature ??
+      nature: (descriptor.resource_nature ??
         'Physical') as import('../../../domain/types.js').ResourceNature,
-      isSourceNdo
-    )
+      isSourceNdo,
+      economicMode: resolvedMode,
+      useKind: resolvedUseKind,
+      maxConcurrentUsers
+    })
   );
 
   function toggleRule(template: GovernanceRuleTemplate) {
@@ -37,13 +58,24 @@
   function acceptAllRecommended() {
     onchange?.(recommended.map((t) => t.id));
   }
+
+  const modeLabel = $derived(
+    isSourceNdo
+      ? 'Source stewardship'
+      : resolvedMode === 'consume'
+        ? 'Consume (batch)'
+        : resolvedMode === 'use' && resolvedUseKind === 'capacity'
+          ? 'Use (capacity)'
+          : resolvedMode === 'use'
+            ? 'Use (unit)'
+            : `${descriptor.property_regime} × ${descriptor.resource_nature}`
+  );
 </script>
 
 <div class="space-y-4">
   <div class="flex flex-wrap items-center justify-between gap-2">
     <p class="text-sm text-gray-600">
-      Recommended rules for {descriptor.property_regime} × {descriptor.resource_nature}. Each rule
-      includes a rationale so you know what it does.
+      Recommended rules for {modeLabel}. Each rule includes a rationale so you know what it does.
     </p>
     <NdoButton variant="ghost" class="text-xs" onclick={acceptAllRecommended}>
       Accept all recommended

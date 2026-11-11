@@ -8,12 +8,14 @@
   } from '../../../domain/types.js';
   import { getArchetype } from '../../../domain/wizard-archetypes.js';
   import {
-    buildWizardResult,
+    alignKernelToNature,
     alignRefinementToNature,
     applySourceType,
+    buildWizardResult,
     createInitialKernel,
     createInitialRefinement,
     getWizardSteps,
+    syncRefinementSubtraction,
     validateKernel,
     validateRefinement,
     type WizardStepId
@@ -82,11 +84,17 @@
   }
 
   function patchKernel(patch: Partial<typeof kernel>) {
-    const next = { ...kernel, ...patch };
-    kernel = next;
+    let next = { ...kernel, ...patch };
     if (patch.resource_nature) {
-      refinement = alignRefinementToNature(refinement, patch.resource_nature, archetype.allowedRegimes);
+      next = alignKernelToNature(next, patch.resource_nature, archetype.isSourceNdo);
+      refinement = alignRefinementToNature(
+        refinement,
+        patch.resource_nature,
+        archetype.allowedRegimes
+      );
     }
+    kernel = next;
+    refinement = syncRefinementSubtraction(refinement, next, archetype.isSourceNdo);
   }
 
   function goNext() {
@@ -103,14 +111,20 @@
         refinement,
         archetype.isSourceNdo,
         kernel.resource_nature,
-        archetype.allowedRegimes
+        archetype.allowedRegimes,
+        kernel
       );
       if (err) {
         localError = err;
         return;
       }
     }
-    if (stepIndex < steps.length - 1) stepIndex += 1;
+    if (stepIndex < steps.length - 1) {
+      if (currentStep === 'kernel') {
+        refinement = syncRefinementSubtraction(refinement, kernel, archetype.isSourceNdo);
+      }
+      stepIndex += 1;
+    }
   }
 
   function goBack() {
@@ -129,7 +143,8 @@
         refinement,
         archetype.isSourceNdo,
         kernel.resource_nature,
-        archetype.allowedRegimes
+        archetype.allowedRegimes,
+        kernel
       );
       if (refineErr) {
         localError = refineErr;

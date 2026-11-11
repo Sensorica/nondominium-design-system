@@ -2,6 +2,7 @@
   import NdoBadge from '../../primitives/NdoBadge.svelte';
   import { getArchetype } from '../../../domain/wizard-archetypes.js';
   import { getGovernanceImplications, subtractionOption } from '../../../domain/wizard-questions.js';
+  import { recommendedGovernanceRuleIds } from '../../../domain/wizard-state.js';
   import { SOURCE_TYPE_OPTIONS } from '../../../domain/spec-profiles.js';
   import type { WizardKernelState, WizardRefinementState } from '../../../domain/types.js';
 
@@ -14,6 +15,7 @@
 
   const archetype = $derived(getArchetype(kernel.archetype));
   const implications = $derived(getGovernanceImplications(refinement, kernel.resource_nature));
+  const packCount = $derived(recommendedGovernanceRuleIds(kernel, refinement).length);
   const displayName = $derived(kernel.name.trim() || (archetype.isSourceNdo ? 'Untitled source' : 'Untitled NDO'));
   const sourceTypeLabel = $derived(
     SOURCE_TYPE_OPTIONS.find((option) => option.id === refinement.source_profile?.source_type)?.label
@@ -42,7 +44,16 @@
     </p>
   </div>
 
-  {#if refinement.rivalry}
+  {#if kernel.economic_mode}
+    <p class="mt-2 text-xs text-gray-600">
+      <span class="font-medium">Interaction:</span>
+      {kernel.economic_mode === 'consume'
+        ? `Consume · ${kernel.initial_quantity ?? '?'} ${kernel.default_unit ?? ''}`
+        : kernel.use_kind === 'capacity'
+          ? `Use · capacity ${kernel.max_concurrent_users ?? '?'}`
+          : 'Use · unit'}
+    </p>
+  {:else if refinement.rivalry}
     <p class="mt-2 text-xs text-gray-600">
       <span class="font-medium">Rivalry:</span>
       {refinement.rivalry}
@@ -75,5 +86,11 @@
         {/each}
       </ul>
     </div>
+  {/if}
+
+  {#if packCount > 0}
+    <p class="mt-3 text-xs text-gray-500">
+      {packCount} recommended governance rule{packCount === 1 ? '' : 's'} preselected at create.
+    </p>
   {/if}
 </div>
