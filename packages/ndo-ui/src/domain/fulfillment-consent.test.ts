@@ -1,6 +1,7 @@
 import { describe, expect, test } from 'bun:test';
 import {
   ALREADY_FULFILLED_HINT,
+  NOT_CUSTODIAN_RESOURCE_STATE_HINT,
   OWN_COMMITMENT_FULFILL_HINT,
   canInitiateCommitmentFulfillment,
   fulfillCommitmentErrorMessage
@@ -48,6 +49,14 @@ describe('fulfillCommitmentErrorMessage', () => {
     expect(
       fulfillCommitmentErrorMessage('Guest("This commitment is already fulfilled")')
     ).toBe(ALREADY_FULFILLED_HINT);
+  });
+
+  test('maps nested Host/Guest not-custodian errors from resource_state_update', () => {
+    expect(
+      fulfillCommitmentErrorMessage(
+        'Wasm runtime error while working with Ribosome: RuntimeError: holochain::core::ribosome::host_fn::call:239: Host("Wasm runtime error while working with Ribosome: RuntimeError: nondominium_shared::errors:119: Guest(\\"Not the custodian of this resource\\")")'
+      )
+    ).toBe(NOT_CUSTODIAN_RESOURCE_STATE_HINT);
   });
 
   test('default mentions online countersign', () => {
