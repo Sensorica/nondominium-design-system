@@ -1,6 +1,7 @@
 <script lang="ts">
   import type {
     DigitalLocatorKind,
+    EconomicMode,
     IdentificationPattern,
     InventoryIntent,
     NdoArchetypeId,
@@ -69,6 +70,8 @@
     ndoName?: string | null;
     ndoArchetype?: NdoArchetypeId | string | null;
     sourceType?: SourceType | string | null;
+    /** When set, this kind was dual-created with the NDO — soften multi-instance copy. */
+    economicMode?: EconomicMode | null;
     /** Seed values for this mount (parent remounts the modal per open). */
     initial: SpecFormInitial;
     mode: 'create' | 'edit';
@@ -84,12 +87,15 @@
     ndoName = null,
     ndoArchetype = null,
     sourceType = null,
+    economicMode = null,
     initial,
     mode,
     canCreate,
     onclose,
     onsubmit
   }: Props = $props();
+
+  const inventoriableFork = $derived(economicMode === 'use' || economicMode === 'consume');
 
   const isSource = isSourceNdoDescriptor({
     ndo_archetype: ndoArchetype,
@@ -163,19 +169,19 @@
         ? 'Edit Source specification'
         : 'Specify this Source'
       : mode === 'edit'
-        ? 'Edit kind of item'
-        : 'Add a kind of item'
+        ? 'Edit specification'
+        : 'Specify this NDO'
   );
   const subtitle = $derived(
     mode === 'edit'
       ? isSource
         ? 'Update boundary, monitoring, and stewardship notes. The link to Layer 0 stays fixed.'
-        : 'Update what this kind means. The link to the resource stays fixed.'
+        : 'Update this NDO’s form. The link to Layer 0 stays fixed.'
       : isSource
-        ? 'Describe the generative system — boundaries and monitoring, not shelf inventory. Extracted units are separate.'
+        ? 'Describe the generative system — boundaries and monitoring, not shelf inventory. Extracted units are separate NDOs.'
         : digital
-          ? 'Describe a digital kind — classified for browsing, located by address, never inventoried.'
-          : 'Describe a type of thing under this resource — separate from browse labels and shelf units.'
+          ? 'Describe this digital artifact — classified for browsing, located by address, never inventoried.'
+          : 'Describe the form of this resource — inventoriable or knowledge-only. One specification per NDO.'
   );
 
   function sourceFieldValue(id: string): string {
@@ -302,7 +308,7 @@
           ? e.message
           : isSource
             ? 'Could not save this Source specification.'
-            : 'Could not save this kind of item.';
+            : 'Could not save this specification.';
     } finally {
       isSubmitting = false;
     }
@@ -564,7 +570,11 @@
                   class="w-full rounded border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none"
                 />
                 <p class="mt-1 text-xs text-gray-500">
-                  Measure for instances of this kind (ValueFlows default unit of resource).
+                  {#if inventoriableFork}
+                    Measure for this held thing or batch (ValueFlows default unit of resource).
+                  {:else}
+                    Measure for instances of this kind (ValueFlows default unit of resource).
+                  {/if}
                 </p>
               </div>
               <label class="flex items-center gap-2 text-sm text-gray-700">
@@ -573,7 +583,11 @@
                   checked={substitutable === true}
                   onchange={(e) => (substitutable = e.currentTarget.checked)}
                 />
-                Units of this kind are interchangeable (substitutable)
+                {#if inventoriableFork}
+                  Portions of this resource are interchangeable (substitutable)
+                {:else}
+                  Units of this kind are interchangeable (substitutable)
+                {/if}
               </label>
             {:else}
               <p class="text-xs text-gray-500">
@@ -694,15 +708,21 @@
               the kind.
             </li>
             <li>
-              <strong>Tracking</strong> (physical/hybrid) = whether instances are inventoried, and
-              how they are identified (serialized, lot, or stock).
+              <strong>Tracking</strong> (physical/hybrid) = whether this resource is inventoried,
+              and how it is identified (serialized, lot, or stock).
             </li>
             <li>
               <strong>Digital location</strong> = address, content hash, repo, store, or host —
               digital kinds are never inventoried.
             </li>
             <li>
-              <strong>Instances</strong> (EconomicResource) are added later only when inventoriable.
+              {#if inventoriableFork}
+                <strong>Economic resource</strong> was dual-created with this NDO — do not add a
+                second inventoriable instance here.
+              {:else}
+                <strong>Instances</strong> (EconomicResource) are added later only when
+                inventoriable.
+              {/if}
             </li>
           </ul>
         </details>
@@ -729,7 +749,13 @@
       disabled={(mode === 'create' && !canCreate) || isSubmitting}
       onclick={handleSubmit}
     >
-      {isSubmitting ? 'Saving…' : mode === 'edit' ? 'Save changes' : 'Add kind of item'}
+      {isSubmitting
+        ? 'Saving…'
+        : mode === 'edit'
+          ? 'Save changes'
+          : isSource
+            ? 'Save Source specification'
+            : 'Save specification'}
     </NdoButton>
   {/snippet}
 </Modal>

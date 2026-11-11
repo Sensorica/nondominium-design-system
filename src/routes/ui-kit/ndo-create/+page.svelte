@@ -91,11 +91,9 @@
         {#if interactionLabel}
           <p class="mt-1 text-sm text-indigo-800">{interactionLabel}</p>
         {/if}
-        {#if lastInput.governance_rule_ids?.length}
-          <p class="mt-1 text-xs text-gray-600">
-            Preselected rules: {lastInput.governance_rule_ids.join(', ')}
-          </p>
-        {/if}
+        <p class="mt-1 text-xs text-gray-600">
+          Governance rules are not applied at create — select and Apply them on the Governance tab.
+        </p>
         {#if lastResult?.refinement.source_profile}
           <p class="mt-1 text-sm text-teal-800">
             Source-NDO · {lastResult.refinement.source_profile.source_type} · stewards:

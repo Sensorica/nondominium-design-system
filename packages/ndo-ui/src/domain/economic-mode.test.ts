@@ -1,6 +1,8 @@
 import { describe, expect, test } from 'bun:test';
 import { getGovernanceTemplatesForNdo } from './governance-templates.js';
 import {
+  allowsManualEconomicResourceCreate,
+  allowsManualKindOfItemCreate,
   buildWizardResult,
   createInitialKernel,
   createInitialRefinement,
@@ -24,6 +26,35 @@ describe('economic mode helpers', () => {
     expect(deriveSubtraction('use', 'unit')).toBe('unit');
     expect(deriveSubtraction('use', 'capacity')).toBe('capacity');
     expect(deriveSubtraction(null, null)).toBeNull();
+  });
+
+  test('allowsManualEconomicResourceCreate gates nature, source, and mode', () => {
+    expect(allowsManualEconomicResourceCreate({ resourceNature: 'Physical' })).toBe(true);
+    expect(allowsManualEconomicResourceCreate({ resourceNature: 'Hybrid' })).toBe(true);
+    expect(allowsManualEconomicResourceCreate({ resourceNature: 'Digital' })).toBe(false);
+    expect(allowsManualEconomicResourceCreate({ isSource: true })).toBe(false);
+    expect(
+      allowsManualEconomicResourceCreate({ resourceNature: 'Physical', economicMode: 'use' })
+    ).toBe(false);
+    expect(
+      allowsManualEconomicResourceCreate({ resourceNature: 'Physical', economicMode: 'consume' })
+    ).toBe(false);
+  });
+
+  test('allowsManualKindOfItemCreate only for initial Specify (no siblings)', () => {
+    expect(allowsManualKindOfItemCreate({ resourceNature: 'Digital' })).toBe(true);
+    expect(allowsManualKindOfItemCreate({ resourceNature: 'Physical' })).toBe(true);
+    expect(
+      allowsManualKindOfItemCreate({ resourceNature: 'Digital', existingSpecCount: 1 })
+    ).toBe(false);
+    expect(
+      allowsManualKindOfItemCreate({ resourceNature: 'Physical', existingSpecCount: 2 })
+    ).toBe(false);
+    expect(allowsManualKindOfItemCreate({ economicMode: 'use' })).toBe(false);
+    expect(allowsManualKindOfItemCreate({ economicMode: 'consume' })).toBe(false);
+    expect(
+      allowsManualKindOfItemCreate({ economicMode: 'use', existingSpecCount: 0 })
+    ).toBe(false);
   });
 });
 
@@ -135,8 +166,8 @@ describe('governance packs Use vs Consume', () => {
   });
 });
 
-describe('create/review preselect', () => {
-  test('buildWizardResult preselects consume pack ids', () => {
+describe('create/review — recommendations without auto-apply', () => {
+  test('buildWizardResult leaves governance_rule_ids unset (agent applies on Governance tab)', () => {
     const kernel = createInitialKernel('active_project');
     kernel.name = 'Tomatoes';
     kernel.resource_nature = 'Physical';
@@ -147,14 +178,15 @@ describe('create/review preselect', () => {
     const refinement = createInitialRefinement('active_project', 'Physical');
     refinement.property_regime = 'CommonPool';
     const result = buildWizardResult(kernel, refinement);
-    expect(result.ndo_input.governance_rule_ids).toEqual(
-      recommendedGovernanceRuleIds(kernel, refinement)
-    );
-    expect(result.ndo_input.governance_rule_ids).toContain('quota_extraction');
-    expect(result.ndo_input.governance_rule_ids).toContain('max_per_agent');
+    expect(result.ndo_input.governance_rule_ids).toBeUndefined();
+    expect(result.specification?.governance_rule_ids ?? []).toEqual([]);
+    // Recommendations still exist for Review / Governance UI.
+    const recommended = recommendedGovernanceRuleIds(kernel, refinement);
+    expect(recommended).toContain('quota_extraction');
+    expect(recommended).toContain('max_per_agent');
   });
 
-  test('defaultSpecificationDraftForDescriptor mirrors Use/unit pack', () => {
+  test('defaultSpecificationDraftForDescriptor starts with no selected rules', () => {
     const draft = defaultSpecificationDraftForDescriptor({
       hash: 'x',
       name: 'Printer',
@@ -169,7 +201,6 @@ describe('create/review preselect', () => {
       economic_mode: 'use',
       use_kind: 'unit'
     });
-    expect(draft.governance_rule_ids).toContain('access_accountable');
-    expect(draft.governance_rule_ids).toContain('maintenance_schedule');
+    expect(draft.governance_rule_ids).toEqual([]);
   });
 });

@@ -89,18 +89,30 @@
   {:else}
     <p class="pu-muted">No resources yet.</p>
   {/each}
-  <Field label="New resource" hint="create_economic_resource · starts PendingValidation with you as custodian">
-    <div class="pu-row new">
-      <input class="pu-input" bind:value={label} placeholder="e.g. Spare spindle" />
-      <button
-        type="button"
-        class="pu-btn"
-        onclick={() => {
-          if (show(proto.actions.addInstance(ndo.id, label))) label = '';
-        }}>Create</button
-      >
-    </div>
-  </Field>
+  {#if ndo.nature === 'Digital'}
+    <p class="pu-muted pu-muted--12">
+      Digital NDOs are unique artifacts (located by address or content hash) — not inventoriable
+      stock. Making a copy is a new NDO or a share of this one, not another shelf unit here.
+    </p>
+  {:else if ndo.economic_mode}
+    <p class="pu-muted pu-muted--12">
+      This {ndo.economic_mode === 'Consume' ? 'batch' : 'held thing'} was dual-created with its
+      economic resource. A second inventoriable instance would be a different NDO.
+    </p>
+  {:else}
+    <Field label="New resource" hint="create_economic_resource · starts PendingValidation with you as custodian">
+      <div class="pu-row new">
+        <input class="pu-input" bind:value={label} placeholder="e.g. Spare spindle" />
+        <button
+          type="button"
+          class="pu-btn"
+          onclick={() => {
+            if (show(proto.actions.addInstance(ndo.id, label))) label = '';
+          }}>Create</button
+        >
+      </div>
+    </Field>
+  {/if}
   <ErrorNote {error} />
 </Modal>
 

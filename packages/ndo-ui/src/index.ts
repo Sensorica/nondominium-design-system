@@ -9,6 +9,8 @@ export * from './domain/format.js';
 export * from './domain/wizard-archetypes.js';
 export * from './domain/wizard-questions.js';
 export * from './domain/wizard-state.js';
+export * from './domain/wizard-machine.js';
+export * from './domain/ndo-ui-profile.js';
 export * from './domain/governance-templates.js';
 export * from './domain/spec-profiles.js';
 export * from './domain/ndo-associations.js';
@@ -18,6 +20,9 @@ export * from './domain/agent-perspective.js';
 export * from './domain/layer1.js';
 export * from './domain/spec-starters.js';
 export * from './domain/spec-inventory.js';
+export * from './domain/vf-actions.js';
+export * from './domain/fulfillment-consent.js';
+
 
 // Fixtures
 export * from './fixtures/index.js';
@@ -79,5 +84,9 @@ export { default as AgentProfile } from './components/patterns/perspectives/Agen
 export { default as NdoActionRow } from './components/patterns/perspectives/NdoActionRow.svelte';
 export { default as ResourceNdoView } from './components/patterns/perspectives/ResourceNdoView.svelte';
 export { default as ResourcesPanel } from './components/patterns/perspectives/ResourcesPanel.svelte';
+export type {
+  CreateInstanceInput,
+  InventoriedInstanceView
+} from './components/patterns/perspectives/ResourcesPanel.svelte';
 export { default as SpecificationFormModal } from './components/patterns/perspectives/SpecificationFormModal.svelte';
 export { default as GroupPerspectivesView } from './components/patterns/perspectives/GroupPerspectivesView.svelte';

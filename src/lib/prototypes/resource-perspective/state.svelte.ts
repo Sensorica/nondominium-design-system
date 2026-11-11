@@ -263,7 +263,11 @@ export function createSpecification(
   const isSource = isSourceNdoDescriptor(ndo);
   const foreshadow = validateForeshadow(
     {
-      inventory_intent: input.inventory_intent ?? 'NotInventoried',
+      inventory_intent:
+        input.inventory_intent ??
+        (String(ndo.resource_nature) === 'Digital' || isSource
+          ? 'NotApplicable'
+          : 'NotInventoried'),
       identification_pattern: input.identification_pattern ?? null,
       default_unit: input.default_unit ?? null,
       substitutable: input.substitutable ?? null,
@@ -348,7 +352,11 @@ export function updateSpecification(
   const foreshadow = validateForeshadow(
     {
       inventory_intent:
-        input.inventory_intent ?? original.inventory_intent ?? 'NotInventoried',
+        input.inventory_intent ??
+        original.inventory_intent ??
+        (String(resourceNature ?? '') === 'Digital' || isSource
+          ? 'NotApplicable'
+          : 'NotInventoried'),
       identification_pattern:
         input.identification_pattern !== undefined
           ? input.identification_pattern

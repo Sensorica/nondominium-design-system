@@ -34,13 +34,15 @@ export const NATURE_CHOICES: NatureChoice[] = [
   {
     id: 'Digital',
     label: 'Digital artifact',
-    description: 'Software, data, designs, documents, datasets, and methods.',
+    description:
+      'Software, data, designs, documents, datasets, and methods — unique by locator/content, not inventoriable stock.',
     suggestedRivalry: 'NonRivalrous'
   },
   {
     id: 'Hybrid',
     label: 'Physical + digital twin',
-    description: 'A material resource with an essential digital specification layer.',
+    description:
+      'Material resource with an essential digital face. Inventory tracks the physical twin; digital is by address.',
     suggestedRivalry: 'Rivalrous'
   }
 ];

@@ -86,6 +86,41 @@ export function needsEconomicMode(
   return nature === 'Physical' || nature === 'Hybrid';
 }
 
+/** Gate for inventoriable / Layer 1 create affordances on the Resources tab. */
+export type ManualCreateGate = {
+  economicMode?: EconomicMode | null;
+  resourceNature?: ResourceNature | string | null;
+  isSource?: boolean;
+  /** Linked ResourceSpecification count — first-order NDOs allow only the initial Specify. */
+  existingSpecCount?: number;
+};
+
+/**
+ * Whether the UI may offer manual `create_economic_resource` (Inventoried instances).
+ *
+ * False for: Digital (unique by locator), Source (not stock), Use/Consume
+ * (hard dual create owns the inventoriable resource). Hybrid may inventory the
+ * physical twin when `economic_mode` is unset.
+ */
+export function allowsManualEconomicResourceCreate(gate: ManualCreateGate): boolean {
+  if (gate.isSource) return false;
+  if (String(gate.resourceNature ?? '') === 'Digital') return false;
+  if (gate.economicMode) return false;
+  return true;
+}
+
+/**
+ * Whether the UI may offer the initial Layer 1 Specify CTA (create a ResourceSpecification).
+ * False once a specification already exists (first-order NDO = one live form; further versions
+ * are edits/supersedes, not sibling kinds). Use/Consume dual-create owns the one kind.
+ * Another concrete artifact is a new NDO, not another spec row.
+ */
+export function allowsManualKindOfItemCreate(gate: ManualCreateGate): boolean {
+  if (gate.economicMode) return false;
+  if ((gate.existingSpecCount ?? 0) > 0) return false;
+  return true;
+}
+
 /** Map Use/Consume (+ use_kind) onto legacy SubtractionKind. */
 export function deriveSubtraction(
   economicMode: EconomicMode | null,
@@ -256,20 +291,14 @@ export function recommendedGovernanceRuleIds(
   }).map((t) => t.id);
 }
 
-/** Preselect pack when enrichment opens with an empty draft. */
+/**
+ * Empty draft when enrichment opens — recommended templates are listed on the
+ * Governance tab; the agent must select and apply them (no silent preselect).
+ */
 export function defaultSpecificationDraftForDescriptor(
-  descriptor: NdoDescriptor
+  _descriptor: NdoDescriptor
 ): NdoSpecificationDraft {
-  const isSource =
-    descriptor.ndo_archetype === 'source_ndo' || !!descriptor.source_profile;
-  const ids = getGovernanceTemplatesForNdo({
-    regime: (descriptor.property_regime ?? 'Commons') as PropertyRegime,
-    nature: (descriptor.resource_nature ?? 'Physical') as ResourceNature,
-    isSourceNdo: isSource,
-    economicMode: descriptor.economic_mode ?? null,
-    useKind: descriptor.use_kind ?? null
-  }).map((t) => t.id);
-  return { fields: [], governance_rule_ids: ids };
+  return { fields: [], governance_rule_ids: [] };
 }
 
 export function buildWizardResult(
@@ -279,11 +308,13 @@ export function buildWizardResult(
 ): WizardResult {
   const isSource = kernel.archetype === 'source_ndo';
   const synced = syncRefinementSubtraction(refinement, kernel, isSource);
+  // Never pre-fill governance_rule_ids for create: recommendations are shown on
+  // Review / Governance for the agent to select and Apply explicitly.
   const draft =
     specification ??
     ({
       fields: [],
-      governance_rule_ids: recommendedGovernanceRuleIds(kernel, synced)
+      governance_rule_ids: []
     } satisfies NdoSpecificationDraft);
   const ndo_input: NdoInput = {
     name: kernel.name.trim(),
@@ -305,9 +336,6 @@ export function buildWizardResult(
     ...(kernel.unique_id?.trim() ? { unique_id: kernel.unique_id.trim() } : {}),
     ...(kernel.max_concurrent_users != null
       ? { max_concurrent_users: kernel.max_concurrent_users }
-      : {}),
-    ...(draft.governance_rule_ids.length
-      ? { governance_rule_ids: [...draft.governance_rule_ids] }
       : {})
   };
 

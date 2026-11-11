@@ -156,19 +156,20 @@
 
   {#if recommendedLabels.length}
     <section class="rounded-lg border border-blue-100 bg-blue-50/40 p-4">
-      <h3 class="text-sm font-semibold text-blue-900">Recommended rules (preselected)</h3>
+      <h3 class="text-sm font-semibold text-blue-900">Recommended rules</h3>
       <ul class="mt-2 space-y-1">
         {#each recommendedLabels as label}
           <li class="text-sm text-blue-900">• {label}</li>
         {/each}
       </ul>
       <p class="mt-2 text-xs text-blue-800">
-        You can accept, drop, or add rules on the Governance tab after creation.
+        Nothing is applied yet. After creation, open the Governance tab, select the rules you want,
+        and press Apply selected.
       </p>
     </section>
   {/if}
 
   <p class="text-xs text-gray-500">
-    Layer 1 specification and governance rules can be refined from the NDO detail view after creation.
+    Layer 1 specification and governance rules are chosen from the NDO detail view after creation.
   </p>
 </div>

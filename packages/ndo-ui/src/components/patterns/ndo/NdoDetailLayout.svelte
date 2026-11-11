@@ -249,10 +249,17 @@
   {:else if tab === 'resources'}
     <ResourcesTabStub />
   {:else if tab === 'governance'}
-    <GovernanceTabStub />
+    <GovernanceTabStub
+      economicMode={descriptor?.economic_mode ?? null}
+      resourceNature={descriptor?.resource_nature ?? null}
+    />
+
   {:else if tab === 'composition'}
     <CompositionTabStub />
   {:else}
-    <ActivityTabStub />
+    <ActivityTabStub
+      economicMode={descriptor?.economic_mode ?? null}
+      resourceNature={descriptor?.resource_nature ?? null}
+    />
   {/if}
 </div>

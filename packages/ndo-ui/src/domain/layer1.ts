@@ -107,5 +107,5 @@ export function layer1GateMessage(
 export function layer1GateMessagePlain(
   lifecycleStage: LifecycleStage | string | null | undefined
 ): string {
-  return `Kinds of item can't be added yet while this resource is in ${lifecycleStage}. Move it past the idea stage first (and avoid Hibernating, Deprecated, or End of life).`;
+  return `This NDO can't be specified yet while it is in ${lifecycleStage}. Move it past the idea stage first (and avoid Hibernating, Deprecated, or End of life).`;
 }

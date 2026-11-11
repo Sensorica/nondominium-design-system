@@ -90,7 +90,8 @@
 
   {#if packCount > 0}
     <p class="mt-3 text-xs text-gray-500">
-      {packCount} recommended governance rule{packCount === 1 ? '' : 's'} preselected at create.
+      {packCount} governance rule{packCount === 1 ? '' : 's'} will be recommended on the Governance
+      tab — select and Apply after create.
     </p>
   {/if}
 </div>

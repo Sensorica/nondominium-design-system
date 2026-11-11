@@ -135,6 +135,8 @@ export interface Ndo {
   y?: number;
   hibernation_origin?: LifecycleStage | null;
   successor?: string;
+  /** Use/Consume inventoriable fork — dual-created; no manual addInstance. */
+  economic_mode?: 'Use' | 'Consume' | null;
 }
 
 /** [type, summary, author]. The author is whoever created the rule
@@ -889,6 +891,16 @@ export function updateRule(s: ProtoState, ctx: Ctx, ndo: string, i: number, type
 export function addInstance(s: ProtoState, ctx: Ctx, ndo: string, label: string): Outcome {
   const n = s.ndos.find((x) => x.id === ndo);
   if (!n) return fail('NDO not found.');
+  if (n.nature === 'Digital') {
+    return fail(
+      'Digital NDOs are not inventoriable — copies are trivial; use a digital locator, not shelf units.'
+    );
+  }
+  if (n.economic_mode) {
+    return fail(
+      'Use/Consume NDOs seed their economic resource at create (or on first Layer-1 transition). A second instance is a different NDO.'
+    );
+  }
   if (NO_ITEM_STAGES.includes(n.stage)) return fail('Instances cannot be added at stage ' + n.stage + '.');
   if (!label || !label.trim()) return fail('Label cannot be empty.');
   const d = leave(s, ctx, ndo, 'work', 'created resource ' + label, null,

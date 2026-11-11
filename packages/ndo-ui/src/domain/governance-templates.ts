@@ -144,6 +144,69 @@ function uniqueIds(ids: string[]): string[] {
   return [...new Set(ids)];
 }
 
+/**
+ * Decision-table rows for inventoriable packs (Physical/Hybrid + economic mode).
+ * First matching row wins. Regime accents are applied after the base pack.
+ */
+type PackRow = {
+  mode: 'consume' | 'use';
+  useKind?: 'unit' | 'capacity' | null;
+  base: string[];
+  /** Extra ids keyed by regime (merged onto base). */
+  byRegime?: Partial<Record<PropertyRegime, string[]>>;
+  /** Full override for a regime (replaces base instead of merging). */
+  regimeReplace?: Partial<Record<PropertyRegime, string[]>>;
+};
+
+const ECONOMIC_PACK_TABLE: PackRow[] = [
+  {
+    mode: 'consume',
+    base: ['quota_extraction', 'max_per_agent'],
+    byRegime: {
+      Private: ['access_accountable'],
+      Commons: ['access_attribution'],
+      Nondominium: ['access_accountable', 'no_ownership_transfer'],
+      CommonPool: ['access_accountable', 'maintenance_schedule']
+    }
+  },
+  {
+    mode: 'use',
+    useKind: 'capacity',
+    base: ['capacity_limit', 'access_accountable'],
+    regimeReplace: {
+      Commons: ['capacity_limit', 'access_attribution']
+    },
+    byRegime: {
+      Nondominium: ['no_ownership_transfer']
+    }
+  },
+  {
+    mode: 'use',
+    useKind: 'unit',
+    base: ['access_accountable', 'maintenance_schedule'],
+    regimeReplace: {
+      Commons: ['access_attribution', 'maintenance_schedule']
+    },
+    byRegime: {
+      Nondominium: ['no_ownership_transfer']
+    }
+  }
+];
+
+function packFromTable(query: GovernanceTemplateQuery): string[] | null {
+  if (!query.economicMode) return null;
+  const useKind = query.useKind ?? 'unit';
+  for (const row of ECONOMIC_PACK_TABLE) {
+    if (row.mode !== query.economicMode) continue;
+    if (row.mode === 'use' && row.useKind && row.useKind !== useKind) continue;
+    const replaced = row.regimeReplace?.[query.regime];
+    if (replaced) return uniqueIds(replaced);
+    const extras = row.byRegime?.[query.regime] ?? [];
+    return uniqueIds([...row.base, ...extras]);
+  }
+  return null;
+}
+
 function resolveIds(query: GovernanceTemplateQuery): string[] {
   if (query.isSourceNdo) {
     return [...SOURCE_NDO_TEMPLATE_IDS];
@@ -157,45 +220,8 @@ function resolveIds(query: GovernanceTemplateQuery): string[] {
     );
   }
 
-  if (query.economicMode === 'consume') {
-    const ids = ['quota_extraction', 'max_per_agent'];
-    if (query.regime === 'Private' || query.regime === 'Nondominium' || query.regime === 'CommonPool') {
-      ids.push('access_accountable');
-    }
-    if (query.regime === 'Commons') {
-      ids.push('access_attribution');
-    }
-    if (query.regime === 'Nondominium') {
-      ids.push('no_ownership_transfer');
-    }
-    if (query.regime === 'CommonPool') {
-      ids.push('maintenance_schedule');
-    }
-    return uniqueIds(ids);
-  }
-
-  if (query.economicMode === 'use' && query.useKind === 'capacity') {
-    const ids = ['capacity_limit', 'access_accountable'];
-    if (query.regime === 'Commons') {
-      return uniqueIds(['capacity_limit', 'access_attribution']);
-    }
-    if (query.regime === 'Nondominium') {
-      ids.push('no_ownership_transfer');
-    }
-    return uniqueIds(ids);
-  }
-
-  if (query.economicMode === 'use') {
-    // use + unit (default)
-    if (query.regime === 'Commons') {
-      return uniqueIds(['access_attribution', 'maintenance_schedule']);
-    }
-    const ids = ['access_accountable', 'maintenance_schedule'];
-    if (query.regime === 'Nondominium') {
-      ids.unshift('no_ownership_transfer');
-    }
-    return uniqueIds(ids);
-  }
+  const fromTable = packFromTable(query);
+  if (fromTable) return fromTable;
 
   // Fallback: legacy regime × nature (no economic mode yet)
   return (

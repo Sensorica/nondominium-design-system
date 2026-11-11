@@ -1,5 +1,5 @@
 /**
- * Context starters for the Layer 1 “kind of item” / Source specification form.
+ * Context starters for the Layer 1 specification / Source specification form.
  * Plain language; keyed off nature + regime + Source archetype (+ NDO name for hints).
  * Seeds VF foreshadow: inventory intent, identification, default unit, SourceSpecification.
  */

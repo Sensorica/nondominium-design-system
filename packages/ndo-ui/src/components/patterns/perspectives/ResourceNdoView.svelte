@@ -11,7 +11,10 @@
   import { formatDate, truncateHash } from '../../../domain/format.js';
   import Breadcrumb, { type BreadcrumbItem } from './Breadcrumb.svelte';
   import NdoActionRow from './NdoActionRow.svelte';
-  import ResourcesPanel from './ResourcesPanel.svelte';
+  import ResourcesPanel, {
+    type CreateInstanceInput,
+    type InventoriedInstanceView
+  } from './ResourcesPanel.svelte';
   import NdoIdentityPanel from '../ndo/NdoIdentityPanel.svelte';
   import ForkNdoModal from '../ndo/ForkNdoModal.svelte';
   import AssociateNdoModal from '../ndo/AssociateNdoModal.svelte';
@@ -48,11 +51,15 @@
     oncreatendo?: () => void;
     /** Layer 1 specifications for this NDO (session or service). */
     specifications?: ResourceSpecification[];
+    /** Inventoried EconomicResource rows keyed by specification action_hash. */
+    instancesBySpec?: Record<string, InventoriedInstanceView[]>;
     oncreatespec?: (input: ResourceSpecificationInput) => void | Promise<void>;
     onupdatespec?: (
       actionHash: string,
       input: ResourceSpecificationInput
     ) => void | Promise<void>;
+    /** Manual create — ignored when descriptor.economic_mode is set. */
+    oncreateinstance?: (input: CreateInstanceInput) => void | Promise<void>;
     /** Open on Resources when the URL carries `tab=resources`. */
     initialTab?: TabId;
     /** Jump to Agent Perspective for the initiator (display name). */
@@ -79,8 +86,10 @@
     operationalState = null,
     oncreatendo,
     specifications = [],
+    instancesBySpec = {},
     oncreatespec,
     onupdatespec,
+    oncreateinstance,
     initialTab = 'overview',
     oninitiatorjump,
     onmemberjump
@@ -328,8 +337,10 @@
       <ResourcesPanel
         {descriptor}
         {specifications}
+        {instancesBySpec}
         oncreate={oncreatespec}
         onupdate={onupdatespec}
+        {oncreateinstance}
       />
     </div>
   {/if}
