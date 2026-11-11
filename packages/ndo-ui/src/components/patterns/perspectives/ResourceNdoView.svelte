@@ -9,6 +9,7 @@
   } from '../../../domain/types.js';
   import { getComingNext, type OperationalStateLabel } from '../../../domain/coming-next.js';
   import { formatDate, truncateHash } from '../../../domain/format.js';
+  import { joinAffordance } from '../../../domain/ndo-membership.js';
   import Breadcrumb, { type BreadcrumbItem } from './Breadcrumb.svelte';
   import NdoActionRow from './NdoActionRow.svelte';
   import ResourcesPanel, {
@@ -35,8 +36,8 @@
     transitionHistory?: NdoTransitionHistoryEvent[];
     /** NDO members (agents who joined). */
     members?: GroupMember[];
-    /** Whether the current agent has joined. */
-    joined?: boolean;
+    /** Whether the current agent has joined. `null` until the membership read returns. */
+    joined?: boolean | null;
     onjoin?: () => void | Promise<void>;
     groups?: GroupDescriptor[];
     associatedGroupIds?: string[];
@@ -160,6 +161,7 @@
   const allAssociated = $derived(
     groups.length > 0 && groups.every((g) => associatedGroupIds.includes(g.id))
   );
+  const joinUi = $derived(joinAffordance({ joined, loading: joining }));
 </script>
 
 {#if soonId}
@@ -211,9 +213,13 @@
         <NdoButton
           variant="ghost"
           class="px-3 py-1.5 text-xs"
-          onclick={() => (showJoinPanel = !showJoinPanel)}
+          disabled={joinUi.disabled}
+          onclick={() => {
+            if (joinUi.disabled) return;
+            showJoinPanel = !showJoinPanel;
+          }}
         >
-          {joined ? 'Joined ✓' : 'Join NDO'}
+          {joinUi.headerLabel}
         </NdoButton>
         <NdoButton
           variant="ghost"
@@ -304,8 +310,8 @@
         group (a curated short list for group members).
       </p>
       <div class="mt-3">
-        <NdoButton class="px-3 py-1.5 text-xs" disabled={joined || joining} onclick={handleJoin}>
-          {joined ? 'You have joined this NDO' : joining ? 'Joining…' : 'Join this NDO'}
+        <NdoButton class="px-3 py-1.5 text-xs" disabled={joinUi.disabled} onclick={handleJoin}>
+          {joinUi.confirmLabel}
         </NdoButton>
       </div>
       <MemberList

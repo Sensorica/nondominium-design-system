@@ -174,7 +174,7 @@
     </section>
 
     <section>
-      <h3 class="text-sm font-semibold text-gray-900">Joined</h3>
+      <h3 class="text-sm font-semibold text-gray-900">NDOs joined</h3>
       <ul class="mt-2 space-y-1">
         {#each joined as d}
           <li>

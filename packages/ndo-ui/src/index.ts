@@ -17,6 +17,7 @@ export * from './domain/ndo-associations.js';
 export * from './domain/coming-next.js';
 export * from './domain/resource-perspective.js';
 export * from './domain/agent-perspective.js';
+export * from './domain/ndo-membership.js';
 export * from './domain/layer1.js';
 export * from './domain/spec-starters.js';
 export * from './domain/spec-inventory.js';
