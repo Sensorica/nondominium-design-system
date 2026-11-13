@@ -6,9 +6,27 @@ Screens should not re-derive nature × regime × mode exceptions ad hoc. Use
 `deriveNdoUiProfile` (`domain/ndo-ui-profile.ts`) as the single expansion point:
 
 - `resources.allowSpecCreate` / `allowInstanceCreate` — Resources tab CTAs
-- `actionPalette` / `activity.defaultAction` — Commitment & event forms
+- `actionPalette` / `activity.defaultAction` — which actions appear on Commitment & event forms
+- `activity.formSpecFor(action, surface)` / `actionFormSpec` — which **fields** each action shows (see below)
 - `governance.recommended` / `applyableIds` — Governance template picker
 - `economicFork` — Use unit / capacity / Consume / none
+
+## Action Form Spec (Activity forms)
+
+`domain/action-form-spec.ts` declares, per `VfAction` + NDO context + `surface`
+(`commitment` | `event`):
+
+- agent mode (`bilateral` vs `unilateralSame`) and labels
+- time mode (`punctual` | `deadline` | `intervalEnd`) mapped to today’s single
+  `due_date` / conductor event time in Phase 1
+- resource hash / resource quantity / effort quantity presence
+- Phase 2 slots (`hasBeginning`, `hasEnd`, `targetLocation`, `multiResource`) as
+  documented hints only — not persisted until schema work lands
+
+`validateCommitmentDraft(spec, draft)` is the shared Phase 1 required-field check.
+Palette filtering stays in `vf-actions.ts`; form shape stays here so Digital Cite
+(no quantities) and Physical Use (Until + both agents + inventoriable hash) share
+one table across design-system and the hApp.
 
 The create wizard mutates kernel/refinement only through `reduceWizard`
 (`domain/wizard-machine.ts`) so dependent fields realign in one place.

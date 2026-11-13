@@ -17,6 +17,11 @@ import {
   type ActionPalette,
   type VfAction
 } from './vf-actions.js';
+import {
+  actionFormSpec,
+  type ActionFormSpec,
+  type FormSurface
+} from './action-form-spec.js';
 
 export type EconomicFork = 'none' | 'use_unit' | 'use_capacity' | 'consume';
 
@@ -63,6 +68,8 @@ export type NdoUiProfile = {
     defaultAction: VfAction;
     /** Bilateral fulfill_commitment_closure; one Claim closes the commitment. */
     fulfillPolicy: 'bilateral_once';
+    /** Field profile for Commitment / Event forms for a chosen action. */
+    formSpecFor: (action: VfAction, surface?: FormSurface) => ActionFormSpec;
   };
 };
 
@@ -201,7 +208,15 @@ export function deriveNdoUiProfile(input: NdoUiProfileInput): NdoUiProfile {
     },
     activity: {
       defaultAction: actionPalette.defaultAction,
-      fulfillPolicy: 'bilateral_once'
+      fulfillPolicy: 'bilateral_once',
+      formSpecFor: (action, surface = 'commitment') =>
+        actionFormSpec(action, {
+          resourceNature: nature || null,
+          propertyRegime: input.propertyRegime ?? null,
+          economicMode,
+          hasInventoriableResource: input.hasInventoriableResource,
+          surface
+        })
     }
   };
 }

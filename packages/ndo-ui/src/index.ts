@@ -22,6 +22,7 @@ export * from './domain/layer1.js';
 export * from './domain/spec-starters.js';
 export * from './domain/spec-inventory.js';
 export * from './domain/vf-actions.js';
+export * from './domain/action-form-spec.js';
 export * from './domain/fulfillment-consent.js';
 
 
