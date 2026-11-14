@@ -1,6 +1,7 @@
 export type PropertyRegime = 'Private' | 'Commons' | 'Nondominium' | 'CommonPool';
 
-export type ResourceNature = 'Physical' | 'Digital' | 'Service' | 'Hybrid' | 'Information';
+/** Layer 0 nature. Digital includes designs, data, documents, datasets, and methods. */
+export type ResourceNature = 'Physical' | 'Digital' | 'Hybrid';
 
 export type LifecycleStage =
   | 'Ideation'
@@ -15,6 +16,21 @@ export type LifecycleStage =
   | 'EndOfLife';
 
 export type Rivalry = 'Rivalrous' | 'NonRivalrous';
+
+/** How a rivalrous resource subtracts. A usage rule, not a second rivalry value. */
+export type SubtractionKind = 'unit' | 'capacity' | 'consumable';
+
+/**
+ * Layer 0 inventoriable fork for Physical / Hybrid (not Digital, not Source).
+ * Use = operate without depleting; Consume = batch/stock that depletes.
+ */
+export type EconomicMode = 'use' | 'consume';
+
+/** Under Use: one held thing vs a place with concurrent capacity. */
+export type UseKind = 'unit' | 'capacity';
+
+/** Lot vs undifferentiated stock for Consume-mode batches. */
+export type ConsumeIdentification = 'LotControlled' | 'Stock';
 
 export type ResourceScope = 'Project' | 'Network' | 'Public';
 
@@ -72,6 +88,11 @@ export interface NdoDescriptor {
   /** When set, this NDO is a Source-NDO specialization */
   ndo_archetype?: NdoArchetypeId | null;
   source_profile?: SourceProfile | null;
+  /** Layer 0 inventoriable fork (Physical/Hybrid). */
+  economic_mode?: EconomicMode | null;
+  use_kind?: UseKind | null;
+  /** Derived / legacy: unit | capacity | consumable */
+  subtraction?: SubtractionKind | null;
 }
 
 export interface GroupDescriptor {
@@ -103,6 +124,19 @@ export interface NdoInput {
   resource_nature: ResourceNature;
   lifecycle_stage: LifecycleStage;
   description?: string;
+  /** Prototype: carry Source / archetype metadata from the create wizard into session state. */
+  ndo_archetype?: NdoArchetypeId | null;
+  source_profile?: SourceProfile | null;
+  /** Physical/Hybrid inventoriable fork — foreshadow until DNA stores it. */
+  economic_mode?: EconomicMode | null;
+  use_kind?: UseKind | null;
+  default_unit?: string | null;
+  initial_quantity?: number | null;
+  identification_pattern?: ConsumeIdentification | 'Serialized' | null;
+  unique_id?: string | null;
+  max_concurrent_users?: number | null;
+  /** Preselected governance template ids from create/review. */
+  governance_rule_ids?: string[];
 }
 
 export interface SourceProfile {
@@ -128,11 +162,27 @@ export interface WizardKernelState {
   description: string;
   resource_nature: ResourceNature;
   lifecycle_stage: LifecycleStage;
+  /** Required for Physical/Hybrid non-Source. Null for Digital / Source. */
+  economic_mode: EconomicMode | null;
+  /** Required when economic_mode === 'use'. */
+  use_kind: UseKind | null;
+  /** Consume: unit label (kg, each, L…). */
+  default_unit: string | null;
+  /** Consume: starting quantity (>0). */
+  initial_quantity: number | null;
+  /** Consume: LotControlled or Stock. */
+  identification_pattern: ConsumeIdentification | null;
+  /** Use/unit: optional serial / QR. */
+  unique_id: string | null;
+  /** Use/capacity: required max concurrent occupants (≥2). */
+  max_concurrent_users: number | null;
 }
 
 export interface WizardRefinementState {
   property_regime: PropertyRegime;
   rivalry: Rivalry | null;
+  /** Set for Physical and Hybrid. Null for Digital. */
+  subtraction?: SubtractionKind | null;
   scope: ResourceScope | null;
   source: ResourceSource | null;
   transferability: Transferability | null;
@@ -151,6 +201,115 @@ export interface NdoSpecificationDraft {
   tags?: string[];
   fields: SpecFieldValue[];
   governance_rule_ids: string[];
+}
+
+/**
+ * VF-aligned inventory intent (foreshadow — not yet on Rust ResourceSpecification).
+ * @see https://www.valueflo.ws/concepts/resources/#inventory
+ */
+export type InventoryIntent = 'Inventoried' | 'NotInventoried' | 'NotApplicable';
+
+/**
+ * VF identification pattern for inventoriable kinds (foreshadow).
+ * Serialized = unique id per instance; LotControlled = batch id; Stock = count/volume.
+ * Not used for Digital — digital kinds use {@link DigitalLocatorKind} instead.
+ */
+export type IdentificationPattern = 'Serialized' | 'LotControlled' | 'Stock';
+
+/**
+ * How a digital artifact is reached (foreshadow — not shelf inventory).
+ * Digital kinds are NotApplicable for inventory; identity is by address / content hash.
+ */
+export type DigitalLocatorKind =
+  | 'ContentAddressed'
+  | 'Url'
+  | 'Repository'
+  | 'DistributedStore'
+  | 'HostedService'
+  | 'LocalHost';
+
+/** Prototype foreshadow of SourceSpecification Layer 1 fields (not on Rust yet). */
+export interface SourceSpecForeshadow {
+  boundary_description?: string | null;
+  monitoring_plan?: string | null;
+  stakeholder_map?: string | null;
+  restoration_obligations?: string | null;
+}
+
+/** Prototype-only VF foreshadow fields stored on the session spec. */
+export interface SpecForeshadow extends SourceSpecForeshadow {
+  inventory_intent: InventoryIntent;
+  identification_pattern: IdentificationPattern | null;
+  default_unit: string | null;
+  substitutable: boolean | null;
+  /** Digital only: how the artifact is located (never inventory). */
+  digital_locator_kind?: DigitalLocatorKind | null;
+  /** Digital only: address, URI, CID, repo path, host id, etc. */
+  digital_locator?: string | null;
+}
+
+/**
+ * Layer 1 ResourceSpecification — mirrors the Rust entry in zome_resource.
+ * Linked from Layer 0 via NdoToSpecification; does not modify NondominiumIdentity.
+ */
+export interface ResourceSpecification {
+  /** Original create action hash (stable identity for this spec). */
+  action_hash: string;
+  name: string;
+  description: string;
+  /**
+   * Primary browse classification (Rust field name `category`).
+   * Not the kind itself — VF classification for discovery.
+   */
+  category: string;
+  image_url: string | null;
+  /** Additional browse classifications / facets. */
+  tags: string[];
+  is_active: boolean;
+  scope: ResourceScope;
+  /** Immutable pointer to the Layer 0 NDO action hash. */
+  ndo_identity_hash: string;
+  /**
+   * Lifecycle stage observed when Layer 1 was activated
+   * (mock equivalent of Rust `ndo_state_hash`).
+   */
+  activated_at_stage: LifecycleStage | string;
+  /** Author agent key; updates are author-only. */
+  author: string;
+  created_at: number;
+  /** Prototype foreshadow of VF inventory / identification (not on Rust yet). */
+  inventory_intent?: InventoryIntent;
+  identification_pattern?: IdentificationPattern | null;
+  default_unit?: string | null;
+  substitutable?: boolean | null;
+  digital_locator_kind?: DigitalLocatorKind | null;
+  digital_locator?: string | null;
+  /** Source-NDO Layer 1 foreshadow (SourceSpecification). */
+  boundary_description?: string | null;
+  monitoring_plan?: string | null;
+  stakeholder_map?: string | null;
+  restoration_obligations?: string | null;
+}
+
+/** Mutable fields accepted when creating or updating a Layer 1 specification. */
+export interface ResourceSpecificationInput {
+  name: string;
+  description: string;
+  /** Primary browse classification (maps to Rust `category`). */
+  category?: string;
+  image_url?: string | null;
+  tags?: string[];
+  scope: ResourceScope;
+  inventory_intent?: InventoryIntent;
+  identification_pattern?: IdentificationPattern | null;
+  default_unit?: string | null;
+  substitutable?: boolean | null;
+  digital_locator_kind?: DigitalLocatorKind | null;
+  digital_locator?: string | null;
+  boundary_description?: string | null;
+  monitoring_plan?: string | null;
+  stakeholder_map?: string | null;
+  restoration_obligations?: string | null;
 }
 
 export interface WizardResult {

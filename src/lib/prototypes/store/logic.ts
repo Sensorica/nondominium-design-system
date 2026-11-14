@@ -38,7 +38,7 @@ export type LifecycleStage = (typeof STAGES)[number];
 
 export const ENUM = {
   regime: ['Nondominium', 'Commons', 'Collective', 'Pool', 'CommonPool', 'Public', 'Private'],
-  nature: ['Physical', 'Digital', 'Service', 'Hybrid', 'Information'],
+  nature: ['Physical', 'Digital', 'Hybrid'],
   opstate: ['Available', 'Reserved', 'InTransit', 'InStorage', 'InMaintenance', 'InUse', 'PendingValidation'],
   role: ['SimpleAgent', 'AccountableAgent', 'PrimaryAccountableAgent', 'Transport', 'Repair', 'Storage'],
   rule: ['AccessRequirement', 'UsageLimit', 'TransferCondition', 'MaintenanceSchedule'],
@@ -135,6 +135,8 @@ export interface Ndo {
   y?: number;
   hibernation_origin?: LifecycleStage | null;
   successor?: string;
+  /** Use/Consume inventoriable fork — dual-created; no manual addInstance. */
+  economic_mode?: 'Use' | 'Consume' | null;
 }
 
 /** [type, summary, author]. The author is whoever created the rule
@@ -755,7 +757,7 @@ export function createNdo(s: ProtoState, ctx: Ctx, f: NdoForm): Outcome<string> 
   const id = ctx.id('n');
   const n: Ndo = {
     id, name: f.name.trim(), group, stage: 'Ideation', regime: f.regime, nature: f.nature,
-    rivalry: ['Digital', 'Information', 'Service'].includes(f.nature) ? 'NonRivalrous' : 'Rivalrous',
+    rivalry: f.nature === 'Digital' ? 'NonRivalrous' : 'Rivalrous',
     initiator: ctx.me, desc: f.desc || '', hash: ctx.hash()
   };
   const d = leave(s, ctx, id, 'work', 'declared this NDO', null, { ndos: [...s.ndos, n] }, [{ text: 'declared ' + n.name, ndo: id, type: 'ResourceCreation' }]);
@@ -889,6 +891,16 @@ export function updateRule(s: ProtoState, ctx: Ctx, ndo: string, i: number, type
 export function addInstance(s: ProtoState, ctx: Ctx, ndo: string, label: string): Outcome {
   const n = s.ndos.find((x) => x.id === ndo);
   if (!n) return fail('NDO not found.');
+  if (n.nature === 'Digital') {
+    return fail(
+      'Digital NDOs are not inventoriable — copies are trivial; use a digital locator, not shelf units.'
+    );
+  }
+  if (n.economic_mode) {
+    return fail(
+      'Use/Consume NDOs seed their economic resource at create (or on first Layer-1 transition). A second instance is a different NDO.'
+    );
+  }
   if (NO_ITEM_STAGES.includes(n.stage)) return fail('Instances cannot be added at stage ' + n.stage + '.');
   if (!label || !label.trim()) return fail('Label cannot be empty.');
   const d = leave(s, ctx, ndo, 'work', 'created resource ' + label, null,

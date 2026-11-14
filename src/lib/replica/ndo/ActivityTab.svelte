@@ -165,6 +165,8 @@
       <h3 class="text-base font-semibold text-gray-900">Activity</h3>
       <p class="text-xs text-gray-500">
         Commitments and events for this NDO (client-filtered by <code>ndo_identity_hash</code>).
+        Fulfill is bilateral: the author of a commitment cannot initiate fulfillment — the other
+        party starts it and the author countersigns.
       </p>
     </div>
     <div class="flex gap-2">

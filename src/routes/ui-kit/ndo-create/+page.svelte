@@ -41,6 +41,17 @@
   }
 
   const demoGroup = $derived(getMockGroups()[0]);
+
+  const interactionLabel = $derived.by(() => {
+    if (!lastInput?.economic_mode) return null;
+    if (lastInput.economic_mode === 'consume') {
+      return `Consume · ${lastInput.initial_quantity ?? '?'} ${lastInput.default_unit ?? ''}`;
+    }
+    if (lastInput.use_kind === 'capacity') {
+      return `Use · capacity ${lastInput.max_concurrent_users ?? '?'}`;
+    }
+    return 'Use · unit';
+  });
 </script>
 
 <svelte:head><title>NDO Create Wizard — UI Kit</title></svelte:head>
@@ -58,6 +69,10 @@
       <span class="text-sm text-gray-600">Demo entry:</span>
       <a href="{base}/ui-kit/ndo-create" class="text-sm text-blue-600 hover:underline">Stub</a>
       <a
+        href="{base}/ui-kit/ndo-create?archetype=active_project"
+        class="text-sm text-blue-600 hover:underline">Physical project (Use/Consume)</a
+      >
+      <a
         href="{base}/ui-kit/ndo-create?archetype=open_design"
         class="text-sm text-blue-600 hover:underline">Open design</a
       >
@@ -73,6 +88,12 @@
         <p class="mt-2 text-sm text-gray-600">
           {lastInput.name} · {lastInput.lifecycle_stage} · {lastInput.property_regime}
         </p>
+        {#if interactionLabel}
+          <p class="mt-1 text-sm text-indigo-800">{interactionLabel}</p>
+        {/if}
+        <p class="mt-1 text-xs text-gray-600">
+          Governance rules are not applied at create — select and Apply them on the Governance tab.
+        </p>
         {#if lastResult?.refinement.source_profile}
           <p class="mt-1 text-sm text-teal-800">
             Source-NDO · {lastResult.refinement.source_profile.source_type} · stewards:
@@ -83,7 +104,13 @@
           Continue to Layer 1 enrichment on the Specification tab.
         </p>
         <a
-          href="{base}/ui-kit/ndo-enrich?hash={MOCK_NDOS.at(-1)?.hash}"
+          href="{base}/ui-kit/ndo-enrich?hash={lastInput.economic_mode === 'consume'
+            ? 'uhC0kConsumeBatchTomatoExample01'
+            : lastInput.economic_mode === 'use' && lastInput.use_kind === 'capacity'
+              ? 'uhC0kUseCapacityBayExample00001'
+              : lastInput.economic_mode === 'use'
+                ? 'uhC0kUseUnitPrinterExample00001'
+                : (MOCK_NDOS.at(-1)?.hash ?? '')}"
           class="mt-4 inline-block text-sm text-blue-600 hover:underline"
         >
           Open enrichment editor →

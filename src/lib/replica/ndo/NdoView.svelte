@@ -78,6 +78,8 @@
   let joinMessage = $state<string | null>(null);
   let joinError = $state<string | null>(null);
   let joinLoading = $state(false);
+  /** null until membership is known; true after join or a successful is-member read. */
+  let joinedByMe = $state<boolean | null>(null);
   let ndoMembers = $state<{ id: string; name: string; role?: string }[]>([]);
   let membersLoading = $state(false);
   let membersError = $state<string | null>(null);
@@ -161,6 +163,7 @@
     if (!specActionHash) return;
     const hash = specActionHash;
     void loadDescriptor(hash);
+    loadMyMembership();
   });
 
   function handleRefresh() {
@@ -180,6 +183,10 @@
     }
   }
 
+  function loadMyMembership() {
+    joinedByMe = ndoService.isNdoMember(specHashB64);
+  }
+
   async function handleJoinNdo() {
     joinLoading = true;
     joinMessage = null;
@@ -189,6 +196,7 @@
     if (!ok) {
       joinError = 'Could not join this NDO. Please try again.';
     } else {
+      joinedByMe = true;
       joinMessage = 'You have joined this NDO.';
       void loadNdoMembers();
     }
@@ -210,6 +218,14 @@
   ];
 
   const isAuthenticated = $derived(appContext.myAgentPubKey != null);
+  /** Disabled until membership is known, and once this agent has joined. */
+  const joinDisabled = $derived(joinLoading || joinedByMe !== false);
+  const joinHeaderLabel = $derived(
+    joinLoading ? 'Joining…' : joinedByMe ? 'Joined' : 'Join NDO'
+  );
+  const joinConfirmLabel = $derived(
+    joinLoading ? 'Joining…' : joinedByMe ? 'Joined' : 'Join this NDO'
+  );
 </script>
 
 {#if parseError}
@@ -251,15 +267,16 @@
       <div class="flex flex-wrap items-center gap-2 md:ml-4 md:shrink-0 md:flex-nowrap">
         <button
           type="button"
-          disabled={joinLoading}
+          disabled={joinDisabled}
           onclick={() => {
+            if (joinDisabled) return;
             const next = !showJoinPanel;
             syncUrl({ join: next });
             if (next) void loadNdoMembers();
           }}
           class="rounded border border-gray-300 px-3 py-1.5 text-xs font-medium text-gray-600 hover:bg-gray-50 disabled:opacity-50"
         >
-          {joinLoading ? 'Joining…' : 'Join NDO'}
+          {joinHeaderLabel}
         </button>
 
         <!-- Associate with group: writes an NdoAnchor (clone coordinates) on the target group DHT -->
@@ -364,11 +381,11 @@
       <div class="mt-3 flex flex-wrap items-center gap-2">
         <button
           type="button"
-          disabled={joinLoading}
+          disabled={joinDisabled}
           onclick={handleJoinNdo}
           class="rounded bg-blue-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-blue-700 disabled:opacity-50"
         >
-          {joinLoading ? 'Joining…' : 'Join this NDO'}
+          {joinConfirmLabel}
         </button>
       </div>
       {#if joinMessage}

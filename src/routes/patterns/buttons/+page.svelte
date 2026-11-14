@@ -23,13 +23,14 @@
 
 <Specimen
   title="Bordered"
-  note="A grey or blue outline on white. The secondary action: Copy invite link, Join NDO, Associate with a group, Fork this NDO. Note the smaller padding — bordered buttons in the NDO header are px-3 py-1.5 text-xs, not px-4 py-2 text-sm."
+  note="A grey or blue outline on white. The secondary action: Copy invite link, Join NDO, Associate with a group, Fork this NDO. After a successful join the same control stays bordered but disabled and reads Joined (create ≠ join). Note the smaller padding — bordered buttons in the NDO header are px-3 py-1.5 text-xs, not px-4 py-2 text-sm."
   code={`class="rounded border border-gray-300 px-3 py-2 text-sm font-medium text-gray-600 hover:bg-gray-50"
 class="rounded border border-blue-300 px-3 py-1.5 text-xs font-medium text-blue-600 hover:bg-blue-50"`}
 >
   {#snippet demo()}
     <button class="rounded border border-gray-300 px-3 py-2 text-sm font-medium text-gray-600 hover:bg-gray-50">Copy invite link</button>
     <button class="rounded border border-gray-300 px-3 py-1.5 text-xs font-medium text-gray-600 hover:bg-gray-50">Join NDO</button>
+    <button class="rounded border border-gray-300 px-3 py-1.5 text-xs font-medium text-gray-600 hover:bg-gray-50 disabled:opacity-50" disabled>Joined</button>
     <button class="rounded border border-blue-300 px-3 py-1.5 text-xs font-medium text-blue-600 hover:bg-blue-50">Associate with a group</button>
   {/snippet}
 </Specimen>

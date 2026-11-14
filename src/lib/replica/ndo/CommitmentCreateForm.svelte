@@ -17,6 +17,7 @@
     Rivalry,
     VfAction
   } from '../types';
+  import { deriveNdoUiProfile } from '@nondominium/ndo-ui';
   import { governanceStore, holochainClientService } from '../stores.svelte';
 
   const encodeHashToBase64 = (h: string): string => h;
@@ -43,26 +44,16 @@
     oncreated
   }: Props = $props();
 
-  const actions: VfAction[] = [
-    'Transfer',
-    'Move',
-    'Use',
-    'Consume',
-    'Produce',
-    'Work',
-    'Modify',
-    'Combine',
-    'Separate',
-    'Raise',
-    'Lower',
-    'Cite',
-    'Accept',
-    'InitialTransfer',
-    'AccessForUse',
-    'TransferCustody'
-  ];
+  const palette = $derived(
+    deriveNdoUiProfile({
+      resourceNature,
+      propertyRegime
+    }).actionPalette
+  );
 
-  let action = $state<VfAction>('Use');
+  let action = $state<VfAction>(
+    deriveNdoUiProfile({ resourceNature, propertyRegime }).activity.defaultAction as VfAction
+  );
   let providerB64 = $state('');
   let dueDateLocal = $state('');
   let note = $state('');
@@ -172,9 +163,18 @@
           bind:value={action}
           class="w-full rounded border border-gray-300 px-3 py-2 text-sm"
         >
-          {#each actions as a}
-            <option value={a}>{a}</option>
-          {/each}
+          <optgroup label="Suggested for this NDO">
+            {#each palette.primary as a}
+              <option value={a}>{a}</option>
+            {/each}
+          </optgroup>
+          {#if palette.more.length > 0}
+            <optgroup label="More">
+              {#each palette.more as a}
+                <option value={a}>{a}</option>
+              {/each}
+            </optgroup>
+          {/if}
         </select>
       </div>
       <div>

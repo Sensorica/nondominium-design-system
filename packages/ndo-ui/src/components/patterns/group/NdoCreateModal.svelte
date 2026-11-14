@@ -6,15 +6,13 @@
     WizardResult
   } from '../../../domain/types.js';
   import { getArchetype } from '../../../domain/wizard-archetypes.js';
+  import { buildWizardResult, getWizardSteps, type WizardStepId } from '../../../domain/wizard-state.js';
   import {
-    buildWizardResult,
-    createInitialKernel,
-    createInitialRefinement,
-    getWizardSteps,
-    validateKernel,
-    validateRefinement,
-    type WizardStepId
-  } from '../../../domain/wizard-state.js';
+    createWizardModel,
+    reduceWizard,
+    validateWizardForSubmit,
+    wizardCurrentStep
+  } from '../../../domain/wizard-machine.js';
   import Modal from '../../primitives/Modal.svelte';
   import NdoButton from '../../primitives/NdoButton.svelte';
   import WizardStepper from '../wizard/WizardStepper.svelte';
@@ -38,7 +36,7 @@
   }
 
   let {
-    groupId,
+    groupId: _groupId,
     groupName = 'Group',
     existingNdos = [],
     isSubmitting = false,
@@ -49,14 +47,14 @@
     onwizardcomplete
   }: Props = $props();
 
-  let stepIndex = $state(0);
-  let kernel = $state(createInitialKernel(initialArchetype));
-  let refinement = $state(createInitialRefinement(initialArchetype, kernel.resource_nature));
-  let localError = $state('');
+  let model = $state(createWizardModel(initialArchetype));
 
-  const steps = $derived(getWizardSteps(kernel.archetype));
-  const currentStep = $derived(steps[stepIndex]?.id ?? 'archetype');
-  const archetype = $derived(getArchetype(kernel.archetype));
+  const steps = $derived(getWizardSteps(model.kernel.archetype));
+  const currentStep = $derived(wizardCurrentStep(model));
+  const archetype = $derived(getArchetype(model.kernel.archetype));
+  const kernel = $derived(model.kernel);
+  const refinement = $derived(model.refinement);
+  const stepIndex = $derived(model.stepIndex);
 
   const nameWarning = $derived(
     kernel.name.trim() &&
@@ -65,60 +63,16 @@
       : ''
   );
 
-  const displayError = $derived(errorMessage ?? localError);
-
-  function selectArchetype(id: NdoArchetypeId) {
-    kernel = createInitialKernel(id);
-    refinement = createInitialRefinement(id, kernel.resource_nature);
-  }
-
-  function patchKernel(patch: Partial<typeof kernel>) {
-    const next = { ...kernel, ...patch };
-    kernel = next;
-    if (patch.resource_nature && archetype.isSourceNdo) {
-      refinement = createInitialRefinement(next.archetype, patch.resource_nature);
-    }
-  }
-
-  function goNext() {
-    localError = '';
-    if (currentStep === 'kernel') {
-      const err = validateKernel(kernel);
-      if (err) {
-        localError = err;
-        return;
-      }
-    }
-    if (currentStep === 'refinement') {
-      const err = validateRefinement(refinement, archetype.isSourceNdo);
-      if (err) {
-        localError = err;
-        return;
-      }
-    }
-    if (stepIndex < steps.length - 1) stepIndex += 1;
-  }
-
-  function goBack() {
-    localError = '';
-    if (stepIndex > 0) stepIndex -= 1;
-  }
+  const displayError = $derived(errorMessage ?? model.localError);
 
   async function handleSubmit() {
-    const kernelErr = validateKernel(kernel);
-    if (kernelErr) {
-      localError = kernelErr;
+    const err = validateWizardForSubmit(model);
+    if (err) {
+      model = { ...model, localError: err };
       return;
     }
-    if (archetype.showRefinement) {
-      const refineErr = validateRefinement(refinement, archetype.isSourceNdo);
-      if (refineErr) {
-        localError = refineErr;
-        return;
-      }
-    }
-    localError = '';
-    const result = buildWizardResult(kernel, refinement);
+    model = reduceWizard(model, { type: 'CLEAR_ERROR' });
+    const result = buildWizardResult(model.kernel, model.refinement);
     await onwizardcomplete?.(result);
     await onsubmit?.(result.ndo_input);
   }
@@ -130,7 +84,13 @@
     review: 'Review and create'
   };
 
-  const stepTitle = $derived(stepTitles[currentStep as WizardStepId] ?? 'Create NDO');
+  const stepTitle = $derived(
+    currentStep === 'kernel' && archetype.isSourceNdo
+      ? 'Describe this source'
+      : currentStep === 'refinement' && archetype.isSourceNdo
+        ? 'Who stewards it'
+        : (stepTitles[currentStep as WizardStepId] ?? 'Create NDO')
+  );
 </script>
 
 <Modal title={stepTitle} subtitle="Register Layer 0 identity within {groupName}." maxWidth="2xl">
@@ -140,11 +100,32 @@
     <div class="grid gap-6 lg:grid-cols-5">
       <div class="lg:col-span-3">
         {#if currentStep === 'archetype'}
-          <ArchetypeStep selected={kernel.archetype} onselect={selectArchetype} />
+          <ArchetypeStep
+            selected={kernel.archetype}
+            onselect={(id) => {
+              model = reduceWizard(model, { type: 'SELECT_ARCHETYPE', id });
+            }}
+          />
         {:else if currentStep === 'kernel'}
-          <NarrativeKernelStep {kernel} {nameWarning} onchange={patchKernel} />
+          <NarrativeKernelStep
+            {kernel}
+            {nameWarning}
+            sourceType={refinement.source_profile?.source_type ?? null}
+            onchange={(patch) => {
+              model = reduceWizard(model, { type: 'PATCH_KERNEL', patch });
+            }}
+            onsourcetype={(sourceType) => {
+              model = reduceWizard(model, { type: 'SELECT_SOURCE_TYPE', sourceType });
+            }}
+          />
         {:else if currentStep === 'refinement'}
-          <RefinementStep {kernel} {refinement} onchange={(r) => (refinement = r)} />
+          <RefinementStep
+            {kernel}
+            {refinement}
+            onchange={(next) => {
+              model = reduceWizard(model, { type: 'SET_REFINEMENT', refinement: next });
+            }}
+          />
         {:else if currentStep === 'review'}
           <ReviewStep {kernel} {refinement} />
         {/if}
@@ -165,14 +146,23 @@
   {#snippet footer()}
     <NdoButton variant="ghost" onclick={onclose}>Cancel</NdoButton>
     {#if stepIndex > 0}
-      <NdoButton variant="ghost" onclick={goBack}>Back</NdoButton>
+      <NdoButton
+        variant="ghost"
+        onclick={() => {
+          model = reduceWizard(model, { type: 'BACK' });
+        }}>Back</NdoButton
+      >
     {/if}
     {#if currentStep === 'review'}
       <NdoButton disabled={isSubmitting} onclick={() => void handleSubmit()}>
         {isSubmitting ? 'Creating…' : 'Create NDO'}
       </NdoButton>
     {:else}
-      <NdoButton onclick={goNext}>Continue</NdoButton>
+      <NdoButton
+        onclick={() => {
+          model = reduceWizard(model, { type: 'NEXT' });
+        }}>Continue</NdoButton
+      >
     {/if}
   {/snippet}
 </Modal>

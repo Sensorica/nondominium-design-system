@@ -31,17 +31,13 @@ export const STAGE_IDENTITY_COLORS: Record<LifecycleStage, string> = {
 export const NATURE_COLORS: Record<ResourceNature, string> = {
   Physical: 'bg-blue-100 text-blue-700 border-blue-300',
   Digital: 'bg-purple-100 text-purple-700 border-purple-300',
-  Service: 'bg-orange-100 text-orange-700 border-orange-300',
-  Hybrid: 'bg-teal-100 text-teal-700 border-teal-300',
-  Information: 'bg-indigo-100 text-indigo-700 border-indigo-300'
+  Hybrid: 'bg-teal-100 text-teal-700 border-teal-300'
 };
 
 export const NATURE_IDENTITY_COLORS: Record<ResourceNature, string> = {
   Physical: 'bg-blue-100 text-blue-700',
   Digital: 'bg-purple-100 text-purple-700',
-  Service: 'bg-orange-100 text-orange-700',
-  Hybrid: 'bg-teal-100 text-teal-700',
-  Information: 'bg-indigo-100 text-indigo-700'
+  Hybrid: 'bg-teal-100 text-teal-700'
 };
 
 /** Regime filter chip colors (filled, dashed border). */
