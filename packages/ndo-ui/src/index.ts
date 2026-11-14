@@ -23,6 +23,7 @@ export * from './domain/spec-starters.js';
 export * from './domain/spec-inventory.js';
 export * from './domain/vf-actions.js';
 export * from './domain/action-form-spec.js';
+export * from './domain/participation-grammar.js';
 export * from './domain/fulfillment-consent.js';
 
 

@@ -16,14 +16,20 @@ Screens should not re-derive nature × regime × mode exceptions ad hoc. Use
 `domain/action-form-spec.ts` declares, per `VfAction` + NDO context + `surface`
 (`commitment` | `event`):
 
-- agent mode (`bilateral` vs `unilateralSame`) and labels
+- agent mode (`bilateral` vs `unilateralSame`) and labels — **driven by**
+  `domain/participation-grammar.ts` (regime × nature × family × initiation).
+  Commitments that close via `fulfill_commitment_closure` always require two
+  distinct agents (performer + witness). Events may stay `unilateralSame` for
+  self-performed observation. Normative detail:
+  nondominium `documentation/specifications/participation-grammar.md`.
 - time mode (`punctual` | `deadline` | `intervalEnd`) mapped to today’s single
   `due_date` / conductor event time in Phase 1
 - resource hash / resource quantity / effort quantity presence
 - Phase 2 slots (`hasBeginning`, `hasEnd`, `targetLocation`, `multiResource`) as
   documented hints only — not persisted until schema work lands
 
-`validateCommitmentDraft(spec, draft)` is the shared Phase 1 required-field check.
+`validateCommitmentDraft(spec, draft)` is the shared Phase 1 required-field check
+(including distinct-agent when the grammar requires it).
 Palette filtering stays in `vf-actions.ts`; form shape stays here so Digital Cite
 (no quantities) and Physical Use (Until + both agents + inventoriable hash) share
 one table across design-system and the hApp.

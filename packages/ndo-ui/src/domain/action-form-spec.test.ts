@@ -5,19 +5,30 @@ import {
 } from './action-form-spec.js';
 
 describe('actionFormSpec', () => {
-  test('Digital Cite: unilateral, punctual, no qty/hash/effort', () => {
+  test('Digital Cite commitment: bilateral performer + witness (closure)', () => {
     const s = actionFormSpec('Cite', {
       resourceNature: 'Digital',
       surface: 'commitment'
     });
-    expect(s.agents.mode).toBe('unilateralSame');
-    expect(s.agents.singleLabel).toBe('Citer');
+    expect(s.agents.mode).toBe('bilateral');
+    expect(s.requireDistinctAgents).toBe(true);
+    expect(s.agents.providerLabel).toBe('Citer');
+    expect(s.agents.receiverLabel).toBe('Witness');
     expect(s.time.mode).toBe('punctual');
     expect(s.time.defaultToNow).toBe(true);
     expect(s.resourceHash.presence).toBe('hidden');
     expect(s.resourceQuantity.presence).toBe('hidden');
     expect(s.effortQuantity.presence).toBe('hidden');
     expect(s.phase2).toEqual([]);
+  });
+
+  test('Digital Cite event: unilateralSame allowed', () => {
+    const s = actionFormSpec('Cite', {
+      resourceNature: 'Digital',
+      surface: 'event'
+    });
+    expect(s.agents.mode).toBe('unilateralSame');
+    expect(s.requireDistinctAgents).toBe(false);
   });
 
   test('Physical Use inventoriable: bilateral, intervalEnd, hash required, Phase 2 interval', () => {
@@ -49,28 +60,44 @@ describe('actionFormSpec', () => {
     expect(s.agents.receiverLabel).toBe('To');
     expect(s.resourceHash.presence).toBe('required');
     expect(s.effortQuantity.presence).toBe('hidden');
+    expect(s.authorSeedWire).toBe('provider');
   });
 
-  test('Consume: unilateral, resource qty required, effort hidden', () => {
-    const s = actionFormSpec('Consume', {
+  test('Consume commitment: bilateral; event unilateral', () => {
+    const c = actionFormSpec('Consume', {
       resourceNature: 'Physical',
       economicMode: 'consume',
       hasInventoriableResource: true,
       surface: 'commitment'
     });
-    expect(s.agents.mode).toBe('unilateralSame');
-    expect(s.time.mode).toBe('punctual');
-    expect(s.resourceQuantity.presence).toBe('required');
-    expect(s.effortQuantity.presence).toBe('hidden');
+    expect(c.agents.mode).toBe('bilateral');
+    expect(c.requireDistinctAgents).toBe(true);
+    expect(c.resourceQuantity.presence).toBe('required');
+
+    const e = actionFormSpec('Consume', {
+      resourceNature: 'Physical',
+      economicMode: 'consume',
+      hasInventoriableResource: true,
+      surface: 'event'
+    });
+    expect(e.agents.mode).toBe('unilateralSame');
   });
 
-  test('Work: effort required on commitment', () => {
+  test('Work: effort required on commitment; Modify seeds witness wire', () => {
     const s = actionFormSpec('Work', {
       resourceNature: 'Digital',
       surface: 'commitment'
     });
     expect(s.effortQuantity.presence).toBe('required');
-    expect(s.resourceQuantity.presence).toBe('hidden'); // digital no inventoriable
+    expect(s.resourceQuantity.presence).toBe('hidden');
+
+    const m = actionFormSpec('Modify', {
+      resourceNature: 'Physical',
+      propertyRegime: 'Nondominium',
+      surface: 'commitment'
+    });
+    expect(m.authorSeedWire).toBe('receiver');
+    expect(m.requireDistinctAgents).toBe(true);
   });
 
   test('event surface: Work effort becomes optional; inventoriable qty required', () => {
@@ -93,7 +120,8 @@ describe('actionFormSpec', () => {
     });
     expect(s.phase2.map((p) => p.id)).toContain('targetLocation');
     const errs = validateCommitmentDraft(s, {
-      provider: 'agent',
+      provider: 'agentA',
+      receiver: 'agentB',
       timeLocal: '2026-01-01T12:00',
       resourceHash: 'hash'
     });
@@ -102,13 +130,28 @@ describe('actionFormSpec', () => {
 });
 
 describe('validateCommitmentDraft', () => {
-  test('Cite needs agent + when', () => {
+  test('Cite commitment needs both agents + when; rejects same agent', () => {
     const s = actionFormSpec('Cite', { resourceNature: 'Digital', surface: 'commitment' });
     expect(validateCommitmentDraft(s, {})).toEqual(
-      expect.arrayContaining(['Citer is required.', 'When is required.'])
+      expect.arrayContaining(['Citer is required.', 'Witness is required.', 'When is required.'])
     );
     expect(
-      validateCommitmentDraft(s, { provider: 'me', timeLocal: '2026-01-01T00:00' })
+      validateCommitmentDraft(s, {
+        provider: 'me',
+        receiver: 'me',
+        timeLocal: '2026-01-01T00:00'
+      })
+    ).toEqual(
+      expect.arrayContaining([
+        'Citer and Witness must be different agents.'
+      ])
+    );
+    expect(
+      validateCommitmentDraft(s, {
+        provider: 'me',
+        receiver: 'other',
+        timeLocal: '2026-01-01T00:00'
+      })
     ).toEqual([]);
   });
 

@@ -216,6 +216,7 @@ export function deriveNdoUiProfile(input: NdoUiProfileInput): NdoUiProfile {
           economicMode,
           hasInventoriableResource: input.hasInventoriableResource,
           surface
+          // initiation defaults inside participationGrammar
         })
     }
   };

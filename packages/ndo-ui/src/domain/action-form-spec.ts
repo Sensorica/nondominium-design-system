@@ -11,6 +11,12 @@
  */
 
 import type { ActionPaletteContext, VfAction } from './vf-actions.js';
+import {
+  authorSeedWireField,
+  participationGrammar,
+  type ParticipationInitiation,
+  type WireField
+} from './participation-grammar.js';
 
 export type FieldPresence = 'hidden' | 'optional' | 'required';
 export type AgentMode = 'bilateral' | 'unilateralSame';
@@ -21,6 +27,8 @@ export type Phase2SlotId = 'hasBeginning' | 'hasEnd' | 'targetLocation' | 'multi
 
 export type ActionFormSpecContext = ActionPaletteContext & {
   surface: FormSurface;
+  /** Peer-production initiation; defaults from participation grammar. */
+  initiation?: ParticipationInitiation | null;
 };
 
 export type ActionFormSpec = {
@@ -46,6 +54,11 @@ export type ActionFormSpec = {
   note: { presence: FieldPresence };
   phase2: Array<{ id: Phase2SlotId; label: string }>;
   summaryHint?: string;
+  /** From participation grammar — commitments that close via countersign. */
+  requireDistinctAgents: boolean;
+  /** Which wire field the proposing author should be prefilled into. */
+  authorSeedWire: WireField;
+  initiation: ParticipationInitiation;
 };
 
 export type CommitmentDraft = {
@@ -344,17 +357,25 @@ const INVENTORIABLE_HASH_ACTIONS: readonly VfAction[] = [
 
 /**
  * Build the form field profile for one VfAction in NDO + surface context.
+ * Agent mode / labels / distinct-agent rules come from participationGrammar.
  */
 export function actionFormSpec(action: VfAction, ctx: ActionFormSpecContext): ActionFormSpec {
   const base = BASE[action];
   const digital = isDigital(ctx.resourceNature);
   const inventoriable = !!ctx.hasInventoriableResource;
+  const grammar = participationGrammar({
+    action,
+    surface: ctx.surface,
+    resourceNature: ctx.resourceNature,
+    propertyRegime: ctx.propertyRegime,
+    initiation: ctx.initiation
+  });
 
   let resourceHash = { ...base.resourceHash };
   let resourceQuantity = { ...base.resourceQuantity };
   let effortQuantity = { ...base.effortQuantity };
   const time = { ...base.time };
-  const agents = { ...base.agents };
+  const agents = { ...grammar.agents };
   const phase2 = [...base.phase2];
 
   if (inventoriable && INVENTORIABLE_HASH_ACTIONS.includes(action)) {
@@ -393,7 +414,10 @@ export function actionFormSpec(action: VfAction, ctx: ActionFormSpecContext): Ac
     effortQuantity,
     note: { presence: 'optional' },
     phase2,
-    summaryHint: base.summaryHint
+    summaryHint: grammar.summaryHint ?? base.summaryHint,
+    requireDistinctAgents: grammar.requireDistinctAgents,
+    authorSeedWire: authorSeedWireField(grammar),
+    initiation: grammar.initiation
   };
 }
 
@@ -407,6 +431,7 @@ function hasNumber(v: number | null | undefined): boolean {
 
 /**
  * Phase 1 client-side required-field checks. Does not enforce Phase 2 slots.
+ * When requireDistinctAgents, provider and receiver must both be set and differ.
  */
 export function validateCommitmentDraft(
   spec: ActionFormSpec,
@@ -425,6 +450,17 @@ export function validateCommitmentDraft(
     if (!hasText(draft.receiver)) {
       errors.push(`${spec.agents.receiverLabel} is required.`);
     }
+  }
+
+  if (
+    spec.requireDistinctAgents &&
+    hasText(draft.provider) &&
+    hasText(draft.receiver) &&
+    draft.provider!.trim() === draft.receiver!.trim()
+  ) {
+    errors.push(
+      `${spec.agents.providerLabel} and ${spec.agents.receiverLabel} must be different agents.`
+    );
   }
 
   if (!hasText(draft.timeLocal)) {
