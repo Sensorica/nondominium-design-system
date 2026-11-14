@@ -1,4 +1,10 @@
-import type { GovernanceRuleTemplate, PropertyRegime, ResourceNature } from './types.js';
+import type {
+  EconomicMode,
+  GovernanceRuleTemplate,
+  PropertyRegime,
+  ResourceNature,
+  UseKind
+} from './types.js';
 
 const BASE_TEMPLATES: GovernanceRuleTemplate[] = [
   {
@@ -27,11 +33,28 @@ const BASE_TEMPLATES: GovernanceRuleTemplate[] = [
     enforced_by: 'PrimaryAccountableAgent'
   },
   {
+    id: 'capacity_limit',
+    rule_type: 'usage_limit',
+    label: 'Capacity at one time',
+    rationale:
+      'A place stays rivalrous. Several people can use it together until the capacity is reached.',
+    rule_data: { max_concurrent_users: 8 },
+    enforced_by: 'AccountableAgent'
+  },
+  {
     id: 'quota_extraction',
     rule_type: 'usage_limit',
     label: 'Extraction quota per period',
     rationale: 'CommonPool resources need subtractability limits to prevent depletion.',
     rule_data: { max_quantity_per_period: 100, unit: 'units' },
+    enforced_by: 'AccountableAgent'
+  },
+  {
+    id: 'max_per_agent',
+    rule_type: 'usage_limit',
+    label: 'Max items per agent',
+    rationale: 'Caps how many units one agent may take from a depleting batch at a time.',
+    rule_data: { max_quantity_per_agent: 3 },
     enforced_by: 'AccountableAgent'
   },
   {
@@ -73,45 +96,30 @@ const BASE_TEMPLATES: GovernanceRuleTemplate[] = [
     rationale: 'Blocks high-impact events when source regime is Stressed or worse.',
     rule_data: { block_when_regime: ['Stressed', 'Degraded', 'Critical'] },
     enforced_by: 'Steward'
-  },
-  {
-    id: 'service_sla',
-    rule_type: 'access_requirement',
-    label: 'Service availability SLA',
-    rationale: 'Service resources need documented availability and response expectations.',
-    rule_data: { min_uptime_percent: 95 },
-    enforced_by: 'AccountableAgent'
   }
 ];
 
+/** Legacy regime × nature matrix — used for Digital and as regime accents. */
 const REGIME_NATURE_MATRIX: Record<PropertyRegime, Partial<Record<ResourceNature, string[]>>> = {
   Private: {
     Physical: ['access_accountable'],
     Digital: ['access_accountable', 'integrity_manifest'],
-    Service: ['access_accountable', 'service_sla'],
-    Hybrid: ['access_accountable', 'maintenance_schedule'],
-    Information: ['access_accountable']
+    Hybrid: ['access_accountable', 'maintenance_schedule']
   },
   Commons: {
     Physical: ['access_attribution'],
     Digital: ['access_attribution', 'integrity_manifest'],
-    Information: ['access_attribution'],
-    Hybrid: ['access_attribution'],
-    Service: ['access_attribution', 'service_sla']
+    Hybrid: ['access_attribution']
   },
   Nondominium: {
     Physical: ['no_ownership_transfer', 'access_accountable', 'maintenance_schedule'],
     Digital: ['no_ownership_transfer', 'access_attribution', 'integrity_manifest'],
-    Information: ['no_ownership_transfer', 'access_attribution'],
-    Hybrid: ['no_ownership_transfer', 'access_accountable'],
-    Service: ['no_ownership_transfer', 'service_sla']
+    Hybrid: ['no_ownership_transfer', 'access_accountable']
   },
   CommonPool: {
     Physical: ['quota_extraction', 'access_accountable', 'maintenance_schedule'],
     Digital: ['quota_extraction'],
-    Hybrid: ['quota_extraction', 'maintenance_schedule'],
-    Service: ['quota_extraction', 'service_sla'],
-    Information: ['access_attribution']
+    Hybrid: ['quota_extraction', 'maintenance_schedule']
   }
 };
 
@@ -122,20 +130,148 @@ export const SOURCE_NDO_TEMPLATE_IDS = [
   'no_ownership_transfer'
 ];
 
-export function getGovernanceTemplatesForNdo(
-  regime: PropertyRegime,
-  nature: ResourceNature,
-  isSourceNdo = false
-): GovernanceRuleTemplate[] {
-  if (isSourceNdo) {
-    return SOURCE_NDO_TEMPLATE_IDS.map((id) => getTemplateById(id)).filter(
-      Boolean
-    ) as GovernanceRuleTemplate[];
+export interface GovernanceTemplateQuery {
+  regime: PropertyRegime;
+  nature: ResourceNature;
+  isSourceNdo?: boolean;
+  economicMode?: EconomicMode | null;
+  useKind?: UseKind | null;
+  /** Override capacity_limit rule_data when known from the wizard. */
+  maxConcurrentUsers?: number | null;
+}
+
+function uniqueIds(ids: string[]): string[] {
+  return [...new Set(ids)];
+}
+
+/**
+ * Decision-table rows for inventoriable packs (Physical/Hybrid + economic mode).
+ * First matching row wins. Regime accents are applied after the base pack.
+ */
+type PackRow = {
+  mode: 'consume' | 'use';
+  useKind?: 'unit' | 'capacity' | null;
+  base: string[];
+  /** Extra ids keyed by regime (merged onto base). */
+  byRegime?: Partial<Record<PropertyRegime, string[]>>;
+  /** Full override for a regime (replaces base instead of merging). */
+  regimeReplace?: Partial<Record<PropertyRegime, string[]>>;
+};
+
+const ECONOMIC_PACK_TABLE: PackRow[] = [
+  {
+    mode: 'consume',
+    base: ['quota_extraction', 'max_per_agent'],
+    byRegime: {
+      Private: ['access_accountable'],
+      Commons: ['access_attribution'],
+      Nondominium: ['access_accountable', 'no_ownership_transfer'],
+      CommonPool: ['access_accountable', 'maintenance_schedule']
+    }
+  },
+  {
+    mode: 'use',
+    useKind: 'capacity',
+    base: ['capacity_limit', 'access_accountable'],
+    regimeReplace: {
+      Commons: ['capacity_limit', 'access_attribution']
+    },
+    byRegime: {
+      Nondominium: ['no_ownership_transfer']
+    }
+  },
+  {
+    mode: 'use',
+    useKind: 'unit',
+    base: ['access_accountable', 'maintenance_schedule'],
+    regimeReplace: {
+      Commons: ['access_attribution', 'maintenance_schedule']
+    },
+    byRegime: {
+      Nondominium: ['no_ownership_transfer']
+    }
+  }
+];
+
+function packFromTable(query: GovernanceTemplateQuery): string[] | null {
+  if (!query.economicMode) return null;
+  const useKind = query.useKind ?? 'unit';
+  for (const row of ECONOMIC_PACK_TABLE) {
+    if (row.mode !== query.economicMode) continue;
+    if (row.mode === 'use' && row.useKind && row.useKind !== useKind) continue;
+    const replaced = row.regimeReplace?.[query.regime];
+    if (replaced) return uniqueIds(replaced);
+    const extras = row.byRegime?.[query.regime] ?? [];
+    return uniqueIds([...row.base, ...extras]);
+  }
+  return null;
+}
+
+function resolveIds(query: GovernanceTemplateQuery): string[] {
+  if (query.isSourceNdo) {
+    return [...SOURCE_NDO_TEMPLATE_IDS];
   }
 
-  const ids =
-    REGIME_NATURE_MATRIX[regime]?.[nature] ?? REGIME_NATURE_MATRIX[regime]?.Physical ?? [];
-  return ids.map((id) => getTemplateById(id)).filter(Boolean) as GovernanceRuleTemplate[];
+  if (query.nature === 'Digital') {
+    return (
+      REGIME_NATURE_MATRIX[query.regime]?.Digital ??
+      REGIME_NATURE_MATRIX[query.regime]?.Physical ??
+      []
+    );
+  }
+
+  const fromTable = packFromTable(query);
+  if (fromTable) return fromTable;
+
+  // Fallback: legacy regime × nature (no economic mode yet)
+  return (
+    REGIME_NATURE_MATRIX[query.regime]?.[query.nature] ??
+    REGIME_NATURE_MATRIX[query.regime]?.Physical ??
+    []
+  );
+}
+
+function materialize(
+  ids: string[],
+  query: GovernanceTemplateQuery
+): GovernanceRuleTemplate[] {
+  return ids
+    .map((id) => getTemplateById(id))
+    .filter(Boolean)
+    .map((t) => {
+      const template = t as GovernanceRuleTemplate;
+      if (
+        template.id === 'capacity_limit' &&
+        query.maxConcurrentUsers != null &&
+        query.maxConcurrentUsers >= 2
+      ) {
+        return {
+          ...template,
+          rule_data: {
+            ...template.rule_data,
+            max_concurrent_users: query.maxConcurrentUsers
+          }
+        };
+      }
+      return template;
+    });
+}
+
+/**
+ * Recommended governance templates for an NDO.
+ * Prefer the object form; the legacy (regime, nature, isSourceNdo) signature remains.
+ */
+export function getGovernanceTemplatesForNdo(
+  regimeOrQuery: PropertyRegime | GovernanceTemplateQuery,
+  nature?: ResourceNature,
+  isSourceNdo = false
+): GovernanceRuleTemplate[] {
+  const query: GovernanceTemplateQuery =
+    typeof regimeOrQuery === 'string'
+      ? { regime: regimeOrQuery, nature: nature!, isSourceNdo }
+      : regimeOrQuery;
+
+  return materialize(resolveIds(query), query);
 }
 
 export function getTemplateById(id: string): GovernanceRuleTemplate | undefined {

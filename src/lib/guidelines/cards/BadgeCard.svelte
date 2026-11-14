@@ -40,9 +40,7 @@
       [
         ['nature-physical', 'Physical'],
         ['nature-digital', 'Digital'],
-        ['nature-service', 'Service'],
-        ['nature-hybrid', 'Hybrid'],
-        ['nature-information', 'Information']
+        ['nature-hybrid', 'Hybrid']
       ]
     ],
     [

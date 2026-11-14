@@ -9,7 +9,8 @@
  * mock backend (directions/flow-graph/backend.ts), and fails unless:
  *   1. every (from, to) lifecycle pair, for every hibernation origin, is
  *      accepted exactly when the integrity zome accepts it, both in
- *      allowedStages() and through the advance() action;
+ *      allowedStages() and through the advance() action. Resource Perspective
+ *      offers a subset of those pairs, and never a pair the store rejects;
  *   2. the hApp's rules hold: initiator-only lifecycle, custodian-only custody
  *      transfer and operational state, a successor for Deprecated, rules that
  *      only their author may change, and the Hard constraints of
@@ -34,6 +35,11 @@
 import * as L from '../src/lib/prototypes/store/logic';
 import { friendly } from '../src/lib/prototypes/plain';
 import type * as FB from '../src/lib/prototypes/directions/flow-graph/backend';
+import { allowedTransitions } from '../packages/ndo-ui/src/domain/lifecycle-transitions.ts';
+import { NDO_ARCHETYPES } from '../packages/ndo-ui/src/domain/wizard-archetypes.ts';
+import { SCOPE_OPTIONS, accessOptionsForNature, natureForSourceType, rivalryForNature, scopePermitted } from '../packages/ndo-ui/src/domain/wizard-questions.ts';
+import { checkRuleDataPermitted, checkScopeCoherence } from '../src/lib/replica/constraints.ts';
+import { defaultRivalryFor } from '../src/lib/replica/rivalry.ts';
 
 /** F's backend as a fresh module, the way each page load evaluates it anew:
  *  module-level counters restart, only localStorage carries over. */
@@ -95,6 +101,112 @@ for (const from of STAGES) {
       }
     }
   }
+}
+
+// Resource Perspective's modal offers a subset of the store's transitions
+// (Hibernating is offered from Active only). Every offered pair must be one
+// the store accepts. advanceStage refuses anything outside that modal list.
+for (const from of STAGES) {
+  const origins = from === 'Hibernating' ? ORIGINS : [null];
+  for (const origin of origins) {
+    const ui = allowedTransitions(from, origin);
+    const store = L.allowedStages({ stage: from, hibernation_origin: origin });
+    for (const to of ui) {
+      check(
+        store.includes(to),
+        `Resource Perspective offers ${from}${origin ? ` (origin ${origin})` : ''} → ${to}, which the store rejects`
+      );
+    }
+  }
+}
+
+{
+  const creatable = new Set(['Ideation', 'Specification', 'Development', 'Prototype', 'Stable', 'Distributed', 'Active']);
+  const stub = NDO_ARCHETYPES.find((a) => a.id === 'stub');
+  check(!!stub && stub.allowedLifecycleStages.length === 1 && stub.allowedLifecycleStages[0] === 'Ideation', 'Capture an idea must register only at Ideation');
+  for (const archetype of NDO_ARCHETYPES) {
+    check(
+      archetype.allowedLifecycleStages.includes(archetype.defaultLifecycleStage),
+      `${archetype.id} default stage ${archetype.defaultLifecycleStage} is not in its allowed list`
+    );
+    for (const stage of archetype.allowedLifecycleStages) {
+      check(creatable.has(stage), `${archetype.id} offers ${stage}, which cannot be an initial stage`);
+    }
+  }
+  const source = NDO_ARCHETYPES.find((a) => a.id === 'source_ndo');
+  const sourceStages = source?.allowedLifecycleStages.join('|');
+  check(
+    sourceStages === 'Specification|Development|Stable|Active',
+    `a source registers at Specification, Development, Stable, or Active (got ${sourceStages})`
+  );
+  check(natureForSourceType('Hydrological') === 'Physical', 'an ecological source is physical');
+  check(natureForSourceType('KnowledgeCommons') === 'Digital', 'a knowledge commons is digital');
+  check(natureForSourceType('SocialCommons') === 'Digital', 'a social commons is digital');
+}
+
+{
+  const regimes = ['Private', 'Commons', 'Nondominium', 'CommonPool'] as const;
+  for (const regime of regimes) {
+    for (const scope of SCOPE_OPTIONS) {
+      const violation = checkScopeCoherence(
+        { resource_nature: 'Physical', property_regime: regime, lifecycle_stage: null },
+        scope.id
+      );
+      const hard = violation?.severity === 'Hard';
+      check(
+        scopePermitted(regime, scope.id) === !hard,
+        `wizard scope ${regime}/${scope.id} ${scopePermitted(regime, scope.id) ? 'allows' : 'hides'} a choice the predicate ${hard ? 'rejects' : 'accepts'}`
+      );
+    }
+  }
+}
+
+{
+  const natures = ['Physical', 'Digital', 'Hybrid'] as const;
+  for (const nature of natures) {
+    check(
+      rivalryForNature(nature) === defaultRivalryFor(nature),
+      `wizard rivalry for ${nature} is ${rivalryForNature(nature)}, nature default is ${defaultRivalryFor(nature)}`
+    );
+  }
+  const freeAccess = { AccessRequirement: { accessibility: 'Free' as const } };
+  for (const nature of natures) {
+    const offersPool = accessOptionsForNature(nature).some((option) => option.id === 'bounded_pool');
+    const soft = checkRuleDataPermitted(
+      { resource_nature: nature, property_regime: 'CommonPool' },
+      freeAccess
+    ).some((violation) => violation.rule_id === 'subtractable_regime_on_nonrivalrous' && violation.severity === 'Soft');
+    check(
+      offersPool === !soft,
+      `wizard bounded pool for ${nature} ${offersPool ? 'is offered' : 'is hidden'} where the predicate ${soft ? 'warns' : 'accepts'} CommonPool`
+    );
+  }
+  check(
+    accessOptionsForNature('Digital', ['Nondominium', 'CommonPool']).map((option) => option.id).join() === 'uncapturable',
+    'a digital source keeps Nondominium and drops CommonPool'
+  );
+  const quantityOnDigital = checkRuleDataPermitted(
+    { resource_nature: 'Digital', property_regime: 'Commons' },
+    { UsageLimit: { max_quantity_per_period: 10, period_days: 30 } }
+  );
+  check(
+    quantityOnDigital.length === 1 && quantityOnDigital[0].rule_id === 'quantity_limit_on_nonrivalrous' && quantityOnDigital[0].severity === 'Soft',
+    'a quantity-per-period limit on a non-rivalrous resource is a Soft warning'
+  );
+  check(
+    checkRuleDataPermitted(
+      { resource_nature: 'Digital', property_regime: 'Commons' },
+      { UsageLimit: { max_duration_hours: 2 } }
+    ).length === 0,
+    'a duration cap on a non-rivalrous resource stays allowed'
+  );
+  check(
+    checkRuleDataPermitted(
+      { resource_nature: 'Digital', property_regime: 'CommonPool', rivalry_override: 'Rivalrous' },
+      freeAccess
+    ).length === 0,
+    'a rivalry override to Rivalrous clears the subtractable-regime warning'
+  );
 }
 
 // ── 2 and 3. Who may do what ──────────────────────────────────────────────

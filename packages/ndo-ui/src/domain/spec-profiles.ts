@@ -50,47 +50,21 @@ const DIGITAL_FIELDS: SpecProfileField[] = [
     placeholder: 'Optional manifest hash',
     inputType: 'text'
   },
-  { id: 'documentation', label: 'Documentation link', inputType: 'url' }
-];
-
-const SERVICE_FIELDS: SpecProfileField[] = [
+  { id: 'documentation', label: 'Documentation link', inputType: 'url' },
   {
-    id: 'endpoint',
-    label: 'Service endpoint',
-    placeholder: 'URL or contact method',
-    inputType: 'url'
+    id: 'method_summary',
+    label: 'Method / protocol summary',
+    placeholder: 'For a method: sites, steps, and reporting format',
+    inputType: 'textarea'
   },
-  {
-    id: 'availability',
-    label: 'Availability window',
-    placeholder: 'e.g. Mon–Fri 9–17',
-    inputType: 'text'
-  },
-  { id: 'sla', label: 'SLA summary', inputType: 'textarea' },
-  {
-    id: 'required_role',
-    label: 'Required role to initiate',
-    placeholder: 'e.g. AccountableAgent',
-    inputType: 'text'
-  }
+  { id: 'version', label: 'Version', placeholder: 'e.g. 1.2.0', inputType: 'text' },
+  { id: 'upstream_ref', label: 'Upstream reference', inputType: 'url' },
+  { id: 'quality_criteria', label: 'Quality criteria', inputType: 'textarea' }
 ];
 
 const HYBRID_FIELDS: SpecProfileField[] = [
   ...PHYSICAL_FIELDS.slice(0, 3),
   ...DIGITAL_FIELDS.slice(0, 3)
-];
-
-const INFORMATION_FIELDS: SpecProfileField[] = [
-  {
-    id: 'method_summary',
-    label: 'Method / protocol summary',
-    inputType: 'textarea',
-    required: true
-  },
-  { id: 'version', label: 'Version', placeholder: 'e.g. 1.2.0', inputType: 'text' },
-  { id: 'license', label: 'License / ToS', inputType: 'text' },
-  { id: 'upstream_ref', label: 'Upstream reference', inputType: 'url' },
-  { id: 'quality_criteria', label: 'Quality criteria', inputType: 'textarea' }
 ];
 
 const SOURCE_FIELDS: SpecProfileField[] = [
@@ -116,20 +90,27 @@ export function getSpecProfileFields(
   return getBaseFieldsForNature(nature);
 }
 
+/** Layer 1 SourceSpecification fields only (no inventoriable Physical extras). */
+export function getSourceSpecificationFields(): SpecProfileField[] {
+  return [...SOURCE_FIELDS];
+}
+
+/** True when this descriptor is a Source-NDO specialization. */
+export function isSourceNdoDescriptor(d: {
+  ndo_archetype?: string | null;
+  source_profile?: unknown;
+} | null | undefined): boolean {
+  return d?.ndo_archetype === 'source_ndo' || !!d?.source_profile;
+}
+
 function getBaseFieldsForNature(nature: ResourceNature): SpecProfileField[] {
   switch (nature) {
     case 'Physical':
       return PHYSICAL_FIELDS;
     case 'Digital':
       return DIGITAL_FIELDS;
-    case 'Service':
-      return SERVICE_FIELDS;
     case 'Hybrid':
       return HYBRID_FIELDS;
-    case 'Information':
-      return INFORMATION_FIELDS;
-    default:
-      return DIGITAL_FIELDS;
   }
 }
 

@@ -66,9 +66,7 @@
   const natureColorMap: Record<string, string> = {
     Physical: 'bg-blue-100 text-blue-700',
     Digital: 'bg-purple-100 text-purple-700',
-    Service: 'bg-orange-100 text-orange-700',
-    Hybrid: 'bg-teal-100 text-teal-700',
-    Information: 'bg-indigo-100 text-indigo-700'
+    Hybrid: 'bg-teal-100 text-teal-700'
   };
 
   function badgeClass(map: Record<string, string>, value: string | null): string {
@@ -78,8 +76,7 @@
   // Restored with the app's own derivation. #132 added the rivalry badge and the
   // replica had neither it nor the util behind it; effectiveRivalryLabel now
   // lives at replica/rivalry.ts. The label distinguishes an explicit override
-  // from the nature's default, and returns null for Service, whose rivalry the
-  // ontology leaves ambiguous on purpose.
+  // from the nature's default.
   const rivalryBadge = $derived(
     effectiveRivalryLabel(
       descriptor?.resource_nature as ResourceNature | null,

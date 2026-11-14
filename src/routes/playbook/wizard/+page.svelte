@@ -6,8 +6,10 @@
     RefinementStep,
     ReviewStep,
     WizardStepper,
+    applySourceType,
     createInitialKernel,
     createInitialRefinement,
+    getArchetype,
     getWizardSteps,
     type NdoArchetypeId
   } from '@nondominium/ndo-ui';
@@ -71,7 +73,21 @@
 
 <section class="specimen-section">
   <h2 class="specimen-heading">Narrative kernel step</h2>
-  <NarrativeKernelStep {kernel} onchange={(p) => (kernel = { ...kernel, ...p })} />
+  <NarrativeKernelStep
+    {kernel}
+    sourceType={refinement.source_profile?.source_type ?? null}
+    onchange={(p) => (kernel = { ...kernel, ...p })}
+    onsourcetype={(sourceType) => {
+      const next = applySourceType(
+        kernel,
+        refinement,
+        sourceType,
+        getArchetype(kernel.archetype).allowedRegimes
+      );
+      kernel = next.kernel;
+      refinement = next.refinement;
+    }}
+  />
 </section>
 
 <section class="specimen-section">

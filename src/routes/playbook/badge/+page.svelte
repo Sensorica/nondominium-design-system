@@ -84,7 +84,7 @@
     <code class="font-mono text-xs">GovernanceRule</code> carries a
     <code class="font-mono text-xs">rivalry_override</code>. It is shown outlined rather than filled because it
     qualifies a regime rather than standing beside it: effective rivalry is the nature's default unless the
-    creator overrode it, and <code class="font-mono text-xs">Service</code> has no confident default.
+    creator overrode it.
     Scope lives on the Layer 1 specification and is the one field that can quietly undo a Layer 0 guarantee, so
     narrowing an open-access regime below <code class="font-mono text-xs">Public</code> is a Hard refusal.
   </p>

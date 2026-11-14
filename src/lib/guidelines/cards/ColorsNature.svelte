@@ -3,9 +3,7 @@
   const natures = [
     { label: 'Physical', bg: 'blue-100', fg: 'blue-700', v: 'blue-100 / 700' },
     { label: 'Digital', bg: 'purple-100', fg: 'purple-700', v: 'purple-100 / 700' },
-    { label: 'Service', bg: 'orange-100', fg: 'orange-700', v: 'orange-100 / 700' },
-    { label: 'Hybrid', bg: 'teal-100', fg: 'teal-700', v: 'teal-100 / 700' },
-    { label: 'Information', bg: 'indigo-100', fg: 'indigo-700', v: 'indigo-100 / 700' }
+    { label: 'Hybrid', bg: 'teal-100', fg: 'teal-700', v: 'teal-100 / 700' }
   ];
 </script>
 

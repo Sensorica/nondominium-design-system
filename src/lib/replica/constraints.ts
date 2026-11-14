@@ -14,11 +14,8 @@
 // function it mirrors, and the rule ids and message text are the app's own, so a
 // screenshot of the prototype and a screenshot of the app say the same words.
 //
-// The one thing deliberately NOT ported is `ResourceNature::default_rivalry` for
-// `Service`. Rust answers `NonRivalrous`; `rivalry.ts` answers `null` so the UI can
-// prompt for an override. That divergence is the app's own, it lives in
-// `ui/src/lib/utils/rivalry.ts`, and this file defers to it rather than
-// contradicting either side.
+// The rivalry default lives in `rivalry.ts` and matches `ResourceNature::default_rivalry`:
+// Physical and Hybrid are Rivalrous; Digital is NonRivalrous.
 
 import { defaultRivalryFor } from './rivalry';
 import type {
@@ -97,45 +94,75 @@ export function softViolationMessages(violations: ConstraintViolation[]): string
     .map((v) => `[${v.rule_id}] ${v.message}`);
 }
 
-/** Mirrors `check_rule_data_permitted`: which `RuleData` variants a classification allows. */
+/** Pool and CommonPool govern subtractable use. Private stewardship of a non-rivalrous resource stays coherent. */
+function regimeAssumesSubtraction(regime: PropertyRegime): boolean {
+  return regime === 'Pool' || regime === 'CommonPool';
+}
+
+/**
+ * Mirrors `check_rule_data_permitted`: which `RuleData` variants a classification allows.
+ *
+ * The rivalry clauses are Soft. A subtractable regime, or a quantity-per-period
+ * usage limit, on a non-rivalrous classification is an advisory. A duration cap
+ * is left alone. Regime and rivalry stay orthogonal, so neither clause is Hard.
+ */
 export function checkRuleDataPermitted(
   ctx: ResourceClassification,
   ruleData: RuleData
 ): ConstraintViolation[] {
-  if ('TransferCondition' in ruleData) {
-    if (ruleData.TransferCondition.transfer_type !== 'Ownership') return [];
-    if (permitsOwnershipTransfer(ctx.property_regime)) return [];
-    return [
-      {
+  const violations: ConstraintViolation[] = [];
+
+  if ('TransferCondition' in ruleData && ruleData.TransferCondition.transfer_type === 'Ownership') {
+    if (!permitsOwnershipTransfer(ctx.property_regime)) {
+      violations.push({
         rule_id: 'ownership_transfer_not_permitted_by_regime',
         message: `${ctx.property_regime} does not permit ownership-transfer rules.`,
         severity: isUncapturable(ctx.property_regime) ? 'Hard' : 'Soft'
-      }
-    ];
+      });
+    }
   }
 
-  if ('AccessRequirement' in ruleData) {
-    if (ruleData.AccessRequirement.accessibility !== 'Gated') return [];
-    if (!isUncapturable(ctx.property_regime)) return [];
-    return [
-      {
+  if ('AccessRequirement' in ruleData && ruleData.AccessRequirement.accessibility === 'Gated') {
+    if (isUncapturable(ctx.property_regime)) {
+      violations.push({
         rule_id: 'gated_access_contradicts_permissionless_regime',
         message:
           "Nondominium resources must remain permissionless (REQ-RES-01); 'Gated' access creates a discretionary chokepoint.",
         severity: 'Soft'
-      }
-    ];
+      });
+    }
   }
 
-  return [];
+  if (effectiveRivalry(ctx) === 'NonRivalrous' && regimeAssumesSubtraction(ctx.property_regime)) {
+    violations.push({
+      rule_id: 'subtractable_regime_on_nonrivalrous',
+      message: `${ctx.property_regime} assumes subtractable use, and this resource is non-rivalrous. A seat or download cap is an access rule.`,
+      severity: 'Soft'
+    });
+  }
+
+  if (
+    'UsageLimit' in ruleData &&
+    ruleData.UsageLimit.max_quantity_per_period != null &&
+    effectiveRivalry(ctx) === 'NonRivalrous'
+  ) {
+    violations.push({
+      rule_id: 'quantity_limit_on_nonrivalrous',
+      message:
+        'A quantity-per-period limit meters subtractable use, and this resource is non-rivalrous. A seat or download cap is an access rule.',
+      severity: 'Soft'
+    });
+  }
+
+  return violations;
 }
 
-/** Mirrors `check_transport_applicability`: Move does not apply to Digital or Information. */
+/** Mirrors `check_transport_applicability`: Move does not apply to Digital. */
 export function checkTransportApplicability(
   ctx: ResourceClassification,
   action: VfAction
 ): ConstraintViolation | null {
-  const nonPhysical = ctx.resource_nature === 'Digital' || ctx.resource_nature === 'Information';
+  const nonPhysical = ctx.resource_nature === 'Digital';
   if (action !== 'Move' || !nonPhysical) return null;
   return {
     rule_id: 'no_transport_for_non_physical_nature',

@@ -1,5 +1,5 @@
 ---
-name: nondominium-design
+name: nondominium-design-system
 description: Use this skill to generate well-branded interfaces and assets for Nondominium (the Sensorica Holochain app for resource governance without ownership), either for production or for throwaway prototypes and mocks. Contains the design tokens, brand brief, component playbook, and a navigable prototype of every screen the app has.
 user-invocable: true
 designsystem:
@@ -14,8 +14,8 @@ designsystem:
   capabilities:
     playbook:      { routes: /patterns, categories: 7 }
     ndo-ui:        { routes: [/playbook, /ui-kit], package: packages/ndo-ui, owner: external }
-    scenarios:     { routes: /scenarios, count: 6 }
-    surface-keys:  { module: src/lib/surface-keys.ts, namespaces: [screen, scenario] }
+    layer0:        { routes: /prototypes/resource-perspective, views: [lobby, group, create, ndo], state: src/lib/prototypes/resource-perspective/state.svelte.ts, ui: packages/ndo-ui }
+    surface-keys:  { module: src/lib/surface-keys.ts, namespaces: [screen, proto] }
     mock-state:    { module: src/lib/replica/stores.svelte.ts }
     prototype-app: { routes: /app, screens: 44, groups: [app, connection], mode: replica, data-states: 'src/lib/replica/stores.svelte.ts' }
     replica:       { source: ../nondominium/ui/src/lib/components, components: 24, check: 'bun run check:fidelity' }
@@ -51,5 +51,6 @@ Key facts:
 - **`lobby/GroupSidebar.svelte` is dead code in the app** (nothing imports it; `shell/Sidebar.svelte` replaced it) and is deliberately not replicated.
 - **Every commentable or navigable surface has a key** in `src/lib/surface-keys.ts`, resolved from the whole URL because modal and tab states are query params.
 - **The lifecycle transition table lives verbatim in `src/lib/replica/ndo/LifecycleTransitionModal.svelte`** and mirrors the Rust integrity zome. Check `documentation/specifications/specifications.md` §7.5 before touching it.
-- **Six v0.1 UI directions live at `/prototypes`** (A Mycelium, B Field Notes, C Instrument, D Signal Board, E Holarchy, F Flow Graph), from the prototype handoff in `docs/prototypes/`. `src/lib/prototypes/directions.ts` is their registry; choosing one is setting its `status` to `'target'` and nothing else. They are explorations of where the app could go, not descriptions of the app: the replica at `/app` stays the record of what exists. Their words come from one module, `src/lib/prototypes/plain.ts`, and A to E share one store whose rules `bun run check:prototypes` holds to the integrity zome.
+- **The working prototype is `/prototypes/resource-perspective`.** Lobby, Group, Resource Perspective, on `@nondominium/ndo-ui`, with session state in `src/lib/prototypes/resource-perspective/state.svelte.ts`. It is the Layer 0 app to keep building. It is not the replica and not one of the six directions.
+- **Six v0.1 UI directions also live at `/prototypes`** (A Mycelium, B Field Notes, C Instrument, D Signal Board, E Holarchy, F Flow Graph), from the prototype handoff in `docs/prototypes/`. `src/lib/prototypes/directions.ts` is their registry; choosing one is setting its `status` to `'target'` and nothing else. They are explorations, not the Layer 0 app: the replica at `/app` stays the record of what the hApp currently is. Their words come from one module, `src/lib/prototypes/plain.ts`, and A to E share one store whose rules `bun run check:prototypes` holds to the integrity zome.
 - Voice is plain and technical. Name constraints and say why; show nulls rather than inventing values.

@@ -33,7 +33,6 @@ type GroupState = 'loading' | 'error' | 'empty';
 type NdoState = 'loading' | 'error' | 'anonymous';
 
 const app = (suffix = '') => `${base}/app${suffix}`;
-const scenarios = (suffix = '') => `${base}/scenarios${suffix}`;
 const patterns = (suffix = '') => `${base}/patterns${suffix}`;
 const prototypes = (suffix = '') => `${base}/prototypes${suffix}`;
 
@@ -107,18 +106,45 @@ export const paths = {
   // ── Prototype: agents ──
   agentProfile: (key: string) => app(`/agent/${encodeURIComponent(key)}`),
 
-  // ── Scenarios ──
-  scenarios: () => scenarios(),
-  scenarioLobbyBrowse: () => scenarios('/lobby-browse'),
-  scenarioNdoCreation: () => scenarios('/ndo-creation'),
-  scenarioNdoLifecycle: () => scenarios('/ndo-lifecycle'),
-  scenarioGroupCollaboration: () => scenarios('/group-collaboration'),
-  scenarioAgentIdentity: () => scenarios('/agent-identity'),
-  scenarioGovernanceReview: () => scenarios('/governance-review'),
-
-  // ── Prototype directions (the v0.1 UI handoff; registry in prototypes/directions.ts) ──
-  /** The index of the six directions, inside the design-system chrome. */
+  // ── Prototypes ──
+  // The Layer 0 app (Lobby › Group › Resource Perspective) is one standalone
+  // route. Its views are query params, same as the direction views below, so
+  // each is a linkable surface. It is not a direction: directions.ts stays the
+  // registry of the six v0.1 explorations.
+  /** The index: the Layer 0 app, then the six directions. Inside the design-system chrome. */
   prototypes: () => prototypes(),
+  /** Layer 0 app, on the lobby. */
+  protoResource: () => prototypes('/resource-perspective'),
+  /** A group as a Perspective host. Optional `perspective` / `agent` for Agent. */
+  protoResourceGroup: (
+    id: string,
+    opts?: { perspective?: 'resource' | 'agent'; agent?: string | null }
+  ) => {
+    const q = new URLSearchParams();
+    q.set('view', 'group');
+    q.set('group', id);
+    if (opts?.perspective && opts.perspective !== 'resource') {
+      q.set('perspective', opts.perspective);
+    }
+    if (opts?.agent) q.set('agent', opts.agent);
+    return prototypes(`/resource-perspective?${q}`);
+  },
+  /** The create-NDO modal, open on a group. */
+  protoResourceCreate: (id: string) =>
+    prototypes(`/resource-perspective?view=group&group=${encodeURIComponent(id)}&createNdo=1`),
+  /** One NDO inside the Resource Perspective. `group` is omitted when the NDO was opened from the lobby. */
+  protoResourceNdo: (
+    hash: string,
+    groupId?: string | null,
+    opts?: { tab?: 'overview' | 'resources' }
+  ) => {
+    const q = new URLSearchParams();
+    q.set('view', 'ndo');
+    if (groupId) q.set('group', groupId);
+    q.set('ndo', hash);
+    if (opts?.tab && opts.tab !== 'overview') q.set('tab', opts.tab);
+    return prototypes(`/resource-perspective?${q}`);
+  },
   /** A direction, full-bleed, on its default view. */
   protoDirection: (slug: DirectionSlug) => prototypes(`/${slug}`),
   /** A named view of a direction, optionally pinned to a record. Views are

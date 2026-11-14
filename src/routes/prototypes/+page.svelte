@@ -4,6 +4,11 @@
   // direction is flipping its `status` there, and this page regroups itself.
   import { paths } from '$lib/paths';
   import { DIRECTION_LIST, type Direction, type DirectionSlug } from '$lib/prototypes/directions';
+  import {
+    RESOURCE_EXAMPLE_GROUP,
+    RESOURCE_EXAMPLE_GROUP_OF_NDO,
+    RESOURCE_EXAMPLE_NDO
+  } from '$lib/prototypes/resource-perspective/examples';
 
   const slug = (d: Direction) => d.slug as DirectionSlug;
   const byStatus = (s: Direction['status']) => DIRECTION_LIST.filter((d) => d.status === s);
@@ -61,6 +66,43 @@
       below names what it lost.
     </p>
   </header>
+
+  <section class="block">
+    <h2 class="ndo-h2">Working app</h2>
+    <article class="ndo-card dcard">
+      <header class="dcard__head">
+        <h3 class="ndo-h3">Resource Perspective</h3>
+      </header>
+      <p class="dcard__pitch">
+        Lobby, then a group, then the Resource Perspective. What is live is what Layer 0 can honestly do: browse,
+        create a group or an NDO, join, associate, and the creator’s lifecycle transition. Agent, Intelligence and Work
+        stay visible, with a Soon badge, and explain themselves instead of pretending to work.
+      </p>
+      <p class="ndo-small">
+        This is the app to keep working in. What you create, join or advance stays for the session, including if you
+        leave for this index and come back. A reload reseeds the example network. The six directions below are the
+        earlier explorations; they are not this app.
+      </p>
+      <div class="dcard__actions">
+        <a class="ndo-btn ndo-btn--primary ndo-btn--sm" href={paths.protoResource()}>Open</a>
+        <a class="ndo-btn ndo-btn--ghost ndo-btn--sm" href={paths.protoResourceGroup(RESOURCE_EXAMPLE_GROUP)}>Sensorica</a>
+        <a class="ndo-btn ndo-btn--ghost ndo-btn--sm" href={paths.protoResourceNdo(RESOURCE_EXAMPLE_NDO, RESOURCE_EXAMPLE_GROUP_OF_NDO)}>
+          NDO you created
+        </a>
+      </div>
+    </article>
+    <div class="ndo-panel">
+      <div class="ndo-panel__head"><h3 class="ndo-h3">Still open</h3></div>
+      <div class="ndo-panel__body">
+        <ul class="ndo-small questions">
+          <li>Popup on click versus an inline explainer inside each tab. The popup is what the app shows.</li>
+          <li>The Overview tab exists so the tab bar has a live entry. The hApp has no such tab today.</li>
+          <li>Offer opens a popup with a shortcut to Create NDO. Whether Offer should open the form directly is undecided.</li>
+          <li>Whether Layer 1/2 forms stay reachable behind a dev flag for internal testing.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
 
   <section class="block">
     <h2 class="ndo-h2">Target</h2>
@@ -224,6 +266,13 @@
     display: flex;
     gap: var(--ndo-spacing-2);
     flex-wrap: wrap;
+  }
+  .questions {
+    margin: 0;
+    padding-left: 1.2em;
+    display: flex;
+    flex-direction: column;
+    gap: var(--ndo-spacing-2);
   }
   .empty {
     padding: var(--ndo-spacing-4);

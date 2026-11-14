@@ -1,7 +1,9 @@
 <script lang="ts">
   import NdoBadge from '../../primitives/NdoBadge.svelte';
   import { getArchetype } from '../../../domain/wizard-archetypes.js';
-  import { getGovernanceImplications } from '../../../domain/wizard-questions.js';
+  import { getGovernanceImplications, subtractionOption } from '../../../domain/wizard-questions.js';
+  import { recommendedGovernanceRuleIds } from '../../../domain/wizard-state.js';
+  import { SOURCE_TYPE_OPTIONS } from '../../../domain/spec-profiles.js';
   import type { WizardKernelState, WizardRefinementState } from '../../../domain/types.js';
 
   interface Props {
@@ -13,7 +15,11 @@
 
   const archetype = $derived(getArchetype(kernel.archetype));
   const implications = $derived(getGovernanceImplications(refinement, kernel.resource_nature));
-  const displayName = $derived(kernel.name.trim() || 'Untitled NDO');
+  const packCount = $derived(recommendedGovernanceRuleIds(kernel, refinement).length);
+  const displayName = $derived(kernel.name.trim() || (archetype.isSourceNdo ? 'Untitled source' : 'Untitled NDO'));
+  const sourceTypeLabel = $derived(
+    SOURCE_TYPE_OPTIONS.find((option) => option.id === refinement.source_profile?.source_type)?.label
+  );
 </script>
 
 <div class="rounded-lg border border-gray-200 bg-gray-50 p-4">
@@ -38,17 +44,29 @@
     </p>
   </div>
 
-  {#if refinement.rivalry}
+  {#if kernel.economic_mode}
+    <p class="mt-2 text-xs text-gray-600">
+      <span class="font-medium">Interaction:</span>
+      {kernel.economic_mode === 'consume'
+        ? `Consume · ${kernel.initial_quantity ?? '?'} ${kernel.default_unit ?? ''}`
+        : kernel.use_kind === 'capacity'
+          ? `Use · capacity ${kernel.max_concurrent_users ?? '?'}`
+          : 'Use · unit'}
+    </p>
+  {:else if refinement.rivalry}
     <p class="mt-2 text-xs text-gray-600">
       <span class="font-medium">Rivalry:</span>
       {refinement.rivalry}
+      {#if refinement.subtraction}
+        · {subtractionOption(refinement.subtraction)?.label}
+      {/if}
     </p>
   {/if}
 
   {#if archetype.isSourceNdo && refinement.source_profile}
     <div class="mt-2 rounded border border-teal-200 bg-teal-50/60 px-3 py-2">
       <p class="text-xs font-medium text-teal-900">
-        Source-NDO · {refinement.source_profile.source_type}
+        Source · {sourceTypeLabel}
       </p>
       <p class="text-xs text-teal-800">Regime state: {refinement.source_profile.regime_state}</p>
       {#if refinement.source_profile.stewarded_by.length}
@@ -68,5 +86,12 @@
         {/each}
       </ul>
     </div>
+  {/if}
+
+  {#if packCount > 0}
+    <p class="mt-3 text-xs text-gray-500">
+      {packCount} governance rule{packCount === 1 ? '' : 's'} will be recommended on the Governance
+      tab — select and Apply after create.
+    </p>
   {/if}
 </div>

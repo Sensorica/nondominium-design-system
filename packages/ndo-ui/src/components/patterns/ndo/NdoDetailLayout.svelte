@@ -15,6 +15,7 @@
   import SpecificationTab from './SpecificationTab.svelte';
   import NdoButton from '../../primitives/NdoButton.svelte';
   import type { NdoSpecificationDraft, SourceProfile } from '../../../domain/types.js';
+  import { joinAffordance } from '../../../domain/ndo-membership.js';
 
   type TabId = 'specification' | 'resources' | 'governance' | 'composition' | 'activity';
 
@@ -29,6 +30,9 @@
     showFork?: boolean;
     showAssociate?: boolean;
     showJoin?: boolean;
+    /** Whether the current agent has joined this NDO. `null` until the membership read returns. */
+    joined?: boolean | null;
+    onjoin?: () => void | Promise<void>;
     specDraft?: NdoSpecificationDraft;
     sourceProfile?: SourceProfile | null;
     onspecchange?: (draft: NdoSpecificationDraft) => void;
@@ -55,6 +59,8 @@
     showFork = true,
     showAssociate = true,
     showJoin = true,
+    joined = false,
+    onjoin,
     specDraft,
     sourceProfile,
     onspecchange,
@@ -73,9 +79,20 @@
   let tab = $state<TabId>(defaultTab);
   let showForkModal = $state(false);
   let showAssociateModal = $state(false);
-  let showJoinSoon = $state(false);
+  let showJoinPanel = $state(false);
+  let joining = $state(false);
 
   const canAssociate = $derived(Boolean(groups && onassociate && descriptor));
+  const joinUi = $derived(joinAffordance({ joined, loading: joining }));
+
+  async function handleJoin() {
+    joining = true;
+    try {
+      await onjoin?.();
+    } finally {
+      joining = false;
+    }
+  }
 
   const tabs: { id: TabId; label: string }[] = [
     { id: 'specification', label: 'Specification' },
@@ -126,24 +143,17 @@
     </div>
     <div class="ml-4 flex shrink-0 items-center gap-2">
       {#if showJoin}
-        <div class="relative">
-          <NdoButton
-            variant="ghost"
-            class="px-3 py-1.5 text-xs"
-            onclick={() => {
-              showJoinSoon = !showJoinSoon;
-            }}
-          >
-            Join NDO
-          </NdoButton>
-          {#if showJoinSoon}
-            <div
-              class="absolute right-0 top-full z-10 mt-1 whitespace-nowrap rounded border border-gray-200 bg-white px-3 py-1.5 text-xs text-gray-500 shadow-md"
-            >
-              Coming soon
-            </div>
-          {/if}
-        </div>
+        <NdoButton
+          variant="ghost"
+          class="px-3 py-1.5 text-xs"
+          disabled={joinUi.disabled}
+          onclick={() => {
+            if (joinUi.disabled) return;
+            showJoinPanel = !showJoinPanel;
+          }}
+        >
+          {joinUi.headerLabel}
+        </NdoButton>
       {/if}
       {#if showAssociate}
         <NdoButton
@@ -191,6 +201,21 @@
     {/each}
   </nav>
 </div>
+
+{#if showJoinPanel}
+  <div class="mx-6 mt-4 rounded-lg border border-gray-200 bg-gray-50 p-4" data-testid="join-panel">
+    <h2 class="text-sm font-semibold text-gray-800">NDO membership</h2>
+    <p class="mt-1 text-xs text-gray-500">
+      Joining an NDO records your participation. This is distinct from associating the NDO with a
+      group.
+    </p>
+    <div class="mt-3">
+      <NdoButton class="px-3 py-1.5 text-xs" disabled={joinUi.disabled} onclick={handleJoin}>
+        {joinUi.confirmLabel}
+      </NdoButton>
+    </div>
+  </div>
+{/if}
 
 {#if loadError}
   <div class="mx-6 mt-4 rounded border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
@@ -249,10 +274,17 @@
   {:else if tab === 'resources'}
     <ResourcesTabStub />
   {:else if tab === 'governance'}
-    <GovernanceTabStub />
+    <GovernanceTabStub
+      economicMode={descriptor?.economic_mode ?? null}
+      resourceNature={descriptor?.resource_nature ?? null}
+    />
+
   {:else if tab === 'composition'}
     <CompositionTabStub />
   {:else}
-    <ActivityTabStub />
+    <ActivityTabStub
+      economicMode={descriptor?.economic_mode ?? null}
+      resourceNature={descriptor?.resource_nature ?? null}
+    />
   {/if}
 </div>

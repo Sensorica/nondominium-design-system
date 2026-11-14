@@ -1,7 +1,10 @@
 <script lang="ts">
   import NdoBadge from '../../primitives/NdoBadge.svelte';
   import { getArchetype } from '../../../domain/wizard-archetypes.js';
-  import { getGovernanceImplications } from '../../../domain/wizard-questions.js';
+  import { getGovernanceImplications, subtractionOption } from '../../../domain/wizard-questions.js';
+  import { getTemplateById } from '../../../domain/governance-templates.js';
+  import { SOURCE_TYPE_OPTIONS } from '../../../domain/spec-profiles.js';
+  import { recommendedGovernanceRuleIds } from '../../../domain/wizard-state.js';
   import type { WizardKernelState, WizardRefinementState } from '../../../domain/types.js';
 
   interface Props {
@@ -13,6 +16,14 @@
 
   const archetype = $derived(getArchetype(kernel.archetype));
   const implications = $derived(getGovernanceImplications(refinement, kernel.resource_nature));
+  const recommendedIds = $derived(recommendedGovernanceRuleIds(kernel, refinement));
+  const recommendedLabels = $derived(
+    recommendedIds.map((id) => getTemplateById(id)?.label ?? id)
+  );
+  const sourceTypeLabel = $derived(
+    SOURCE_TYPE_OPTIONS.find((option) => option.id === refinement.source_profile?.source_type)?.label ??
+      refinement.source_profile?.source_type
+  );
 </script>
 
 <div class="space-y-4">
@@ -56,6 +67,48 @@
           <dd>{refinement.rivalry}</dd>
         </div>
       {/if}
+      {#if kernel.economic_mode}
+        <div class="flex justify-between">
+          <dt class="text-gray-600">Interaction</dt>
+          <dd class="text-right">
+            {kernel.economic_mode === 'consume'
+              ? 'Consume (batch)'
+              : kernel.use_kind === 'capacity'
+                ? 'Use — capacity'
+                : 'Use — unit'}
+          </dd>
+        </div>
+      {/if}
+      {#if kernel.economic_mode === 'consume'}
+        <div class="flex justify-between">
+          <dt class="text-gray-600">Initial stock</dt>
+          <dd>
+            {kernel.initial_quantity}
+            {kernel.default_unit}
+            {#if kernel.identification_pattern}
+              · {kernel.identification_pattern}
+            {/if}
+          </dd>
+        </div>
+      {/if}
+      {#if kernel.economic_mode === 'use' && kernel.use_kind === 'capacity' && kernel.max_concurrent_users != null}
+        <div class="flex justify-between">
+          <dt class="text-gray-600">Capacity</dt>
+          <dd>{kernel.max_concurrent_users} concurrent</dd>
+        </div>
+      {/if}
+      {#if kernel.unique_id?.trim()}
+        <div class="flex justify-between">
+          <dt class="text-gray-600">Unique ID</dt>
+          <dd>{kernel.unique_id}</dd>
+        </div>
+      {/if}
+      {#if refinement.subtraction}
+        <div class="flex justify-between">
+          <dt class="text-gray-600">Use runs out</dt>
+          <dd>{subtractionOption(refinement.subtraction)?.label}</dd>
+        </div>
+      {/if}
       {#if refinement.scope}
         <div class="flex justify-between">
           <dt class="text-gray-600">Scope</dt>
@@ -76,7 +129,7 @@
       <dl class="mt-2 space-y-1 text-sm">
         <div class="flex justify-between">
           <dt class="text-gray-600">Type</dt>
-          <dd>{refinement.source_profile.source_type}</dd>
+          <dd>{sourceTypeLabel}</dd>
         </div>
         <div class="flex justify-between">
           <dt class="text-gray-600">Regime state</dt>
@@ -101,7 +154,22 @@
     </section>
   {/if}
 
+  {#if recommendedLabels.length}
+    <section class="rounded-lg border border-blue-100 bg-blue-50/40 p-4">
+      <h3 class="text-sm font-semibold text-blue-900">Recommended rules</h3>
+      <ul class="mt-2 space-y-1">
+        {#each recommendedLabels as label}
+          <li class="text-sm text-blue-900">• {label}</li>
+        {/each}
+      </ul>
+      <p class="mt-2 text-xs text-blue-800">
+        Nothing is applied yet. After creation, open the Governance tab, select the rules you want,
+        and press Apply selected.
+      </p>
+    </section>
+  {/if}
+
   <p class="text-xs text-gray-500">
-    Layer 1 specification and governance rules can be added from the NDO detail view after creation.
+    Layer 1 specification and governance rules are chosen from the NDO detail view after creation.
   </p>
 </div>

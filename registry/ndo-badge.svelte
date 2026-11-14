@@ -16,9 +16,7 @@
     | 'lifecycle-end-of-life'
     | 'nature-physical'
     | 'nature-digital'
-    | 'nature-service'
     | 'nature-hybrid'
-    | 'nature-information'
     | 'regime-nondominium'
     | 'regime-commons'
     | 'regime-collective'
@@ -100,9 +98,7 @@
   /* Resource nature */
   .badge.nature-physical    { background: rgb(var(--ndo-blue-100));   color: rgb(var(--ndo-blue-700)); }
   .badge.nature-digital     { background: rgb(var(--ndo-purple-100)); color: rgb(var(--ndo-purple-700)); }
-  .badge.nature-service     { background: rgb(var(--ndo-orange-100)); color: rgb(var(--ndo-orange-700)); }
   .badge.nature-hybrid      { background: rgb(var(--ndo-teal-100));   color: rgb(var(--ndo-teal-700)); }
-  .badge.nature-information { background: rgb(var(--ndo-indigo-100)); color: rgb(var(--ndo-indigo-700)); }
 
   /* Property regime on cards — per-hue dashed outline (Claude Design's
      Badge.jsx `regime()` helper: transparent fill, `1px dashed <hue>-700`,

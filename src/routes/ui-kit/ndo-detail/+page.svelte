@@ -27,6 +27,7 @@
 
   let showTransitionModal = $state(false);
   let associateMessage = $state<string | null>(null);
+  let joined = $state(false);
 
   async function handleAssociate(groupIds: string[]) {
     applyMockNdoGroupAssociations(descriptor.hash, groupIds);
@@ -65,6 +66,10 @@
     {descriptor}
     initiatorName={initiatorName}
     isInitiator={true}
+    {joined}
+    onjoin={() => {
+      joined = true;
+    }}
     {groups}
     {associatedGroupIds}
     onassociate={handleAssociate}

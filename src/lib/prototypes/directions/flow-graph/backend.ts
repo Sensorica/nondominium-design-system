@@ -84,7 +84,7 @@ export const CONDUCTORS: Record<string, Conductor> = {};
 export const ENUMS = {
   LifecycleStage: ['Ideation', 'Specification', 'Development', 'Prototype', 'Stable', 'Distributed', 'Active', 'Hibernating', 'Deprecated', 'EndOfLife'],
   PropertyRegime: ['Private', 'Commons', 'Collective', 'Pool', 'CommonPool', 'Public', 'Nondominium'],
-  ResourceNature: ['Physical', 'Digital', 'Service', 'Hybrid', 'Information'],
+  ResourceNature: ['Physical', 'Digital', 'Hybrid'],
   OperationalState: ['Available', 'Reserved', 'InTransit', 'InStorage', 'InMaintenance', 'InUse', 'PendingValidation'],
   VfAction: ['Transfer', 'Move', 'Use', 'Consume', 'Produce', 'Work', 'Modify', 'Combine', 'Separate', 'Raise', 'Lower', 'Cite', 'Accept', 'InitialTransfer', 'AccessForUse', 'TransferCustody'],
   RoleType: ['SimpleAgent', 'AccountableAgent', 'PrimaryAccountableAgent', 'Transport', 'Repair', 'Storage'],
