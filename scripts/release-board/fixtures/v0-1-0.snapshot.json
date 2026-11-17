@@ -1,0 +1,456 @@
+{
+  "app": {
+    "repo": "Sensorica/nondominium",
+    "defaultBranch": "dev",
+    "milestone": {
+      "number": 11,
+      "title": "v0.1.0 Moss pilot",
+      "url": "https://github.com/Sensorica/nondominium/milestone/11",
+      "state": "open",
+      "dueOn": "2026-12-15T00:00:00Z",
+      "closedAt": null,
+      "openCount": 8,
+      "closedCount": 22
+    },
+    "nextMilestone": null,
+    "labels": [],
+    "prs": [],
+    "issues": [
+      {
+        "number": 121,
+        "title": "chore(release): produce and smoke-test the v0.1.0 Moss tool .webhapp",
+        "url": "https://github.com/Sensorica/nondominium/issues/121",
+        "labels": [
+          "P1-critical"
+        ],
+        "assignees": []
+      },
+      {
+        "number": 122,
+        "title": "feat(infra): bootstrap + relay server for the v0.1.0 Moss pilot",
+        "url": "https://github.com/Sensorica/nondominium/issues/122",
+        "labels": [
+          "P1-critical"
+        ],
+        "assignees": []
+      },
+      {
+        "number": 123,
+        "title": "release: v0.1.0",
+        "url": "https://github.com/Sensorica/nondominium/issues/123",
+        "labels": [
+          "P1-critical"
+        ],
+        "assignees": []
+      },
+      {
+        "number": 124,
+        "title": "docs: v0.1.0 join-the-pilot-in-Moss guide",
+        "url": "https://github.com/Sensorica/nondominium/issues/124",
+        "labels": [
+          "documentation",
+          "P2-high"
+        ],
+        "assignees": []
+      },
+      {
+        "number": 125,
+        "title": "chore(release): two-machine Moss dogfood runbook",
+        "url": "https://github.com/Sensorica/nondominium/issues/125",
+        "labels": [
+          "P2-high",
+          "testing"
+        ],
+        "assignees": []
+      },
+      {
+        "number": 127,
+        "title": "test(v0.1.0): harden e2e and Sweettest coverage for the peer-mesh release",
+        "url": "https://github.com/Sensorica/nondominium/issues/127",
+        "labels": [
+          "P2-high",
+          "testing"
+        ],
+        "assignees": []
+      },
+      {
+        "number": 147,
+        "title": "feat(ui): implement the design-system improvements in the app before v0.1.0",
+        "url": "https://github.com/Sensorica/nondominium/issues/147",
+        "labels": [
+          "enhancement",
+          "P2-high",
+          "frontend"
+        ],
+        "assignees": []
+      },
+      {
+        "number": 166,
+        "title": "feat(infra): always-online wdocker node for the pilot group",
+        "url": "https://github.com/Sensorica/nondominium/issues/166",
+        "labels": [],
+        "assignees": []
+      }
+    ],
+    "merged": [
+      {
+        "number": 59,
+        "title": "feat(person): implement hREA Phase 1 Person/ReaAgent bridge (#51, #52, #53, #55)",
+        "url": "https://github.com/Sensorica/nondominium/pull/59",
+        "mergedAt": "2026-03-17T23:48:05Z",
+        "author": "Soushi888"
+      },
+      {
+        "number": 62,
+        "title": "refactor(utils): centralize error handling in shared utils crate",
+        "url": "https://github.com/Sensorica/nondominium/pull/62",
+        "mergedAt": "2026-03-18T00:43:49Z",
+        "author": "Soushi888"
+      },
+      {
+        "number": 64,
+        "title": "refactor(tests): establish Sweettest scaffold (#61)",
+        "url": "https://github.com/Sensorica/nondominium/pull/64",
+        "mergedAt": "2026-03-26T01:50:54Z",
+        "author": "Soushi888"
+      },
+      {
+        "number": 65,
+        "title": "Ndo",
+        "url": "https://github.com/Sensorica/nondominium/pull/65",
+        "mergedAt": "2026-03-18T03:38:33Z",
+        "author": "TiberiusB"
+      },
+      {
+        "number": 66,
+        "title": "docs(ndo): add NDO Prima Materia specification and integrate across docs",
+        "url": "https://github.com/Sensorica/nondominium/pull/66",
+        "mergedAt": "2026-03-25T18:52:03Z",
+        "author": "TiberiusB"
+      },
+      {
+        "number": 67,
+        "title": "docs: add NDO v1.0 architecture design and consolidate hREA documentation",
+        "url": "https://github.com/Sensorica/nondominium/pull/67",
+        "mergedAt": "2026-03-31T18:24:27Z",
+        "author": "Soushi888"
+      },
+      {
+        "number": 79,
+        "title": "test(sweettest): deprecate Tryorama, scaffold hREA bridge tests",
+        "url": "https://github.com/Sensorica/nondominium/pull/79",
+        "mergedAt": "2026-04-06T21:05:16Z",
+        "author": "Soushi888"
+      },
+      {
+        "number": 80,
+        "title": "feat(resource): add NondominiumIdentity entry type with lifecycle validation",
+        "url": "https://github.com/Sensorica/nondominium/pull/80",
+        "mergedAt": "2026-04-06T23:27:50Z",
+        "author": "Soushi888"
+      },
+      {
+        "number": 82,
+        "title": "feat(resource): redesign lifecycle state machine with hibernation memory",
+        "url": "https://github.com/Sensorica/nondominium/pull/82",
+        "mergedAt": "2026-04-07T16:58:51Z",
+        "author": "Soushi888"
+      },
+      {
+        "number": 84,
+        "title": "feat(resource): add NDO DHT categorization anchors and query functions",
+        "url": "https://github.com/Sensorica/nondominium/pull/84",
+        "mergedAt": "2026-04-08T01:19:52Z",
+        "author": "Soushi888"
+      },
+      {
+        "number": 86,
+        "title": "test(sweettest): NDO Layer 0 test suite (#76)",
+        "url": "https://github.com/Sensorica/nondominium/pull/86",
+        "mergedAt": "2026-04-30T01:39:28Z",
+        "author": "Soushi888"
+      },
+      {
+        "number": 87,
+        "title": "docs(post-mvp): Lobby DNA requirements and architecture design",
+        "url": "https://github.com/Sensorica/nondominium/pull/87",
+        "mergedAt": "2026-04-15T04:31:10Z",
+        "author": "Soushi888"
+      },
+      {
+        "number": 88,
+        "title": "feat(ui): migrate from Tailwind CSS to UnoCSS + Melt UI next-gen",
+        "url": "https://github.com/Sensorica/nondominium/pull/88",
+        "mergedAt": "2026-04-15T01:36:35Z",
+        "author": "Soushi888"
+      },
+      {
+        "number": 89,
+        "title": "feat(ui): Effect-TS foundation — deps, error layer, schema layer, shared utilities",
+        "url": "https://github.com/Sensorica/nondominium/pull/89",
+        "mergedAt": "2026-04-15T04:20:26Z",
+        "author": "Soushi888"
+      },
+      {
+        "number": 97,
+        "title": "refactor(services,stores): effectify zome services and stores with R&O DI pattern",
+        "url": "https://github.com/Sensorica/nondominium/pull/97",
+        "mergedAt": "2026-04-15T09:17:43Z",
+        "author": "Soushi888"
+      },
+      {
+        "number": 98,
+        "title": "feat(lobby-ui): implement Lobby-first architecture with NDO view",
+        "url": "https://github.com/Sensorica/nondominium/pull/98",
+        "mergedAt": "2026-04-22T04:00:56Z",
+        "author": "Soushi888"
+      },
+      {
+        "number": 103,
+        "title": "feat(dna): Lobby DNA multi-network federation entry point with Sweettest suite",
+        "url": "https://github.com/Sensorica/nondominium/pull/103",
+        "mergedAt": "2026-05-13T03:11:06Z",
+        "author": "Soushi888"
+      },
+      {
+        "number": 104,
+        "title": "feat(docs): add TELOS, Cursor rules generation, and nondominium-domain skill",
+        "url": "https://github.com/Sensorica/nondominium/pull/104",
+        "mergedAt": "2026-05-13T05:00:41Z",
+        "author": "Soushi888"
+      },
+      {
+        "number": 105,
+        "title": "feat(ui): NDO Layer 0 full UI integration — creation, lifecycle, filters, history (#102)",
+        "url": "https://github.com/Sensorica/nondominium/pull/105",
+        "mergedAt": "2026-05-01T04:11:53Z",
+        "author": "Soushi888"
+      },
+      {
+        "number": 107,
+        "title": "feat(dna): Group DNA per-group coordination DHT with Sweettest suite",
+        "url": "https://github.com/Sensorica/nondominium/pull/107",
+        "mergedAt": "2026-05-27T03:53:55Z",
+        "author": "Soushi888"
+      },
+      {
+        "number": 108,
+        "title": "feat(ui): NDO Layer 0 UI — Lobby-first architecture with group-scoped NDO management",
+        "url": "https://github.com/Sensorica/nondominium/pull/108",
+        "mergedAt": "2026-05-20T00:21:34Z",
+        "author": "Soushi888"
+      },
+      {
+        "number": 111,
+        "title": "feat(ui): DNA-backed groups, multi-agent web harness, and NDO layer-0 UI",
+        "url": "https://github.com/Sensorica/nondominium/pull/111",
+        "mergedAt": "2026-06-19T21:47:02Z",
+        "author": "Soushi888"
+      },
+      {
+        "number": 114,
+        "title": "feat(ui): wire Lobby DNA into UI — profile bar, NdoBrowser states, DHT profile sync (#106)",
+        "url": "https://github.com/Sensorica/nondominium/pull/114",
+        "mergedAt": "2026-08-06T18:48:22Z",
+        "author": "Soushi888"
+      },
+      {
+        "number": 115,
+        "title": "feat(dna): NDO DNA role, per-NDO cell cloning, NdoAnchor in zome_group (#112)",
+        "url": "https://github.com/Sensorica/nondominium/pull/115",
+        "mergedAt": "2026-08-06T17:47:36Z",
+        "author": "Soushi888"
+      },
+      {
+        "number": 116,
+        "title": "docs: retrofit architecture documentation to multi-DNA reality (#113)",
+        "url": "https://github.com/Sensorica/nondominium/pull/116",
+        "mergedAt": "2026-08-06T18:48:19Z",
+        "author": "Soushi888"
+      },
+      {
+        "number": 118,
+        "title": "test(e2e): browser e2e suite against real conductors (Playwright)",
+        "url": "https://github.com/Sensorica/nondominium/pull/118",
+        "mergedAt": "2026-08-06T17:54:05Z",
+        "author": "Soushi888"
+      },
+      {
+        "number": 126,
+        "title": "fix(group): robust member listing, group persistence, and join reliability",
+        "url": "https://github.com/Sensorica/nondominium/pull/126",
+        "mergedAt": "2026-08-09T00:09:25Z",
+        "author": "Soushi888"
+      },
+      {
+        "number": 128,
+        "title": "feat(ndo): per-NDO-cell model A with DnaHash binding",
+        "url": "https://github.com/Sensorica/nondominium/pull/128",
+        "mergedAt": "2026-08-16T00:30:30Z",
+        "author": "Soushi888"
+      },
+      {
+        "number": 129,
+        "title": "feat(ndo): NDO membership — join, list, and is-member on the per-NDO cell",
+        "url": "https://github.com/Sensorica/nondominium/pull/129",
+        "mergedAt": "2026-08-16T02:25:01Z",
+        "author": "Soushi888"
+      },
+      {
+        "number": 130,
+        "title": "chore(deps): upgrade to Holochain 0.7.1",
+        "url": "https://github.com/Sensorica/nondominium/pull/130",
+        "mergedAt": "2026-11-04T02:45:30Z",
+        "author": "Soushi888"
+      },
+      {
+        "number": 131,
+        "title": "docs(sync): harmonize documentation and READMEs across the repo",
+        "url": "https://github.com/Sensorica/nondominium/pull/131",
+        "mergedAt": "2026-09-22T22:40:47Z",
+        "author": "Soushi888"
+      },
+      {
+        "number": 132,
+        "title": "feat(resource)!: NDO Layer 1 typed governance rules, classification constraints, and OperationalState",
+        "url": "https://github.com/Sensorica/nondominium/pull/132",
+        "mergedAt": "2026-08-29T23:11:19Z",
+        "author": "Soushi888"
+      },
+      {
+        "number": 137,
+        "title": "test(e2e): fix red dev e2e (leaked guard clone) + add Sweettest CI matrix",
+        "url": "https://github.com/Sensorica/nondominium/pull/137",
+        "mergedAt": "2026-08-15T23:04:20Z",
+        "author": "Soushi888"
+      },
+      {
+        "number": 138,
+        "title": "fix(nix): make the materialized .claude/ writable so the skills hook can write",
+        "url": "https://github.com/Sensorica/nondominium/pull/138",
+        "mergedAt": "2026-08-16T00:35:42Z",
+        "author": "Soushi888"
+      },
+      {
+        "number": 143,
+        "title": "chore(pai): make the PR review procedure shared and executable",
+        "url": "https://github.com/Sensorica/nondominium/pull/143",
+        "mergedAt": "2026-10-27T19:30:09Z",
+        "author": "Soushi888"
+      },
+      {
+        "number": 146,
+        "title": "chore(nix): pin the holochain agent skill to v1.0.0-rc.1",
+        "url": "https://github.com/Sensorica/nondominium/pull/146",
+        "mergedAt": "2026-09-08T19:33:04Z",
+        "author": "Soushi888"
+      },
+      {
+        "number": 149,
+        "title": "refactor(ui): migrate to Effect 4 and enforce the UI architecture invariants",
+        "url": "https://github.com/Sensorica/nondominium/pull/149",
+        "mergedAt": "2026-10-27T18:35:21Z",
+        "author": "Soushi888"
+      },
+      {
+        "number": 151,
+        "title": "fix(resource): reconcile global discovery anchor when a spec's scope changes",
+        "url": "https://github.com/Sensorica/nondominium/pull/151",
+        "mergedAt": "2026-10-27T18:35:01Z",
+        "author": "Soushi888"
+      },
+      {
+        "number": 152,
+        "title": "ci(sweettest): split the slow nondominium shard and stop retrying the serial core-flows story",
+        "url": "https://github.com/Sensorica/nondominium/pull/152",
+        "mergedAt": "2026-10-27T18:35:42Z",
+        "author": "Soushi888"
+      },
+      {
+        "number": 155,
+        "title": "chore(deps): vendor the hREA GraphQL adapter 0.700.0-rc.0 into the UI",
+        "url": "https://github.com/Sensorica/nondominium/pull/155",
+        "mergedAt": "2026-10-27T19:34:51Z",
+        "author": "Soushi888"
+      },
+      {
+        "number": 157,
+        "title": "feat(resource): reduce ResourceNature to Physical, Digital, Hybrid",
+        "url": "https://github.com/Sensorica/nondominium/pull/157",
+        "mergedAt": "2026-10-27T17:43:22Z",
+        "author": "TiberiusB"
+      },
+      {
+        "number": 158,
+        "title": "feat(ui): usable app shell and NDO header on phones",
+        "url": "https://github.com/Sensorica/nondominium/pull/158",
+        "mergedAt": "2026-10-28T03:07:21Z",
+        "author": "Soushi888"
+      },
+      {
+        "number": 170,
+        "title": "ci(tests): run the group and lobby Sweettest suites",
+        "url": "https://github.com/Sensorica/nondominium/pull/170",
+        "mergedAt": "2026-11-04T02:44:28Z",
+        "author": "Soushi888"
+      },
+      {
+        "number": 171,
+        "title": "docs(requirements): add group model requirements for Moss and standalone",
+        "url": "https://github.com/Sensorica/nondominium/pull/171",
+        "mergedAt": "2026-11-04T02:43:45Z",
+        "author": "Soushi888"
+      },
+      {
+        "number": 172,
+        "title": "docs(adr): record that work contexts live in the group DHT",
+        "url": "https://github.com/Sensorica/nondominium/pull/172",
+        "mergedAt": "2026-11-04T03:33:46Z",
+        "author": "Soushi888"
+      },
+      {
+        "number": 178,
+        "title": "docs: publish the Holochain 0.7.1 DNA hashes",
+        "url": "https://github.com/Sensorica/nondominium/pull/178",
+        "mergedAt": "2026-11-04T03:51:13Z",
+        "author": "Soushi888"
+      },
+      {
+        "number": 180,
+        "title": "feat(ui): run Nondominium as a Moss tool in weave dev mode",
+        "url": "https://github.com/Sensorica/nondominium/pull/180",
+        "mergedAt": "2026-11-04T04:15:43Z",
+        "author": "Soushi888"
+      },
+      {
+        "number": 181,
+        "title": "feat(ui): Moss group context for groups and NDOs",
+        "url": "https://github.com/Sensorica/nondominium/pull/181",
+        "mergedAt": "2026-11-04T04:45:05Z",
+        "author": "Soushi888"
+      },
+      {
+        "number": 182,
+        "title": "feat(ui): expose NDOs as Moss assets",
+        "url": "https://github.com/Sensorica/nondominium/pull/182",
+        "mergedAt": "2026-11-04T05:08:22Z",
+        "author": "Soushi888"
+      },
+      {
+        "number": 183,
+        "title": "feat: bring Tibi's general backend work from commitment-pool-experiment onto dev",
+        "url": "https://github.com/Sensorica/nondominium/pull/183",
+        "mergedAt": "2026-11-11T00:05:13Z",
+        "author": "Soushi888"
+      }
+    ],
+    "previousRelease": null,
+    "ownRelease": null,
+    "heavyRuns": [],
+    "refs": {},
+    "packageVersion": "0.1.0",
+    "holochainLine": "0.7"
+  },
+  "wrapper": null,
+  "names": {}
+}

@@ -1,0 +1,34 @@
+# A release file for the edge cases in cases.snapshot.json (derive.test.ts).
+slug: cases
+title: "Cases board"
+app:
+  repo: example/app
+  milestone: 3
+  heavy-workflow: tests-manual.yml
+wrapper:
+  repo: example/wrapper
+  prs: [7]
+maintainers:
+  alice: Alice
+  bob: Bob
+streams:
+  drop:one:
+    note: "Ships first. [decided](source:2026-11-11-dev#decisions-1)"
+  drop:empty:
+    note: ""
+plan:
+  - from: "2026-11-14"
+    to: "2026-11-15"
+    title: "Fix"
+    what: "**All** of #10 and [the spec](https://example.org/spec)."
+  - from: "2026-11-17"
+    kind: milestone
+    tone: bad
+    title: "Tag [decided 11 Nov](source:2026-11-11-dev#decisions-1) [and here](source:2026-11-11-dev#decisions-2)"
+decided: "Agreed at the [dev meeting](meeting:2026-11-11-dev):"
+rules:
+  - "#99 is out of scope."
+calls: []
+links:
+  - text: "Meeting"
+    href: "https://design.sensorica.co/meetings/2026-11-11-dev#actions-1"

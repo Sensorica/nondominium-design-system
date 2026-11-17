@@ -1,0 +1,55 @@
+{
+  "app": {
+    "repo": "example/app",
+    "defaultBranch": "dev",
+    "milestone": { "number": 3, "title": "v1.2.0-alpha.1, Cases", "url": "https://github.com/example/app/milestone/3", "state": "open", "dueOn": "2026-11-17T00:00:00Z", "closedAt": null, "openCount": 9, "closedCount": 3 },
+    "nextMilestone": null,
+    "labels": [
+      { "name": "drop:empty", "description": "Workstream: nothing in it yet" },
+      { "name": "drop:one", "description": "Workstream: the first stream" },
+      { "name": "drop:two", "description": "" }
+    ],
+    "prs": [
+      { "number": 10, "title": "feat(x): a feature nobody reviewed", "url": "https://github.com/example/app/pull/10", "isDraft": false, "baseRef": "dev", "headRef": "feat/x", "headSha": "aaaa1111", "author": "alice", "labels": ["drop:one"], "reviews": [], "ci": "SUCCESS", "updatedAt": "2026-11-14T10:00:00Z" },
+      { "number": 11, "title": "fix(x): stacked on #10, green", "url": "https://github.com/example/app/pull/11", "isDraft": false, "baseRef": "feat/x", "headRef": "fix/x", "headSha": "bbbb2222", "author": "alice", "labels": ["drop:one", "bug"], "reviews": [], "ci": "SUCCESS", "updatedAt": "2026-11-14T10:00:00Z" },
+      { "number": 12, "title": "feat(y): a draft with changes requested", "url": "https://github.com/example/app/pull/12", "isDraft": true, "baseRef": "dev", "headRef": "feat/y", "headSha": "cccc3333", "author": "bob", "labels": ["drop:one"], "reviews": [{ "author": "alice", "state": "CHANGES_REQUESTED", "commit": "cccc3333", "submittedAt": "2026-11-13T15:00:00Z" }], "ci": "FAILURE", "updatedAt": "2026-11-14T10:00:00Z" },
+      { "number": 13, "title": "feat(z): changes asked at the head", "url": "https://github.com/example/app/pull/13", "isDraft": false, "baseRef": "dev", "headRef": "feat/z", "headSha": "dddd4444", "author": "bob", "labels": ["drop:two"], "reviews": [{ "author": "alice", "state": "CHANGES_REQUESTED", "commit": "dddd4444", "submittedAt": "2026-11-13T15:00:00Z" }], "ci": "SUCCESS", "updatedAt": "2026-11-14T10:00:00Z" },
+      { "number": 14, "title": "refactor(z): changes asked, head moved since", "url": "https://github.com/example/app/pull/14", "isDraft": false, "baseRef": "dev", "headRef": "refactor/z", "headSha": "eeee5555", "author": "bob", "labels": ["drop:two"], "reviews": [{ "author": "alice", "state": "CHANGES_REQUESTED", "commit": "old00000", "submittedAt": "2026-11-12T15:00:00Z" }], "ci": "PENDING", "updatedAt": "2026-11-14T10:00:00Z" },
+      { "number": 15, "title": "docs: approved but red", "url": "https://github.com/example/app/pull/15", "isDraft": false, "baseRef": "dev", "headRef": "docs/a", "headSha": "ffff6666", "author": "bob", "labels": ["drop:two"], "reviews": [{ "author": "alice", "state": "APPROVED", "commit": "ffff6666", "submittedAt": "2026-11-13T15:00:00Z" }], "ci": "FAILURE", "updatedAt": "2026-11-14T10:00:00Z" },
+      { "number": 16, "title": "chore: no workstream label", "url": "https://github.com/example/app/pull/16", "isDraft": false, "baseRef": "dev", "headRef": "chore/a", "headSha": "1111aaaa", "author": "carol", "labels": ["chore"], "reviews": [], "ci": "SUCCESS", "updatedAt": "2026-11-14T10:00:00Z" },
+      { "number": 17, "title": "feat: two workstream labels", "url": "https://github.com/example/app/pull/17", "isDraft": false, "baseRef": "dev", "headRef": "feat/b", "headSha": "2222bbbb", "author": "carol", "labels": ["drop:one", "drop:two"], "reviews": [], "ci": "SUCCESS", "updatedAt": "2026-11-14T10:00:00Z" }
+    ],
+    "issues": [
+      { "number": 20, "title": "An issue with no workstream label", "url": "https://github.com/example/app/issues/20", "labels": [], "assignees": [] },
+      { "number": 21, "title": "An issue of stream one", "url": "https://github.com/example/app/issues/21", "labels": ["drop:one"], "assignees": ["alice", "carol"] }
+    ],
+    "merged": [
+      { "number": 5, "title": "fix(a): an earlier merge", "url": "https://github.com/example/app/pull/5", "mergedAt": "2026-11-10T20:00:00Z", "author": "bob" },
+      { "number": 6, "title": "feat(b)!: the latest merge", "url": "https://github.com/example/app/pull/6", "mergedAt": "2026-11-14T03:30:00Z", "author": "carol" }
+    ],
+    "previousRelease": { "tag": "v1.1.0", "publishedAt": "2026-10-01T16:00:00Z" },
+    "ownRelease": null,
+    "heavyRuns": [
+      { "headSha": "aaaa1111", "status": "completed", "conclusion": "failure", "createdAt": "2026-11-13T10:00:00Z", "url": "https://github.com/example/app/actions/runs/1" },
+      { "headSha": "aaaa1111", "status": "completed", "conclusion": "success", "createdAt": "2026-11-14T10:00:00Z", "url": "https://github.com/example/app/actions/runs/2" },
+      { "headSha": "bbbb2222", "status": "completed", "conclusion": "cancelled", "createdAt": "2026-11-14T11:00:00Z", "url": "https://github.com/example/app/actions/runs/3" },
+      { "headSha": "dddd4444", "status": "completed", "conclusion": "failure", "createdAt": "2026-11-14T12:00:00Z", "url": "https://github.com/example/app/actions/runs/4" }
+    ],
+    "refs": {
+      "10": { "kind": "pr", "title": "feat(x): a feature nobody reviewed", "url": "https://github.com/example/app/pull/10" },
+      "99": { "kind": "issue", "title": "Out of scope", "url": "https://github.com/example/app/issues/99" }
+    },
+    "packageVersion": "1.2.0-alpha.1",
+    "holochainLine": "0.7"
+  },
+  "wrapper": {
+    "repo": "example/wrapper",
+    "releaseBranch": "release",
+    "releaseConfig": { "version": "1.1.0", "networkSeed": "old-seed", "holochainVersion": "0.6.1", "bootstrapUrl": "https://bootstrap.example.org/" },
+    "markedBy": "config",
+    "prs": [
+      { "number": 7, "title": "chore: Holochain 0.7", "url": "https://github.com/example/wrapper/pull/7", "isDraft": false, "baseRef": "main", "headRef": "chore/0.7", "headSha": "7777cccc", "author": "alice", "labels": [], "reviews": [], "ci": null, "updatedAt": "2026-11-02T10:00:00Z", "config": { "version": "1.2.0-alpha.1", "networkSeed": "new-seed", "holochainVersion": "0.7.0", "bootstrapUrl": "https://bootstrap.example.org/" } }
+    ]
+  },
+  "names": { "carol": "Carol" }
+}

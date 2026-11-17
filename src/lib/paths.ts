@@ -157,6 +157,13 @@ export const paths = {
   // ── Workflow: the iterative V, with the published boards at each stage ──
   workflow: () => `${base}/workflow`,
 
+  // ── Releases: a release board, rendered from content/releases/<slug>.json (docs/RELEASE_BOARD.md) ──
+  release: (slug: string) => `${base}/releases/${encodeURIComponent(slug)}`,
+  /** The release the team is working toward. Change the slug when the next release file lands. */
+  releaseCurrent: () => `${base}/releases/v0-1-0`,
+  /** The prefix every board sits under, for the rail's active state; there is no index page. */
+  releases: () => `${base}/releases`,
+
   // ── Branch previews: every pushed branch, linked to its Cloudflare preview ──
   previews: () => `${base}/previews`,
 

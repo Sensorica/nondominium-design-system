@@ -178,6 +178,12 @@
           </div>
 
           <div class="group">
+            <a class="grouphead" href={paths.releaseCurrent()} class:on={current.startsWith(paths.releases())}>
+              Release board
+            </a>
+          </div>
+
+          <div class="group">
             <a class="grouphead" href={paths.workflow()} class:on={current.startsWith(paths.workflow())}>
               Workflow
             </a>

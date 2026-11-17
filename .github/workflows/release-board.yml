@@ -1,0 +1,100 @@
+name: Release board
+
+# Keeps every release board current with no human in the loop (docs/RELEASE_BOARD.md).
+# Each scheduled run derives content/releases/<slug>.json from GitHub; when a board's content
+# changed (its measurement instant aside) it commits the file to master and dispatches both
+# deploy workflows, deploy.yml (GitHub Pages) and deploy-cloudflare.yml (design.sensorica.co).
+#
+# Why a dispatch: a push made with the GITHUB_TOKEN starts no other workflow, so the commit
+# alone would never deploy. workflow_dispatch is one of the events the GITHUB_TOKEN may still
+# trigger (https://docs.github.com/en/actions/concepts/security/github_token#when-github_token-triggers-workflow-runs).
+#
+# Cost: this repo and Sensorica/nondominium are public, so the hourly run uses no metered
+# minutes. It installs nothing (the script uses only bun's standard library). Once every
+# tracked milestone is closed and its final board is committed, the workflow disables itself;
+# enable it again from the Actions tab when the next release file lands.
+#
+# On a pull request that touches the board, the checks job runs the derivation tests and
+# parses every release file, so a broken edit made on github.com names the field it broke.
+
+on:
+  schedule:
+    - cron: "17 * * * *"
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - "content/releases/**"
+      - "scripts/release-board.ts"
+      - "scripts/release-board/**"
+      - "src/lib/releases/**"
+      - ".github/workflows/release-board.yml"
+
+permissions:
+  contents: write
+  actions: write
+
+concurrency:
+  group: release-board-${{ github.event_name == 'pull_request' && github.ref || 'derive' }}
+  cancel-in-progress: false
+
+jobs:
+  checks:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+      - name: The derivation, on recorded snapshots
+        run: bun test scripts/release-board
+      - name: Every release file parses
+        run: bun scripts/release-board/check-config.ts content/releases/*.release.yaml
+
+  derive:
+    if: github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: master
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      # Sensorica/nondominium is public, so the workflow's own token reads it.
+      - name: Derive the boards from GitHub
+        id: derive
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: bun scripts/release-board.ts --summary "$GITHUB_OUTPUT"
+
+      - name: Commit the boards that changed
+        if: steps.derive.outputs.changed == 'true'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add content/releases/*.json
+          git commit -m "chore(releases): boards derived from GitHub"
+          git pull --rebase origin master
+          git push origin HEAD:master
+
+      - name: Deploy the site
+        if: steps.derive.outputs.changed == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh workflow run deploy.yml --ref master --repo "$GITHUB_REPOSITORY"
+          gh workflow run deploy-cloudflare.yml --ref master --repo "$GITHUB_REPOSITORY"
+
+      # Every milestone closed and its final board committed: nothing left to measure.
+      - name: Stop the schedule
+        if: steps.derive.outputs.active == '0' && github.event_name == 'schedule'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh workflow disable release-board.yml --repo "$GITHUB_REPOSITORY"

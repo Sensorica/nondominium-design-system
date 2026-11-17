@@ -1,0 +1,84 @@
+# The v0.1.0 release board: the only hand-written input.
+# Everything else on the board (which PRs and issues are in the release, their workstream,
+# state, review, author, who holds the next step, every number) is read from GitHub by
+# scripts/release-board.ts. To fix a wrong card, fix GitHub: put the item on the milestone
+# and give it exactly one drop: label.
+#
+# How to edit this file: docs/RELEASE_BOARD.md. In short: keep every note in "double quotes",
+# write #121 for a PR or issue of the app, [text](https://...) for a link,
+# [text](source:2026-10-27-dev#decisions-6) for a source link to a meeting, **bold** for bold.
+
+slug: v0-1-0
+title: "Nondominium v0.1.0"
+
+app:
+  repo: Sensorica/nondominium
+  milestone: 11
+  # No heavy-test workflow: Sweettest and e2e run in build.yml on every pull request,
+  # so the fast CI of a PR's head already carries them. Name a workflow file here when
+  # the repo gets a manual heavy suite, and the H mark and its number appear.
+
+# No wrapper: v0.1.0 ships as a Moss tool (.webhapp), and Nondominium has no desktop
+# wrapper repo, so the board has no desktop card.
+
+# GitHub login: the name the board shows. Each reviews the other's feat and refactor PRs.
+maintainers:
+  Soushi888: Soushi
+  TiberiusB: Tibi
+
+# The workstreams, in the order of their cards. A note is optional and shows under "Next".
+# No item on milestone 11 carries a drop: label yet, so every open item is on the Unsorted
+# card. The streams below are a proposal, read from the milestone's four epics and its open
+# issues; nothing is created on GitHub until Soushi decides. To adopt them: create each
+# drop: label on Sensorica/nondominium with its description, put one on each item, then
+# uncomment the lines here.
+streams: {}
+#   drop:moss:
+#     note: ""          # The Moss tool, its .webhapp produced and smoke-tested: #121
+#   drop:network:
+#     note: ""          # Bootstrap and relay, the always-online node on our Holoports: #122, #166
+#   drop:pilot:
+#     note: ""          # Getting the pilot cohort in: the join guide #124, the two-machine dogfood runbook #125
+#   drop:quality:
+#     note: ""          # Test coverage for the peer mesh #127, and the design system in the app #147
+#   drop:release:
+#     note: ""          # The tag itself: #123
+#
+# Label descriptions to create with them (the card's line under its title):
+#   drop:moss      "Workstream: the Moss tool and its .webhapp"
+#   drop:network   "Workstream: bootstrap, relay and the always-online node"
+#   drop:pilot     "Workstream: what the pilot cohort needs to join"
+#   drop:quality   "Workstream: tests and the design system in the app"
+#   drop:release   "Workstream: the v0.1.0 tag"
+#
+# The milestone's two other epics, Holochain 0.7 with hREA 0.5 and the group model through
+# the V, have no open item left (#134, #153, #154, #164, #165, #167, #168 are closed), so they
+# would be empty cards and are not proposed.
+
+# The plan to the tag. Dates are YYYY-MM-DD, in quotes. kind: phase (spans days) or milestone (one day).
+# tone: ok (green), warn (amber), bad (red) or accent (blue).
+# Both dates come from the description of milestone 11 on GitHub.
+plan:
+  - from: "2026-11-24"
+    kind: milestone
+    tone: warn
+    title: "Dev-mode checkpoint"
+  - from: "2026-12-15"
+    kind: milestone
+    tone: bad
+    title: "Tag v0.1.0"
+
+decided: "**Decided on 27 October**, by Soushi and Tibi at the [dev meeting](meeting:2026-10-27-dev):"
+
+rules:
+  - "v0.1.0 aims for a basic Moss integration, without the context of work, usable by Grassroots Economics; Moss first, standalone follows. [decided 27 Oct](source:2026-10-27-dev#decisions-6)"
+
+calls:
+  - "The date of a stable Moss release on Holochain 0.7, which conditions the tool's public release. [open since 27 Oct](source:2026-10-27-dev#outstanding-1)"
+  - "Whether Grassroots Economics needs the context of work from its first use, or whether Moss groups and NDOs are enough. [open since 27 Oct](source:2026-10-27-dev#outstanding-2)"
+  - "The board applies the merge rule of Requests and Offers: feat and refactor get the other maintainer's review; fix, docs, chore, test and copy are self-merged after a green run. Confirm it is Nondominium's, or say which rule holds."
+  - "No item on milestone 11 has a drop: label, so every open item is on the Unsorted card. The proposed workstreams are in content/releases/v0-1-0.release.yaml, commented out, waiting on a decision."
+
+links:
+  - text: "27 October meeting"
+    href: "meeting:2026-10-27-dev"

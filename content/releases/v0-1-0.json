@@ -1,0 +1,727 @@
+{
+  "schema": 1,
+  "slug": "v0-1-0",
+  "title": "Nondominium v0.1.0",
+  "version": "v0.1.0",
+  "milestone": {
+    "text": "milestone 11",
+    "href": "https://github.com/Sensorica/nondominium/milestone/11",
+    "state": "open"
+  },
+  "measuredAt": "2026-11-17T00:31:51.585Z",
+  "measuredLine": "16 Nov at 19:31",
+  "timeZone": "America/Toronto",
+  "kpis": [
+    {
+      "n": "29",
+      "unit": "days",
+      "label": [
+        "to the tag, Tuesday 15 December"
+      ],
+      "src": "milestone 11 due date on GitHub",
+      "tone": "warn"
+    },
+    {
+      "n": "22/30",
+      "unit": "73%",
+      "label": [
+        "milestone 11 items closed (issues and PRs)"
+      ],
+      "src": "milestone 11 on GitHub",
+      "tone": "accent",
+      "bar": 0.7333333333333333
+    },
+    {
+      "n": "0",
+      "unit": "open",
+      "label": [
+        "PRs on the milestone, none a draft"
+      ],
+      "src": "pull requests on GitHub",
+      "tone": "ok"
+    },
+    {
+      "n": "0",
+      "unit": "",
+      "label": [
+        "with Request Changes standing: none"
+      ],
+      "src": "reviews on GitHub",
+      "tone": "ok"
+    },
+    {
+      "n": "50",
+      "unit": "",
+      "label": [
+        "merged into dev since the start"
+      ],
+      "src": "merged pull requests on GitHub",
+      "tone": "ok"
+    }
+  ],
+  "streams": [
+    {
+      "id": "unsorted",
+      "title": "Unsorted",
+      "tone": "bad",
+      "tag": "8 to sort",
+      "why": [
+        "On ",
+        {
+          "text": "milestone 11",
+          "href": "https://github.com/Sensorica/nondominium/milestone/11"
+        },
+        " with no drop: workstream label, or with more than one. Give each exactly one on GitHub and the next run files it."
+      ],
+      "chips": [
+        {
+          "label": "#121",
+          "href": "https://github.com/Sensorica/nondominium/issues/121",
+          "title": "chore(release): produce and smoke-test the v0.1.0 Moss tool .webhapp",
+          "state": "no workstream",
+          "kind": "changes",
+          "who": "unassigned",
+          "stateTitle": "no workstream label"
+        },
+        {
+          "label": "#122",
+          "href": "https://github.com/Sensorica/nondominium/issues/122",
+          "title": "feat(infra): bootstrap + relay server for the v0.1.0 Moss pilot",
+          "state": "no workstream",
+          "kind": "changes",
+          "who": "unassigned",
+          "stateTitle": "no workstream label"
+        },
+        {
+          "label": "#123",
+          "href": "https://github.com/Sensorica/nondominium/issues/123",
+          "title": "release: v0.1.0",
+          "state": "no workstream",
+          "kind": "changes",
+          "who": "unassigned",
+          "stateTitle": "no workstream label"
+        },
+        {
+          "label": "#124",
+          "href": "https://github.com/Sensorica/nondominium/issues/124",
+          "title": "docs: v0.1.0 join-the-pilot-in-Moss guide",
+          "state": "no workstream",
+          "kind": "changes",
+          "who": "unassigned",
+          "stateTitle": "no workstream label"
+        },
+        {
+          "label": "#125",
+          "href": "https://github.com/Sensorica/nondominium/issues/125",
+          "title": "chore(release): two-machine Moss dogfood runbook",
+          "state": "no workstream",
+          "kind": "changes",
+          "who": "unassigned",
+          "stateTitle": "no workstream label"
+        },
+        {
+          "label": "#127",
+          "href": "https://github.com/Sensorica/nondominium/issues/127",
+          "title": "test(v0.1.0): harden e2e and Sweettest coverage for the peer-mesh release",
+          "state": "no workstream",
+          "kind": "changes",
+          "who": "unassigned",
+          "stateTitle": "no workstream label"
+        },
+        {
+          "label": "#147",
+          "href": "https://github.com/Sensorica/nondominium/issues/147",
+          "title": "feat(ui): implement the design-system improvements in the app before v0.1.0",
+          "state": "no workstream",
+          "kind": "changes",
+          "who": "unassigned",
+          "stateTitle": "no workstream label"
+        },
+        {
+          "label": "#166",
+          "href": "https://github.com/Sensorica/nondominium/issues/166",
+          "title": "feat(infra): always-online wdocker node for the pilot group",
+          "state": "no workstream",
+          "kind": "changes",
+          "who": "unassigned",
+          "stateTitle": "no workstream label"
+        }
+      ],
+      "holds": [
+        "Any maintainer: Soushi and Tibi"
+      ],
+      "next": [
+        {
+          "text": "#121",
+          "href": "https://github.com/Sensorica/nondominium/issues/121",
+          "title": "chore(release): produce and smoke-test the v0.1.0 Moss tool .webhapp"
+        },
+        ": add one drop: label; ",
+        {
+          "text": "#122",
+          "href": "https://github.com/Sensorica/nondominium/issues/122",
+          "title": "feat(infra): bootstrap + relay server for the v0.1.0 Moss pilot"
+        },
+        ": add one drop: label; ",
+        {
+          "text": "#123",
+          "href": "https://github.com/Sensorica/nondominium/issues/123",
+          "title": "release: v0.1.0"
+        },
+        ": add one drop: label; ",
+        {
+          "text": "#124",
+          "href": "https://github.com/Sensorica/nondominium/issues/124",
+          "title": "docs: v0.1.0 join-the-pilot-in-Moss guide"
+        },
+        ": add one drop: label; ",
+        {
+          "text": "#125",
+          "href": "https://github.com/Sensorica/nondominium/issues/125",
+          "title": "chore(release): two-machine Moss dogfood runbook"
+        },
+        ": add one drop: label; ",
+        {
+          "text": "#127",
+          "href": "https://github.com/Sensorica/nondominium/issues/127",
+          "title": "test(v0.1.0): harden e2e and Sweettest coverage for the peer-mesh release"
+        },
+        ": add one drop: label; ",
+        {
+          "text": "#147",
+          "href": "https://github.com/Sensorica/nondominium/issues/147",
+          "title": "feat(ui): implement the design-system improvements in the app before v0.1.0"
+        },
+        ": add one drop: label; ",
+        {
+          "text": "#166",
+          "href": "https://github.com/Sensorica/nondominium/issues/166",
+          "title": "feat(infra): always-online wdocker node for the pilot group"
+        },
+        ": add one drop: label."
+      ]
+    }
+  ],
+  "legend": [
+    "Each chip: the PR or issue (to GitHub), its state on GitHub (hover for the review, the CI and who holds the next step), ",
+    "and its author, or for an issue its assignees. Every item of the release: ",
+    {
+      "text": "milestone 11 on GitHub",
+      "href": "https://github.com/Sensorica/nondominium/milestone/11"
+    },
+    "."
+  ],
+  "days": [
+    "2026-11-24",
+    "2026-11-25",
+    "2026-11-26",
+    "2026-11-27",
+    "2026-11-28",
+    "2026-11-29",
+    "2026-11-30",
+    "2026-12-01",
+    "2026-12-02",
+    "2026-12-03",
+    "2026-12-04",
+    "2026-12-05",
+    "2026-12-06",
+    "2026-12-07",
+    "2026-12-08",
+    "2026-12-09",
+    "2026-12-10",
+    "2026-12-11",
+    "2026-12-12",
+    "2026-12-13",
+    "2026-12-14",
+    "2026-12-15"
+  ],
+  "plan": [
+    {
+      "kind": "milestone",
+      "tone": "warn",
+      "from": "2026-11-24",
+      "to": "2026-11-24",
+      "title": [
+        "Dev-mode checkpoint"
+      ],
+      "what": []
+    },
+    {
+      "kind": "milestone",
+      "tone": "bad",
+      "from": "2026-12-15",
+      "to": "2026-12-15",
+      "title": [
+        "Tag v0.1.0"
+      ],
+      "what": []
+    }
+  ],
+  "decided": [
+    {
+      "text": "Decided on 27 October",
+      "strong": true
+    },
+    ", by Soushi and Tibi at the ",
+    {
+      "text": "dev meeting",
+      "meeting": "2026-10-27-dev"
+    },
+    ":"
+  ],
+  "rules": [
+    [
+      "v0.1.0 aims for a basic Moss integration, without the context of work, usable by Grassroots Economics; Moss first, standalone follows.",
+      {
+        "text": "decided 27 Oct",
+        "meeting": "2026-10-27-dev",
+        "anchor": "decisions-6",
+        "cite": true
+      }
+    ]
+  ],
+  "calls": [
+    [
+      "The date of a stable Moss release on Holochain 0.7, which conditions the tool's public release.",
+      {
+        "text": "open since 27 Oct",
+        "meeting": "2026-10-27-dev",
+        "anchor": "outstanding-1",
+        "cite": true
+      }
+    ],
+    [
+      "Whether Grassroots Economics needs the context of work from its first use, or whether Moss groups and NDOs are enough.",
+      {
+        "text": "open since 27 Oct",
+        "meeting": "2026-10-27-dev",
+        "anchor": "outstanding-2",
+        "cite": true
+      }
+    ],
+    [
+      "The board applies the merge rule of Requests and Offers: feat and refactor get the other maintainer's review; fix, docs, chore, test and copy are self-merged after a green run. Confirm it is Nondominium's, or say which rule holds."
+    ],
+    [
+      "No item on milestone 11 has a drop: label, so every open item is on the Unsorted card. The proposed workstreams are in content/releases/v0-1-0.release.yaml, commented out, waiting on a decision."
+    ]
+  ],
+  "landedSince": "the start",
+  "landed": [
+    {
+      "at": "2026-11-11T00:05:13Z",
+      "when": "10 Nov 19:05",
+      "n": 183,
+      "href": "https://github.com/Sensorica/nondominium/pull/183",
+      "title": "bring Tibi's general backend work from commitment-pool-experiment onto dev",
+      "who": "Soushi"
+    },
+    {
+      "at": "2026-11-04T05:08:22Z",
+      "when": "4 Nov 00:08",
+      "n": 182,
+      "href": "https://github.com/Sensorica/nondominium/pull/182",
+      "title": "expose NDOs as Moss assets",
+      "who": "Soushi"
+    },
+    {
+      "at": "2026-11-04T04:45:05Z",
+      "when": "3 Nov 23:45",
+      "n": 181,
+      "href": "https://github.com/Sensorica/nondominium/pull/181",
+      "title": "Moss group context for groups and NDOs",
+      "who": "Soushi"
+    },
+    {
+      "at": "2026-11-04T04:15:43Z",
+      "when": "3 Nov 23:15",
+      "n": 180,
+      "href": "https://github.com/Sensorica/nondominium/pull/180",
+      "title": "run Nondominium as a Moss tool in weave dev mode",
+      "who": "Soushi"
+    },
+    {
+      "at": "2026-11-04T03:51:13Z",
+      "when": "3 Nov 22:51",
+      "n": 178,
+      "href": "https://github.com/Sensorica/nondominium/pull/178",
+      "title": "publish the Holochain 0.7.1 DNA hashes",
+      "who": "Soushi"
+    },
+    {
+      "at": "2026-11-04T03:33:46Z",
+      "when": "3 Nov 22:33",
+      "n": 172,
+      "href": "https://github.com/Sensorica/nondominium/pull/172",
+      "title": "record that work contexts live in the group DHT",
+      "who": "Soushi"
+    },
+    {
+      "at": "2026-11-04T02:45:30Z",
+      "when": "3 Nov 21:45",
+      "n": 130,
+      "href": "https://github.com/Sensorica/nondominium/pull/130",
+      "title": "upgrade to Holochain 0.7.1",
+      "who": "Soushi"
+    },
+    {
+      "at": "2026-11-04T02:44:28Z",
+      "when": "3 Nov 21:44",
+      "n": 170,
+      "href": "https://github.com/Sensorica/nondominium/pull/170",
+      "title": "run the group and lobby Sweettest suites",
+      "who": "Soushi"
+    },
+    {
+      "at": "2026-11-04T02:43:45Z",
+      "when": "3 Nov 21:43",
+      "n": 171,
+      "href": "https://github.com/Sensorica/nondominium/pull/171",
+      "title": "add group model requirements for Moss and standalone",
+      "who": "Soushi"
+    },
+    {
+      "at": "2026-10-28T03:07:21Z",
+      "when": "27 Oct 23:07",
+      "n": 158,
+      "href": "https://github.com/Sensorica/nondominium/pull/158",
+      "title": "usable app shell and NDO header on phones",
+      "who": "Soushi"
+    },
+    {
+      "at": "2026-10-27T19:34:51Z",
+      "when": "27 Oct 15:34",
+      "n": 155,
+      "href": "https://github.com/Sensorica/nondominium/pull/155",
+      "title": "vendor the hREA GraphQL adapter 0.700.0-rc.0 into the UI",
+      "who": "Soushi"
+    },
+    {
+      "at": "2026-10-27T19:30:09Z",
+      "when": "27 Oct 15:30",
+      "n": 143,
+      "href": "https://github.com/Sensorica/nondominium/pull/143",
+      "title": "make the PR review procedure shared and executable",
+      "who": "Soushi"
+    },
+    {
+      "at": "2026-10-27T18:35:42Z",
+      "when": "27 Oct 14:35",
+      "n": 152,
+      "href": "https://github.com/Sensorica/nondominium/pull/152",
+      "title": "split the slow nondominium shard and stop retrying the serial core-flows story",
+      "who": "Soushi"
+    },
+    {
+      "at": "2026-10-27T18:35:21Z",
+      "when": "27 Oct 14:35",
+      "n": 149,
+      "href": "https://github.com/Sensorica/nondominium/pull/149",
+      "title": "migrate to Effect 4 and enforce the UI architecture invariants",
+      "who": "Soushi"
+    },
+    {
+      "at": "2026-10-27T18:35:01Z",
+      "when": "27 Oct 14:35",
+      "n": 151,
+      "href": "https://github.com/Sensorica/nondominium/pull/151",
+      "title": "reconcile global discovery anchor when a spec's scope changes",
+      "who": "Soushi"
+    },
+    {
+      "at": "2026-10-27T17:43:22Z",
+      "when": "27 Oct 13:43",
+      "n": 157,
+      "href": "https://github.com/Sensorica/nondominium/pull/157",
+      "title": "reduce ResourceNature to Physical, Digital, Hybrid",
+      "who": "Tibi"
+    },
+    {
+      "at": "2026-09-22T22:40:47Z",
+      "when": "22 Sept 18:40",
+      "n": 131,
+      "href": "https://github.com/Sensorica/nondominium/pull/131",
+      "title": "harmonize documentation and READMEs across the repo",
+      "who": "Soushi"
+    },
+    {
+      "at": "2026-09-08T19:33:04Z",
+      "when": "8 Sept 15:33",
+      "n": 146,
+      "href": "https://github.com/Sensorica/nondominium/pull/146",
+      "title": "pin the holochain agent skill to v1.0.0-rc.1",
+      "who": "Soushi"
+    },
+    {
+      "at": "2026-08-29T23:11:19Z",
+      "when": "29 Aug 19:11",
+      "n": 132,
+      "href": "https://github.com/Sensorica/nondominium/pull/132",
+      "title": "NDO Layer 1 typed governance rules, classification constraints, and OperationalState",
+      "who": "Soushi"
+    },
+    {
+      "at": "2026-08-16T02:25:01Z",
+      "when": "15 Aug 22:25",
+      "n": 129,
+      "href": "https://github.com/Sensorica/nondominium/pull/129",
+      "title": "NDO membership — join, list, and is-member on the per-NDO cell",
+      "who": "Soushi"
+    },
+    {
+      "at": "2026-08-16T00:35:42Z",
+      "when": "15 Aug 20:35",
+      "n": 138,
+      "href": "https://github.com/Sensorica/nondominium/pull/138",
+      "title": "make the materialized .claude/ writable so the skills hook can write",
+      "who": "Soushi"
+    },
+    {
+      "at": "2026-08-16T00:30:30Z",
+      "when": "15 Aug 20:30",
+      "n": 128,
+      "href": "https://github.com/Sensorica/nondominium/pull/128",
+      "title": "per-NDO-cell model A with DnaHash binding",
+      "who": "Soushi"
+    },
+    {
+      "at": "2026-08-15T23:04:20Z",
+      "when": "15 Aug 19:04",
+      "n": 137,
+      "href": "https://github.com/Sensorica/nondominium/pull/137",
+      "title": "fix red dev e2e (leaked guard clone) + add Sweettest CI matrix",
+      "who": "Soushi"
+    },
+    {
+      "at": "2026-08-09T00:09:25Z",
+      "when": "8 Aug 20:09",
+      "n": 126,
+      "href": "https://github.com/Sensorica/nondominium/pull/126",
+      "title": "robust member listing, group persistence, and join reliability",
+      "who": "Soushi"
+    },
+    {
+      "at": "2026-08-06T18:48:22Z",
+      "when": "6 Aug 14:48",
+      "n": 114,
+      "href": "https://github.com/Sensorica/nondominium/pull/114",
+      "title": "wire Lobby DNA into UI — profile bar, NdoBrowser states, DHT profile sync (#106)",
+      "who": "Soushi"
+    },
+    {
+      "at": "2026-08-06T18:48:19Z",
+      "when": "6 Aug 14:48",
+      "n": 116,
+      "href": "https://github.com/Sensorica/nondominium/pull/116",
+      "title": "retrofit architecture documentation to multi-DNA reality (#113)",
+      "who": "Soushi"
+    },
+    {
+      "at": "2026-08-06T17:54:05Z",
+      "when": "6 Aug 13:54",
+      "n": 118,
+      "href": "https://github.com/Sensorica/nondominium/pull/118",
+      "title": "browser e2e suite against real conductors (Playwright)",
+      "who": "Soushi"
+    },
+    {
+      "at": "2026-08-06T17:47:36Z",
+      "when": "6 Aug 13:47",
+      "n": 115,
+      "href": "https://github.com/Sensorica/nondominium/pull/115",
+      "title": "NDO DNA role, per-NDO cell cloning, NdoAnchor in zome_group (#112)",
+      "who": "Soushi"
+    },
+    {
+      "at": "2026-06-19T21:47:02Z",
+      "when": "19 Jun 17:47",
+      "n": 111,
+      "href": "https://github.com/Sensorica/nondominium/pull/111",
+      "title": "DNA-backed groups, multi-agent web harness, and NDO layer-0 UI",
+      "who": "Soushi"
+    },
+    {
+      "at": "2026-05-27T03:53:55Z",
+      "when": "26 May 23:53",
+      "n": 107,
+      "href": "https://github.com/Sensorica/nondominium/pull/107",
+      "title": "Group DNA per-group coordination DHT with Sweettest suite",
+      "who": "Soushi"
+    },
+    {
+      "at": "2026-05-20T00:21:34Z",
+      "when": "19 May 20:21",
+      "n": 108,
+      "href": "https://github.com/Sensorica/nondominium/pull/108",
+      "title": "NDO Layer 0 UI — Lobby-first architecture with group-scoped NDO management",
+      "who": "Soushi"
+    },
+    {
+      "at": "2026-05-13T05:00:41Z",
+      "when": "13 May 01:00",
+      "n": 104,
+      "href": "https://github.com/Sensorica/nondominium/pull/104",
+      "title": "add TELOS, Cursor rules generation, and nondominium-domain skill",
+      "who": "Soushi"
+    },
+    {
+      "at": "2026-05-13T03:11:06Z",
+      "when": "12 May 23:11",
+      "n": 103,
+      "href": "https://github.com/Sensorica/nondominium/pull/103",
+      "title": "Lobby DNA multi-network federation entry point with Sweettest suite",
+      "who": "Soushi"
+    },
+    {
+      "at": "2026-05-01T04:11:53Z",
+      "when": "1 May 00:11",
+      "n": 105,
+      "href": "https://github.com/Sensorica/nondominium/pull/105",
+      "title": "NDO Layer 0 full UI integration — creation, lifecycle, filters, history (#102)",
+      "who": "Soushi"
+    },
+    {
+      "at": "2026-04-30T01:39:28Z",
+      "when": "29 Apr 21:39",
+      "n": 86,
+      "href": "https://github.com/Sensorica/nondominium/pull/86",
+      "title": "NDO Layer 0 test suite (#76)",
+      "who": "Soushi"
+    },
+    {
+      "at": "2026-04-22T04:00:56Z",
+      "when": "22 Apr 00:00",
+      "n": 98,
+      "href": "https://github.com/Sensorica/nondominium/pull/98",
+      "title": "implement Lobby-first architecture with NDO view",
+      "who": "Soushi"
+    },
+    {
+      "at": "2026-04-15T09:17:43Z",
+      "when": "15 Apr 05:17",
+      "n": 97,
+      "href": "https://github.com/Sensorica/nondominium/pull/97",
+      "title": "effectify zome services and stores with R&O DI pattern",
+      "who": "Soushi"
+    },
+    {
+      "at": "2026-04-15T04:31:10Z",
+      "when": "15 Apr 00:31",
+      "n": 87,
+      "href": "https://github.com/Sensorica/nondominium/pull/87",
+      "title": "Lobby DNA requirements and architecture design",
+      "who": "Soushi"
+    },
+    {
+      "at": "2026-04-15T04:20:26Z",
+      "when": "15 Apr 00:20",
+      "n": 89,
+      "href": "https://github.com/Sensorica/nondominium/pull/89",
+      "title": "Effect-TS foundation — deps, error layer, schema layer, shared utilities",
+      "who": "Soushi"
+    },
+    {
+      "at": "2026-04-15T01:36:35Z",
+      "when": "14 Apr 21:36",
+      "n": 88,
+      "href": "https://github.com/Sensorica/nondominium/pull/88",
+      "title": "migrate from Tailwind CSS to UnoCSS + Melt UI next-gen",
+      "who": "Soushi"
+    },
+    {
+      "at": "2026-04-08T01:19:52Z",
+      "when": "7 Apr 21:19",
+      "n": 84,
+      "href": "https://github.com/Sensorica/nondominium/pull/84",
+      "title": "add NDO DHT categorization anchors and query functions",
+      "who": "Soushi"
+    },
+    {
+      "at": "2026-04-07T16:58:51Z",
+      "when": "7 Apr 12:58",
+      "n": 82,
+      "href": "https://github.com/Sensorica/nondominium/pull/82",
+      "title": "redesign lifecycle state machine with hibernation memory",
+      "who": "Soushi"
+    },
+    {
+      "at": "2026-04-06T23:27:50Z",
+      "when": "6 Apr 19:27",
+      "n": 80,
+      "href": "https://github.com/Sensorica/nondominium/pull/80",
+      "title": "add NondominiumIdentity entry type with lifecycle validation",
+      "who": "Soushi"
+    },
+    {
+      "at": "2026-04-06T21:05:16Z",
+      "when": "6 Apr 17:05",
+      "n": 79,
+      "href": "https://github.com/Sensorica/nondominium/pull/79",
+      "title": "deprecate Tryorama, scaffold hREA bridge tests",
+      "who": "Soushi"
+    },
+    {
+      "at": "2026-03-31T18:24:27Z",
+      "when": "31 Mar 14:24",
+      "n": 67,
+      "href": "https://github.com/Sensorica/nondominium/pull/67",
+      "title": "add NDO v1.0 architecture design and consolidate hREA documentation",
+      "who": "Soushi"
+    },
+    {
+      "at": "2026-03-26T01:50:54Z",
+      "when": "25 Mar 21:50",
+      "n": 64,
+      "href": "https://github.com/Sensorica/nondominium/pull/64",
+      "title": "establish Sweettest scaffold (#61)",
+      "who": "Soushi"
+    },
+    {
+      "at": "2026-03-25T18:52:03Z",
+      "when": "25 Mar 14:52",
+      "n": 66,
+      "href": "https://github.com/Sensorica/nondominium/pull/66",
+      "title": "add NDO Prima Materia specification and integrate across docs",
+      "who": "Tibi"
+    },
+    {
+      "at": "2026-03-18T03:38:33Z",
+      "when": "17 Mar 23:38",
+      "n": 65,
+      "href": "https://github.com/Sensorica/nondominium/pull/65",
+      "title": "Ndo",
+      "who": "Tibi"
+    },
+    {
+      "at": "2026-03-18T00:43:49Z",
+      "when": "17 Mar 20:43",
+      "n": 62,
+      "href": "https://github.com/Sensorica/nondominium/pull/62",
+      "title": "centralize error handling in shared utils crate",
+      "who": "Soushi"
+    },
+    {
+      "at": "2026-03-17T23:48:05Z",
+      "when": "17 Mar 19:48",
+      "n": 59,
+      "href": "https://github.com/Sensorica/nondominium/pull/59",
+      "title": "implement hREA Phase 1 Person/ReaAgent bridge (#51, #52, #53, #55)",
+      "who": "Soushi"
+    }
+  ],
+  "links": [
+    {
+      "text": "27 October meeting",
+      "meeting": "2026-10-27-dev"
+    },
+    {
+      "text": "Milestone 11, v0.1.0",
+      "href": "https://github.com/Sensorica/nondominium/milestone/11"
+    },
+    {
+      "text": "Open PRs of the release",
+      "href": "https://github.com/Sensorica/nondominium/pulls?q=is%3Apr%20is%3Aopen%20milestone%3A%22v0.1.0%20Moss%20pilot%22"
+    }
+  ],
+  "footer": "Derived from GitHub: which items are in the release, their workstreams, states, holders and every number. The plan, the rules, the calls and the notes are the team's, in content/releases/v0-1-0.release.yaml. A wrong board is fixed on GitHub (the milestone, one drop: label per item) or in that file, never in the generated JSON."
+}
