@@ -36,6 +36,11 @@
       body: 'Six UI directions for v0.1, from the prototype handoff, side by side. One gets chosen and implemented against the hApp.',
     },
     {
+      href: paths.releaseCurrent(),
+      title: 'Release board',
+      body: 'Where v0.1.0 stands, derived from GitHub every hour: the milestone, its issues and PRs, who holds the next step, the plan to the tag.',
+    },
+    {
       href: paths.previews(),
       title: 'Branch previews',
       body: 'Every branch pushed to the repo, live on its own address, so work in progress can be opened and compared before it is merged.',
