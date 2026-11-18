@@ -121,6 +121,7 @@ const FR_SECTION_ID: Record<string, string> = {
   'discut-non-tranch': 'discussed-not-decided',
   'discut-non-d-cid': 'discussed-not-decided',
   'en-suspens': 'outstanding',
+  'les-parties': 'the-parts',
   'corrections-apr-s-la-rencontre': 'corrections-after-the-meeting',
 };
 
