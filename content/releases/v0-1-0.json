@@ -8,8 +8,8 @@
     "href": "https://github.com/Sensorica/nondominium/milestone/11",
     "state": "open"
   },
-  "measuredAt": "2026-11-17T09:14:46.107Z",
-  "measuredLine": "17 Nov at 04:14",
+  "measuredAt": "2026-11-18T01:38:07.544Z",
+  "measuredLine": "17 Nov at 20:38",
   "timeZone": "America/Toronto",
   "kpis": [
     {
@@ -50,7 +50,7 @@
       "tone": "ok"
     },
     {
-      "n": "50",
+      "n": "52",
       "unit": "",
       "label": [
         "merged into dev since the start"
@@ -308,6 +308,22 @@
   ],
   "landedSince": "the start",
   "landed": [
+    {
+      "at": "2026-11-17T23:26:20Z",
+      "when": "17 Nov 18:26",
+      "n": 216,
+      "href": "https://github.com/Sensorica/nondominium/pull/216",
+      "title": "add relevant badges to the README",
+      "who": "Soushi"
+    },
+    {
+      "at": "2026-11-17T22:45:42Z",
+      "when": "17 Nov 17:45",
+      "n": 215,
+      "href": "https://github.com/Sensorica/nondominium/pull/215",
+      "title": "fix the broken DeepWiki badge in the README",
+      "who": "Soushi"
+    },
     {
       "at": "2026-11-11T00:05:13Z",
       "when": "10 Nov 19:05",
