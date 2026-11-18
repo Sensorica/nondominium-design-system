@@ -8,8 +8,8 @@
     "href": "https://github.com/Sensorica/nondominium/milestone/11",
     "state": "open"
   },
-  "measuredAt": "2026-11-18T10:12:05.095Z",
-  "measuredLine": "18 Nov at 05:12",
+  "measuredAt": "2026-11-18T18:51:34.314Z",
+  "measuredLine": "18 Nov at 13:51",
   "timeZone": "America/Toronto",
   "kpis": [
     {
@@ -22,14 +22,14 @@
       "tone": "warn"
     },
     {
-      "n": "22/30",
-      "unit": "73%",
+      "n": "22/38",
+      "unit": "58%",
       "label": [
         "milestone 11 items closed (issues and PRs)"
       ],
       "src": "milestone 11 on GitHub",
       "tone": "accent",
-      "bar": 0.7333333333333333
+      "bar": 0.5789473684210527
     },
     {
       "n": "0",
@@ -64,7 +64,7 @@
       "id": "unsorted",
       "title": "Unsorted",
       "tone": "bad",
-      "tag": "8 to sort",
+      "tag": "16 to sort",
       "why": [
         "On ",
         {
@@ -145,6 +145,78 @@
           "kind": "changes",
           "who": "unassigned",
           "stateTitle": "no workstream label"
+        },
+        {
+          "label": "#217",
+          "href": "https://github.com/Sensorica/nondominium/issues/217",
+          "title": "docs(license): adopt OVN License v2.0 and ship pie-chart.json at the root",
+          "state": "no workstream",
+          "kind": "changes",
+          "who": "unassigned",
+          "stateTitle": "no workstream label"
+        },
+        {
+          "label": "#218",
+          "href": "https://github.com/Sensorica/nondominium/issues/218",
+          "title": "ci: validate pie-chart.json against the OVN pie chart schema",
+          "state": "no workstream",
+          "kind": "changes",
+          "who": "unassigned",
+          "stateTitle": "no workstream label"
+        },
+        {
+          "label": "#219",
+          "href": "https://github.com/Sensorica/nondominium/issues/219",
+          "title": "docs: list Nondominium's first-layer dependencies for the pie chart",
+          "state": "no workstream",
+          "kind": "changes",
+          "who": "unassigned",
+          "stateTitle": "no workstream label"
+        },
+        {
+          "label": "#220",
+          "href": "https://github.com/Sensorica/nondominium/issues/220",
+          "title": "fix(gouvernance): agreement shares must sum to exactly 100",
+          "state": "no workstream",
+          "kind": "changes",
+          "who": "unassigned",
+          "stateTitle": "no workstream label"
+        },
+        {
+          "label": "#221",
+          "href": "https://github.com/Sensorica/nondominium/issues/221",
+          "title": "feat(ui): show and edit an NDO's contribution pie chart",
+          "state": "no workstream",
+          "kind": "changes",
+          "who": "unassigned",
+          "stateTitle": "no workstream label"
+        },
+        {
+          "label": "#222",
+          "href": "https://github.com/Sensorica/nondominium/issues/222",
+          "title": "feat(gouvernance): store the distribution placeholder and the license share parameter",
+          "state": "no workstream",
+          "kind": "changes",
+          "who": "unassigned",
+          "stateTitle": "no workstream label"
+        },
+        {
+          "label": "#223",
+          "href": "https://github.com/Sensorica/nondominium/issues/223",
+          "title": "feat(gouvernance): a forked NDO must carry its parent's share, validated in integrity",
+          "state": "no workstream",
+          "kind": "changes",
+          "who": "Soushi",
+          "stateTitle": "no workstream label"
+        },
+        {
+          "label": "#224",
+          "href": "https://github.com/Sensorica/nondominium/issues/224",
+          "title": "feat(gouvernance): import pie-chart.json into the project NDO's agreement",
+          "state": "no workstream",
+          "kind": "changes",
+          "who": "unassigned",
+          "stateTitle": "no workstream label"
         }
       ],
       "holds": [
@@ -197,6 +269,54 @@
           "text": "#166",
           "href": "https://github.com/Sensorica/nondominium/issues/166",
           "title": "feat(infra): always-online wdocker node for the pilot group"
+        },
+        ": add one drop: label; ",
+        {
+          "text": "#217",
+          "href": "https://github.com/Sensorica/nondominium/issues/217",
+          "title": "docs(license): adopt OVN License v2.0 and ship pie-chart.json at the root"
+        },
+        ": add one drop: label; ",
+        {
+          "text": "#218",
+          "href": "https://github.com/Sensorica/nondominium/issues/218",
+          "title": "ci: validate pie-chart.json against the OVN pie chart schema"
+        },
+        ": add one drop: label; ",
+        {
+          "text": "#219",
+          "href": "https://github.com/Sensorica/nondominium/issues/219",
+          "title": "docs: list Nondominium's first-layer dependencies for the pie chart"
+        },
+        ": add one drop: label; ",
+        {
+          "text": "#220",
+          "href": "https://github.com/Sensorica/nondominium/issues/220",
+          "title": "fix(gouvernance): agreement shares must sum to exactly 100"
+        },
+        ": add one drop: label; ",
+        {
+          "text": "#221",
+          "href": "https://github.com/Sensorica/nondominium/issues/221",
+          "title": "feat(ui): show and edit an NDO's contribution pie chart"
+        },
+        ": add one drop: label; ",
+        {
+          "text": "#222",
+          "href": "https://github.com/Sensorica/nondominium/issues/222",
+          "title": "feat(gouvernance): store the distribution placeholder and the license share parameter"
+        },
+        ": add one drop: label; ",
+        {
+          "text": "#223",
+          "href": "https://github.com/Sensorica/nondominium/issues/223",
+          "title": "feat(gouvernance): a forked NDO must carry its parent's share, validated in integrity"
+        },
+        ": add one drop: label; ",
+        {
+          "text": "#224",
+          "href": "https://github.com/Sensorica/nondominium/issues/224",
+          "title": "feat(gouvernance): import pie-chart.json into the project NDO's agreement"
         },
         ": add one drop: label."
       ]
