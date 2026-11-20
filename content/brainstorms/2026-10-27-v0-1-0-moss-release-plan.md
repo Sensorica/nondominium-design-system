@@ -2,8 +2,6 @@
 title: "Nondominium v0.1.0 : le plan de release Moss"
 date: 2026-10-27
 lifecycle: project-management
-lifecycle-architecture: content/brainstorms/2026-11-20-nondominium-architecture.md
-lifecycle-requirements: content/brainstorms/2026-11-03-group-model-requirements.md
 project: nondominium
 status: open
 summary: "Plan de la première release, réorientée en Tool Moss avec un nœud toujours en ligne : Moss sur Holochain 0.7.1, le serveur bootstrap à héberger et les décisions qui restent à prendre."

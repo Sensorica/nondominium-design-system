@@ -3,11 +3,9 @@ title: "Nondominium: the whole app, as it runs and as it is planned"
 date: 2026-11-20
 template: architecture
 lifecycle: architecture
-lifecycle-requirements: content/brainstorms/2026-11-03-group-model-requirements.md
-lifecycle-project-management: content/brainstorms/2026-10-27-v0-1-0-moss-release-plan.md
 project: nondominium
 status: open
-summary: "The complete architecture of the Nondominium hApp on dev at 2e2f235, from the C4 context down to every DNA, zome and UI module, with the planned work of the v0.1.0 Moss pilot, v0.2 and v0.3 drawn as new, modified or removed parts. A map to explore the app, with no decision to take."
+summary: "The complete architecture of the Nondominium hApp on dev at 2e2f235, from the C4 context down to every DNA, zome and UI module, with the planned work of the v0.1.0 Moss pilot, v0.2 and v0.3 drawn as planified, modified or removed parts. A map to explore the app, with no decision to take."
 lang: en
 sha: 2e2f235d980e27753ea8a6d8a4d252863d293de7
 change-new: planified
@@ -22,7 +20,7 @@ The hApp is one bundle of five DNA roles (`lobby`, `nondominium`, `hrea`, `group
 A group is its own cloned cell, and so is every NDO, whose DNA hash is bound to its immutable Layer 0 fields.
 
 Every box without a mark is on `dev` today.
-A box or arrow marked **new** is planned and not yet in the code, **modified** is on `dev` and planned to change, **removed** is on `dev` and planned to go.
+A box or arrow marked **planified** is planned and not yet in the code, **modified** is on `dev` and planned to change, **removed** is on `dev` and planned to go.
 Each planned part names its source (an issue, a milestone or a design document) in its spec.
 The map's head offers **all · current · change**: *current* draws only what runs today, *change* fades what stays as it is.
 
