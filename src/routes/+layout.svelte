@@ -17,6 +17,7 @@
   import { paths } from '$lib/paths';
   import CommentsHost from '$lib/components/comments/CommentsHost.svelte';
   import { DIRECTION_LIST, type DirectionSlug } from '$lib/prototypes/directions';
+  import { theme, initTheme, toggleTheme, applyTheme, pinnedLight, type Theme } from '$lib/theme.svelte';
 
   let { children } = $props();
 
@@ -32,6 +33,23 @@
   }
 
   const current = $derived(page.url.pathname);
+
+  // The theme: app.html wrote the first one before paint; from here the
+  // layout keeps <html data-theme> in step with the toggle, the OS, and the
+  // route (the replica and the card frames stay light, see theme.svelte.ts).
+  // In an effect, not at init: the prerendered HTML says light, and state
+  // changed before hydration would leave the toggle's attributes stale.
+  $effect(() => initTheme());
+  $effect(() => {
+    applyTheme(pinned ? 'light' : theme.mode);
+  });
+  const nextTheme = $derived<Theme>(theme.mode === 'dark' ? 'light' : 'dark');
+  const pinned = $derived(pinnedLight(current));
+  const toggleTitle = $derived(
+    pinned
+      ? `This page shows the app, which has no dark mode; the ${theme.mode} theme applies elsewhere`
+      : `Switch to ${nextTheme} theme`
+  );
   // Full-bleed: the replica at /app, and each prototype direction. The
   // direction index at /prototypes keeps the chrome.
   const isApp = $derived(
@@ -97,6 +115,19 @@
           </span>
         </a>
 
+        <div class="railtools">
+        <button
+          type="button"
+          class="themetoggle"
+          class:themetoggle--pinned={pinned}
+          aria-label={toggleTitle}
+          title={toggleTitle}
+          aria-pressed={theme.mode === 'dark'}
+          onclick={toggleTheme}
+        >
+          <span class="themetoggle__disc" aria-hidden="true"></span>
+        </button>
+
         <button
           type="button"
           class="menutoggle"
@@ -107,6 +138,7 @@
         >
           <span class="menutoggle__bars" aria-hidden="true"></span>
         </button>
+        </div>
       </div>
 
       <div class="railbody" id="ds-menu">
@@ -343,6 +375,41 @@
     border-left-color: rgb(var(--ndo-brand-teal-500));
   }
 
+  /* The theme toggle sits in the rail head, beside the brand, so it is in view
+     on every page and at every width (below 860px, next to the hamburger). Same
+     box as the hamburger, and like it drawn in CSS rather than taken from an
+     icon set: a disc half lit, the half that shows is the theme it switches to. */
+  .railtools { display: flex; align-items: center; gap: var(--ndo-spacing-2); }
+  .themetoggle {
+    display: inline-flex;
+    width: 32px;
+    height: 32px;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    border: 1px solid rgb(255 255 255 / 0.15);
+    border-radius: var(--ndo-radius-md);
+    background: transparent;
+    color: #fff;
+    cursor: pointer;
+    transition: var(--ndo-transition-colors);
+  }
+  .themetoggle:hover { background: rgb(255 255 255 / 0.07); }
+  /* On a pinned page the toggle still works (the choice applies to the rest of
+     the site) but reads as quieter, so the light page does not look like a bug. */
+  .themetoggle--pinned { opacity: 0.5; }
+  .themetoggle:focus-visible { outline: 2px solid rgb(var(--ndo-brand-teal-300)); outline-offset: 2px; }
+  .themetoggle__disc {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    border: 1.5px solid currentColor;
+    background: linear-gradient(90deg, currentColor 50%, transparent 50%);
+    transition: transform var(--ndo-duration-base) var(--ndo-easing);
+  }
+  .themetoggle[aria-pressed='true'] .themetoggle__disc { transform: rotate(180deg); }
+
   .version { margin: auto 0 0; padding: 0 8px; font-size: var(--ndo-text-xs); color: rgb(255 255 255 / 0.3); }
   kbd {
     font-family: var(--ndo-font-mono);
@@ -375,6 +442,7 @@
     /* The gradient hairline moves from the right edge to the bottom edge. */
     .rail::after { top: auto; left: 0; width: auto; height: 2px; }
     .menutoggle { display: inline-flex; }
+    .themetoggle { width: 40px; height: 40px; }
     .railbody {
       display: none;
       position: absolute;

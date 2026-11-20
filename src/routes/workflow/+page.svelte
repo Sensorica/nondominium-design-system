@@ -162,7 +162,7 @@
   .n { flex-basis: 100%; font-family: var(--ndo-font-mono); font-size: var(--ndo-text-xs); color: var(--ndo-color-text-muted); }
   h2 { margin: 0; font-size: var(--ndo-text-xs); line-height: var(--ndo-lh-xs); font-weight: var(--ndo-weight-bold); overflow-wrap: normal; word-break: normal; hyphens: manual; min-width: 0; }
   .sub { display: block; font-weight: var(--ndo-weight-medium); color: var(--ndo-color-text-secondary); }
-  .count { margin-left: auto; align-self: center; font-size: var(--ndo-text-xs); font-weight: var(--ndo-weight-bold); color: rgb(var(--ndo-color-text-inverse)); background: rgb(var(--ndo-primary-600)); border-radius: var(--ndo-radius-pill); padding: 0 7px; }
+  .count { margin-left: auto; align-self: center; font-size: var(--ndo-text-xs); font-weight: var(--ndo-weight-bold); color: rgb(var(--ndo-color-text-on-fill)); background: rgb(var(--ndo-primary-600)); border-radius: var(--ndo-radius-pill); padding: 0 7px; }
   .boards { list-style: none; margin: var(--ndo-spacing-2) 0 0; padding: 0; display: flex; flex-direction: column; gap: var(--ndo-spacing-2); }
   .boards a { display: block; color: var(--ndo-color-link); font-size: var(--ndo-text-xs); line-height: var(--ndo-lh-xs); font-weight: var(--ndo-weight-semibold); text-decoration: none; overflow-wrap: normal; word-break: normal; hyphens: manual; }
   .boards a:hover { text-decoration: underline; }

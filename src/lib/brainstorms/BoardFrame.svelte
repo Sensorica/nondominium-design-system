@@ -6,8 +6,62 @@
   import { comments } from '$lib/comments/comments.svelte';
   import { STAGE_LABEL, STATUS_LABEL, LANG_LABEL } from '$lib/brainstorms/labels';
 
+  import { untrack } from 'svelte';
+  import { theme, type Theme } from '$lib/theme.svelte';
+
   type Framed = { title: string; lifecycle: string; status: string; date: string; lang: string; board: string };
   let { board: b, surfaceLabel, indexHref }: { board: Framed; surfaceLabel: string; indexHref: string } = $props();
+
+  // The board follows the site's theme. A compiled Niceboard paints from its own
+  // <html data-theme> (its CSS has light and dark under that attribute) and marks
+  // dark with html.dark for its diagrams; without either it falls back to
+  // prefers-color-scheme, which inside a frame follows the frame's colour-scheme.
+  // So the frame gets all three: `?theme=` in the src for a board compiled with
+  // the embed mode to paint right the first time, the frame's color-scheme for
+  // the fallback, and the two marks written into the board on load and on every
+  // site theme change. The frame is same-origin, so its document is reachable.
+  // The board's own theme button is hidden: the site's toggle drives it, and two
+  // switches that disagree would be worse than one.
+  let frame = $state<HTMLIFrameElement>();
+  // The frame is mounted on the client only. Its src carries the theme, which
+  // the prerendered HTML cannot know, and hydration does not repair a src.
+  // Read once from what app.html (or the layout) already wrote on <html>: a src
+  // that changed with the theme would reload the board; a new board (b.board)
+  // is a new src.
+  let src = $state('');
+  $effect(() => {
+    const t = document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'light';
+    src = `${b.board}?theme=${t}`;
+  });
+
+  function paintBoard(el: HTMLIFrameElement | undefined, mode: Theme): void {
+    if (!el) return;
+    el.style.colorScheme = mode;
+    let doc: Document | null = null;
+    try {
+      doc = el.contentDocument;
+    } catch {
+      return;
+    }
+    if (!doc?.documentElement) return;
+    const html = doc.documentElement;
+    html.setAttribute('data-theme', mode);
+    html.classList.toggle('dark', mode === 'dark');
+    if (doc.head && !doc.getElementById('ndo-ds-embed')) {
+      const style = doc.createElement('style');
+      style.id = 'ndo-ds-embed';
+      style.textContent = '#themeSwitch{display:none!important}';
+      doc.head.appendChild(style);
+    }
+  }
+
+  $effect(() => paintBoard(frame, theme.mode));
+
+  // The bar's Comments button replaces the floating one while a board is framed.
+  $effect(() => {
+    untrack(() => (comments.inlineTriggers += 1));
+    return () => untrack(() => (comments.inlineTriggers -= 1));
+  });
 </script>
 
 <svelte:head><title>{b.title} — {surfaceLabel} — Nondominium Design System</title></svelte:head>
@@ -27,7 +81,11 @@
     </div>
   </div>
   <h1 class="sr">{b.title}</h1>
-  <iframe src={b.board} title={b.title} lang={b.lang}></iframe>
+  {#if src}
+    <iframe bind:this={frame} {src} title={b.title} lang={b.lang} onload={() => paintBoard(frame, theme.mode)}></iframe>
+  {:else}
+    <div class="frame-wait"></div>
+  {/if}
 </div>
 
 <style>
@@ -46,5 +104,6 @@
   .actions button, .actions a { font: inherit; font-size: var(--ndo-text-xs); font-weight: var(--ndo-weight-medium); color: var(--ndo-color-text-primary); background: transparent; border: 1px solid var(--ndo-color-border); border-radius: var(--ndo-radius-pill); padding: 3px 12px; cursor: pointer; text-decoration: none; white-space: nowrap; }
   .actions button:hover, .actions a:hover { border-color: rgb(var(--ndo-primary-600)); }
   .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+  .frame-wait { flex: 1; background: var(--ndo-color-bg-app); }
   iframe { flex: 1; width: 100%; border: 0; background: rgb(var(--ndo-color-card-bg)); }
 </style>
