@@ -17,6 +17,7 @@
   import { paths } from '$lib/paths';
   import CommentsHost from '$lib/components/comments/CommentsHost.svelte';
   import { DIRECTION_LIST, type DirectionSlug } from '$lib/prototypes/directions';
+  import { theme, initTheme, setTheme, applyTheme, pinnedLight, type Theme } from '$lib/theme.svelte';
 
   let { children } = $props();
 
@@ -32,6 +33,20 @@
   }
 
   const current = $derived(page.url.pathname);
+
+  // The theme: app.html wrote the first one before paint; from here the
+  // layout keeps <html data-theme> in step with the toggle, the OS, and the
+  // route (the replica and the card frames stay light, see theme.svelte.ts).
+  // In an effect, not at init: the prerendered HTML says light, and state
+  // changed before hydration would leave the toggle's attributes stale.
+  $effect(() => initTheme());
+  $effect(() => {
+    applyTheme(pinnedLight(current) ? 'light' : theme.mode);
+  });
+  const themes: { value: Theme; label: string }[] = [
+    { value: 'light', label: 'Light' },
+    { value: 'dark', label: 'Dark' },
+  ];
   // Full-bleed: the replica at /app, and each prototype direction. The
   // direction index at /prototypes keeps the chrome.
   const isApp = $derived(
@@ -202,6 +217,18 @@
           </div>
         </nav>
 
+        <div class="themeswitch" role="group" aria-label="Colour theme">
+          {#each themes as t (t.value)}
+            <button
+              type="button"
+              class="themeswitch__opt"
+              class:themeswitch__opt--on={theme.mode === t.value}
+              aria-pressed={theme.mode === t.value}
+              onclick={() => setTheme(t.value)}
+            >{t.label}</button>
+          {/each}
+        </div>
+
         <p class="version">v0.2.0 · press <kbd>c</kbd> to comment</p>
       </div>
     </aside>
@@ -343,7 +370,36 @@
     border-left-color: rgb(var(--ndo-brand-teal-500));
   }
 
-  .version { margin: auto 0 0; padding: 0 8px; font-size: var(--ndo-text-xs); color: rgb(255 255 255 / 0.3); }
+  /* Light or dark, a two-option segmented control in the rail's own ink and
+     teal, no icon (the app has no icon set). Sits at the foot of the rail with
+     the version line. */
+  .themeswitch {
+    margin-top: auto;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2px;
+    padding: 2px;
+    border: 1px solid rgb(255 255 255 / 0.15);
+    border-radius: var(--ndo-radius-pill);
+  }
+  .themeswitch__opt {
+    padding: 4px 10px;
+    border: 0;
+    border-radius: var(--ndo-radius-pill);
+    background: transparent;
+    color: rgb(255 255 255 / 0.65);
+    font: inherit;
+    font-size: var(--ndo-text-xs);
+    font-weight: var(--ndo-weight-medium);
+    cursor: pointer;
+    transition: var(--ndo-transition-colors);
+  }
+  .themeswitch__opt:hover { background: rgb(255 255 255 / 0.07); color: rgb(255 255 255 / 0.92); }
+  .themeswitch__opt:focus-visible { outline: 2px solid rgb(var(--ndo-brand-teal-300)); outline-offset: 1px; }
+  .themeswitch__opt--on,
+  .themeswitch__opt--on:hover { background: rgb(255 255 255 / 0.12); color: #fff; box-shadow: inset 0 -2px 0 rgb(var(--ndo-brand-teal-500)); }
+
+  .version { margin: 0; padding: 0 8px; font-size: var(--ndo-text-xs); color: rgb(255 255 255 / 0.3); }
   kbd {
     font-family: var(--ndo-font-mono);
     border: 1px solid rgb(255 255 255 / 0.2);
