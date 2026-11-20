@@ -59,13 +59,13 @@
   .card__title {
     font-size: var(--ndo-text-sm);
     font-weight: var(--ndo-weight-semibold);
-    color: rgb(var(--ndo-gray-900));
+    color: var(--ndo-color-text-primary);
     text-decoration: none;
   }
   .card__title:hover { color: rgb(var(--ndo-blue-600)); }
-  .card__subtitle { margin: 0; font-size: var(--ndo-text-xs); color: rgb(var(--ndo-gray-500)); }
+  .card__subtitle { margin: 0; font-size: var(--ndo-text-xs); color: var(--ndo-color-text-muted); }
   .card__frame {
-    border: 1px solid rgb(var(--ndo-gray-200));
+    border: 1px solid var(--ndo-color-border);
     border-radius: var(--ndo-radius-lg);
     /* Each card renders at its declared viewport size, so on a phone the frame
        scrolls instead of shrinking the card. */
