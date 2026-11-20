@@ -3,6 +3,8 @@ title: "Nondominium group model: requirements for Moss and standalone"
 date: 2026-11-03
 template: requirements
 lifecycle: requirements
+lifecycle-architecture: content/brainstorms/2026-11-20-nondominium-architecture.md
+lifecycle-project-management: content/brainstorms/2026-10-27-v0-1-0-moss-release-plan.md
 project: nondominium
 status: open
 summary: "What a group is in standalone and in Moss, what v0.1.0 ships and what v0.2 adds: the proposed requirement rows for issue #167, each waiting on a priority, a status and nine open questions."

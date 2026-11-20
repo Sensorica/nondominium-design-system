@@ -4,9 +4,9 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Nondominium group model: requirements for Moss and standalone</title>
-<!-- template: requirements · theme: theme.css · source: 2026-11-03-group-model-requirements.md -->
+<!-- template: requirements · theme: nondominium.css · source: 2026-11-03-group-model-requirements.md -->
 <!-- icon: static/favicon.png -->
-<link rel="icon" href="data:image/png;base64,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">
+<link rel="icon" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAAAIGNIUk0AAHomAACAhAAA+gAAAIDoAAB1MAAA6mAAADqYAAAXcJy6UTwAAAAGYktHRAD/AP8A/6C9p5MAAAAHdElNRQfqCxQHBh8Nvd9rAAAki0lEQVR42nW7d5xcVfk//n7OufdO3Z2d3WxJspueTYEkNA3dgEJA2kdBRRR/0gVBkKKCwOfDB0WFSFWqoWMBPoKAFGnSm3RI78kmu0m2zE69955znu8ft8xs9Df7mkx2dubec576ft7Pc2j69OmSiAAAlmVxIpEgr+aib2DA3DwyDP+nlyXcfffJ15qzzR7DsgkqXauNilffGll/4021a7WH6ZMmU7YpC9d1CQCYGY2P6HetNYwxICIIISCEgFIKAGDbNoQQ7Ps+CSEQrSn6vuM4LISA53kkpWQA5Hkur169hl//5CdY/+6eqSxmN/sVyERSmDKtL2ZnvVopbO8wl110s0jYKSISsG2biYiMMayUIpo6dWpSCBEsHDCqUkGqWqFv33jTxNEJnYt2WtYhBWB2mSjvsZFSkE6BR5qVWZF3/Vdy27e/8ta1161fUxjllnyetNbQWtN/EAJprcHMsQCIiJVSFAlfCBELKHoQEYgIUkomIiilSGvNa7eu5UvO+mV6QvqAPU01dYhy7b0kJyYSC5uItWJ/u3TUp3bafa1Ma9658Y9n7iQvJ5qzOZAgMDOUUkS9vb2J8Eai0L+Nv3vej3J8wMJjNqWTP9hkML8Atj0AmoIvgQABwGFGlqG6CCu7XXVH7uNP/nTHTy8tTJg9W0gphVKKI+0SERtjKNwYA6DoNRJUuNHGv4GZKXwvFkTVLWP+ggXiwN5z9tXl9rO52nQY+04LjABBROIOpceQtqpZKfeDRK5058bRJ5988PFbyuPyPaSUYq11IAASAttXrcIPbrt1wo7eGVesBJ/YD5PyiAAQiBmN+iQAHCpJQCAPuL3Mj/UOjVy19Bsnrm/q7SVjdLSJWOuNWjXGjNmgEALMjFBQsTVEgmBmFEqD5oxvXZJskYtOr45kfwI30ymM0yCzSJjBAokIAgIkDIRTqzpNhYdG8NHVN/7ljIHxLbOgjYYcN26ctWnlSj7/lps7+ub2/vYjmJO2E9k61gOBwltEz1C4oSAYNSJrmGl3mU3vvvirR7z13K23D7Z1dYGCTRAASCljYURaF0JAShm//v/EDyIiLldGcdIJZzkd4ogfVwfzVxo320JGgsPNN8gXRAgFTmAwiAVY27bxEnsmZK577z0WvvHy+w+WW5o6SGbTGfuYww+za0d85eJPCacNEongxmPWEW8c4caJAQo/xAA8AAXmKal0Jrlo/MQXP3j7Ld9KJES0Ua11bMbMTI2bF0Jw+Ld/C6IUPji5GYt6r/52ZSj/C+Nm0oJjDY3ZeMMyg0U2rt5YxMqZm0k2p2bMyb/68Yr3tNi2eZPuPP3UI1cLedZOEjKQWmRQ0U8oEG4wNAruyKB4HSUirBH0TbP4kK8ObNsGrXWkXbZtG8lkkqWUICJmZkRBsVHT4d/BzGSMISEEVm9Ybc459m8zqiPZS1QtnWEGDDOYCRytietPMAV2G/lptAcwoBxSoy3/X0/y6KO3lrcYecnV/9u+ceqU/14NzFPUuDuAA1tCFkCnlOU25qEsQRtwwoegSOSRoAlA1XCCmLu//qWDXn7unvtGWsaNo0jzkf+Hm43dgzlYaaTs8HcK3MXwHgs7xdTUSefXRnP/xdqOzTMUf2CNlm/sZHW7nVYbyPKKRCYNIy2wAMW+G1uCzWTGHbTf3s9aZu+9v7AZvG8NAEyjxRAkG3QTDc4i8Zcuw0+JUrnflzK3I51avJ5x2ibmdp+i2BvYiisY6w32nTBt+tmnfOObVzzz7jsqlcnsatZRIOTGmBC+RgJjIQRGyn106Jy7u2sDqePYt2NNCgAGBMDATpYH0q3l2+ymkadYVLYbQwnyxu2lis3neaWmA9lYgVUwB37CBOOm927i2Ydag0nnsGHmVhYUSJYIoMC/e4CRhb661Lv9nj/+8v8eqSHIgHzmUUe/s/C8Hy6DYy1Zx9zBDbFBABglYAWb7+1/6imv9D/y8NNT5swRUkoYYxhAlAHqCSXMChEGiGKD1ho7t1U1eZ17+a49zUCA2QSL4EBfVqI06LQOXPD6wGWPPfm7f3GmRQrfM9qr8Poll/31fWDK7V6x5SvQFkBhViICe3bG1DJfFsOG96yyGaMFAyANxnTQn/TSB/706Kuv+HPnzpXTp0/H1KlT6fF33tY7r/n1ozPAS5vCtM5xKAiyRh9z2+qEdfEld/9h4tCWzdQYAI0xFJl99IiQoWVZkFKylJK11rTH8WDlJhYoXzqBtQCGCcwCED6cbOmh9WrJ4++9vglTpkyRE9qn8ewZ82jevHny4mu+vtFpKSwhu1pgMJjjtAo2BO3bC0QNmKTCsM8cBj1mNBNVOjz36Rv+/Ce3tbMjhqeWZaG5Jc93vfqKN65QeDpPNDgmFnMgAl8IrGKzf/+USed+66STnMLQEDekv0aMQMwcCyB6n4ggLYF5bYdI36WJRhOMCQMdGIYYZPkVO1t75g+3/8NvybVCSskRvFZK0YSedlG2Pn1fOP5nJoiNYTgkMBO0LzqFIEpwHUOEvgJYzCU9NLxdABSlsEwmQ5VKBcPDQwyA9ODwDpsxTNg1dwe2PSqEWAWckjzu2IM39fUZHZg4h5YQWR1HUDd6RsL2Pd+0JCdIpbiJmcCGw0gfvsIUXb+4DQCFmcZENQMRcSbZTMvWv1hhNtuYTBQy43UqrRPCKL8oECG+ekRXjCQy2RYT+myoGR4aGmLP8wDAJMaPzyuiHIdmP1YIwYW2AK2rEolLrrz/vkkrV6wwjUHQsqw47QkhkEwm2XEcWJYFz/OoXB2lia37JSRZ7bHHcKRKBrHIWCLVASBOmVJK+L5PWmvsGNzGe846KgFQF8K9NaZ2KckTKcvqFwRwmFQiYygwmofS6a+e9aVDZKVUgjEGbq2GlpYWSiUStBiwBlPJwwtAexA3g58IkUcC8QVhHeGgzRPGn3n2UUc5nutGvs7JZJIbhRAJLqwhaHv/kKbK1Gm+a81oBDSRvWnlZP1a8+KjT9zdUtojAKSUQiKRYCEII0MVJcvT9vJrcjdwZP7RBRiWjW0iZ/jTRCPKCfNrhQhrhPx29qcXH3NISys+//xzvXLVKt62bRsfu/cXxMLn/n74GoFTRyPF7GoCkRUwYRREa2BOy/zgzMU7166F0poty+LG1GiMgeu65Louaa1FsTTEZ5/9w0RxMPt933XG1wFNA0QzEn4p+539O284YvKMBJYtX8Zbt6+jtRs/5+XLV+gll//f5NpI/qfGS+URu054DakhbO9duuixx457K526e4tAKyCCjYggCFkgTDHYOgPm7nGu+0JGme06kxrX7ziHrWV92lpjJvgQQX4NoWkMjyk0OQoyhK0N5pF4Zbd1G77/izPO6Js/fz4xM/m+3wiQoKHJc2u8cOEeYlbuR6eVB9t+pWvZbB3LUARCw+8JOOlyX7pt9BaRGnzWyNEhm5IZS3UtqIxkz/ZGMwdDW0SguEYQIMhkpZjs7D+VfnbVVZ1r91v4hw/AR/tCxECQAEAQJIAMM7cKGkmRLPmEph0wzSUDESmQOYgCFAGCBjxlQlzBzGgxzF8EruNbbv/fFz58XzXlcqS15saKsVAc4kVfOUDOb7vo5KG+1K+8cqY1qOzqLhAXZLEUGGS52nLcAcvmEWKZZuV0GT+RJJaBSxLHm4cwSOaK/+D2d04mAPaPn3j8yH85zr2bhMizaFh9CIUD6VFcdTKFqKqxYgqF8J+qqDjJMGMyaOf+njrj/iO/+vfWefMER5kBhEqtRHvvM08s6Lz4eyP92Wv8Sqa1MWpTLIi6JUQuy2GMBwGCKHwK1DXPQWlMBlaqOpJtHz7lgnsPfFpOnTTJGV8qb27bfffsCLCwJigGz0SAAIHE2PTx7+7OYwJo9JldajEwEcowacexpx+1ePELD99620h7eztZloVSpYADD1oo53Vc8L3hrU3X1MrJVoTaiOuISCegseVvg0VQtHkEr/H3on/tqp/MF367snzPA0P9g5AdnZ3Wu6+/rg6cN++TZEd75yiwe42ECO0mviuN2e7Y8rhhi7FGqIFHaPymJoGKMROyqXRt4dDI66u2bTOecrHo4MPltNzpJ4/0N//KLSVb2cgxZhRV9/GyKNJs6LLRew2+TpFSiEFMEFZNZcYVl5bsd3619C/XV/LNHSQ7OjpkurkZbz/1ZPXAubu93dzZ6XgCu5eJHNNoZoQxcGdsWTzW5Ilief+74IjgEpEmMWvKXnt//Pff/27t8NAIH3/4/35hpD93uzuabg+Ksl21zLGGx24yqkGC9CsaLCCyFiEAmSgPpVpHfutmPvj1LX/8WXF8+1QBADKXy9nGGGpqaxOv/vXx8n7ju96YNKlnc1LIbp9NmwIkE8HEoZcgmCCZ4TDDZgNiwFC9fI4X2ZB34yAWbqrKlLGknPD1A/Z96bWnni4evP/Ryi/lDvSq1lRuCESB+XPdjIkhHcWW7ddIKpdIS2YpGjeM0DqYGEWuYSdvHcq27zx3/eidf3jgsbtqnW09cdlNM2fOTBARCSGYmVEpldABpiP/53+6B8d3HDCcTB5akXKPCnG7BhIC8JOM4RTzpjTRRvJVSUnZOQReMMA0qyDICgw1ThF1lI0GIAcgb4zZm/mXuGbJr+55+UXvsh88cWixv+Mhv9LUHoSiKBYxpDCwU+VtqSbvn4mMehWyulEr5Vp2ZupH6ws/r1USUzN2BhZZYGJUjYthv4CB2iC03Lm+p2PL4rce+93G7mmzSErJEUttMTOlUikKGRrTlMuhpDVu+vGFG7Ol0qb/OuGbf519xGGtJtfcaoRIkTa+XakMqdVrhrY+9XStf/067j7oQKv3W98cP9jRfuwayzprPfFMV9QjQkTbCFCdciBGgYRYy+YHX7zo/Hfx8ovPrS/d+lpP88W3ac+5nFVKBAUvQdg1P5UvPZZuHb5+u/nbZ7c+uNQ1Q8Hlf3//Y59tXL/u7M2jeqogCyJg9KBhYGDAxMjYiqVwkE5JGGOglBIRK2UBQKVSYSLiZDIZExXClrwN4NsefbiKRx/eAmBzY9BNZVKip6dHygnjzcoVK7ytZ561Yd9s9pb977rjjVSu+cbPGQvdkJVqdIdACGExQ4w+oH2lbV348ztu+/iXZ5098LPzjr0r5S3YtzpiHU4sIZ2K2zK+fJOfefe6K2+4pDBpcreY2T5Lik6Bvk1r2ChIkoKMUABUgDt2iTtBJUhMALTW1MBIw2rk5RF8AJlMms767o2zjZfOacU60B+zEETMBp7yWdquHip9tO6dfz1bthNJTJ42jTZ4Hr34tePfv+KpJ39eSiWXrgZP5l2Yyjg1hm7gS4ENRAd3TZ167jknfvvqX99yTv8VP3zqF74nd9OuMz7bVr4F+Td/c+9Dv67MmTPXUso3SqmQP7RJ+S4zcxiiKA60AeQlkBCwE0lykknhe5oAkG3bUb3BQgjBUX2utYavfMzdvVsM9mUu6V+ff2bHxvand25sf2bnpvZntm9of2bHxo6nh/smPlvc3nX/9O6D2tduWsdRTW9bFnp7e+nd0858fYbW17cYdpljOjIgJFiD2ICYQSaQSkFArhJ0Svrkk/YDgLc2XvpuU9vILU3tgw97qY+XLLn90lJL0wRmNqahv0BOIolyaUT5vqvjOoEIIAnLTiGVyaM514WWXBcSiQyFwmEhBMKqk6xMJsPGGPi+T8wMozUxQSiVzCo33QQWMVMGIAY8joOqY7E0ftzdIWaGlJI+qJR5n08/f2jmgvkHlrX6Rk0IiF0AYoQlyABGEPoI7a3JxM8u/8Odq39x+pl9C855765sviX5l79eW+ju7BVEZCIiNaTRSSsFBoSTSFEi6UBYNizpQFoOhJUAhB3kD1EmAiidSUApRUopTiaTZFkWWb7vx+UpAGijIKVFRKKeZYkbUB3FktbGUFMWwmjDhk2cp9t7urHkootGL3zkketHWpr2XmN4mhGivntCA2QmCAaUENhgeNG4KZPP+M5hh13zyFN3VCqVarmtrQ3MAWVmjIl6imBmltKGcBKUa22hCpKIlDUWr3DI3guWQsY9CETWUCqVRLVaJdd1qVarERMTkwzxUz111eEkB9pkBhtG1QNH9HbU5ACA6XPnivcuvuTjXsO/bROi0ogB6mQ+4iKKmFEgiNWg0yf86NxFg5u2mHy+FbbtcESQRFZap9YSxIAgYYkg9Yr65uNqsbGXFXSZHcdhpRS7rsvCsqwo8pPWmmAA7XmBcVI9Z5v4KeJUJqSAqoFJBA2NiNyImh/LvYpJv/nuH2dBPJ5hDirmEFBFxUod5wVgqo/QsTaZuOCie5Z2bly92kSd5pA1Jq01lFLwfZ+M0aiUi1DGcMT5xT0IIoAiakaE6FxQ1H0KqTkW6XQ6IiNZCMFsmN1aBcRxf+XfkkrcEGNNMoWYxm7MKMwMJ5kxv7nqv0vTRgrXTyZaLrm+yNg8Y/0wYBgeAeuID93R0332iYuPsGvVKoiIQ0VFATdooJLHyXQWQkoCUYBERfCMaoUIvTIzVSsV9n2flFIUXUf4vs+NAwlRXR6JKjapBuY0Kj8ZYEF1aUbtLqUUmBnFYpG7J06kB48//pNpSl3XwVymKCeIkCeIGJ6GbDEspFhBfFrXj87+0vYNG7RSCmG2qocRIniei1Q6CyFk3JMYG2iiEipYv1KMAP/Wu89jv4OAmnKcZOQ08YWJgnIj6J9oKO1BGQ+ZdEBIhqY65tnc3EzpTIZKra0k/v7M470kHsmYoO/AYQ1BsXDDmBC+t5WoY10qcdlF9yyduGrVKhZEcByHw+mQwMqMYdu2QRSE6QgDxNxFXNKDSQhDQMxBAmApJYQxBp7nRWYBgCnImSxjOE8Aw8DXLoqVYQyO9mOkNABtavBcxF2dEGbGYy/JZDLIH7Zlbrr55lLP4OCSKYRPrLCyixp7wX85TrIEwCfCWuL9t3aPP+PEQ7/suCGZGlHetm2zMSbIWA21lkFD7RGLJSxSBdDQfA3cPgowYQ6HlBYr7TMAw2Sg2UPFG8VwcQCDhW0olAZR88pQ2oeQxJViYFWRAOJmBxjGaJo4sUuccvJF7Yd9ZbF86Jsnrp6pzXXjGcUgijZqa+wMAgEokRDrLHl6z4/PO3jtmjXG8zyK4oEQAirgEzmkoyLf+PcLEZMQgYxDF49jiWiUSKhBMkaxpz1TdkcxVBjASGEHKrVRKO2CocAwYDaIOk2hRsYEQmlLMeKvNLtN/uEXBzf13jN/+hnz1gOGnv7HE70sHmr6D7xSQ/YKkSOhn0Xn+kz6kisfuH/81hUrgrQuwl4iM0uSICkD1krgPwRtBkJ4oHTs5vFojmhsSEaabErnabQ8JAulnXD9atxTQ9x/D/N4mMZs2+Zw+goAyPOrvLO4TH/vyEf3LA223VDY3rZ4ZHvm0p9ecHPL9TfeUOnZsePm6aAP7DDwCXAQE4kblBbc0iPGBuIvbZnY9ZMLr78+t3zFcmVUSKQagIRA3YGiH9NAoAdWQYIYZmxbTmsdCKBhQiMAHX6FlVLG6GAQQQlA2QIqIaEcASUBHTieAcDlUgHF4gj1D27E2o1r9ddPON76zuLHjujf2HRXZTS1FysbpZHkMaMDPacc84054qZvn7R6uuv+ZjxhhOqBKmBxItorpNgJjCJBLCecuWXPeTdd9bf/m3dgzxSxbNkyU9UwthTaVz40KWjLh3I8aMeHlgoGOhAwE6QISGyllLAsi+JmbJxTwzSjlc/SFI0v2JiWJKz2ZojWDGQ6AbYIMAxddWGhlClOdA6+5Lp7qtnRTQVwQnjVzqxfzs8tbk1+q1hIHOdVEq0wAgwD7Ses0aGmC2b0XP3+kzjhldpf//bslG987b4h5h9VbEGCGhll3YBAArQwRMb5iOnbAy1NC7uuvPipiy49/0NLm8oyC1PNfGuCxQSZkYAEoAFT1dCDDLNVQ1d8Er4SFoEsy4p6nUxETNOnT09Gmy8WRrDPXnPljCMvPGTtlubrq5TvRdqBFtEoCsc8oCSDhKWqaV1b52wrDjj9vkBVjvM9e7Ly7KaI1GQ2iEYBiBjplsKr43r6Tv7traf3XXrHnVPfyrfct1Ja+6eyKdi2CIUQBpcGmotisAskwEgztEWkXYZdYUNa1FtfUQlOhiAqAplhtzw/i186b75+1yO331HOdHRwxIDJ9vZ2aVkWhnYM8HEnfy+T2/vUs7ZW239TlC2TtS2hG7uxDRjeMMHX0q4ap8OV2am1ojNFD8oOeHaC4wbJrsN1gPLEZLAQCw8a98Z9V12x80tfP2HnlrL75a2lWpqNgRWiysgt6lR4FOgZCkAFEGWCrBFIg4OZoeg+0RqJwQkD3SKdkiMOyEydPHG/vfb+8OUHHiy0jR8PACTb29vt4sgQH37MUank7t+9uK+cv6zgJVpgBExj3yMaAWmM1WH7SzsAWhMQJCAKPoRB3BiIhpVE+H1mQNrVYn6c+9Rbn71Y21OZ9U0L9shtq7r776x5VKm4UL6BIAlLCkgCCKah4RpUoo0N2NjCGnNAXPEFFlETsEpSLrDb2rq/fMBBbz679O5ivr2dZM+kbqc949OUI6787uZSyxVFP5FhDkveqLSkujY5pHKoThAEqUUCnLNAvoEo6rGLifrGpJFsGn0/1zH848f/+fONuWyPfOH1N9Rxhx66pppMzuvXPNUzQLWqUC7V4NY8GAakFJChVdTZ4X9PnY1vRKiw3kQEPCIqEs3JtuaSX2xpe23ZRx8ruX1bP51w2V37bK113TBSS3ZEffgxXS9qRNqNbZF6O4oiIWRtiIKCXY1GGCPD1Mi0VD5unzR6zoPPf+fDjJxEANDR1UVP3nvvyBHHn7C1QNZhI5qz0f09X6Nc8VCquPC8IIlbQkKSgATqVjVGHmH6i2adGjCmIcAVTJ6gOROnz1j15u9u+1yeccqxiWrn4p8MlLNfNixiApPjizEc4XHGcQtJUdvuCE8DlDQclFuNXDzAYBuQQkIMepAmEoFGurn8ac8095w///P4D7KilyzLgmVZbEmJbDZLUwtDfU27z08MKHNgjYOuVtTaMoZRq/kolTyUKgqeH0x7RACIGEgaIM/ktTANZyA0AQmvISDGxkoCHshJW1bL4gV7PS8XnfqLuX3l/GVlP5mPVB99SZBBs1MemJgdvX18cuAXWW/DbeNS7pNNKdrCjMmusVqCj4oxEJRsCTnowa4BTAZOavTzlvE7z3349W++neLZEQUPZibHcZBKp/HPl17Shx98wEo3l9tjQKlpmqL2WtgYCcfbtDaouB6K5RqKVQ+uZ9AKWdlNikdmKn3thJHird0kn2hzEls9pScVDecggqtEtFwQo824znzLJ1aJWw8ve/akqIERTX4SDHKJysDk3PD5Gx+74omlL/xLWQAUsHbRvAnv7HHarS8D7XcMe7neuK4PGQ/tMEzegSlU4CSLKzKtO3703Afff8fxZwhYiJFnOP4OAJg4axbddcEF20+874Fr+yXNWad5YkSdjdUhgZjABnBrCs3KeLOEvGn8628s+c2vfzMaffLIqTNenX/TdS9Vfe/3m6ScnskmYYlgloEJGAGahhznKFHxrC/6SlrGMIwJJyiMgU0+xqVKD/Q/femTH64c4JkzZ4pZu+1Gc+bMEZtKCfz9gv96ozNRvtGB78MArAOKjHVgQbpJAJnR1dm2gXOf+fz7r1lqdkTGxDWHUgqe51F00KJ50iTU7rj1tXkJ685WJh1xEPWx17EUe4IJc5Kp52duWnfT0uuvL+22225yVm+v7O3tFcuMZz479msvTfexRBeqXv9gCa5vwhRp4LJBCdhTVFxM1ApgbWC0ASsDrRmO8AazNPK3R//+kZK23RhjOZlKYTWAZjn6YtpSmzmc20U4xWUMQ+ZVIT+jetnz73z/VVmeLDzP33VIMp4ZDAkPpDMZ3PPmW2rG4M67ZyesFx0wmMQYNFGfCWZkBdQEMo/dcOHFg+3TZ0AIwdKymIiQTKb4HwAmuO4LbcLaOFpysW1wFFVXw+gAN3iSOkStphJKGyhloJWB8g20pyBZlRwzusMJGwnROHs0zGgDmNLdXkwl7NH6cFFDBknrnSq/5eOdW0BCSAo3T2FnpvGgBDNzTFPNnTtX/P788wbmSr52shRbKRyIbcy5FMIim6jq1CqbRuvXjjgD0lpTRgi0em4xLeWwYEKlqrBjuAxPBfm9ZrQUklgrpaGUhvIVlO9D+wq1qk5UfSutwjm+aIQtbCiwBWBzX3/S9f1kNB/Eob8yG0gLOtOU1cbUx+wi/D3GnMJaJLQEMsZQx7Rp5N639M35CevWNhJ+MGYzZpgRIIYi2OzYrc2AiHiI6F62bbNvDEqA42mTCicSUan4GBmtQmnAArGwSG1m7UMrFQhBayhtUKyifdhrPmh2Gqy15gY+HlprqgE8opr3Lddo8q6zIAQgIdWg7Q+VUrkmiiiomCsIByJ3gS+RJSCRTNITb76tJ2/bdM+cpPNCspHbiysSQklzcqeVOOK8885NjAwOxqdQovNALQD3N+f22+l502J0boDiqItaVSHFGBRJR39A8LXWGiY48ASjFSoeyb5h56wDL7tnT3f1ar16+TIeHR6kgb7N2Pjxx3zhdffOGnJz57vGSTUiMIAghEHSUsu2vPVIKZNrjapNklJGwoiPxjRYAQkhEHB8hK5p08RtP/nZjvlQS6Yn7K2gmIENbsWMKjM+K1eP23HAwV87Zs/5cuXKlWZH3xbesnYtr169Wv/goT/OWu7pi3YqzpAJh7iYYbRBbbSChG8+o7N//acDPhto+8twJTWR2IA5zLzEEGTQma192J2rXJuX298ubV9VSuV7Mm56xv6DXuuPhrymfRVb8YhSMJ/DSDm12rTstjPuPf/oh8fPmCEQUO7RvLHRWpPWmqKx2dA9xhyu0FqjVCxi0YJ5jvrOKRc+XyhdvtOwPWbWkQAJxrSEPbBXKnnrJLfyJLZu3SY7xqW2JpLzV2pxwfKav2i0PsUHgCGI0ZWw3KOzqZ9Zdt9Ln+YyRz8/UrG/zywANtHnYEhioJjes1izlqYT2fXSmTpoitRSHbJn1JjSyTTDthuPuQVsTLPtvpOtbX4xm89Sw4GpmM0NN8uhO8QnxqJgGGGDTDaLx5973jtj3wPumDW+Z59i1T/GpaBkDugDAUOM9a7pHPTLV3ZIOtPpnLDVCJEdrupJg0pnvIjcjzpRRJDE6Jbi4+bNm58jCVinXv3Q/st3tD00XEl0BxeuV1YBIxyNqdTHookYlmUh05SG7YRNSGKkZbUyuWnH2X++8Kt/7Jo9W2ql4inzKBA2ZIQ4szROikejsiHNxquWLeMz777/oJcM3bdWme56m53iOiQo3kwMyznGkMHDRM0iZoy3hXdIU/KijWeeebec2dubSI68uTU/ZV+/6MmDfWPb9alh1Gd+YkEgFoYxwWIt24aUhIR0uSszcq9Z8/gdW7Zs9C07Mca8GzOAMYYCWlvG2KDhJAkarIVy+RZqW7eiv2Pf/TI7tD6ohHrrNg49jRNb/2FIIpomayZgr5Tz58krlt/07uef12RbW5vV1zdsZky0VmTbZ9pll/dR2rbqmxd1hoWi42mRWTG0BowCskljOlJDjzaV3v/vJ5beNJjvmBBrNNJywxAGNZ4QbXxtFEDUvZFS4tNPP9dfOfjA1bK5uXvI8+dWEcTQiFaPBrNC36iXzSKyEkaWGLsnnWfnDQ9e/uf/uWJbU2eXkPl8XqazzVj58Xtqn9173pOZ1oqnzHzPyDRDhBVElN7qMo/iBJFBRlZKXenC0pbaR1c9fdfV/ZlgCqs+qREek4vMPIr4DQcoG3MhGtJlLJRUSws98cADo18//CvvJrOZVFXruRXDthFjD0VFkyIIZ5SDQGnQIeDvlU0+Oa9U+MnTl/98gxjXDq01y9bWVssYQ8lMs/jkvTe86U073+mcPONDZpNj5gnKkFM3tHqet0gj7bhuR7b67qSW0SudzY/f+fJj948kc12IToA0HJSkqGsc/R5tNsrduwiAGg5YxxpobWujFx58oHDo9KlvTOyeuNaRYoIGdyo2Ip4LoLqKbGa0SeLelLVq71Ty2pkb1y958ppfbqO2NlAAlohmzJiRiKozrTW0UuwOrOcjTv1xXrV94YvDtaZFVd/axzWiXWu2bFtoW+ihrK0/z6Xdfzbpja8/d+ul/WWrTaQzmVirkQCi0yDRYYaweRoHwOgRDWmEKRIA4nZ7w2ATpJQoFYs8WRAWXX5Fz47W9kP7ff2lHa6aM2pMXrF2pJAmJeVIXmBdT9p5bbJWz71x+WVrlhfLlM3lwhBkYFmWoFmzZsmGQMWWFZyuKg0N0rrNfeaFZ+8WH/alm4YqdvNosWi15FtUzimXW3e+NNr/06Xqlo5x1NycIxJj01lk/rZtcyKRiLUd9Q+11rSLAOL8H50oj5otnudR4+eECFJhqVrlDevX4/HbfpfYNK6rtWA5zb4UCVtKk1V+Ib9pw9CcpXdWDlqxlqd0TxQcuBUnk0moIDvR/wP74AZX7bX5XAAAAABJRU5ErkJggg==">
 <style>
 /* Nondominium, main theme for every HTML artefact rendered into this repo (brainstorm boards, PutItDown and RenderMarkdown pages). Soushi, 2026-10-09: "make Nondominium theme for the HTML artefacts of nondominium".
    Source: ../nondominium-design-system/static/tokens.css § BRAND, sampled from nondominium_logo.png: teal #14b8b8 (the mark's dominant hue), violet #7048d8, blue #2f6bcc, wordmark navy #0b1a38. Lifecycle hues (amber, rose, green) from the same file.
@@ -444,7 +444,7 @@ body.picking .dv-stage{cursor:crosshair}
 <section id="trace" hidden><h2>Traceability</h2><p class="lede">Source to requirement to check to code. <b>24</b> of 25 rows have no check that proves them yet; they are flagged.</p><table class="trace"><thead><tr><th>Source</th><th>Requirement</th><th>Check</th><th>Code</th></tr></thead><tbody><tr class="ksplit"><th colspan="4">Functional</th></tr><tr data-id="REQ-REL-01" class="uncovered"><td class="src">Decision of 2026-11-03 (release board question 7: Moss only, standalone builds but is not released)</td><td><a href="#" data-open="REQ-REL-01"><span class="rid">REQ-REL-01</span></a> v0.1.0 ships for Moss only. The standalone build is kept building and passing CI, but is not released.</td><td><span class="unc">no check yet</span></td><td><span class="dim">none named</span></td></tr><tr data-id="REQ-REL-02" class="uncovered"><td class="src">Decision of 2026-11-03 (release board question 8, option 1); ADR-010 and ADR-011</td><td><a href="#" data-open="REQ-REL-02"><span class="rid">REQ-REL-02</span></a> v0.1.0 in Moss ships one Nondominium group per Moss group (the tool instance's group cell, joined automatically, no invite code) and NDOs as cloned cells anchored in that group.</td><td><span class="unc">no check yet</span></td><td><span class="dim">none named</span></td></tr><tr data-id="REQ-REL-03" class="uncovered"><td class="src">27 Oct brainstorm, decision 'La v0.1.0 vise une integration Moss de base, sans contexte de travail'; 2026-11-03</td><td><a href="#" data-open="REQ-REL-03"><span class="rid">REQ-REL-03</span></a> v0.1.0 ships no work context: no work-context entry type exposed to users, no coordinator function and no interface for it.</td><td><span class="unc">no check yet</span></td><td><span class="dim">none named</span></td></tr><tr data-id="REQ-REL-05" class="uncovered"><td class="src">Decision of 2026-11-03; issue #167</td><td><a href="#" data-open="REQ-REL-05"><span class="rid">REQ-REL-05</span></a> v0.2 adds work contexts in the group DHT (REQ-WC-01 to REQ-WC-07), their many-to-many relation with groups (REQ-WC-03), and the cross-group view that serves the federation layer (REQ-FED-02).</td><td><span class="unc">no check yet</span></td><td><span class="dim">none named</span></td></tr><tr data-id="REQ-GROUP-19" class="uncovered"><td class="src">Decision of 2026-11-03 (the Group DNA stays in both modes)</td><td><a href="#" data-open="REQ-GROUP-19"><span class="rid">REQ-GROUP-19</span></a> The Group DNA is the group architecture in both deployment modes: a Moss build and a standalone build contain the same group role, and a group cell answers the same zome calls in both.</td><td><span class="unc">no check yet</span></td><td><span class="dim">none named</span></td></tr><tr data-id="REQ-GROUP-20" class=""><td class="src">Existing REQ-GROUP-01, REQ-GROUP-05, REQ-LOBBY-10; PR #107 and PR #111</td><td><a href="#" data-open="REQ-GROUP-20"><span class="rid">REQ-GROUP-20</span></a> In standalone mode a group is a cloned Group DNA cell that an agent creates, registers in the Lobby and opens to others by invite code.</td><td><ul><li>group_sweettest, group test binary (dnas/group/tests/src)</li></ul></td><td><span class="dim">none named</span></td></tr><tr data-id="REQ-GROUP-21" class="uncovered"><td class="src">Decision of 2026-11-03 (release board question 8, option 1)</td><td><a href="#" data-open="REQ-GROUP-21"><span class="rid">REQ-GROUP-21</span></a> In Moss there is exactly one Nondominium group per Moss group: the group cell of the Nondominium tool instance installed in that Moss group. The Moss group is the federation layer above it.</td><td><span class="unc">no check yet</span></td><td><span class="dim">none named</span></td></tr><tr data-id="REQ-GROUP-22" class="uncovered"><td class="src">Decision of 2026-11-03 (joined automatically, no invite code)</td><td><a href="#" data-open="REQ-GROUP-22"><span class="rid">REQ-GROUP-22</span></a> In Moss an agent joins the Nondominium group automatically when the agent joins the tool instance. No invite code is requested and no Lobby group announcement is needed to reach the group.</td><td><span class="unc">no check yet</span></td><td><span class="dim">none named</span></td></tr><tr data-id="REQ-GROUP-23" class="uncovered"><td class="src">lobby-architecture.md section 9 (Moss vs standalone feature map); release board issue M2</td><td><a href="#" data-open="REQ-GROUP-23"><span class="rid">REQ-GROUP-23</span></a> In Moss, membership and the agent profile come from Moss, and Nondominium does not keep a second copy of either. Standalone keeps the Lobby agent profile and the invite flow unchanged.</td><td><span class="unc">no check yet</span></td><td><span class="dim">none named</span></td></tr><tr data-id="REQ-WC-01" class="uncovered"><td class="src">Decision of 2026-11-03; reverses the 27 Oct lean toward a dedicated DNA</td><td><a href="#" data-open="REQ-WC-01"><span class="rid">REQ-WC-01</span></a> A work context is stored in the Group DHT, as entries of the group cell, in both deployment modes. It has no DNA of its own.</td><td><span class="unc">no check yet</span></td><td><span class="dim">none named</span></td></tr><tr data-id="REQ-WC-02" class="uncovered"><td class="src">27 Oct brainstorm, decision 'Les projets ne sont pas des NDO'; 2026-11-03</td><td><a href="#" data-open="REQ-WC-02"><span class="rid">REQ-WC-02</span></a> A work context is not an NDO: no Nondominium identity, no Layer 0 lifecycle, no PPRs. It is a space and an amalgam of agents, closer to an organizational agent than to a resource.</td><td><span class="unc">no check yet</span></td><td><span class="dim">none named</span></td></tr><tr data-id="REQ-WC-03" class="uncovered"><td class="src">27 Oct brainstorm, decision 'plusieurs a plusieurs'; 2026-11-03</td><td><a href="#" data-open="REQ-WC-03"><span class="rid">REQ-WC-03</span></a> Work contexts and groups are many-to-many: a group holds several work contexts, and one work context may be worked in by several groups. Reference case: Catmaster, worked in by Sensorica, Ludociel and Sainte-Justine.</td><td><span class="unc">no check yet</span></td><td><span class="dim">none named</span></td></tr><tr data-id="REQ-WC-04" class="uncovered"><td class="src">27 Oct brainstorm (interoperability through pointers between DHTs); ADR-011</td><td><a href="#" data-open="REQ-WC-04"><span class="rid">REQ-WC-04</span></a> A work context works with NDOs by reference, following the pointer pattern of ADR-011: it stores the NDO's clone coordinates (DnaHash, network seed, properties), never a copy of the NDO's data. One NDO may appear in several work contexts.</td><td><span class="unc">no check yet</span></td><td><span class="dim">none named</span></td></tr><tr data-id="REQ-WC-05" class="uncovered"><td class="src">27 Oct brainstorm (each level has its own plate-bande); REQ-GROUP-18</td><td><a href="#" data-open="REQ-WC-05"><span class="rid">REQ-WC-05</span></a> A work context governs its own scope only. Its governance cannot change an NDO's lifecycle or an NDO's governance rules.</td><td><span class="unc">no check yet</span></td><td><span class="dim">none named</span></td></tr><tr data-id="REQ-WC-06" class="uncovered"><td class="src">27 Oct brainstorm (the cloning illustration of fractal sovereignty)</td><td><a href="#" data-open="REQ-WC-06"><span class="rid">REQ-WC-06</span></a> A work context may clone an NDO to experiment. Disagreements about the clone stay in the clone, and the original NDO and its governance are untouched.</td><td><span class="unc">no check yet</span></td><td><span class="dim">none named</span></td></tr><tr data-id="REQ-SOV-01" class="uncovered"><td class="src">27 Oct brainstorm, decision 'Trois niveaux de souverainete'</td><td><a href="#" data-open="REQ-SOV-01"><span class="rid">REQ-SOV-01</span></a> Three sovereignty levels exist, NDO, work context and federation, each with its own governance scope, and no level's governance changes another level's.</td><td><span class="unc">no check yet</span></td><td><span class="dim">none named</span></td></tr><tr data-id="REQ-SOV-02" class="uncovered"><td class="src">27 Oct brainstorm (what each level governs)</td><td><a href="#" data-open="REQ-SOV-02"><span class="rid">REQ-SOV-02</span></a> The NDO governs what it becomes: its lifecycle from idea to design specification, prototype and new versions, including the choice between designs and forking.</td><td><span class="unc">no check yet</span></td><td><span class="dim">none named</span></td></tr><tr data-id="REQ-SOV-03" class="uncovered"><td class="src">27 Oct brainstorm (what each level governs)</td><td><a href="#" data-open="REQ-SOV-03"><span class="rid">REQ-SOV-03</span></a> A work context governs which NDOs it works with, the soft links it makes, the direction it develops in, what it submits to an NDO as a version or update, activity management, and the order of contributions before they reach the NDO.</td><td><span class="unc">no check yet</span></td><td><span class="dim">none named</span></td></tr><tr data-id="REQ-SOV-04" class="uncovered"><td class="src">27 Oct brainstorm (what each level governs)</td><td><a href="#" data-open="REQ-SOV-04"><span class="rid">REQ-SOV-04</span></a> The federation governs the list of work contexts, the overall strategy, the link to the macro level and common policies across work contexts.</td><td><span class="unc">no check yet</span></td><td><span class="dim">none named</span></td></tr><tr data-id="REQ-SOV-05" class="uncovered"><td class="src">27 Oct brainstorm (cloning as the illustration)</td><td><a href="#" data-open="REQ-SOV-05"><span class="rid">REQ-SOV-05</span></a> A work context may clone an NDO and disagree on the clone without touching the original NDO or its governance.</td><td><span class="unc">no check yet</span></td><td><span class="dim">none named</span></td></tr><tr data-id="REQ-FED-01" class="uncovered"><td class="src">27 Oct brainstorm, decision 'Dans Moss, les groupes Moss sont la couche federative'; REQ-GROUP-03</td><td><a href="#" data-open="REQ-FED-01"><span class="rid">REQ-FED-01</span></a> In Moss the Moss group is the federation layer. Nondominium adds no group-of-groups structure of its own, so groups stay flat. In standalone mode the Lobby remains the only shared layer above groups.</td><td><span class="unc">no check yet</span></td><td><span class="dim">none named</span></td></tr><tr data-id="REQ-FED-02" class="uncovered"><td class="src">27 Oct brainstorm (the source chain gives the agent's groups, groups give work contexts); release board issue M2 (cross-group view out of scope for v0.1.0)</td><td><a href="#" data-open="REQ-FED-02"><span class="rid">REQ-FED-02</span></a> In Moss an agent can view the work contexts of all the agent's groups from one place, across Moss groups.</td><td><span class="unc">no check yet</span></td><td><span class="dim">none named</span></td></tr><tr class="ksplit"><th colspan="4">Non-functional: Usability</th></tr><tr data-id="REQ-WC-07" class="uncovered"><td class="src">27 Oct brainstorm, decision 'Le contexte de travail est le nom technique interne, projet le nom affiche'; 2026-11-03</td><td><a href="#" data-open="REQ-WC-07"><span class="rid">REQ-WC-07</span></a> The interface displays a work context as a project by default, and the code and the design documents call it a work context.</td><td><span class="unc">no check yet</span></td><td><span class="dim">none named</span></td></tr><tr class="ksplit"><th colspan="4">Non-functional: Maintainability</th></tr><tr data-id="REQ-REL-04" class="uncovered"><td class="src">Release board epic E4 (the v0.1.0 wiring leaves the right seam)</td><td><a href="#" data-open="REQ-REL-04"><span class="rid">REQ-REL-04</span></a> The v0.1.0 wiring leaves the seam for v0.2: the Moss group cell is the same cell that will hold work contexts, so adding them does not change how a group is created or joined.</td><td><span class="unc">no check yet</span></td><td><span class="dim">none named</span></td></tr><tr class="ksplit"><th colspan="4">Non-functional: Compatibility</th></tr><tr data-id="REQ-XCUT-05" class="uncovered"><td class="src">27 Oct brainstorm, corrections section (measured the same evening on the Moss releases)</td><td><a href="#" data-open="REQ-XCUT-05"><span class="rid">REQ-XCUT-05</span></a> An agent in a standalone Nondominium and an agent in Moss reach the same NDO when both derive the same clone cell from the same coordinates (DnaHash, network seed, properties) and run the same Holochain network protocol.</td><td><span class="unc">no check yet</span></td><td><span class="dim">none named</span></td></tr></tbody></table></section>
 <h2 id="anything-else">Anything else</h2>
 <textarea id="comment" data-md rows="3" placeholder="General comments on these requirements…"></textarea>
-<p class="src">Source: <code>2026-11-03-group-model-requirements.md</code> · theme: theme.css</p>
+<p class="src">Source: <code>2026-11-03-group-model-requirements.md</code> · theme: nondominium.css</p>
 </main>
 <aside class="panel" id="panel" hidden aria-live="polite"></aside>
 </div>
@@ -453,6 +453,131 @@ body.picking .dv-stage{cursor:crosshair}
 <div class="pinpop" id="pinpop" role="dialog" aria-label="comment on this part of the board"><p class="pp-where"></p><textarea data-md placeholder="your comment on this part… (Ctrl+Enter saves)"></textarea><div class="pp-btns"><button class="btn" data-act="save">save</button><button class="btn" data-act="del">delete</button><button class="btn" data-act="close">close</button></div></div>
 <div class="toast" id="toast"></div>
 <div class="errs" id="errs" role="alert" style="display:none"><button type="button" class="errs-x" id="errsX" aria-label="dismiss board errors">×</button><span id="errsMsg"></span></div>
+<script>
+// One placement for every popup a niceboard opens (shared/place.js), inlined through ERRS_HTML (render/ErrorBanner.ts)
+// ahead of the template's own scripts, as window.NB.place. A comment box, a context menu, the list of new marks, a
+// symbol popup and a hover card all land through it, so none keeps its own clamp and none can run off the screen.
+//
+// The rule, in one place: the whole box is inside the viewport, EDGE (8px) from every side.
+//   horizontal   starts at the anchor's left; when it does not fit it flips to end at the anchor's right; then it is
+//                clamped. Wider than the viewport: it starts at EDGE and takes the viewport's width as max-width.
+//   vertical     below the anchor; when it does not fit it flips above; when it fits neither side it is clamped inside the
+//                viewport. Taller than the viewport: it takes the viewport's height as max-height and scrolls inside.
+//
+//   NB.place.compute(anchor, size, vp, opts)   the pure geometry: { left, top, maxHeight, maxWidth } (maxHeight and
+//                                              maxWidth are null when the box fits as it is)
+//   NB.place.apply(el, anchor, opts)           measures el, places it (position:fixed is the caller's CSS), returns the result
+//   NB.place.clamp(el, x, y)                   keeps a box dragged to (x, y) inside, and gives it its max-height
+//   NB.place.track(el, anchorFn, opts)         re-places el on a window resize and on any scroll, until the returned stop()
+//
+// anchor: { left, top, right, bottom } (a rect), or { x, y } (a pointer or a caret: a zero-size rect).
+// opts:   gap (px between anchor and box, default 8), edge (default 8), align "start" | "end", prefer "below" | "above",
+//         width (px, when the caller fixed it).
+;(function (root) {
+  "use strict"
+  var NB = root.NB = root.NB || {}
+  if (NB.place && NB.place.installed) return
+
+  var EDGE = 8, GAP = 8
+
+  function rectOf(a) {
+    if (a && a.x != null && a.left == null) return { left: a.x, top: a.y, right: a.x, bottom: a.y }
+    a = a || {}
+    var l = a.left || 0, t = a.top || 0
+    return { left: l, top: t, right: a.right == null ? l : a.right, bottom: a.bottom == null ? t : a.bottom }
+  }
+
+  function compute(anchor, size, vp, opts) {
+    opts = opts || {}
+    var edge = opts.edge == null ? EDGE : opts.edge, gap = opts.gap == null ? GAP : opts.gap
+    var a = rectOf(anchor), w = size.w || 0, h = size.h || 0
+    var availW = Math.max(0, vp.w - 2 * edge), availH = Math.max(0, vp.h - 2 * edge)
+    var maxWidth = null, maxHeight = null
+    if (w > availW) { w = availW; maxWidth = availW }
+    if (h > availH) { h = availH; maxHeight = availH }
+
+    var left = opts.align === "end" ? a.right - w : a.left
+    if (left + w > vp.w - edge) left = a.right - w // no room to the right: flip, ending at the anchor's right edge
+    left = Math.max(edge, Math.min(left, vp.w - edge - w))
+
+    var below = a.bottom + gap, above = a.top - gap - h, top
+    var fitsBelow = below + h <= vp.h - edge, fitsAbove = above >= edge
+    if (opts.prefer === "above") top = fitsAbove ? above : fitsBelow ? below : above
+    else top = fitsBelow ? below : fitsAbove ? above : below
+    top = Math.max(edge, Math.min(top, vp.h - edge - h))
+    return { left: left, top: top, maxHeight: maxHeight, maxWidth: maxWidth }
+  }
+
+  function viewport() { return { w: root.innerWidth || 1024, h: root.innerHeight || 768 } }
+
+  // the box at its natural size: a limit from an earlier placement must not be measured as the size
+  function natural(el) {
+    // from the corner: a fixed box that starts near the right edge shrink-wraps to what is left of the viewport and measures taller
+    el.style.maxHeight = ""; el.style.maxWidth = ""; el.style.left = "0px"; el.style.top = "0px"
+    var r = el.getBoundingClientRect ? el.getBoundingClientRect() : { width: 0, height: 0 }
+    return { w: el.offsetWidth || r.width || 0, h: el.offsetHeight || r.height || 0 }
+  }
+
+  function write(el, p) {
+    el.style.left = p.left + "px"; el.style.top = p.top + "px"
+    el.style.maxHeight = p.maxHeight == null ? "" : p.maxHeight + "px"
+    el.style.maxWidth = p.maxWidth == null ? "" : p.maxWidth + "px"
+    // a box taller than the viewport scrolls inside itself; one that fits keeps whatever overflow its own CSS gave it
+    if (p.maxHeight != null) { el.style.overflowY = "auto"; el.style.overscrollBehavior = "contain" }
+    else if (el.style.overflowY === "auto" && el.__nbPlaceOverflow) { el.style.overflowY = "" }
+    el.__nbPlaceOverflow = p.maxHeight != null
+  }
+
+  function apply(el, anchor, opts) {
+    if (!el) return null
+    var s = natural(el)
+    if (opts && opts.width) s.w = opts.width // a width the caller set itself is the width, whatever the page can measure
+    var p = compute(anchor, s, viewport(), opts)
+    write(el, p)
+    settle(el)
+    return p
+  }
+
+  // The box is measured at the corner and used at its place, and a box can lay out differently there (the text wraps
+  // where the room is narrower). So once it stands, what it really occupies is read back and pulled inside.
+  function settle(el) {
+    var vp = viewport(), l = parseFloat(el.style.left) || 0, t = parseFloat(el.style.top) || 0
+    var w = el.offsetWidth || 0, h = el.offsetHeight || 0
+    var nl = Math.max(EDGE, Math.min(l, vp.w - EDGE - w)), nt = Math.max(EDGE, Math.min(t, vp.h - EDGE - h))
+    if (nl !== l) el.style.left = nl + "px"
+    if (nt !== t) el.style.top = nt + "px"
+  }
+
+  // a box dragged to (x, y) stays whole inside the viewport, and taller than it, it scrolls
+  function clamp(el, x, y) {
+    var vp = viewport(), s = natural(el)
+    var p = compute({ x: x, y: y }, s, vp, { gap: 0, prefer: "below" })
+    // compute flips; a drag wants the box where the pointer put it, only pulled back inside
+    var h = p.maxHeight == null ? s.h : p.maxHeight, w = p.maxWidth == null ? s.w : p.maxWidth
+    p.left = Math.max(EDGE, Math.min(x, vp.w - EDGE - w))
+    p.top = Math.max(EDGE, Math.min(y, vp.h - EDGE - h))
+    write(el, p)
+    settle(el)
+    p.left = parseFloat(el.style.left); p.top = parseFloat(el.style.top)
+    return { x: p.left, y: p.top }
+  }
+
+  function track(el, anchorFn, opts) {
+    function stop() { root.removeEventListener("resize", again); root.removeEventListener("scroll", again, true) }
+    function again(e) {
+      if (!el || el.isConnected === false) return stop() // a popup built per open is gone: its listeners go with it
+      if (e && e.type === "scroll" && e.target && e.target.nodeType === 1 && el.contains(e.target)) return // its own scroll
+      if (el.hidden || !(el.offsetWidth || el.offsetHeight || el.getClientRects().length)) return
+      apply(el, anchorFn(), opts)
+    }
+    root.addEventListener("resize", again)
+    root.addEventListener("scroll", again, true)
+    return stop
+  }
+
+  NB.place = { installed: true, compute: compute, apply: apply, clamp: clamp, track: track, EDGE: EDGE }
+})(typeof window !== "undefined" ? window : this);
+</script>
 <style id="nbcm-css">
 /* The context menu every niceboard carries (shared/contextmenu.js): drawn in the board's own tokens, so it follows
    the project theme in light and dark. Above every page layer (the Live drawer is 410, its skills list 420). */
@@ -622,17 +747,12 @@ body.picking .dv-stage{cursor:crosshair}
   }
   // at the pointer, or at the focused element for a keyboard open; turned back inside the viewport, never off it
   function place(x, y, target) {
-    var W = root.innerWidth || 1024, H = root.innerHeight || 768
     if (x == null || y == null) {
       var r = target.getBoundingClientRect ? target.getBoundingClientRect() : { left: 8, top: 8, height: 0 }
       x = r.left + 8; y = r.top + Math.min(r.height || 0, 24)
     }
-    box.style.left = "0px"; box.style.top = "0px"
-    var w = box.offsetWidth || 0, h = box.offsetHeight || 0
-    if (x + w > W - 8) x = Math.max(8, x - w)
-    if (y + h > H - 8) y = Math.max(8, y - h)
-    box.style.left = Math.max(8, Math.min(x, W - w - 8)) + "px"
-    box.style.top = Math.max(8, Math.min(y, H - h - 8)) + "px"
+    // one placement for every popup (shared/place.js): flipped when there is no room, clamped, scrolling when too tall
+    NB.place.apply(box, { x: x, y: y }, { gap: 0 })
   }
   function isOpen() { return !!box && !box.hidden }
   // `restore`: give focus back to where it was (Escape, an item run); a click elsewhere keeps its own focus
@@ -690,6 +810,17 @@ body.picking .dv-stage{cursor:crosshair}
     var what = ctx.ref ? "`" + ctx.ref + "`" : ctx.selection ? "this passage" : "this part of the board"
     return "About " + what + " (" + link(ctx) + "):\n" + quote(words(ctx.text, 400)) + "\n\n"
   }
+  // the reference Ask SoushAI puts in the drawer: a code line by its path:line, any other part as a drag would give it,
+  // and a part with no reference of its own (a paragraph, a list item) as the section it sits in, at its own anchor
+  function askRef(ctx) {
+    var CR = (root.NB || {}).chatref
+    if (!CR) return null
+    var board = root.location.pathname
+    if (ctx.ref) return { kind: "prline", label: CR.cut(ctx.ref), board: board, anchor: ctx.ref }
+    var r = CR.refOf(ctx.el, board)
+    if (r && ctx.anchor && r.anchor !== ctx.anchor.slice(1) && r.kind === "section") r = { kind: "section", label: ctx.label || r.label, board: board, anchor: ctx.anchor.slice(1) }
+    return r || { kind: "section", label: ctx.label || "this part of the board", board: board, anchor: (ctx.anchor || "").slice(1) }
+  }
   register({ id: "comment", section: "here", when: function (c) { return !!c.comment }, label: function (c) { return c.selection ? "Comment on the selection" : "Comment here" }, run: function (c) { c.comment(c) } })
   register({
     id: "ask", section: "here", when: function () { return !!drawer() },
@@ -698,7 +829,10 @@ body.picking .dv-stage{cursor:crosshair}
       var d = drawer(); if (!d) return
       if (!d.box.classList.contains("open")) d.tab.click()
       var was = d.ta.value.replace(/\s+$/, "")
-      d.ta.value = (was ? was + "\n\n" : "") + askText(c)
+      // with the reference chips (shared/chatref.js, the drawer's liveAddRef) the part goes in as a chip, the same one
+      // a drag gives, and the box keeps only its quoted words; without them, the reference is written out in the text
+      var ref = askRef(c), chip = !!(ref && root.liveAddRef && root.liveAddRef(ref))
+      d.ta.value = (was ? was + "\n\n" : "") + (chip ? quote(words(c.text, 400)) + "\n\n" : askText(c))
       d.ta.dispatchEvent(new root.Event("input", { bubbles: true }))
       d.ta.focus()
       try { d.ta.setSelectionRange(d.ta.value.length, d.ta.value.length) } catch (e) {}
@@ -999,17 +1133,24 @@ window.NB_MDLIVE_CSS="/* shared/mdlive.js (#109): Markdown that takes shape wher
     var start = pre.toString().length
     return { start: start, end: start + r.toString().length }
   }
-  // at the boundary between two text nodes the caret takes the start of the next one, so after a newline it sits on
-  // the new line rather than at the end of the one before
-  function setCaret(box, n) {
+  // [node, offset] for the n-th character of the box's text. At the boundary between two text nodes it takes the start of
+  // the next one, so after a newline it sits on the new line rather than at the end of the one before
+  function locate(box, n) {
     var doc = box.ownerDocument, walk = doc.createTreeWalker(box, 4), node, left = n, last = null
     while ((node = walk.nextNode())) {
-      if (left < node.length) { var r = doc.createRange(); r.setStart(node, left); r.collapse(true); var s = doc.getSelection(); s.removeAllRanges(); s.addRange(r); return }
+      if (left < node.length) return [node, left]
       left -= node.length; last = node
     }
-    if (last && !box.querySelector("br.md-end")) { var r2 = doc.createRange(); r2.setStart(last, last.length); r2.collapse(true); var s1 = doc.getSelection(); s1.removeAllRanges(); s1.addRange(r2); return }
-    var end = doc.createRange(); end.selectNodeContents(box); end.collapse(false); var s2 = doc.getSelection(); s2.removeAllRanges(); s2.addRange(end)
+    if (last && !box.querySelector("br.md-end")) return [last, last.length]
+    return [box, box.childNodes.length]
   }
+  // the selection from character a to b of the box's text (a caret when they are equal)
+  function setRange(box, a, b) {
+    var doc = box.ownerDocument, s = doc.getSelection(), from = locate(box, a), to = a === b ? from : locate(box, b), r = doc.createRange()
+    r.setStart(from[0], from[1]); r.setEnd(to[0], to[1])
+    s.removeAllRanges(); s.addRange(r)
+  }
+  function setCaret(box, n) { setRange(box, n, n) }
 
   // a browser without plaintext-only editing (Firefox before 136) throws on it or reads it back as something else
   function plainEditable(doc) {
@@ -1085,6 +1226,18 @@ window.NB_MDLIVE_CSS="/* shared/mdlive.js (#109): Markdown that takes shape wher
       ta.dispatchEvent(new root.Event("input", { bubbles: true }))
     }
     Object.defineProperty(ta, "value", { configurable: true, get: raw, set: function (v) { desc.set.call(ta, v); paint(doc.activeElement === box ? (selectionOf(box) || { end: 0 }).end : null) } })
+
+    // The textarea's selection speaks for the box the reader sees. The textarea is hidden: its own caret is wherever it was
+    // left, so a page that asks where the caret is, or puts it somewhere (the / picker, soushai#563), would read and move a
+    // caret nobody sees. Outside the box the textarea's own selection answers, as before.
+    var TA = root.HTMLTextAreaElement.prototype, nStart = Object.getOwnPropertyDescriptor(TA, "selectionStart"), nEnd = Object.getOwnPropertyDescriptor(TA, "selectionEnd")
+    Object.defineProperty(ta, "selectionStart", { configurable: true, get: function () { var s = selectionOf(box); return s ? s.start : nStart.get.call(ta) }, set: function (n) { ta.setSelectionRange(n, Math.max(n, ta.selectionEnd)) } })
+    Object.defineProperty(ta, "selectionEnd", { configurable: true, get: function () { var s = selectionOf(box); return s ? s.end : nEnd.get.call(ta) }, set: function (n) { ta.setSelectionRange(Math.min(n, ta.selectionStart), n) } })
+    ta.setSelectionRange = function (a, b, dir) {
+      var len = raw().length, from = Math.max(0, Math.min(a, len)), to = Math.max(from, Math.min(b, len))
+      TA.setSelectionRange.call(ta, from, to, dir)
+      if (doc.activeElement === box || selectionOf(box)) setRange(box, from, to)
+    }
 
     // the box's text is the source, character for character: what the reader typed becomes the textarea's value, then
     // the page hears `input`. While a composition is open (an IME, a dead key) the box is never redrawn, or the
@@ -1628,7 +1781,7 @@ window.NB_MDLIVE_CSS="/* shared/mdlive.js (#109): Markdown that takes shape wher
 
   // the live backup (pm#40 c): a served board keeps a second copy of the reader's state on its server
   // (Live.ts sets these hooks); a template hands every save here, and reset empties the server's copy too,
-  // or the restore bar would offer the cleared answers back
+  // or the next load would put the cleared answers back from it
   function backup(json) { if (typeof root.brainstormOnSave === "function") try { root.brainstormOnSave(json) } catch (e) {} }
   function backupReset() { if (typeof root.brainstormOnReset === "function") try { root.brainstormOnReset() } catch (e) {} }
 
@@ -1749,7 +1902,8 @@ window.NB_MDLIVE_CSS="/* shared/mdlive.js (#109): Markdown that takes shape wher
     function placePins() {
       if (!pinsBox) return
       var count = {}, lost = []
-      $$(".pin").forEach(function (p) {
+      // the board's own pins only: the zoom viewer draws its pins in its own layer, without data-id, and places them itself
+      Array.prototype.forEach.call(pinsBox.querySelectorAll(".pin[data-id]"), function (p) {
         var pin = st().pins.filter(function (x) { return x.id === p.dataset.id })[0], el = pin && cfg.element(pin)
         if (el && cfg.away && cfg.away(el)) { p.style.display = "none"; return }
         if (!el || !el.getClientRects().length) { p.style.display = "none"; if (pin) lost.push(pin); return }
@@ -1863,20 +2017,14 @@ window.NB_MDLIVE_CSS="/* shared/mdlive.js (#109): Markdown that takes shape wher
     // header goes back to the default spot, beside the part. Pointer events, so mouse, pen and touch all drag.
     var popNear = null, POPKEY = (cfg.key || "board") + ":pop", popPos = null
     try { popPos = JSON.parse(root.sessionStorage.getItem(POPKEY) || "null") } catch (e) { popPos = null }
-    function clampPop(x, y) {
-      return { x: Math.min(Math.max(8, x), Math.max(8, root.innerWidth - pop.offsetWidth - 8)), y: Math.min(Math.max(8, y), Math.max(8, root.innerHeight - pop.offsetHeight - 8)) }
-    }
+    // placement is shared/place.js (NB.place): beside the part, flipped above or to the left when there is no room,
+    // clamped inside the viewport, and scrolling inside itself when taller than it. Re-placed when the window is resized
+    // or scrolled and when the typed text makes the box grow.
+    function clampPop(x, y) { return root.NB.place.clamp(pop, x, y) }
     function placePop() {
       if (!pop || !pop.classList.contains("on")) return
-      var p
-      if (popPos) p = clampPop(popPos.x, popPos.y)
-      else {
-        var near = popNear || { left: 8, top: 8, bottom: 8 }
-        var x = near.left, y = near.bottom + 8
-        if (y + pop.offsetHeight > root.innerHeight - 8) y = near.top - pop.offsetHeight - 8
-        p = clampPop(x, y)
-      }
-      pop.style.left = p.x + "px"; pop.style.top = p.y + "px"
+      if (popPos) clampPop(popPos.x, popPos.y)
+      else root.NB.place.apply(pop, popNear || { left: 8, top: 8, right: 8, bottom: 8 })
     }
     function keepPopPos(p) {
       popPos = p
@@ -1907,8 +2055,7 @@ window.NB_MDLIVE_CSS="/* shared/mdlive.js (#109): Markdown that takes shape wher
       })
       grip.addEventListener("pointermove", function (e) {
         if (!drag || e.pointerId !== drag.id) return
-        var p = clampPop(e.clientX - drag.dx, e.clientY - drag.dy)
-        pop.style.left = p.x + "px"; pop.style.top = p.y + "px"
+        clampPop(e.clientX - drag.dx, e.clientY - drag.dy)
       })
       var endDrag = function (e) {
         if (!drag || e.pointerId !== drag.id) return
@@ -1920,8 +2067,9 @@ window.NB_MDLIVE_CSS="/* shared/mdlive.js (#109): Markdown that takes shape wher
       grip.addEventListener("pointercancel", endDrag)
       grip.addEventListener("dblclick", function (e) { e.preventDefault(); e.stopPropagation(); keepPopPos(null); placePop() })
       root.addEventListener("resize", placePop)
+      root.addEventListener("scroll", function (e) { if (!(e.target && e.target.nodeType === 1 && pop.contains(e.target))) placePop() }, true)
       var pta = pop.querySelector("textarea")
-      pta.addEventListener("input", function () { fit(pta); keepDraftState(pta.value) })
+      pta.addEventListener("input", function () { fit(pta); keepDraftState(pta.value); placePop() })
       // Ctrl+Enter or Ctrl+click (Cmd on a Mac) anywhere in the box saves it
       pta.addEventListener("keydown", function (e) {
         if (e.key === "Enter" && (e.ctrlKey || e.metaKey) && current) { e.preventDefault(); keepDraft() }
@@ -1967,8 +2115,10 @@ window.NB_MDLIVE_CSS="/* shared/mdlive.js (#109): Markdown that takes shape wher
         var cp = viewerPart(from), twin = viewerTwin(cp)
         e.preventDefault(); e.stopPropagation()
         if (!twin) {
-          var whole = DV.dvFigure && DV.dvFigure.closest(".figwrap")
-          if (!whole) return
+          // the board's figure frame, else whatever the template keys the figure as (a prose block)
+          var whole = DV.dvFigure && (DV.dvFigure.closest(".figwrap") || cfg.pickable(DV.dvFigure))
+          // never a silent click: picking ends and says why
+          if (!whole) { setPicking(false); say("this part of the diagram cannot take a comment"); return }
           setPicking(false)
           openPop(whole, null, e.target.getBoundingClientRect())
           return
@@ -2135,7 +2285,9 @@ window.NB_MDLIVE_CSS="/* shared/mdlive.js (#109): Markdown that takes shape wher
 //     offstage optional (key) => true when that key's place is simply not drawn now (another view of a page that
 //              redraws its views): the pin is hidden, never sent to the tray
 //     partSel, htmlParts  optional selectors of a figure's parts, handed to shared/pins.js so a part copied into the
-//              zoom viewer is pinned through its twin on the page (the issues runtime names its Graph nodes)
+//              zoom viewer is pinned through its twin on the page (the issues runtime names its Graph nodes); partSel
+//              defaults to the mermaid parts the brainstorm board picks (PARTS below), so every template's viewer
+//              takes comments on a node (Soushi, 2026-11-10 05:00: a diagram could not take comments in full screen)
 //     never    optional selector of what is never picked, besides the panel, the box, the bar and the pins layer: a
 //              template with the shared editor names its code view, whose lines take their own line comments
 //   returns the NB.pins instance, created
@@ -2147,6 +2299,10 @@ window.NB_MDLIVE_CSS="/* shared/mdlive.js (#109): Markdown that takes shape wher
   function create(cfg) {
     var doc = root.document
     function $$(s, r) { return Array.prototype.slice.call((r || doc).querySelectorAll(s)) }
+    // a figure's parts: the brainstorm's selector (BoardRuntime.js PART_SEL), unless the template names its own
+    var PARTS = cfg.partSel || 'g.node, g.rough-node, g.edgeLabel, g[id*="entity-"], text.actor, text.messageText'
+    // a part's key: the figure's block key, then `@`, its name's hash and, for a second part of the same name, `.<n>`
+    var PART_KEY = /^(p:.*)@([0-9a-z]+)(?:\.(\d+))?$/
     var targets = cfg.targets || [], KEYS = typeof WeakMap === "function" ? new WeakMap() : null
     var NEVER = "#panel, #pinpop, .bar, #pins, .dv" + (cfg.never ? ", " + cfg.never : "")
     function words(t, n) { var w = String(t || "").replace(/\s+/g, " ").trim().split(" "); return w.slice(0, n).join(" ") + (w.length > n ? "…" : "") }
@@ -2156,6 +2312,8 @@ window.NB_MDLIVE_CSS="/* shared/mdlive.js (#109): Markdown that takes shape wher
       // what the reader changes in place (a severity badge, a chip, a count) is not the element's words: a key hashed
       // from it would move every time it changes (pm#57)
       $$("button, textarea, .thr-mount, .thrbox, .badge, .chip, [data-volatile]", c).forEach(function (n) { n.remove() })
+      // a drawing's own stylesheet is the same in every mermaid figure: hashed, it would give them all one key
+      $$("style", c).forEach(function (n) { n.remove() })
       return c.textContent
     }
     function hash(t) { var h = 5381, s = String(t).toLowerCase().replace(/\s+/g, " ").trim().slice(0, 120); for (var i = 0; i < s.length; i++) h = ((h << 5) + h + s.charCodeAt(i)) | 0; return (h >>> 0).toString(36) }
@@ -2166,9 +2324,8 @@ window.NB_MDLIVE_CSS="/* shared/mdlive.js (#109): Markdown that takes shape wher
     function stale() { return !blocks.length || blocks.some(function (b) { return !b.el.isConnected }) }
     function readBlocks() {
       blocks = []
-      if (!cfg.prose) return
       var seen = {}
-      $$(cfg.prose).forEach(function (pr) {
+      if (cfg.prose) $$(cfg.prose).forEach(function (pr) {
         if (pr.closest(NEVER)) return
         var sec = pr.closest("section[id]"), sid = sec ? sec.id : "intro", h = sec && sec.querySelector("h2, h3")
         var zone = h ? words(h.textContent, 6) : "Introduction"
@@ -2178,13 +2335,23 @@ window.NB_MDLIVE_CSS="/* shared/mdlive.js (#109): Markdown that takes shape wher
           var hs = $$("h2", pr).filter(function (x) { return x.compareDocumentPosition(b) & 4 })
           return hs.length ? words(hs[hs.length - 1].textContent, 6) : zone
         }
-        $$("table, .figwrap, p, li, pre, blockquote, h3, h4, h5, h6", pr).forEach(function (b) {
+        // a figure (a rendered mermaid diagram) is one block: its parts are keyed under it, `<figure key>@<name hash>` (partKeyOf)
+        $$("table, .figwrap, figure, p, li, pre, blockquote, h3, h4, h5, h6", pr).forEach(function (b) {
           if (b.parentNode.closest("table, .figwrap") || (b.tagName === "LI" && b.querySelector("p")) || (b.tagName === "BLOCKQUOTE" && b.querySelector("p"))) return
           if (targets.some(function (t) { return b.closest(t.sel) })) return
           var k = sid + ":" + hash(textOf(b))
           seen[k] = (seen[k] || 0) + 1
           blocks.push({ el: b, key: "p:" + k + (seen[k] > 1 ? "~" + seen[k] : ""), zone: heading(b) })
         })
+      })
+      // every zoomable figure is a block wherever it sits, prose or not, so a node picked in the viewer has a key on
+      // any template; a click on the board still goes to the template's own target first (pickable)
+      $$("figure[data-zoom]").forEach(function (f) {
+        if (f.closest(NEVER) || blocks.some(function (b) { return b.el === f })) return
+        var sec = f.closest("section[id]"), h = sec && sec.querySelector("h2, h3")
+        var k = (sec ? sec.id : "intro") + ":" + hash(textOf(f))
+        seen[k] = (seen[k] || 0) + 1
+        blocks.push({ el: f, key: "p:" + k + (seen[k] > 1 ? "~" + seen[k] : ""), zone: h ? words(h.textContent, 6) : "Introduction" })
       })
     }
     readBlocks()
@@ -2198,7 +2365,45 @@ window.NB_MDLIVE_CSS="/* shared/mdlive.js (#109): Markdown that takes shape wher
       for (var n = el; n && n.nodeType === 1; n = n.parentNode) for (var i = 0; i < targets.length; i++) if (n.matches(targets[i].sel)) return { el: n, t: targets[i] }
       return null
     }
-    function keyOfEl(el) { if (KEYS && KEYS.get(el)) return KEYS.get(el); var hit = targetOf(el); if (hit && hit.el === el) return hit.t.key(el); var b = blockOf(el); return b && b.el === el ? b.key : null }
+    // a part of a figure, keyed by the figure's block, a hash of its source id and name (partSig) and its order among the parts of its own
+    // drawing with the same name: `<figure key>@<hash>`, `.<n>` after it from the second one on. A figure carries one
+    // drawing per theme (light and dark copies), and the key is the same in each. A node drawn before it in a later
+    // build leaves the key alone, where an index would have shifted the pin onto that node; a renamed node takes its
+    // pin to the tray
+    function partKeyOf(el) {
+      var svg = el && el.ownerSVGElement
+      if (!svg || !el.matches || !el.matches(PARTS)) return null
+      var b = blockOf(svg)
+      if (!b) return null
+      var w = partSig(el), n = $$(PARTS, svg).filter(function (p) { return partSig(p) === w }).indexOf(el)
+      return n < 0 ? null : b.key + "@" + hash(w) + (n ? "." + n : "")
+    }
+    // a part's name: its first label (an entity's name, not its attribute rows run together), else its words
+    function partLabel(el) {
+      var ls = $$(".nodeLabel, text", el).map(function (n) { return n.textContent.trim() }).filter(Boolean)
+      return ls[0] || el.textContent
+    }
+    function partName(el) { return String(partLabel(el) || "").replace(/\s+/g, " ").trim() }
+    // what tells a part from every other: the id it has in the diagram's source (mermaid draws `<svg id>-flowchart-<Id>-<n>`,
+    // `<svg id>-entity-<Name>-<n>`; the counter moves with the build and is dropped) joined to its name, so two nodes with one
+    // label stay two and a changed label still sends the pin to the tray. A part with no source id (a sequence actor, an
+    // edge label) is told by its name alone, and the order among parts of that name stands in for the id
+    function partSig(el) {
+      var m = /(?:^|-)(?:flowchart|entity)-(.+)-\d+$/.exec(el.getAttribute && el.getAttribute("id") || "")
+      if (m) return "#" + m[1] + "\u0001" + partName(el)
+      // an arrow's label has no id: its source id (L_A_X_0) is the data-id of the `.label` inside it
+      var l = el.querySelector && el.querySelector(".label[data-id]")
+      return l ? "@" + l.getAttribute("data-id") + "\u0001" + partName(el) : partName(el)
+    }
+    function partHost(key) {
+      var m = PART_KEY.exec(key)
+      var b = m && blocks.filter(function (x) { return x.key === m[1] })[0]
+      if (!b) return null
+      var svgs = $$("svg", b.el), shown = svgs.filter(function (s) { return s.getClientRects().length })[0] || svgs[0]
+      if (!shown) return null
+      return $$(PARTS, shown).filter(function (p) { return hash(partSig(p)) === m[2] })[+(m[3] || 0)] || null
+    }
+    function keyOfEl(el) { if (KEYS && KEYS.get(el)) return KEYS.get(el); var pk = partKeyOf(el); if (pk) return pk; var hit = targetOf(el); if (hit && hit.el === el) return hit.t.key(el); var b = blockOf(el); return b && b.el === el ? b.key : null }
     // what a click at `t` comments on: a target, else a block of prose, else nothing
     function pickable(t) {
       if (!t || !t.closest || t.closest(NEVER)) return null
@@ -2210,6 +2415,7 @@ window.NB_MDLIVE_CSS="/* shared/mdlive.js (#109): Markdown that takes shape wher
     }
     // the element a key stands for on the page, never the panel's copy
     function hostOf(key) {
+      if (PART_KEY.test(key)) { fresh(); return partHost(key) }
       if (key.indexOf("p:") === 0) { fresh(); var b = blocks.filter(function (x) { return x.key === key })[0]; return b ? b.el : null }
       for (var i = 0; i < targets.length; i++) {
         var el = $$(targets[i].sel).filter(function (x) { return !x.closest(NEVER) && targets[i].key(x) === key })[0]
@@ -2221,6 +2427,7 @@ window.NB_MDLIVE_CSS="/* shared/mdlive.js (#109): Markdown that takes shape wher
       var hit = targetOf(el)
       if (hit && hit.el === el) return { zone: hit.t.zone(el), label: words(hit.t.label(el), 14) }
       var b = blockOf(el)
+      if (b && partKeyOf(el)) return { zone: b.zone, label: words(partLabel(el), 14) }
       return { zone: b ? b.zone : "the page", label: words(textOf(el), 14) }
     }
     // what element() hands back for a pin whose place is not drawn now: away() hides it, the tray never sees it
@@ -2229,7 +2436,7 @@ window.NB_MDLIVE_CSS="/* shared/mdlive.js (#109): Markdown that takes shape wher
       state: cfg.state, save: cfg.save, fit: cfg.fit, key: cfg.key, keyBlocked: cfg.keyBlocked,
       // the zoom viewer maps a copied part back to the page only through these (pins.js), so a pin on a copied
       // node lands on that node and is labelled by its target, never by the whole figure's text (2026-11-10)
-      partSel: cfg.partSel, htmlParts: cfg.htmlParts,
+      partSel: PARTS, htmlParts: cfg.htmlParts,
       pickable: pickable,
       anchorOf: function (el) { var k = keyOfEl(el); return k ? { z: "page", key: k } : { z: "page", i: -1 } },
       // a pin that cannot be found is in the tray: it is never moved to some other element
@@ -2860,7 +3067,9 @@ window.NB_MDLIVE_CSS="/* shared/mdlive.js (#109): Markdown that takes shape wher
     }
     list.hidden = false; fill(true)
     var r = count.getBoundingClientRect()
-    list.style.top = (r.bottom + 6) + "px"; list.style.left = Math.max(8, Math.min(r.left, window.innerWidth - list.offsetWidth - 8)) + "px"
+    // shared/place.js: under the count, flipped above or to the left when there is no room, scrolling when too tall; kept so on resize and scroll
+    window.NB.place.apply(list, r, { gap: 6 })
+    if (!list.__placed) { list.__placed = true; window.NB.place.track(list, function () { return count.getBoundingClientRect() }, { gap: 6 }) }
     count.setAttribute("aria-expanded", "true")
   }
   function closeList() {
