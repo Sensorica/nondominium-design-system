@@ -7,6 +7,7 @@ project: nondominium
 status: open
 summary: "The complete architecture of the Nondominium hApp on dev at 2e2f235, from the C4 context down to every DNA, zome and UI module, with the planned work of the v0.1.0 Moss pilot, v0.2 and v0.3 drawn as planified, modified or removed parts. A map to explore the app, with no decision to take."
 lang: en
+repo: Sensorica/nondominium
 sha: 2e2f235d980e27753ea8a6d8a4d252863d293de7
 change-new: planified
 ---
@@ -93,12 +94,26 @@ None of it is in the code yet: the substrate is [#184](https://github.com/Sensor
   kind: person
   entry: a member of a group, in Moss or standalone
   does: "A person in an open value network who creates groups and NDOs, joins them, proposes commitments, logs economic events and fulfills commitments with a counterparty."
+  links:
+    - label: "Design system: the app replica"
+      url: "/app"
+    - label: "Design system: scenarios"
+      url: "/scenarios"
+    - label: "Design system: the v0.1 UI prototypes"
+      url: "/prototypes"
 - id: developer
   name: Developer
   level: system
   kind: person
   entry: a developer running the app locally
   does: "A contributor who builds the zomes and the UI and runs two agents locally, in weave dev mode inside Moss or in a Holochain sandbox."
+  links:
+    - label: "README.md at 2e2f235"
+      url: "https://github.com/Sensorica/nondominium/blob/2e2f235d980e27753ea8a6d8a4d252863d293de7/README.md"
+    - label: "CONTRIBUTING.md at 2e2f235"
+      url: "https://github.com/Sensorica/nondominium/blob/2e2f235d980e27753ea8a6d8a4d252863d293de7/CONTRIBUTING.md"
+    - label: "documentation/README.md at 2e2f235"
+      url: "https://github.com/Sensorica/nondominium/blob/2e2f235d980e27753ea8a6d8a4d252863d293de7/documentation/README.md"
 
 - id: nd
   name: Nondominium hApp
@@ -109,6 +124,13 @@ None of it is in the code yet: the substrate is [#184](https://github.com/Sensor
   code:
     - workdir/happ.yaml:1-60
     - Cargo.toml:7-43
+  links:
+    - label: "Design system: the app replica"
+      url: "/app"
+    - label: "Source at 2e2f235: workdir/happ.yaml"
+      url: "https://github.com/Sensorica/nondominium/blob/2e2f235d980e27753ea8a6d8a4d252863d293de7/workdir/happ.yaml"
+    - label: "Source at 2e2f235: Cargo.toml"
+      url: "https://github.com/Sensorica/nondominium/blob/2e2f235d980e27753ea8a6d8a4d252863d293de7/Cargo.toml"
 - id: conductor
   name: Holochain conductor
   level: system
@@ -118,6 +140,11 @@ None of it is in the code yet: the substrate is [#184](https://github.com/Sensor
   code:
     - Cargo.toml:47-55
     - scripts/launch-happ.mjs:1-20
+  links:
+    - label: "Source at 2e2f235: Cargo.toml"
+      url: "https://github.com/Sensorica/nondominium/blob/2e2f235d980e27753ea8a6d8a4d252863d293de7/Cargo.toml"
+    - label: "Source at 2e2f235: scripts/launch-happ.mjs"
+      url: "https://github.com/Sensorica/nondominium/blob/2e2f235d980e27753ea8a6d8a4d252863d293de7/scripts/launch-happ.mjs"
 - id: moss
   name: Moss and The Weave
   level: system
@@ -127,6 +154,9 @@ None of it is in the code yet: the substrate is [#184](https://github.com/Sensor
   code:
     - ui/package.json:47-58
     - documentation/specifications/moss-integration.md:1-91
+  links:
+    - label: "moss-integration.md at 2e2f235"
+      url: "https://github.com/Sensorica/nondominium/blob/2e2f235d980e27753ea8a6d8a4d252863d293de7/documentation/specifications/moss-integration.md"
 - id: netinfra
   name: Bootstrap and relay server
   level: system
@@ -136,6 +166,9 @@ None of it is in the code yet: the substrate is [#184](https://github.com/Sensor
   change: new
   code:
     - weave/weave.dev.config.ts:1-14
+  links:
+    - label: "#122: feat(infra): bootstrap + relay server for the v0.1.0 Moss pilot"
+      url: "https://github.com/Sensorica/nondominium/issues/122"
 - id: alwayson
   name: Always-online node
   level: system
@@ -143,6 +176,9 @@ None of it is in the code yet: the substrate is [#184](https://github.com/Sensor
   tech: wdocker, NixOS
   does: "A headless conductor on Sensorica's Holoports that joins the pilot group and keeps its group and NDO cells readable while every member is offline. Planned in #166 (v0.1.0 Moss pilot)."
   change: new
+  links:
+    - label: "#166: feat(infra): always-online wdocker node for the pilot group"
+      url: "https://github.com/Sensorica/nondominium/issues/166"
 - id: dsys
   name: Nondominium design system
   level: system
@@ -150,12 +186,22 @@ None of it is in the code yet: the substrate is [#184](https://github.com/Sensor
   tech: "@nondominium/ndo-ui, nix flake input"
   does: "This design system's component package, to come into the UI as a pinned nix flake input rather than npm, resolved inside nix develop. Planned in #205 (v0.3)."
   change: new
+  links:
+    - label: "#205: feat(ui): design-system adapters with a resolvable ndo-ui dependency"
+      url: "https://github.com/Sensorica/nondominium/issues/205"
+    - label: "Design system: the ndo-ui playbook"
+      url: "/playbook"
+    - label: "Design system: the ndo-ui UI kit"
+      url: "/ui-kit"
 - id: mosslib
   name: Moss public library
   level: system
   kind: external
   does: "The catalogue a Moss group installs tools from; the tool is to be listed there once Moss 0.16 is stable. Planned in #202 (v0.3)."
   change: new
+  links:
+    - label: "#202: release(moss): publish the tool to the Moss public library"
+      url: "https://github.com/Sensorica/nondominium/issues/202"
 - id: flowsta
   name: Flowsta
   level: system
@@ -164,6 +210,11 @@ None of it is in the code yet: the substrate is [#184](https://github.com/Sensor
   change: new
   code:
     - documentation/requirements/post-mvp/flowsta-integration.md:1-12
+  links:
+    - label: "#156: feat(identity): link agents to Flowsta for cross-app identity and key recovery (Tier 1)"
+      url: "https://github.com/Sensorica/nondominium/issues/156"
+    - label: "flowsta-integration.md at 2e2f235"
+      url: "https://github.com/Sensorica/nondominium/blob/2e2f235d980e27753ea8a6d8a4d252863d293de7/documentation/requirements/post-mvp/flowsta-integration.md"
 - id: unyt
   name: Unyt
   level: system
@@ -172,6 +223,11 @@ None of it is in the code yet: the substrate is [#184](https://github.com/Sensor
   change: new
   code:
     - documentation/requirements/post-mvp/unyt-integration.md:141-160
+  links:
+    - label: "#222: feat(gouvernance): store the distribution placeholder and the license share parameter"
+      url: "https://github.com/Sensorica/nondominium/issues/222"
+    - label: "unyt-integration.md at 2e2f235"
+      url: "https://github.com/Sensorica/nondominium/blob/2e2f235d980e27753ea8a6d8a4d252863d293de7/documentation/requirements/post-mvp/unyt-integration.md"
 
 - id: ui
   name: hApp UI
@@ -184,6 +240,17 @@ None of it is in the code yet: the substrate is [#184](https://github.com/Sensor
   code:
     - ui/package.json:1-58
     - ui/scripts/check-architecture.ts:1-13
+  links:
+    - label: "#150: chore(deps): migrate the ui package to SvelteKit 3"
+      url: "https://github.com/Sensorica/nondominium/issues/150"
+    - label: "#193: feat(ui): economic reads through hREA, with the GraphQL adapter from npm"
+      url: "https://github.com/Sensorica/nondominium/issues/193"
+    - label: "#203: release(standalone): ship the standalone build beside Moss"
+      url: "https://github.com/Sensorica/nondominium/issues/203"
+    - label: "Design system: the app replica"
+      url: "/app"
+    - label: "Design system: the v0.1 UI prototypes"
+      url: "/prototypes"
 - id: lobbydna
   name: Lobby DNA
   level: container
@@ -194,6 +261,11 @@ None of it is in the code yet: the substrate is [#184](https://github.com/Sensor
   code:
     - workdir/happ.yaml:4-14
     - dnas/lobby/workdir/dna.yaml:1-17
+  links:
+    - label: "Source at 2e2f235: workdir/happ.yaml"
+      url: "https://github.com/Sensorica/nondominium/blob/2e2f235d980e27753ea8a6d8a4d252863d293de7/workdir/happ.yaml"
+    - label: "Source at 2e2f235: dnas/lobby/workdir/dna.yaml"
+      url: "https://github.com/Sensorica/nondominium/blob/2e2f235d980e27753ea8a6d8a4d252863d293de7/dnas/lobby/workdir/dna.yaml"
 - id: coredna
   name: Nondominium DNA
   level: container
@@ -205,6 +277,9 @@ None of it is in the code yet: the substrate is [#184](https://github.com/Sensor
   code:
     - workdir/happ.yaml:15-23
     - dnas/nondominium/workdir/dna.yaml:1-36
+  links:
+    - label: "#185: Epic: hREA as the economic substrate (v0.2)"
+      url: "https://github.com/Sensorica/nondominium/issues/185"
 - id: groupdna
   name: Group DNA
   level: container
@@ -216,6 +291,11 @@ None of it is in the code yet: the substrate is [#184](https://github.com/Sensor
   code:
     - workdir/happ.yaml:34-43
     - dnas/group/workdir/dna.yaml:1-17
+  links:
+    - label: "#201: feat(group): work contexts in the group DHT"
+      url: "https://github.com/Sensorica/nondominium/issues/201"
+    - label: "ADR-014-work-contexts-in-group-dht.md at 2e2f235"
+      url: "https://github.com/Sensorica/nondominium/blob/2e2f235d980e27753ea8a6d8a4d252863d293de7/documentation/specifications/adr/ADR-014-work-contexts-in-group-dht.md"
 - id: ndodna
   name: NDO DNA
   level: container
@@ -227,6 +307,11 @@ None of it is in the code yet: the substrate is [#184](https://github.com/Sensor
   code:
     - workdir/happ.yaml:44-53
     - dnas/ndo/workdir/dna.yaml:1-25
+  links:
+    - label: "#184: feat(resource): CapabilitySlot substrate on the NDO identity (REQ-NDO-CS-01, 02, 04, 06)"
+      url: "https://github.com/Sensorica/nondominium/issues/184"
+    - label: "#223: feat(gouvernance): a forked NDO must carry its parent's share, validated in integrity"
+      url: "https://github.com/Sensorica/nondominium/issues/223"
 - id: hreadna
   name: hREA DNA
   level: container
@@ -239,6 +324,11 @@ None of it is in the code yet: the substrate is [#184](https://github.com/Sensor
     - workdir/happ.yaml:24-33
     - .gitmodules:1-3
     - vendor/README.md:1-3
+  links:
+    - label: "#185: Epic: hREA as the economic substrate (v0.2)"
+      url: "https://github.com/Sensorica/nondominium/issues/185"
+    - label: "#187: research(hrea): module interface RFC on h-REA/hREA"
+      url: "https://github.com/Sensorica/nondominium/issues/187"
 - id: capslots
   name: Capability slot surface
   level: container
@@ -250,6 +340,13 @@ None of it is in the code yet: the substrate is [#184](https://github.com/Sensor
   code:
     - documentation/requirements/ndo_prima_materia.md:547-606
     - documentation/requirements/ndo_prima_materia.md:1356-1375
+  links:
+    - label: "#184: feat(resource): CapabilitySlot substrate on the NDO identity (REQ-NDO-CS-01, 02, 04, 06)"
+      url: "https://github.com/Sensorica/nondominium/issues/184"
+    - label: "#209: Epic: Capability slots"
+      url: "https://github.com/Sensorica/nondominium/issues/209"
+    - label: "ndo_prima_materia.md at 2e2f235"
+      url: "https://github.com/Sensorica/nondominium/blob/2e2f235d980e27753ea8a6d8a4d252863d293de7/documentation/requirements/ndo_prima_materia.md"
 - id: sharedcrate
   name: Shared Rust crate
   level: container
@@ -259,6 +356,9 @@ None of it is in the code yet: the substrate is [#184](https://github.com/Sensor
   does: "The types, constraint checks, anchor paths and cross-zome call helpers every zome compiles in, so the DNAs agree on one vocabulary."
   code:
     - crates/shared/src/lib.rs:1-146
+  links:
+    - label: "Source at 2e2f235: crates/shared/src/lib.rs"
+      url: "https://github.com/Sensorica/nondominium/blob/2e2f235d980e27753ea8a6d8a4d252863d293de7/crates/shared/src/lib.rs"
 - id: bundle
   name: Bundle and packaging
   level: container
@@ -269,6 +369,11 @@ None of it is in the code yet: the substrate is [#184](https://github.com/Sensor
   change: modified
   code:
     - package.json:10-34
+  links:
+    - label: "#121: chore(release): produce and smoke-test the v0.1.0 Moss tool .webhapp"
+      url: "https://github.com/Sensorica/nondominium/issues/121"
+    - label: "#203: release(standalone): ship the standalone build beside Moss"
+      url: "https://github.com/Sensorica/nondominium/issues/203"
 - id: testsuites
   name: Test suites
   level: container
@@ -279,6 +384,11 @@ None of it is in the code yet: the substrate is [#184](https://github.com/Sensor
   code:
     - Cargo.toml:16-19
     - package.json:13-15
+  links:
+    - label: "Source at 2e2f235: Cargo.toml"
+      url: "https://github.com/Sensorica/nondominium/blob/2e2f235d980e27753ea8a6d8a4d252863d293de7/Cargo.toml"
+    - label: "Source at 2e2f235: package.json"
+      url: "https://github.com/Sensorica/nondominium/blob/2e2f235d980e27753ea8a6d8a4d252863d293de7/package.json"
 
 - id: routes
   name: Routes and root layout
@@ -290,6 +400,11 @@ None of it is in the code yet: the substrate is [#184](https://github.com/Sensor
   code:
     - ui/src/routes/+layout.svelte:1-58
     - ui/src/routes/ndo/new/+page.svelte:1-32
+  links:
+    - label: "Design system: the app replica"
+      url: "/app"
+    - label: "Source at 2e2f235: ui/src/routes/"
+      url: "https://github.com/Sensorica/nondominium/tree/2e2f235d980e27753ea8a6d8a4d252863d293de7/ui/src/routes"
 - id: shell
   name: App shell
   level: component
@@ -300,6 +415,15 @@ None of it is in the code yet: the substrate is [#184](https://github.com/Sensor
   code:
     - ui/src/lib/components/shell/AppShell.svelte:1-72
     - ui/src/lib/components/shell/Sidebar.svelte:1-294
+  links:
+    - label: "Design system: the app replica"
+      url: "/app"
+    - label: "Design system: shell patterns"
+      url: "/patterns/shell"
+    - label: "Design system: ndo-ui shell"
+      url: "/playbook/shell"
+    - label: "Source at 2e2f235: ui/src/lib/components/shell/"
+      url: "https://github.com/Sensorica/nondominium/tree/2e2f235d980e27753ea8a6d8a4d252863d293de7/ui/src/lib/components/shell"
 - id: lobbyviews
   name: Lobby views
   level: component
@@ -312,6 +436,13 @@ None of it is in the code yet: the substrate is [#184](https://github.com/Sensor
     - ui/src/lib/components/lobby/NdoBrowser.svelte:1-279
     - ui/src/lib/components/lobby/GroupSidebar.svelte:1-184
     - ui/src/lib/components/lobby/ProfileSetupModal.svelte:1-79
+  links:
+    - label: "Design system: the app replica"
+      url: "/app"
+    - label: "Design system: the lobby browse scenario"
+      url: "/scenarios/lobby-browse"
+    - label: "Source at 2e2f235: ui/src/lib/components/lobby/"
+      url: "https://github.com/Sensorica/nondominium/tree/2e2f235d980e27753ea8a6d8a4d252863d293de7/ui/src/lib/components/lobby"
 - id: groupviews
   name: Group views
   level: component
@@ -323,6 +454,13 @@ None of it is in the code yet: the substrate is [#184](https://github.com/Sensor
     - ui/src/lib/components/group/GroupView.svelte:1-228
     - ui/src/lib/components/group/NdoCreateModal.svelte:1-245
     - ui/src/lib/components/group/MemberList.svelte:1-36
+  links:
+    - label: "Design system: replica of a group page"
+      url: "/app/group/sensorica-lab-7f3a"
+    - label: "Design system: the group collaboration scenario"
+      url: "/scenarios/group-collaboration"
+    - label: "Source at 2e2f235: ui/src/lib/components/group/"
+      url: "https://github.com/Sensorica/nondominium/tree/2e2f235d980e27753ea8a6d8a4d252863d293de7/ui/src/lib/components/group"
 - id: ndoviews
   name: NDO views
   level: component
@@ -338,6 +476,15 @@ None of it is in the code yet: the substrate is [#184](https://github.com/Sensor
     - ui/src/lib/components/ndo/EconomicEventCreateForm.svelte:1-289
     - ui/src/lib/components/ndo/ForkNdoModal.svelte:1-102
     - ui/src/lib/components/ndo/LifecycleTransitionModal.svelte:1-182
+  links:
+    - label: "PR #183: feat: bring Tibi's general backend work from commitment-pool-experiment onto dev"
+      url: "https://github.com/Sensorica/nondominium/pull/183"
+    - label: "#223: feat(gouvernance): a forked NDO must carry its parent's share, validated in integrity"
+      url: "https://github.com/Sensorica/nondominium/issues/223"
+    - label: "Design system: replica of an NDO page"
+      url: "/app/ndo/uhC0kVX5k7dL2mPqR8sT1uW4xY7zA0bC3dE6fG9h"
+    - label: "Design system: the NDO lifecycle scenario"
+      url: "/scenarios/ndo-lifecycle"
 - id: piechart
   name: Contribution pie chart
   level: component
@@ -346,6 +493,13 @@ None of it is in the code yet: the substrate is [#184](https://github.com/Sensor
   tech: Svelte 5
   does: "Shows and edits an NDO's contribution pie chart, the shares of its agreement. Planned in #221 (v0.1.0 Moss pilot), with #220 (shares sum to exactly 100) and #224 (import pie-chart.json)."
   change: new
+  links:
+    - label: "#221: feat(ui): show and edit an NDO's contribution pie chart"
+      url: "https://github.com/Sensorica/nondominium/issues/221"
+    - label: "#220: fix(gouvernance): agreement shares must sum to exactly 100"
+      url: "https://github.com/Sensorica/nondominium/issues/220"
+    - label: "#224: feat(gouvernance): import pie-chart.json into the project NDO's agreement"
+      url: "https://github.com/Sensorica/nondominium/issues/224"
 - id: dsadapters
   name: Design-system adapters
   level: component
@@ -354,6 +508,13 @@ None of it is in the code yet: the substrate is [#184](https://github.com/Sensor
   tech: TypeScript
   does: "Convert between the design system's component shapes and the app's create inputs and rule data. On Tibi's experiment branch today; to land on dev with a resolvable ndo-ui dependency in #205 (v0.3)."
   change: new
+  links:
+    - label: "#205: feat(ui): design-system adapters with a resolvable ndo-ui dependency"
+      url: "https://github.com/Sensorica/nondominium/issues/205"
+    - label: "Design system: the ndo-ui playbook"
+      url: "/playbook"
+    - label: "Design system: the ndo-ui UI kit"
+      url: "/ui-kit"
 - id: stores
   name: Stores
   level: component
@@ -366,6 +527,9 @@ None of it is in the code yet: the substrate is [#184](https://github.com/Sensor
     - ui/src/lib/stores/lobby.store.svelte.ts:1-237
     - ui/src/lib/stores/governance.store.svelte.ts:1-430
     - ui/src/lib/stores/moss.store.svelte.ts:1-96
+  links:
+    - label: "Source at 2e2f235: ui/src/lib/stores/"
+      url: "https://github.com/Sensorica/nondominium/tree/2e2f235d980e27753ea8a6d8a4d252863d293de7/ui/src/lib/stores"
 - id: domainlayer
   name: Domain layer
   level: component
@@ -378,6 +542,9 @@ None of it is in the code yet: the substrate is [#184](https://github.com/Sensor
     - ui/src/lib/domain/lifecycle.ts:1-29
     - ui/src/lib/domain/entity-state.ts:1-104
     - ui/src/lib/domain/ndo-filters.ts:1-25
+  links:
+    - label: "Source at 2e2f235: ui/src/lib/domain/"
+      url: "https://github.com/Sensorica/nondominium/tree/2e2f235d980e27753ea8a6d8a4d252863d293de7/ui/src/lib/domain"
 - id: zomeservices
   name: Zome services
   level: component
@@ -390,6 +557,9 @@ None of it is in the code yet: the substrate is [#184](https://github.com/Sensor
     - ui/src/lib/services/zomes/lobby.service.ts:627-675
     - ui/src/lib/services/zomes/governance.service.ts:1-273
     - ui/src/lib/services/zomes/moss-lobby.ts:1-25
+  links:
+    - label: "Source at 2e2f235: ui/src/lib/services/zomes/"
+      url: "https://github.com/Sensorica/nondominium/tree/2e2f235d980e27753ea8a6d8a4d252863d293de7/ui/src/lib/services/zomes"
 - id: schemas
   name: Schemas and errors
   level: component
@@ -400,6 +570,9 @@ None of it is in the code yet: the substrate is [#184](https://github.com/Sensor
   code:
     - ui/src/lib/schemas/resource.schemas.ts:1-190
     - ui/src/lib/errors/error-contexts.ts:1-142
+  links:
+    - label: "Source at 2e2f235: ui/src/lib/"
+      url: "https://github.com/Sensorica/nondominium/tree/2e2f235d980e27753ea8a6d8a4d252863d293de7/ui/src/lib"
 - id: hcservice
   name: Holochain client service
   level: component
@@ -411,6 +584,9 @@ None of it is in the code yet: the substrate is [#184](https://github.com/Sensor
     - ui/src/lib/services/holochain.service.svelte.ts:1-60
     - ui/src/lib/services/holochain.service.svelte.ts:230-300
     - ui/src/lib/services/cell.manager.ts:1-85
+  links:
+    - label: "Source at 2e2f235: ui/src/lib/services/"
+      url: "https://github.com/Sensorica/nondominium/tree/2e2f235d980e27753ea8a6d8a4d252863d293de7/ui/src/lib/services"
 - id: hcconnect
   name: Connection modes
   level: component
@@ -420,6 +596,15 @@ None of it is in the code yet: the substrate is [#184](https://github.com/Sensor
   does: "Opens the conductor connection in one of four modes: the launcher, the hc-connection.json manifest the dev launcher writes, environment variables, or the applet client Moss hands the tool."
   code:
     - ui/src/lib/utils/hc-connect.ts:1-287
+  links:
+    - label: "Design system: replica of the connecting screen"
+      url: "/app/connecting"
+    - label: "Design system: replica of the connection error screen"
+      url: "/app/connection-error"
+    - label: "Design system: replica of the disconnected screen"
+      url: "/app/disconnected"
+    - label: "Source at 2e2f235: ui/src/lib/utils/hc-connect.ts"
+      url: "https://github.com/Sensorica/nondominium/blob/2e2f235d980e27753ea8a6d8a4d252863d293de7/ui/src/lib/utils/hc-connect.ts"
 - id: mossadapter
   name: Moss host layer
   level: component
@@ -434,6 +619,9 @@ None of it is in the code yet: the substrate is [#184](https://github.com/Sensor
     - ui/src/lib/moss/assets.ts:1-55
     - ui/src/lib/moss/profile.ts:1-64
     - ui/src/lib/moss/ndo-clone.ts:1-43
+  links:
+    - label: "Source at 2e2f235: ui/src/lib/moss/"
+      url: "https://github.com/Sensorica/nondominium/tree/2e2f235d980e27753ea8a6d8a4d252863d293de7/ui/src/lib/moss"
 - id: sharedtypes
   name: Shared TypeScript types
   level: component
@@ -444,6 +632,9 @@ None of it is in the code yet: the substrate is [#184](https://github.com/Sensor
   code:
     - packages/shared-types/src/index.ts:1-43
     - packages/shared-types/src/resource.types.ts:1-463
+  links:
+    - label: "Source at 2e2f235: packages/shared-types/src/"
+      url: "https://github.com/Sensorica/nondominium/tree/2e2f235d980e27753ea8a6d8a4d252863d293de7/packages/shared-types/src"
 - id: archcheck
   name: Architecture check
   level: component
@@ -453,6 +644,9 @@ None of it is in the code yet: the substrate is [#184](https://github.com/Sensor
   does: "Fails the UI check when a Svelte file reaches effect or the services (I1), a store imports another store (I2), or the domain layer imports Svelte, Effect, services or stores (I3)."
   code:
     - ui/scripts/check-architecture.ts:1-60
+  links:
+    - label: "Source at 2e2f235: ui/scripts/check-architecture.ts"
+      url: "https://github.com/Sensorica/nondominium/blob/2e2f235d980e27753ea8a6d8a4d252863d293de7/ui/scripts/check-architecture.ts"
 - id: vendoredadapter
   name: Vendored GraphQL adapter
   level: component
@@ -464,6 +658,11 @@ None of it is in the code yet: the substrate is [#184](https://github.com/Sensor
   code:
     - ui/package.json:54-54
     - vendor/README.md:5-21
+  links:
+    - label: "#153: chore(deps): vendor the hREA GraphQL adapter 0.700.0-rc.0 into the UI"
+      url: "https://github.com/Sensorica/nondominium/issues/153"
+    - label: "#193: feat(ui): economic reads through hREA, with the GraphQL adapter from npm"
+      url: "https://github.com/Sensorica/nondominium/issues/193"
 - id: hreareads
   name: hREA economic reads
   level: component
@@ -474,6 +673,11 @@ None of it is in the code yet: the substrate is [#184](https://github.com/Sensor
   change: new
   code:
     - documentation/hREA/v0.2-release-plan.md:126-135
+  links:
+    - label: "#193: feat(ui): economic reads through hREA, with the GraphQL adapter from npm"
+      url: "https://github.com/Sensorica/nondominium/issues/193"
+    - label: "v0.2-release-plan.md at 2e2f235"
+      url: "https://github.com/Sensorica/nondominium/blob/2e2f235d980e27753ea8a6d8a4d252863d293de7/documentation/hREA/v0.2-release-plan.md"
 
 - id: lobbyint
   name: zome_lobby_integrity
@@ -485,6 +689,9 @@ None of it is in the code yet: the substrate is [#184](https://github.com/Sensor
   code:
     - dnas/lobby/zomes/integrity/zome_lobby_integrity/src/lib.rs:6-47
     - dnas/lobby/zomes/integrity/zome_lobby_integrity/src/lib.rs:63-120
+  links:
+    - label: "Source at 2e2f235: dnas/lobby/zomes/integrity/zome_lobby_integrity/src/"
+      url: "https://github.com/Sensorica/nondominium/tree/2e2f235d980e27753ea8a6d8a4d252863d293de7/dnas/lobby/zomes/integrity/zome_lobby_integrity/src"
 - id: lobbycoord
   name: zome_lobby_coordinator
   level: component
@@ -494,6 +701,9 @@ None of it is in the code yet: the substrate is [#184](https://github.com/Sensor
   does: "Nine hdk_extern functions, init included: upsert and read lobby profiles, announce a group, and list all groups, my groups or one group by its DNA hash."
   code:
     - dnas/lobby/zomes/coordinator/zome_lobby_coordinator/src/lib.rs:1-291
+  links:
+    - label: "Source at 2e2f235: dnas/lobby/zomes/coordinator/zome_lobby_coordinator/src/lib.rs"
+      url: "https://github.com/Sensorica/nondominium/blob/2e2f235d980e27753ea8a6d8a4d252863d293de7/dnas/lobby/zomes/coordinator/zome_lobby_coordinator/src/lib.rs"
 
 - id: personint
   name: zome_person integrity
@@ -505,6 +715,11 @@ None of it is in the code yet: the substrate is [#184](https://github.com/Sensor
   code:
     - dnas/nondominium/zomes/integrity/zome_person/src/lib.rs:42-120
     - dnas/nondominium/zomes/integrity/zome_person/src/lib.rs:264-306
+  links:
+    - label: "Design system: replica of an agent profile"
+      url: "/app/agent/uhCAkZ4x0cV7bN2mQ5wE8rT1yU4iO7pA0sD3fG6hJ9kL2"
+    - label: "Source at 2e2f235: dnas/nondominium/zomes/integrity/zome_person/src/"
+      url: "https://github.com/Sensorica/nondominium/tree/2e2f235d980e27753ea8a6d8a4d252863d293de7/dnas/nondominium/zomes/integrity/zome_person/src"
 - id: personcoord
   name: zome_person coordinator
   level: component
@@ -518,6 +733,13 @@ None of it is in the code yet: the substrate is [#184](https://github.com/Sensor
     - dnas/nondominium/zomes/coordinator/zome_person/src/capability_based_sharing.rs:30-120
     - dnas/nondominium/zomes/coordinator/zome_person/src/device_management.rs:46-130
     - dnas/nondominium/zomes/coordinator/zome_person/src/hrea_bridge.rs:1-39
+  links:
+    - label: "Design system: replica of an agent profile"
+      url: "/app/agent/uhCAkZ4x0cV7bN2mQ5wE8rT1yU4iO7pA0sD3fG6hJ9kL2"
+    - label: "Design system: the agent identity scenario"
+      url: "/scenarios/agent-identity"
+    - label: "Source at 2e2f235: dnas/nondominium/zomes/coordinator/zome_person/src/"
+      url: "https://github.com/Sensorica/nondominium/tree/2e2f235d980e27753ea8a6d8a4d252863d293de7/dnas/nondominium/zomes/coordinator/zome_person/src"
 - id: resint
   name: zome_resource integrity
   level: component
@@ -529,6 +751,11 @@ None of it is in the code yet: the substrate is [#184](https://github.com/Sensor
   code:
     - dnas/nondominium/zomes/integrity/zome_resource/src/lib.rs:15-145
     - dnas/nondominium/zomes/integrity/zome_resource/src/lib.rs:146-209
+  links:
+    - label: "#184: feat(resource): CapabilitySlot substrate on the NDO identity (REQ-NDO-CS-01, 02, 04, 06)"
+      url: "https://github.com/Sensorica/nondominium/issues/184"
+    - label: "#204: feat(resource): bring the Use and Consume fork from the experiment branch"
+      url: "https://github.com/Sensorica/nondominium/issues/204"
 - id: rescoord
   name: zome_resource coordinator
   level: component
@@ -543,6 +770,17 @@ None of it is in the code yet: the substrate is [#184](https://github.com/Sensor
     - dnas/nondominium/zomes/coordinator/zome_resource/src/economic_resource.rs:390-509
     - dnas/nondominium/zomes/coordinator/zome_resource/src/governance_rule.rs:25-107
     - dnas/nondominium/zomes/coordinator/zome_resource/src/lib.rs:44-80
+  links:
+    - label: "#206: feat(resource): Layer 1 specification versions, the latest link canonical (REQ-NDO-L1-03)"
+      url: "https://github.com/Sensorica/nondominium/issues/206"
+    - label: "#207: feat(resource): dormant Layer 1 marks the specification inactive (REQ-NDO-L1-04)"
+      url: "https://github.com/Sensorica/nondominium/issues/207"
+    - label: "#144: bug(resource): changing a specification's scope never reconciles the global discovery anchor"
+      url: "https://github.com/Sensorica/nondominium/issues/144"
+    - label: "#189: feat(hrea): ResourceSpecification through ReaResourceSpecification, behind dual-read"
+      url: "https://github.com/Sensorica/nondominium/issues/189"
+    - label: "#190: feat(hrea): EconomicResource through ReaEconomicResource, behind dual-read"
+      url: "https://github.com/Sensorica/nondominium/issues/190"
 - id: govint
   name: zome_gouvernance integrity
   level: component
@@ -555,6 +793,17 @@ None of it is in the code yet: the substrate is [#184](https://github.com/Sensor
     - dnas/nondominium/zomes/integrity/zome_gouvernance/src/lib.rs:17-158
     - dnas/nondominium/zomes/integrity/zome_gouvernance/src/lib.rs:160-202
     - dnas/nondominium/zomes/integrity/zome_gouvernance/src/ppr.rs:253-330
+  links:
+    - label: "#220: fix(gouvernance): agreement shares must sum to exactly 100"
+      url: "https://github.com/Sensorica/nondominium/issues/220"
+    - label: "#222: feat(gouvernance): store the distribution placeholder and the license share parameter"
+      url: "https://github.com/Sensorica/nondominium/issues/222"
+    - label: "#223: feat(gouvernance): a forked NDO must carry its parent's share, validated in integrity"
+      url: "https://github.com/Sensorica/nondominium/issues/223"
+    - label: "Design system: replica of an NDO's governance tab"
+      url: "/app/ndo/uhC0kVX5k7dL2mPqR8sT1uW4xY7zA0bC3dE6fG9h?tab=governance"
+    - label: "Design system: the governance review scenario"
+      url: "/scenarios/governance-review"
 - id: govcoord
   name: zome_gouvernance coordinator
   level: component
@@ -570,6 +819,15 @@ None of it is in the code yet: the substrate is [#184](https://github.com/Sensor
     - dnas/nondominium/zomes/coordinator/zome_gouvernance/src/ppr.rs:85-120
     - dnas/nondominium/zomes/coordinator/zome_gouvernance/src/transition.rs:1-70
     - dnas/nondominium/zomes/coordinator/zome_gouvernance/src/lib.rs:42-68
+  links:
+    - label: "#191: feat(hrea): Commitment through ReaCommitment, behind dual-read"
+      url: "https://github.com/Sensorica/nondominium/issues/191"
+    - label: "#192: feat(hrea): EconomicEvent through ReaEconomicEvent, behind dual-read"
+      url: "https://github.com/Sensorica/nondominium/issues/192"
+    - label: "Design system: replica of an NDO's governance tab"
+      url: "/app/ndo/uhC0kVX5k7dL2mPqR8sT1uW4xY7zA0bC3dE6fG9h?tab=governance"
+    - label: "Design system: the governance review scenario"
+      url: "/scenarios/governance-review"
 - id: misc
   name: misc
   level: component
@@ -579,6 +837,9 @@ None of it is in the code yet: the substrate is [#184](https://github.com/Sensor
   does: "A coordinator zome with one function, ping, answering Pong: a liveness probe for the core cell."
   code:
     - dnas/nondominium/zomes/coordinator/misc/src/lib.rs:1-6
+  links:
+    - label: "Source at 2e2f235: dnas/nondominium/zomes/coordinator/misc/src/lib.rs"
+      url: "https://github.com/Sensorica/nondominium/blob/2e2f235d980e27753ea8a6d8a4d252863d293de7/dnas/nondominium/zomes/coordinator/misc/src/lib.rs"
 - id: nativevf
   name: Native Valueflows types
   level: component
@@ -591,6 +852,11 @@ None of it is in the code yet: the substrate is [#184](https://github.com/Sensor
     - dnas/nondominium/zomes/integrity/zome_resource/src/lib.rs:15-90
     - dnas/nondominium/zomes/integrity/zome_gouvernance/src/lib.rs:28-69
     - documentation/hREA/v0.2-release-plan.md:52-85
+  links:
+    - label: "#194: refactor(hrea): remove the native Phase A types once parity holds"
+      url: "https://github.com/Sensorica/nondominium/issues/194"
+    - label: "v0.2-release-plan.md at 2e2f235"
+      url: "https://github.com/Sensorica/nondominium/blob/2e2f235d980e27753ea8a6d8a4d252863d293de7/documentation/hREA/v0.2-release-plan.md"
 - id: govengine
   name: Governance engine
   level: component
@@ -601,6 +867,21 @@ None of it is in the code yet: the substrate is [#184](https://github.com/Sensor
   change: new
   code:
     - documentation/specifications/governance/governance-operator-architecture.md:1-36
+  links:
+    - label: "#41: Define cross-zome interface types for governance-as-operator protocol"
+      url: "https://github.com/Sensorica/nondominium/issues/41"
+    - label: "#42: Implement pure-function GovernanceEngine for state transition evaluation"
+      url: "https://github.com/Sensorica/nondominium/issues/42"
+    - label: "#145: design: decide whether write paths funnel through evaluate_state_transition or stay parallel"
+      url: "https://github.com/Sensorica/nondominium/issues/145"
+    - label: "#43: Refactor resource zome to use Request-Evaluate-Apply pattern"
+      url: "https://github.com/Sensorica/nondominium/issues/43"
+    - label: "#44: Automatic economic event generation on approved state transitions"
+      url: "https://github.com/Sensorica/nondominium/issues/44"
+    - label: "#45: Governance-as-operator testing infrastructure: mock engine and cross-zome tests"
+      url: "https://github.com/Sensorica/nondominium/issues/45"
+    - label: "governance-operator-architecture.md at 2e2f235"
+      url: "https://github.com/Sensorica/nondominium/blob/2e2f235d980e27753ea8a6d8a4d252863d293de7/documentation/specifications/governance/governance-operator-architecture.md"
 - id: ppr
   name: Private participation receipts
   level: component
@@ -612,6 +893,9 @@ None of it is in the code yet: the substrate is [#184](https://github.com/Sensor
     - dnas/nondominium/zomes/integrity/zome_gouvernance/src/ppr.rs:7-33
     - dnas/nondominium/zomes/integrity/zome_gouvernance/src/ppr.rs:253-349
     - dnas/nondominium/zomes/coordinator/zome_gouvernance/src/ppr.rs:85-120
+  links:
+    - label: "#200: test(ppr): PPRs stay private entries after the migration"
+      url: "https://github.com/Sensorica/nondominium/issues/200"
 - id: roles
   name: Roles and governance tiers
   level: component
@@ -622,6 +906,13 @@ None of it is in the code yet: the substrate is [#184](https://github.com/Sensor
   code:
     - dnas/nondominium/zomes/integrity/zome_person/src/lib.rs:76-157
     - dnas/nondominium/zomes/coordinator/zome_person/src/role.rs:55-104
+  links:
+    - label: "Design system: replica of an NDO's governance tab"
+      url: "/app/ndo/uhC0kVX5k7dL2mPqR8sT1uW4xY7zA0bC3dE6fG9h?tab=governance"
+    - label: "Design system: the governance review scenario"
+      url: "/scenarios/governance-review"
+    - label: "Source at 2e2f235: dnas/nondominium/zomes/"
+      url: "https://github.com/Sensorica/nondominium/tree/2e2f235d980e27753ea8a6d8a4d252863d293de7/dnas/nondominium/zomes"
 - id: privdata
   name: Private data and capability grants
   level: component
@@ -633,6 +924,9 @@ None of it is in the code yet: the substrate is [#184](https://github.com/Sensor
     - dnas/nondominium/zomes/integrity/zome_person/src/lib.rs:56-75
     - dnas/nondominium/zomes/integrity/zome_person/src/lib.rs:156-188
     - dnas/nondominium/zomes/coordinator/zome_person/src/capability_based_sharing.rs:30-120
+  links:
+    - label: "Source at 2e2f235: dnas/nondominium/zomes/"
+      url: "https://github.com/Sensorica/nondominium/tree/2e2f235d980e27753ea8a6d8a4d252863d293de7/dnas/nondominium/zomes"
 - id: flowstazomes
   name: Flowsta agent-linking zomes
   level: component
@@ -644,6 +938,11 @@ None of it is in the code yet: the substrate is [#184](https://github.com/Sensor
   code:
     - documentation/requirements/post-mvp/flowsta-integration.md:105-118
     - documentation/requirements/post-mvp/flowsta-integration.md:131-143
+  links:
+    - label: "#156: feat(identity): link agents to Flowsta for cross-app identity and key recovery (Tier 1)"
+      url: "https://github.com/Sensorica/nondominium/issues/156"
+    - label: "flowsta-integration.md at 2e2f235"
+      url: "https://github.com/Sensorica/nondominium/blob/2e2f235d980e27753ea8a6d8a4d252863d293de7/documentation/requirements/post-mvp/flowsta-integration.md"
 - id: filestorage
   name: File storage zomes
   level: component
@@ -652,6 +951,9 @@ None of it is in the code yet: the substrate is [#184](https://github.com/Sensor
   tech: holochain-open-dev/file-storage
   does: "Chunked, peer-hosted file storage so an NDO carries its design files, models and documents as DigitalAsset capability slots. Planned in #99 (v0.2), which names the nondominium DNA as its home; it predates the per-NDO cells."
   change: new
+  links:
+    - label: "#99: Integrate holochain-open-dev/file-storage as DigitalAsset CapabilitySlot for NDO content attachments"
+      url: "https://github.com/Sensorica/nondominium/issues/99"
 
 - id: groupint
   name: zome_group_integrity
@@ -663,6 +965,11 @@ None of it is in the code yet: the substrate is [#184](https://github.com/Sensor
   code:
     - dnas/group/zomes/integrity/zome_group_integrity/src/lib.rs:12-93
     - dnas/group/zomes/integrity/zome_group_integrity/src/lib.rs:180-241
+  links:
+    - label: "Design system: replica of a group page"
+      url: "/app/group/sensorica-lab-7f3a"
+    - label: "Source at 2e2f235: dnas/group/zomes/integrity/zome_group_integrity/src/"
+      url: "https://github.com/Sensorica/nondominium/tree/2e2f235d980e27753ea8a6d8a4d252863d293de7/dnas/group/zomes/integrity/zome_group_integrity/src"
 - id: groupcoord
   name: zome_group coordinator
   level: component
@@ -675,6 +982,11 @@ None of it is in the code yet: the substrate is [#184](https://github.com/Sensor
     - dnas/group/zomes/coordinator/zome_group/src/membership.rs:7-113
     - dnas/group/zomes/coordinator/zome_group/src/ndo_anchor.rs:1-117
     - dnas/group/zomes/coordinator/zome_group/src/work_log.rs:13-44
+  links:
+    - label: "Design system: replica of a group page"
+      url: "/app/group/sensorica-lab-7f3a"
+    - label: "Source at 2e2f235: dnas/group/zomes/coordinator/zome_group/src/"
+      url: "https://github.com/Sensorica/nondominium/tree/2e2f235d980e27753ea8a6d8a4d252863d293de7/dnas/group/zomes/coordinator/zome_group/src"
 - id: workctx
   name: Work contexts
   level: component
@@ -685,6 +997,11 @@ None of it is in the code yet: the substrate is [#184](https://github.com/Sensor
   change: new
   code:
     - documentation/specifications/adr/ADR-014-work-contexts-in-group-dht.md:23-31
+  links:
+    - label: "#201: feat(group): work contexts in the group DHT"
+      url: "https://github.com/Sensorica/nondominium/issues/201"
+    - label: "ADR-014-work-contexts-in-group-dht.md at 2e2f235"
+      url: "https://github.com/Sensorica/nondominium/blob/2e2f235d980e27753ea8a6d8a4d252863d293de7/documentation/specifications/adr/ADR-014-work-contexts-in-group-dht.md"
 
 - id: ndoresint
   name: zome_resource integrity (NDO cell)
@@ -696,6 +1013,11 @@ None of it is in the code yet: the substrate is [#184](https://github.com/Sensor
   code:
     - dnas/ndo/workdir/dna.yaml:3-12
     - dnas/nondominium/zomes/integrity/zome_resource/src/lib.rs:675-692
+  links:
+    - label: "Source at 2e2f235: dnas/ndo/workdir/dna.yaml"
+      url: "https://github.com/Sensorica/nondominium/blob/2e2f235d980e27753ea8a6d8a4d252863d293de7/dnas/ndo/workdir/dna.yaml"
+    - label: "Source at 2e2f235: dnas/nondominium/zomes/integrity/zome_resource/src/lib.rs"
+      url: "https://github.com/Sensorica/nondominium/blob/2e2f235d980e27753ea8a6d8a4d252863d293de7/dnas/nondominium/zomes/integrity/zome_resource/src/lib.rs"
 - id: ndorescoord
   name: zome_resource coordinator (NDO cell)
   level: component
@@ -707,6 +1029,13 @@ None of it is in the code yet: the substrate is [#184](https://github.com/Sensor
     - dnas/ndo/workdir/dna.yaml:13-19
     - dnas/nondominium/zomes/coordinator/zome_resource/src/ndo_identity.rs:140-214
     - dnas/nondominium/zomes/coordinator/zome_resource/src/ndo_membership.rs:31-118
+  links:
+    - label: "Source at 2e2f235: dnas/ndo/workdir/dna.yaml"
+      url: "https://github.com/Sensorica/nondominium/blob/2e2f235d980e27753ea8a6d8a4d252863d293de7/dnas/ndo/workdir/dna.yaml"
+    - label: "Source at 2e2f235: dnas/nondominium/zomes/coordinator/zome_resource/src/ndo_identity.rs"
+      url: "https://github.com/Sensorica/nondominium/blob/2e2f235d980e27753ea8a6d8a4d252863d293de7/dnas/nondominium/zomes/coordinator/zome_resource/src/ndo_identity.rs"
+    - label: "Source at 2e2f235: dnas/nondominium/zomes/coordinator/zome_resource/src/ndo_membership.rs"
+      url: "https://github.com/Sensorica/nondominium/blob/2e2f235d980e27753ea8a6d8a4d252863d293de7/dnas/nondominium/zomes/coordinator/zome_resource/src/ndo_membership.rs"
 - id: ndogovint
   name: zome_gouvernance integrity (NDO cell)
   level: component
@@ -716,6 +1045,9 @@ None of it is in the code yet: the substrate is [#184](https://github.com/Sensor
   does: "The same zome_gouvernance integrity wasm, validating the NDO's commitments, claims, events and agreement inside its own DHT."
   code:
     - dnas/ndo/workdir/dna.yaml:9-12
+  links:
+    - label: "Source at 2e2f235: dnas/ndo/workdir/dna.yaml"
+      url: "https://github.com/Sensorica/nondominium/blob/2e2f235d980e27753ea8a6d8a4d252863d293de7/dnas/ndo/workdir/dna.yaml"
 - id: ndogovcoord
   name: zome_gouvernance coordinator (NDO cell)
   level: component
@@ -726,6 +1058,11 @@ None of it is in the code yet: the substrate is [#184](https://github.com/Sensor
   code:
     - dnas/ndo/workdir/dna.yaml:20-25
     - dnas/nondominium/zomes/coordinator/zome_gouvernance/src/commitment.rs:121-163
+  links:
+    - label: "Source at 2e2f235: dnas/ndo/workdir/dna.yaml"
+      url: "https://github.com/Sensorica/nondominium/blob/2e2f235d980e27753ea8a6d8a4d252863d293de7/dnas/ndo/workdir/dna.yaml"
+    - label: "Source at 2e2f235: dnas/nondominium/zomes/coordinator/zome_gouvernance/src/commitment.rs"
+      url: "https://github.com/Sensorica/nondominium/blob/2e2f235d980e27753ea8a6d8a4d252863d293de7/dnas/nondominium/zomes/coordinator/zome_gouvernance/src/commitment.rs"
 - id: dnaprops
   name: NDO DNA properties
   level: component
@@ -737,6 +1074,11 @@ None of it is in the code yet: the substrate is [#184](https://github.com/Sensor
   code:
     - crates/shared/src/types.rs:277-282
     - documentation/specifications/adr/ADR-010-013-per-ndo-cells.md:1-40
+  links:
+    - label: "#223: feat(gouvernance): a forked NDO must carry its parent's share, validated in integrity"
+      url: "https://github.com/Sensorica/nondominium/issues/223"
+    - label: "ADR-010-013-per-ndo-cells.md at 2e2f235"
+      url: "https://github.com/Sensorica/nondominium/blob/2e2f235d980e27753ea8a6d8a4d252863d293de7/documentation/specifications/adr/ADR-010-013-per-ndo-cells.md"
 - id: layer0
   name: "Layer 0: identity"
   level: component
@@ -748,6 +1090,19 @@ None of it is in the code yet: the substrate is [#184](https://github.com/Sensor
   code:
     - dnas/nondominium/zomes/integrity/zome_resource/src/lib.rs:88-130
     - documentation/requirements/ndo_prima_materia.md:223-266
+  links:
+    - label: "#41: Define cross-zome interface types for governance-as-operator protocol"
+      url: "https://github.com/Sensorica/nondominium/issues/41"
+    - label: "#42: Implement pure-function GovernanceEngine for state transition evaluation"
+      url: "https://github.com/Sensorica/nondominium/issues/42"
+    - label: "#44: Automatic economic event generation on approved state transitions"
+      url: "https://github.com/Sensorica/nondominium/issues/44"
+    - label: "ndo_prima_materia.md at 2e2f235"
+      url: "https://github.com/Sensorica/nondominium/blob/2e2f235d980e27753ea8a6d8a4d252863d293de7/documentation/requirements/ndo_prima_materia.md"
+    - label: "Design system: replica of the new NDO form"
+      url: "/app/ndo/new"
+    - label: "Design system: the NDO creation scenario"
+      url: "/scenarios/ndo-creation"
 - id: layer1
   name: "Layer 1: specification"
   level: component
@@ -759,6 +1114,17 @@ None of it is in the code yet: the substrate is [#184](https://github.com/Sensor
   code:
     - dnas/nondominium/zomes/coordinator/zome_resource/src/resource_specification.rs:228-236
     - documentation/requirements/ndo_prima_materia.md:268-293
+  links:
+    - label: "PR #132: feat(resource)!: NDO Layer 1 typed governance rules, classification constraints, and OperationalState"
+      url: "https://github.com/Sensorica/nondominium/pull/132"
+    - label: "#206: feat(resource): Layer 1 specification versions, the latest link canonical (REQ-NDO-L1-03)"
+      url: "https://github.com/Sensorica/nondominium/issues/206"
+    - label: "#207: feat(resource): dormant Layer 1 marks the specification inactive (REQ-NDO-L1-04)"
+      url: "https://github.com/Sensorica/nondominium/issues/207"
+    - label: "ndo_prima_materia.md at 2e2f235"
+      url: "https://github.com/Sensorica/nondominium/blob/2e2f235d980e27753ea8a6d8a4d252863d293de7/documentation/requirements/ndo_prima_materia.md"
+    - label: "Design system: replica of the specification form"
+      url: "/app/ndo/uhC0kVX5k7dL2mPqR8sT1uW4xY7zA0bC3dE6fG9h?modal=spec-create"
 - id: layer2
   name: "Layer 2: process"
   level: component
@@ -770,6 +1136,13 @@ None of it is in the code yet: the substrate is [#184](https://github.com/Sensor
   code:
     - documentation/requirements/ndo_prima_materia.md:295-320
     - documentation/requirements/ndo_prima_materia.md:1320-1329
+  links:
+    - label: "#78: [Epic] NDO Three-Layer Architecture"
+      url: "https://github.com/Sensorica/nondominium/issues/78"
+    - label: "PR #183: feat: bring Tibi's general backend work from commitment-pool-experiment onto dev"
+      url: "https://github.com/Sensorica/nondominium/pull/183"
+    - label: "ndo_prima_materia.md at 2e2f235"
+      url: "https://github.com/Sensorica/nondominium/blob/2e2f235d980e27753ea8a6d8a4d252863d293de7/documentation/requirements/ndo_prima_materia.md"
 
 - id: slotlink
   name: CapabilitySlot link
@@ -782,6 +1155,11 @@ None of it is in the code yet: the substrate is [#184](https://github.com/Sensor
   code:
     - documentation/requirements/ndo_prima_materia.md:1131-1155
     - documentation/requirements/ndo_prima_materia.md:563-585
+  links:
+    - label: "#184: feat(resource): CapabilitySlot substrate on the NDO identity (REQ-NDO-CS-01, 02, 04, 06)"
+      url: "https://github.com/Sensorica/nondominium/issues/184"
+    - label: "ndo_prima_materia.md at 2e2f235"
+      url: "https://github.com/Sensorica/nondominium/blob/2e2f235d980e27753ea8a6d8a4d252863d293de7/documentation/requirements/ndo_prima_materia.md"
 - id: slotapi
   name: Slot functions
   level: component
@@ -792,6 +1170,11 @@ None of it is in the code yet: the substrate is [#184](https://github.com/Sensor
   change: new
   code:
     - documentation/specifications/ndo-v1-architecture-design.md:632-636
+  links:
+    - label: "#184: feat(resource): CapabilitySlot substrate on the NDO identity (REQ-NDO-CS-01, 02, 04, 06)"
+      url: "https://github.com/Sensorica/nondominium/issues/184"
+    - label: "ndo-v1-architecture-design.md at 2e2f235"
+      url: "https://github.com/Sensorica/nondominium/blob/2e2f235d980e27753ea8a6d8a4d252863d293de7/documentation/specifications/ndo-v1-architecture-design.md"
 - id: personslot
   name: Person capability slot
   level: component
@@ -803,6 +1186,11 @@ None of it is in the code yet: the substrate is [#184](https://github.com/Sensor
   code:
     - dnas/nondominium/zomes/integrity/zome_person/src/lib.rs:28-37
     - documentation/requirements/ndo_prima_materia.md:607-622
+  links:
+    - label: "#156: feat(identity): link agents to Flowsta for cross-app identity and key recovery (Tier 1)"
+      url: "https://github.com/Sensorica/nondominium/issues/156"
+    - label: "ndo_prima_materia.md at 2e2f235"
+      url: "https://github.com/Sensorica/nondominium/blob/2e2f235d980e27753ea8a6d8a4d252863d293de7/documentation/requirements/ndo_prima_materia.md"
 - id: slottrust
   name: Slot trust marking
   level: component
@@ -813,6 +1201,11 @@ None of it is in the code yet: the substrate is [#184](https://github.com/Sensor
   change: new
   code:
     - documentation/requirements/ndo_prima_materia.md:594-606
+  links:
+    - label: "#184: feat(resource): CapabilitySlot substrate on the NDO identity (REQ-NDO-CS-01, 02, 04, 06)"
+      url: "https://github.com/Sensorica/nondominium/issues/184"
+    - label: "ndo_prima_materia.md at 2e2f235"
+      url: "https://github.com/Sensorica/nondominium/blob/2e2f235d980e27753ea8a6d8a4d252863d293de7/documentation/requirements/ndo_prima_materia.md"
 - id: slotdigital
   name: DigitalAsset slot
   level: component
@@ -823,6 +1216,11 @@ None of it is in the code yet: the substrate is [#184](https://github.com/Sensor
   change: new
   code:
     - documentation/requirements/post-mvp/project-type-ndo-specifications.md:87-96
+  links:
+    - label: "#99: Integrate holochain-open-dev/file-storage as DigitalAsset CapabilitySlot for NDO content attachments"
+      url: "https://github.com/Sensorica/nondominium/issues/99"
+    - label: "project-type-ndo-specifications.md at 2e2f235"
+      url: "https://github.com/Sensorica/nondominium/blob/2e2f235d980e27753ea8a6d8a4d252863d293de7/documentation/requirements/post-mvp/project-type-ndo-specifications.md"
 - id: slotflowsta
   name: FlowstaIdentity slot
   level: component
@@ -833,6 +1231,11 @@ None of it is in the code yet: the substrate is [#184](https://github.com/Sensor
   change: new
   code:
     - documentation/requirements/post-mvp/flowsta-integration.md:105-118
+  links:
+    - label: "#156: feat(identity): link agents to Flowsta for cross-app identity and key recovery (Tier 1)"
+      url: "https://github.com/Sensorica/nondominium/issues/156"
+    - label: "flowsta-integration.md at 2e2f235"
+      url: "https://github.com/Sensorica/nondominium/blob/2e2f235d980e27753ea8a6d8a4d252863d293de7/documentation/requirements/post-mvp/flowsta-integration.md"
 - id: slotunyt
   name: UnytAgreement slot
   level: component
@@ -844,6 +1247,11 @@ None of it is in the code yet: the substrate is [#184](https://github.com/Sensor
   code:
     - documentation/requirements/post-mvp/unyt-integration.md:169-174
     - documentation/requirements/ndo_prima_materia.md:641-660
+  links:
+    - label: "unyt-integration.md at 2e2f235"
+      url: "https://github.com/Sensorica/nondominium/blob/2e2f235d980e27753ea8a6d8a4d252863d293de7/documentation/requirements/post-mvp/unyt-integration.md"
+    - label: "ndo_prima_materia.md at 2e2f235"
+      url: "https://github.com/Sensorica/nondominium/blob/2e2f235d980e27753ea8a6d8a4d252863d293de7/documentation/requirements/ndo_prima_materia.md"
 - id: slotweave
   name: WeaveWAL slot
   level: component
@@ -854,6 +1262,11 @@ None of it is in the code yet: the substrate is [#184](https://github.com/Sensor
   change: new
   code:
     - documentation/requirements/ndo_prima_materia.md:586-593
+  links:
+    - label: "#165: feat(moss): NDOs as Moss assets"
+      url: "https://github.com/Sensorica/nondominium/issues/165"
+    - label: "ndo_prima_materia.md at 2e2f235"
+      url: "https://github.com/Sensorica/nondominium/blob/2e2f235d980e27753ea8a6d8a4d252863d293de7/documentation/requirements/ndo_prima_materia.md"
 - id: slotcustom
   name: CustomApp slot
   level: component
@@ -864,6 +1277,11 @@ None of it is in the code yet: the substrate is [#184](https://github.com/Sensor
   change: new
   code:
     - documentation/requirements/ndo_prima_materia.md:1141-1153
+  links:
+    - label: "#184: feat(resource): CapabilitySlot substrate on the NDO identity (REQ-NDO-CS-01, 02, 04, 06)"
+      url: "https://github.com/Sensorica/nondominium/issues/184"
+    - label: "ndo_prima_materia.md at 2e2f235"
+      url: "https://github.com/Sensorica/nondominium/blob/2e2f235d980e27753ea8a6d8a4d252863d293de7/documentation/requirements/ndo_prima_materia.md"
 - id: slotother
   name: Other predefined slot types
   level: component
@@ -874,6 +1292,9 @@ None of it is in the code yet: the substrate is [#184](https://github.com/Sensor
   change: new
   code:
     - documentation/requirements/ndo_prima_materia.md:563-585
+  links:
+    - label: "ndo_prima_materia.md at 2e2f235"
+      url: "https://github.com/Sensorica/nondominium/blob/2e2f235d980e27753ea8a6d8a4d252863d293de7/documentation/requirements/ndo_prima_materia.md"
 
 - id: hreazomes
   name: hREA zomes
@@ -885,6 +1306,11 @@ None of it is in the code yet: the substrate is [#184](https://github.com/Sensor
   code:
     - crates/shared/src/lib.rs:83-110
     - vendor/README.md:1-3
+  links:
+    - label: "Source at 2e2f235: crates/shared/src/lib.rs"
+      url: "https://github.com/Sensorica/nondominium/blob/2e2f235d980e27753ea8a6d8a4d252863d293de7/crates/shared/src/lib.rs"
+    - label: "Source at 2e2f235: vendor/README.md"
+      url: "https://github.com/Sensorica/nondominium/blob/2e2f235d980e27753ea8a6d8a4d252863d293de7/vendor/README.md"
 - id: hreamodif
   name: hREA module interface
   level: component
@@ -894,6 +1320,13 @@ None of it is in the code yet: the substrate is [#184](https://github.com/Sensor
   change: new
   code:
     - documentation/hREA/v0.2-release-plan.md:37-48
+  links:
+    - label: "#187: research(hrea): module interface RFC on h-REA/hREA"
+      url: "https://github.com/Sensorica/nondominium/issues/187"
+    - label: "#199: feat(hrea): register InitialTransfer and AccessForUse through the module interface"
+      url: "https://github.com/Sensorica/nondominium/issues/199"
+    - label: "v0.2-release-plan.md at 2e2f235"
+      url: "https://github.com/Sensorica/nondominium/blob/2e2f235d980e27753ea8a6d8a4d252863d293de7/documentation/hREA/v0.2-release-plan.md"
 - id: hreamodules
   name: Nondominium hREA modules
   level: component
@@ -903,6 +1336,17 @@ None of it is in the code yet: the substrate is [#184](https://github.com/Sensor
   change: new
   code:
     - documentation/hREA/v0.2-release-plan.md:70-80
+  links:
+    - label: "#195: feat(hrea): the source module"
+      url: "https://github.com/Sensorica/nondominium/issues/195"
+    - label: "#196: feat(hrea): the nondominium-identity module"
+      url: "https://github.com/Sensorica/nondominium/issues/196"
+    - label: "#197: feat(hrea): the governance module"
+      url: "https://github.com/Sensorica/nondominium/issues/197"
+    - label: "#198: feat(hrea): the federation module"
+      url: "https://github.com/Sensorica/nondominium/issues/198"
+    - label: "v0.2-release-plan.md at 2e2f235"
+      url: "https://github.com/Sensorica/nondominium/blob/2e2f235d980e27753ea8a6d8a4d252863d293de7/documentation/hREA/v0.2-release-plan.md"
 
 - id: shareddomain
   name: Domain types and constraints
@@ -914,6 +1358,9 @@ None of it is in the code yet: the substrate is [#184](https://github.com/Sensor
   code:
     - crates/shared/src/types.rs:13-401
     - crates/shared/src/constraints.rs:128-260
+  links:
+    - label: "Source at 2e2f235: crates/shared/src/"
+      url: "https://github.com/Sensorica/nondominium/tree/2e2f235d980e27753ea8a6d8a4d252863d293de7/crates/shared/src"
 - id: sharedcalls
   name: Call helpers and paths
   level: component
@@ -924,6 +1371,9 @@ None of it is in the code yet: the substrate is [#184](https://github.com/Sensor
   code:
     - crates/shared/src/lib.rs:29-110
     - crates/shared/src/paths.rs:1-36
+  links:
+    - label: "Source at 2e2f235: crates/shared/src/"
+      url: "https://github.com/Sensorica/nondominium/tree/2e2f235d980e27753ea8a6d8a4d252863d293de7/crates/shared/src"
 
 - id: happyaml
   name: hApp manifest
@@ -934,6 +1384,9 @@ None of it is in the code yet: the substrate is [#184](https://github.com/Sensor
   does: "Declares the five roles, which are provisioned at install and which are cloned on demand, and their clone limits."
   code:
     - workdir/happ.yaml:1-60
+  links:
+    - label: "Source at 2e2f235: workdir/happ.yaml"
+      url: "https://github.com/Sensorica/nondominium/blob/2e2f235d980e27753ea8a6d8a4d252863d293de7/workdir/happ.yaml"
 - id: mossmanifest
   name: webhapp and Moss manifests
   level: component
@@ -945,6 +1398,9 @@ None of it is in the code yet: the substrate is [#184](https://github.com/Sensor
   code:
     - workdir/web-happ.yaml:1-6
     - workdir/moss.yaml:1-11
+  links:
+    - label: "#121: chore(release): produce and smoke-test the v0.1.0 Moss tool .webhapp"
+      url: "https://github.com/Sensorica/nondominium/issues/121"
 - id: standalone
   name: Standalone release
   level: component
@@ -952,6 +1408,9 @@ None of it is in the code yet: the substrate is [#184](https://github.com/Sensor
   kind: module
   does: "A released standalone .webhapp from the same tag as the Moss tool, the target chosen by a Vite build flag, each with a smoke test. Planned in #203 (v0.2)."
   change: new
+  links:
+    - label: "#203: release(standalone): ship the standalone build beside Moss"
+      url: "https://github.com/Sensorica/nondominium/issues/203"
 - id: weavedev
   name: Weave dev config
   level: component
@@ -961,6 +1420,9 @@ None of it is in the code yet: the substrate is [#184](https://github.com/Sensor
   does: "Starts two Moss agents, Alice and Bob, in one dev group with the tool served from the local Vite server."
   code:
     - weave/weave.dev.config.ts:1-60
+  links:
+    - label: "Source at 2e2f235: weave/weave.dev.config.ts"
+      url: "https://github.com/Sensorica/nondominium/blob/2e2f235d980e27753ea8a6d8a4d252863d293de7/weave/weave.dev.config.ts"
 - id: launcher
   name: Dev network launcher
   level: component
@@ -970,6 +1432,9 @@ None of it is in the code yet: the substrate is [#184](https://github.com/Sensor
   does: "Starts a bootstrap server and one sandbox conductor per agent, installs the .happ by path and writes the connection manifest the UI reads."
   code:
     - scripts/launch-happ.mjs:1-60
+  links:
+    - label: "Source at 2e2f235: scripts/launch-happ.mjs"
+      url: "https://github.com/Sensorica/nondominium/blob/2e2f235d980e27753ea8a6d8a4d252863d293de7/scripts/launch-happ.mjs"
 
 - id: sweettest
   name: Sweettest suites
@@ -982,6 +1447,13 @@ None of it is in the code yet: the substrate is [#184](https://github.com/Sensor
     - dnas/nondominium/tests/src/nondominium/ndo_layer0/mod.rs:1-80
     - dnas/group/tests/src/ndo_anchor/mod.rs:1-80
     - dnas/lobby/tests/src/lobby/mod.rs:1-60
+  links:
+    - label: "Source at 2e2f235: dnas/nondominium/tests/src/nondominium/ndo_layer0/mod.rs"
+      url: "https://github.com/Sensorica/nondominium/blob/2e2f235d980e27753ea8a6d8a4d252863d293de7/dnas/nondominium/tests/src/nondominium/ndo_layer0/mod.rs"
+    - label: "Source at 2e2f235: dnas/group/tests/src/ndo_anchor/mod.rs"
+      url: "https://github.com/Sensorica/nondominium/blob/2e2f235d980e27753ea8a6d8a4d252863d293de7/dnas/group/tests/src/ndo_anchor/mod.rs"
+    - label: "Source at 2e2f235: dnas/lobby/tests/src/lobby/mod.rs"
+      url: "https://github.com/Sensorica/nondominium/blob/2e2f235d980e27753ea8a6d8a4d252863d293de7/dnas/lobby/tests/src/lobby/mod.rs"
 - id: e2e
   name: Playwright end-to-end
   level: component
@@ -992,6 +1464,11 @@ None of it is in the code yet: the substrate is [#184](https://github.com/Sensor
   code:
     - ui/playwright.config.ts:1-67
     - ui/tests/e2e/specs/multi-agent.spec.ts:1-60
+  links:
+    - label: "Source at 2e2f235: ui/playwright.config.ts"
+      url: "https://github.com/Sensorica/nondominium/blob/2e2f235d980e27753ea8a6d8a4d252863d293de7/ui/playwright.config.ts"
+    - label: "Source at 2e2f235: ui/tests/e2e/specs/multi-agent.spec.ts"
+      url: "https://github.com/Sensorica/nondominium/blob/2e2f235d980e27753ea8a6d8a4d252863d293de7/ui/tests/e2e/specs/multi-agent.spec.ts"
 - id: tryorama
   name: Tryorama suite (deprecated)
   level: component
@@ -1001,6 +1478,9 @@ None of it is in the code yet: the substrate is [#184](https://github.com/Sensor
   does: "The legacy TypeScript suite, kept as reference only: it cannot connect to a Holochain 0.7 conductor."
   code:
     - tests/DEPRECATED.md:1-20
+  links:
+    - label: "Source at 2e2f235: tests/DEPRECATED.md"
+      url: "https://github.com/Sensorica/nondominium/blob/2e2f235d980e27753ea8a6d8a4d252863d293de7/tests/DEPRECATED.md"
 - id: parity
   name: Dual-read parity harness
   level: component
@@ -1011,6 +1491,11 @@ None of it is in the code yet: the substrate is [#184](https://github.com/Sensor
   change: new
   code:
     - documentation/hREA/v0.2-release-plan.md:89-108
+  links:
+    - label: "#188: test(hrea): dual-read parity harness for Phase A"
+      url: "https://github.com/Sensorica/nondominium/issues/188"
+    - label: "v0.2-release-plan.md at 2e2f235"
+      url: "https://github.com/Sensorica/nondominium/blob/2e2f235d980e27753ea8a6d8a4d252863d293de7/documentation/hREA/v0.2-release-plan.md"
 ```
 
 ```board-relations
