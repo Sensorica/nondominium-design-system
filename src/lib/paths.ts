@@ -154,6 +154,12 @@ export const paths = {
   /** The compiled board itself, full page, outside the site chrome. */
   brainstormBoard: (slug: string) => `${base}/brainstorms/boards/${encodeURIComponent(slug)}.html`,
 
+  // ── Architecture: the Niceboard sources in content/architecture/, compiled to static/architecture/boards/ ──
+  architecture: () => `${base}/architecture`,
+  architectureBoard: (slug: string) => `${base}/architecture/${encodeURIComponent(slug)}`,
+  /** The compiled board itself, full page, outside the site chrome. */
+  architectureBoardFile: (slug: string) => `${base}/architecture/boards/${encodeURIComponent(slug)}.html`,
+
   // ── Workflow: the iterative V, with the published boards at each stage ──
   workflow: () => `${base}/workflow`,
 

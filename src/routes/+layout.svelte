@@ -178,6 +178,12 @@
           </div>
 
           <div class="group">
+            <a class="grouphead" href={paths.architecture()} class:on={current.startsWith(paths.architecture())}>
+              Architecture
+            </a>
+          </div>
+
+          <div class="group">
             <a class="grouphead" href={paths.releaseCurrent()} class:on={current.startsWith(paths.releases())}>
               Release board
             </a>

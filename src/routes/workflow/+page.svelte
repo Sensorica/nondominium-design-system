@@ -96,7 +96,7 @@
     <p class="lede">
       Nondominium's work runs down an iterative V. It starts as a brainstorm and descends through requirements, architecture, interfaces and project management to implementation, the point of the V. It then climbs back up the other arm, where each rung checks the one it faces: review and merge against project management, unit, integration and acceptance proofs against interfaces, architecture and requirements, and deployments against the brainstorm. A board moves down the V as the work advances, and a later stage can send the work back up to an earlier one. Each stage lists the boards published at it.
     </p>
-    <p class="summary"><b>{total}</b> {total === 1 ? 'board' : 'boards'} across <b>{data.stages.filter((s) => s.boards.length).length}</b> of {data.stages.length} stages · <a href={paths.brainstorms()}>all brainstorms</a></p>
+    <p class="summary"><b>{total}</b> {total === 1 ? 'board' : 'boards'} across <b>{data.stages.filter((s) => s.boards.length).length}</b> of {data.stages.length} stages · <a href={paths.brainstorms()}>all brainstorms</a> · <a href={paths.architecture()}>all architecture</a></p>
   </header>
 
   <div class="vscroll" bind:this={scroller}>
@@ -120,7 +120,7 @@
           <ul class="boards">
             {#each boards as b (b.slug)}
               <li>
-                <a href={paths.brainstorm(b.slug)} lang={b.lang}>{b.title}</a>
+                <a href={b.href} lang={b.lang}>{b.title}</a>
                 <span class="meta">{b.date} · {STATUS_LABEL[b.status] ?? b.status}{b.lang !== 'en' ? ` · ${LANG_LABEL[b.lang] ?? b.lang}` : ''}</span>
               </li>
             {/each}

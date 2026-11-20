@@ -2,6 +2,8 @@
 
 `/brainstorms` lists every published Nondominium design board, newest first, with full-text search and filters by stage, status, project and language. Each one opens at `/brainstorms/<slug>` inside the site chrome, with the comments drawer on its own thread and a link to open the board full page.
 
+Boards that draw the system's structure rather than weigh options (`template: architecture`) go under `content/architecture/` and are published at `/architecture`: see [ARCHITECTURE_BOARDS.md](ARCHITECTURE_BOARDS.md).
+
 A board is a Niceboard: one markdown source compiled into an interactive, offline page (stickies, decision cards with a "copy my answers" export, zoomable diagrams). The site publishes the compiled page as it is and indexes the source's frontmatter.
 
 ## Adding a board
@@ -61,7 +63,7 @@ The boards live in `boards/`, not beside the route, because the site prerenders 
 
 ### The V on the site
 
-`/workflow` draws the V with five rungs per side and implementation at the point, on the axis of symmetry. Each rung on the right checks the one it faces on the left: deployments face the brainstorm, acceptance proofs face requirements, integration proofs face architecture, unit proofs face interfaces, and review and merge faces project management. Review and merge is not a `lifecycle:` stage, since no board sits there (pull requests close the issues opened at project management), and the three proofs rungs all list the `lifecycle: proofs` boards. Each stage lists the published boards whose `lifecycle:` is that stage, newest first, each linking to its page at `/brainstorms/<slug>`. A stage with no board says so. Under 860px the V becomes a vertical list in the same order.
+`/workflow` draws the V with five rungs per side and implementation at the point, on the axis of symmetry. Each rung on the right checks the one it faces on the left: deployments face the brainstorm, acceptance proofs face requirements, integration proofs face architecture, unit proofs face interfaces, and review and merge faces project management. Review and merge is not a `lifecycle:` stage, since no board sits there (pull requests close the issues opened at project management), and the three proofs rungs all list the `lifecycle: proofs` boards. Each stage lists the published boards whose `lifecycle:` is that stage, newest first, each linking to its page at `/brainstorms/<slug>` or, for an architecture board, `/architecture/<slug>`. A stage with no board says so. Under 860px the V becomes a vertical list in the same order.
 
 A board moves down the V as the work advances: when a brainstorm settles into requirements, change its `lifecycle:` (or publish the requirements board as its own file), recompile, and the board appears at its new stage on the next build. The stage labels come from `src/lib/brainstorms/labels.ts`, which mirrors the compiler's stage ids and order.
 
