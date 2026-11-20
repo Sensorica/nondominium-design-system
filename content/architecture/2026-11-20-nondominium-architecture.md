@@ -69,6 +69,23 @@ Inside the NDO cell, integrity refuses an identity whose name, regime or nature 
 
 Inside Moss, the Moss group takes the place of the lobby: the tool's provisioned `group` cell is the group, profiles come from Moss, clone cells are created through the WeaveClient, and every NDO is offered to other tools as a Moss asset.
 
+## Inside an NDO: three layers and a surface
+
+An NDO is not one record but three layers on one anchor (prima materia §4).
+Layer 0, the `NondominiumIdentity`, is always there and is never deleted; Layer 1, the specification, is attached to it by `NdoToSpecification` and runs on `dev` today; Layer 2, the process, is to be attached by `NDOToProcess` and is not started.
+Each layer adds coordination only when the resource's social complexity asks for it, which is why the NDO DNA's map draws them as three boxes on the identity.
+
+## Capability slots, the attachment surface
+
+Capability slots are how anything the NDO's designers did not foresee attaches to it (prima materia §6).
+A slot is a typed DHT link from a stable identity hash to any other hash, tagged with its `SlotType`, which any accountable agent may create without the custodian's permission and which stays readable at every lifecycle stage.
+The surface spans two anchors: the NDO's Layer 0 identity, and a person's `Person` entry (§6.5, G15).
+
+Almost every integration after the MVP goes through it, so it is drawn as a container of its own, the **Capability slot surface**, rather than as a link type inside one zome.
+Open it to see the slot types and what attaches through each: file storage through `DigitalAsset`, Flowsta through `FlowstaIdentity` on a person, Unyt through `UnytAgreement`, Moss through `WeaveWAL`, and any other hApp, the commitment pool included, through `CustomApp`.
+Governance reads the surface twice: it marks which slots are trusted, and its engine can require an endorsed Unyt agreement or a verified Flowsta identity before it approves a transition (the two-tier model of §6.6 and §6.7).
+None of it is in the code yet: the substrate is [#184](https://github.com/Sensorica/nondominium/issues/184) in v0.2, under the [capability slots epic](https://github.com/Sensorica/nondominium/issues/209), and each slot type is its own issue.
+
 ```board-components
 - id: member
   name: Member
@@ -205,7 +222,7 @@ Inside Moss, the Moss group takes the place of the lobby: the tool's provisioned
   parent: nd
   kind: service
   tech: Rust, HDK 0.7.1, cloned per NDO
-  does: "One cloned cell per NDO, its DNA hash bound to the NDO's immutable Layer 0 fields: the identity, its members, its specifications, commitments, events and agreement. Planned: capability slots on the identity (#184, v0.2) and a fork's inherited share in its DNA properties (#223, v0.1.0)."
+  does: "One cloned cell per NDO, its DNA hash bound to the NDO's immutable Layer 0 fields: the three layers of the NDO on its identity, its members, commitments, events and agreement. Planned: the capability slots that hang off the identity (#184, v0.2, drawn as the Capability slot surface) and a fork's inherited share in its DNA properties (#223, v0.1.0)."
   change: modified
   code:
     - workdir/happ.yaml:44-53
@@ -222,6 +239,17 @@ Inside Moss, the Moss group takes the place of the lobby: the tool's provisioned
     - workdir/happ.yaml:24-33
     - .gitmodules:1-3
     - vendor/README.md:1-3
+- id: capslots
+  name: Capability slot surface
+  level: container
+  parent: nd
+  kind: module
+  tech: CapabilitySlot links, compiled into zome_resource and zome_person
+  does: "The stigmergic attachment surface of prima materia §6: typed links from an NDO's Layer 0 identity, or from a Person, to any capability target, so tools nobody anticipated attach without changing the NDO. A protocol carried by the NDO cells and the core cell, not a DNA of its own. Planned in #184 (v0.2) under the capability slots epic #209, each slot type in its own issue."
+  change: new
+  code:
+    - documentation/requirements/ndo_prima_materia.md:547-606
+    - documentation/requirements/ndo_prima_materia.md:1356-1375
 - id: sharedcrate
   name: Shared Rust crate
   level: container
@@ -573,6 +601,49 @@ Inside Moss, the Moss group takes the place of the lobby: the tool's provisioned
   change: new
   code:
     - documentation/specifications/governance/governance-operator-architecture.md:1-36
+- id: ppr
+  name: Private participation receipts
+  level: component
+  parent: coredna
+  kind: store
+  tech: PrivateParticipationClaim, private entries
+  does: "The user-sovereign reputation primitive: a bilaterally signed receipt in one of the ParticipationClaimType categories, held as a private entry on each party's own chain, and a ReputationSummary the agent derives and chooses to share. No global score, no third-party visibility. Planned: they stay private entries through the hREA migration (#200, v0.2)."
+  code:
+    - dnas/nondominium/zomes/integrity/zome_gouvernance/src/ppr.rs:7-33
+    - dnas/nondominium/zomes/integrity/zome_gouvernance/src/ppr.rs:253-349
+    - dnas/nondominium/zomes/coordinator/zome_gouvernance/src/ppr.rs:85-120
+- id: roles
+  name: Roles and governance tiers
+  level: component
+  parent: coredna
+  kind: store
+  tech: PersonRole, RoleType
+  does: "The graduated trust of the network: three governance tiers (Simple, Accountable, Primary Accountable Agent) and three functional roles (Transport, Repair, Storage), assigned by agents of the right tier after private identity validation and, for the higher tiers, PPR milestones."
+  code:
+    - dnas/nondominium/zomes/integrity/zome_person/src/lib.rs:76-157
+    - dnas/nondominium/zomes/coordinator/zome_person/src/role.rs:55-104
+- id: privdata
+  name: Private data and capability grants
+  level: component
+  parent: coredna
+  kind: store
+  tech: Holochain capability grants, private entries
+  does: "A person's private identity data, shared field by field through capability grants that expire after 30 days at most, with a revocation marker because a revoked Holochain grant leaves no trace of its own."
+  code:
+    - dnas/nondominium/zomes/integrity/zome_person/src/lib.rs:56-75
+    - dnas/nondominium/zomes/integrity/zome_person/src/lib.rs:156-188
+    - dnas/nondominium/zomes/coordinator/zome_person/src/capability_based_sharing.rs:30-120
+- id: flowstazomes
+  name: Flowsta agent-linking zomes
+  level: component
+  parent: coredna
+  kind: module
+  tech: flowsta-agent-linking integrity and coordinator
+  does: "Flowsta's zomes added to the DNA manifest, committing the dual-signed IsSamePersonEntry (the NDO agent key and the Flowsta Vault key) on the DHT the Person lives in. Planned in #156 (v0.3), Phase 1 of flowsta-integration.md."
+  change: new
+  code:
+    - documentation/requirements/post-mvp/flowsta-integration.md:105-118
+    - documentation/requirements/post-mvp/flowsta-integration.md:131-143
 - id: filestorage
   name: File storage zomes
   level: component
@@ -666,17 +737,143 @@ Inside Moss, the Moss group takes the place of the lobby: the tool's provisioned
   code:
     - crates/shared/src/types.rs:277-282
     - documentation/specifications/adr/ADR-010-013-per-ndo-cells.md:1-40
-- id: capslot
-  name: Capability slots
+- id: layer0
+  name: "Layer 0: identity"
   level: component
   parent: ndodna
-  kind: module
-  tech: CapabilitySlot link type in zome_resource
-  does: "A link from an NDO identity to any DHT hash, tagged with its SlotType (CustomApp included), that any accountable agent may attach and that stays readable at every lifecycle stage. Planned in #184 (v0.2), the attachment point for #99 and #156."
+  kind: store
+  tech: NondominiumIdentity genesis entry
+  does: "The NDO's permanent anchor: the identity every layer and every capability slot links to, never deleted and readable as a tombstone at EndOfLife, its classification immutable and only its lifecycle stage moving through the integrity-checked state machine. Planned: transitions approved by the governance engine with role checks (REQ-NDO-LC-07, #41 and #42, v0.2) and an EconomicEvent per transition (#44, v0.3)."
+  change: modified
+  code:
+    - dnas/nondominium/zomes/integrity/zome_resource/src/lib.rs:88-130
+    - documentation/requirements/ndo_prima_materia.md:223-266
+- id: layer1
+  name: "Layer 1: specification"
+  level: component
+  parent: ndodna
+  kind: store
+  tech: ResourceSpecification over NdoToSpecification
+  does: "The NDO's form: specifications and their governance rules, activated by an NdoToSpecification link from the identity (#132), its files attached as DigitalAsset slots rather than embedded (REQ-NDO-L1-06). Planned: versions with the latest link canonical (#206) and a dormant layer marked inactive (#207), both v0.2."
+  change: modified
+  code:
+    - dnas/nondominium/zomes/coordinator/zome_resource/src/resource_specification.rs:228-236
+    - documentation/requirements/ndo_prima_materia.md:268-293
+- id: layer2
+  name: "Layer 2: process"
+  level: component
+  parent: ndodna
+  kind: store
+  tech: NDOToProcess link, planned
+  does: "The NDO's activity: a Valueflows process attached to the identity, through which its events, commitments, claims and receipts are linked (REQ-NDO-L2-01 to L2-06). Not started and under no milestone (epic #78); today the NDO cell links commitments to the NDO directly (#183)."
   change: new
   code:
-    - documentation/requirements/ndo_prima_materia.md:547-606
-    - documentation/requirements/ndo_prima_materia.md:1131-1160
+    - documentation/requirements/ndo_prima_materia.md:295-320
+    - documentation/requirements/ndo_prima_materia.md:1320-1329
+
+- id: slotlink
+  name: CapabilitySlot link
+  level: component
+  parent: capslots
+  kind: module
+  tech: LinkTypes::CapabilitySlot, CapabilitySlotTag, SlotType
+  does: "A link from an NDO identity hash to any DHT hash or external reference, its tag carrying the SlotType, the time it was attached and a label. Any accountable agent attaches one without the custodian's permission (REQ-NDO-CS-02), and it stays listed at every stage, EndOfLife included (REQ-NDO-CS-06). Planned in #184 (v0.2), in zome_resource integrity, so it lives in each NDO cell."
+  change: new
+  code:
+    - documentation/requirements/ndo_prima_materia.md:1131-1155
+    - documentation/requirements/ndo_prima_materia.md:563-585
+- id: slotapi
+  name: Slot functions
+  level: component
+  parent: capslots
+  kind: service
+  tech: zome_resource coordinator
+  does: "Attach a slot to an NDO and list its slots, all of them or filtered by SlotType, CustomApp included. Planned in #184 (v0.2)."
+  change: new
+  code:
+    - documentation/specifications/ndo-v1-architecture-design.md:632-636
+- id: personslot
+  name: Person capability slot
+  level: component
+  parent: capslots
+  kind: module
+  tech: PersonCapabilitySlot link type in zome_person
+  does: "The same surface on a person: a link from a Person entry hash to a DID document, a credential wallet, a reputation oracle or a Flowsta attestation, with the same tag and SlotType, the Person schema unchanged (G15, REQ-AGENT-11, REQ-NDO-AGENT-07). A TODO in zome_person today; built in #156 (v0.3) or split out ahead of it."
+  change: new
+  code:
+    - dnas/nondominium/zomes/integrity/zome_person/src/lib.rs:28-37
+    - documentation/requirements/ndo_prima_materia.md:607-622
+- id: slottrust
+  name: Slot trust marking
+  level: component
+  parent: capslots
+  kind: module
+  tech: governance validation of slots
+  does: "Which slots are surfaced: those of the initiator and custodians trusted by default, those of accountable agents conditionally, those of unknown agents filtered until governance validates them (REQ-NDO-CS-03). Attachment stays permissionless; trust is read side. The follow-up #184 leaves out of scope."
+  change: new
+  code:
+    - documentation/requirements/ndo_prima_materia.md:594-606
+- id: slotdigital
+  name: DigitalAsset slot
+  level: component
+  parent: capslots
+  kind: store
+  tech: SlotType::DigitalAsset
+  does: "Design files, 3D models, code and manifests attached to an NDO's identity, the target being a file-storage manifest hash (REQ-NDO-L1-06); a specification package references these slots by hash (REQ-PROJ-SPEC-03). Planned in #99 (v0.2)."
+  change: new
+  code:
+    - documentation/requirements/post-mvp/project-type-ndo-specifications.md:87-96
+- id: slotflowsta
+  name: FlowstaIdentity slot
+  level: component
+  parent: capslots
+  kind: store
+  tech: SlotType::FlowstaIdentity on a Person
+  does: "Links an agent's own Person hash to the dual-signed IsSamePersonEntry that proves its NDO key and its Flowsta Vault key belong to one person, giving it a W3C DID (REQ-NDO-CS-12, CS-13). Tier 1, a voluntary trust signal; Tier 2 lets governance require it. Planned in #156 (v0.3)."
+  change: new
+  code:
+    - documentation/requirements/post-mvp/flowsta-integration.md:105-118
+- id: slotunyt
+  name: UnytAgreement slot
+  level: component
+  parent: capslots
+  kind: store
+  tech: SlotType::UnytAgreement(network seed)
+  does: "Attaches a proposed Unyt Smart Agreement to an NDO's identity, the String carrying the Alliance network seed (REQ-NDO-CS-07, CS-08). The slot makes the agreement discoverable; an endorsed EconomicAgreement governance rule makes it mandatory. Post-MVP, under no milestone."
+  change: new
+  code:
+    - documentation/requirements/post-mvp/unyt-integration.md:169-174
+    - documentation/requirements/ndo_prima_materia.md:641-660
+- id: slotweave
+  name: WeaveWAL slot
+  level: component
+  parent: capslots
+  kind: store
+  tech: SlotType::WeaveWAL
+  does: "Declares the NDO a Weave asset by pointing at its WAL, so other Moss tools attach to its identity and answer its lifecycle transitions (REQ-NDO-CS-05). Today the Moss host layer offers NDOs as assets without a slot (#165); no issue yet for the slot."
+  change: new
+  code:
+    - documentation/requirements/ndo_prima_materia.md:586-593
+- id: slotcustom
+  name: CustomApp slot
+  level: component
+  parent: capslots
+  kind: store
+  tech: SlotType::CustomApp(label)
+  does: "Any other hApp, labelled by its consumer (REQ-NDO-CS-04). The commitment pool experiment plans a CustomApp CommitmentPool slot as its NDO-side index once #184 lands."
+  change: new
+  code:
+    - documentation/requirements/ndo_prima_materia.md:1141-1153
+- id: slotother
+  name: Other predefined slot types
+  level: component
+  parent: capslots
+  kind: store
+  tech: Documentation, IssueTracker, FabricationQueue, GovernanceDAO, VersionGraph
+  does: "The rest of the vocabulary of prima materia §6.2: docs and wikis, issue trackers, fabrication queues, governance DAOs and version graphs, each attaching its own hApp or entry to the NDO identity. Specified, with no issue yet."
+  change: new
+  code:
+    - documentation/requirements/ndo_prima_materia.md:563-585
 
 - id: hreazomes
   name: hREA zomes
@@ -874,14 +1071,30 @@ Inside Moss, the Moss group takes the place of the lobby: the tool's provisioned
   to: mosslib
   says: is published as a tool
   change: new
-- from: personcoord
+- from: slotflowsta
   to: flowsta
-  says: links an agent to its Flowsta identity
-  via: Person capability slot
+  says: makes the agent's Flowsta DID discoverable
+  via: IsSamePersonEntry
   change: new
-- from: govcoord
+- from: flowstazomes
+  to: flowsta
+  says: links the agent key to a Flowsta Vault key
+  via: "@flowsta/holochain, Vault"
+  change: new
+- from: slotunyt
   to: unyt
-  says: hands the agreement to Smart Agreements for settlement
+  says: points at a Smart Agreement on an Alliance DHT
+  via: Alliance network seed
+  change: new
+- from: govengine
+  to: unyt
+  says: validates the settlement proof before approving a triggering transition
+  via: RAVE, cross-DNA call
+  change: new
+- from: slotweave
+  to: moss
+  says: declares the NDO a Weave asset other tools attach to
+  via: WAL
   change: new
 
 - from: routes
@@ -1036,8 +1249,50 @@ Inside Moss, the Moss group takes the place of the lobby: the tool's provisioned
   says: delegates transition evaluation
   change: new
 - from: filestorage
-  to: capslot
-  says: fills DigitalAsset slots
+  to: slotdigital
+  says: fills DigitalAsset slots with file manifests
+  change: new
+- from: govcoord
+  to: ppr
+  says: issues a receipt to each party on fulfillment
+- from: personcoord
+  to: roles
+  says: assigns and promotes
+- from: personcoord
+  to: privdata
+  says: shares fields through capability grants
+- from: govengine
+  to: roles
+  says: checks the role each transition requires
+  change: new
+- from: rescoord
+  to: govengine
+  says: requests each state transition and applies only what it approves
+  change: new
+- from: personslot
+  to: personint
+  says: adds the PersonCapabilitySlot link type to
+  change: new
+- from: slotflowsta
+  to: flowstazomes
+  says: targets the IsSamePersonEntry committed by
+  change: new
+- from: govcoord
+  to: slottrust
+  says: marks slots trusted or untrusted
+  change: new
+- from: govengine
+  to: slotunyt
+  says: requires an endorsed agreement's settlement for triggering actions
+  change: new
+- from: govengine
+  to: slotflowsta
+  says: requires a verified identity for high-trust promotions
+  change: new
+- from: zomeservices
+  to: slotapi
+  says: attaches and lists an NDO's slots
+  via: NDO clone cell id
   change: new
 
 - from: groupcoord
@@ -1071,10 +1326,68 @@ Inside Moss, the Moss group takes the place of the lobby: the tool's provisioned
   to: ndorescoord
   says: reads the NDO, updates operational state on fulfillment
   via: same-cell call
-- from: capslot
+- from: slotlink
   to: ndoresint
   says: adds the CapabilitySlot link type to
   change: new
+- from: slotlink
+  to: layer0
+  says: hangs off the identity's action hash
+  change: new
+- from: ndorescoord
+  to: layer0
+  says: writes the genesis identity and its lifecycle transitions
+- from: layer0
+  to: dnaprops
+  says: carries the same name, regime and nature as
+- from: ndorescoord
+  to: layer1
+  says: activates with an NdoToSpecification link
+- from: layer1
+  to: layer0
+  says: is attached to
+  via: NdoToSpecification
+- from: layer2
+  to: layer0
+  says: is to be attached to
+  via: NDOToProcess
+  change: new
+- from: ndogovcoord
+  to: layer2
+  says: is to link events, commitments and claims through
+  change: new
+- from: layer1
+  to: slotdigital
+  says: carries its files as
+  change: new
+
+- from: slotapi
+  to: slotlink
+  says: creates and lists
+- from: personslot
+  to: slotlink
+  says: reuses the tag and SlotType of
+- from: slottrust
+  to: slotlink
+  says: decides which links are surfaced
+- from: slotdigital
+  to: slotlink
+  says: is a SlotType of
+- from: slotunyt
+  to: slotlink
+  says: is a SlotType of
+- from: slotweave
+  to: slotlink
+  says: is a SlotType of
+- from: slotcustom
+  to: slotlink
+  says: is a SlotType of
+- from: slotother
+  to: slotlink
+  says: are SlotTypes of
+- from: slotflowsta
+  to: personslot
+  says: is a SlotType carried by
 - from: piechart
   to: ndogovcoord
   says: writes the NDO's agreement
