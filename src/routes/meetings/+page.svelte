@@ -94,7 +94,7 @@
   .summary b { color: var(--ndo-color-text-primary); font-size: var(--ndo-text-lg); margin-right: 2px; }
   .filter { display: flex; flex-wrap: wrap; gap: var(--ndo-spacing-1-5); margin-top: var(--ndo-spacing-4); }
   .filter button { font: inherit; font-size: var(--ndo-text-xs); font-weight: var(--ndo-weight-medium); color: var(--ndo-color-text-primary); background: rgb(var(--ndo-color-card-bg)); border: 1px solid var(--ndo-color-border); border-radius: var(--ndo-radius-pill); padding: 3px 12px; cursor: pointer; }
-  .filter button.on { background: rgb(var(--ndo-primary-600)); border-color: rgb(var(--ndo-primary-600)); color: rgb(var(--ndo-color-text-inverse)); }
+  .filter button.on { background: rgb(var(--ndo-primary-600)); border-color: rgb(var(--ndo-primary-600)); color: rgb(var(--ndo-color-text-on-fill)); }
   .empty { margin-top: var(--ndo-spacing-8); padding: var(--ndo-spacing-5); border: 1px dashed var(--ndo-color-border-strong); border-radius: var(--ndo-radius-lg); color: var(--ndo-color-text-secondary); }
   .empty code { font-family: var(--ndo-font-mono); font-size: var(--ndo-text-sm); }
   h2 { font-size: var(--ndo-text-xs); line-height: var(--ndo-lh-xs); font-weight: var(--ndo-weight-bold); letter-spacing: 0.08em; text-transform: uppercase; color: var(--ndo-color-text-secondary); margin: var(--ndo-spacing-8) 0 var(--ndo-spacing-2); }

@@ -376,7 +376,7 @@
   /* Colours are the design system's own tokens; nothing here is a R&O hue. */
   .bar { position: sticky; top: 0; z-index: 5; display: flex; gap: var(--ndo-spacing-3); align-items: center; flex-wrap: wrap; padding: var(--ndo-spacing-3) var(--ndo-spacing-6); background: var(--ndo-color-surface); border-bottom: 1px solid var(--ndo-color-border); font-size: var(--ndo-text-sm); font-weight: var(--ndo-weight-medium); color: var(--ndo-color-text-secondary); }
   .bar .back { color: var(--ndo-color-link); text-decoration: none; font-weight: var(--ndo-weight-semibold); }
-  .bar .primary { background: rgb(var(--ndo-primary-600)); border-color: rgb(var(--ndo-primary-600)); color: rgb(var(--ndo-color-text-inverse)); }
+  .bar .primary { background: rgb(var(--ndo-primary-600)); border-color: rgb(var(--ndo-primary-600)); color: rgb(var(--ndo-color-text-on-fill)); }
 
   .wrap { display: grid; grid-template-columns: 220px minmax(0, 720px); gap: 48px; justify-content: center; padding: var(--ndo-spacing-8) var(--ndo-spacing-6) 6rem; }
   .rail { position: sticky; top: 64px; align-self: start; font-size: var(--ndo-text-sm); line-height: var(--ndo-lh-sm); }
