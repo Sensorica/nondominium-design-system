@@ -14,7 +14,10 @@
  * light-only UnoCSS, and rendering them dark would show reviewers something that
  * does not exist: the replica (/app), the class-string specimens (/patterns),
  * the ndo-ui component sheets (/playbook) and screen compositions (/ui-kit), the
- * scenarios (/scenarios), and the Claude Design card frames (/guidelines/<id>).
+ * scenarios (/scenarios), the Claude Design card frames (/guidelines/<id>), and
+ * the six prototype directions (/prototypes/<slug>), each of which paints its own
+ * look over the light tokens and has no dark variant of it. The index at
+ * /prototypes is the design system's own page and follows the toggle.
  * Their markup is the app's own utility classes (text-gray-900 on white), so a
  * dark page would paint the app's dark text on it. `pinnedLight` is the one
  * rule both this module and app.html apply.
@@ -31,7 +34,7 @@ const PINNED = /\/(app|patterns|playbook|ui-kit|scenarios)(\/|$)/;
 
 /** Same test as the inline script in src/app.html; keep the two in step. */
 export function pinnedLight(pathname: string): boolean {
-  return PINNED.test(pathname) || /\/guidelines\/[^/]+/.test(pathname);
+  return PINNED.test(pathname) || /\/(guidelines|prototypes)\/[^/]+/.test(pathname);
 }
 
 export const theme = $state({

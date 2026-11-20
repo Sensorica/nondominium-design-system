@@ -17,7 +17,7 @@
           else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) t = 'dark';
         } catch (e) {}
         var p = location.pathname;
-        if (/\/(app|patterns|playbook|ui-kit|scenarios)(\/|$)/.test(p) || /\/guidelines\/[^/]+/.test(p)) t = 'light';
+        if (/\/(app|patterns|playbook|ui-kit|scenarios)(\/|$)/.test(p) || /\/(guidelines|prototypes)\/[^/]+/.test(p)) t = 'light';
         document.documentElement.setAttribute('data-theme', t);
       })();
     </script>
