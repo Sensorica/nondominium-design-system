@@ -10,10 +10,14 @@
  * the same rule before any CSS paints, so there is no light flash in dark mode.
  * `initTheme` only adopts what that script wrote and keeps it current.
  *
- * Some surfaces are pinned light: the replica at /app and the Claude Design card
- * frames at /guidelines/<id> reproduce a product and cards that have no dark
- * mode, and rendering them dark would show reviewers something that does not
- * exist. `pinnedLight` is the one rule both this module and app.html apply.
+ * Some surfaces are pinned light, because they show the app, which is
+ * light-only UnoCSS, and rendering them dark would show reviewers something that
+ * does not exist: the replica (/app), the class-string specimens (/patterns),
+ * the ndo-ui component sheets (/playbook) and screen compositions (/ui-kit), the
+ * scenarios (/scenarios), and the Claude Design card frames (/guidelines/<id>).
+ * Their markup is the app's own utility classes (text-gray-900 on white), so a
+ * dark page would paint the app's dark text on it. `pinnedLight` is the one
+ * rule both this module and app.html apply.
  *
  * Every browser API is guarded: the site prerenders with adapter-static, so
  * module scope runs in Node during the build.
@@ -23,9 +27,11 @@ export type Theme = 'light' | 'dark';
 
 export const THEME_KEY = 'ndo-ds-theme';
 
+const PINNED = /\/(app|patterns|playbook|ui-kit|scenarios)(\/|$)/;
+
 /** Same test as the inline script in src/app.html; keep the two in step. */
 export function pinnedLight(pathname: string): boolean {
-  return /\/app(\/|$)/.test(pathname) || /\/guidelines\/[^/]+/.test(pathname);
+  return PINNED.test(pathname) || /\/guidelines\/[^/]+/.test(pathname);
 }
 
 export const theme = $state({

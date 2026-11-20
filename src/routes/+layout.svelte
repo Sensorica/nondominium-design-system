@@ -17,7 +17,7 @@
   import { paths } from '$lib/paths';
   import CommentsHost from '$lib/components/comments/CommentsHost.svelte';
   import { DIRECTION_LIST, type DirectionSlug } from '$lib/prototypes/directions';
-  import { theme, initTheme, setTheme, applyTheme, pinnedLight, type Theme } from '$lib/theme.svelte';
+  import { theme, initTheme, toggleTheme, applyTheme, pinnedLight, type Theme } from '$lib/theme.svelte';
 
   let { children } = $props();
 
@@ -41,12 +41,15 @@
   // changed before hydration would leave the toggle's attributes stale.
   $effect(() => initTheme());
   $effect(() => {
-    applyTheme(pinnedLight(current) ? 'light' : theme.mode);
+    applyTheme(pinned ? 'light' : theme.mode);
   });
-  const themes: { value: Theme; label: string }[] = [
-    { value: 'light', label: 'Light' },
-    { value: 'dark', label: 'Dark' },
-  ];
+  const nextTheme = $derived<Theme>(theme.mode === 'dark' ? 'light' : 'dark');
+  const pinned = $derived(pinnedLight(current));
+  const toggleTitle = $derived(
+    pinned
+      ? `This page shows the app, which has no dark mode; the ${theme.mode} theme applies elsewhere`
+      : `Switch to ${nextTheme} theme`
+  );
   // Full-bleed: the replica at /app, and each prototype direction. The
   // direction index at /prototypes keeps the chrome.
   const isApp = $derived(
@@ -112,6 +115,19 @@
           </span>
         </a>
 
+        <div class="railtools">
+        <button
+          type="button"
+          class="themetoggle"
+          class:themetoggle--pinned={pinned}
+          aria-label={toggleTitle}
+          title={toggleTitle}
+          aria-pressed={theme.mode === 'dark'}
+          onclick={toggleTheme}
+        >
+          <span class="themetoggle__disc" aria-hidden="true"></span>
+        </button>
+
         <button
           type="button"
           class="menutoggle"
@@ -122,6 +138,7 @@
         >
           <span class="menutoggle__bars" aria-hidden="true"></span>
         </button>
+        </div>
       </div>
 
       <div class="railbody" id="ds-menu">
@@ -216,18 +233,6 @@
             </a>
           </div>
         </nav>
-
-        <div class="themeswitch" role="group" aria-label="Colour theme">
-          {#each themes as t (t.value)}
-            <button
-              type="button"
-              class="themeswitch__opt"
-              class:themeswitch__opt--on={theme.mode === t.value}
-              aria-pressed={theme.mode === t.value}
-              onclick={() => setTheme(t.value)}
-            >{t.label}</button>
-          {/each}
-        </div>
 
         <p class="version">v0.2.0 · press <kbd>c</kbd> to comment</p>
       </div>
@@ -370,36 +375,42 @@
     border-left-color: rgb(var(--ndo-brand-teal-500));
   }
 
-  /* Light or dark, a two-option segmented control in the rail's own ink and
-     teal, no icon (the app has no icon set). Sits at the foot of the rail with
-     the version line. */
-  .themeswitch {
-    margin-top: auto;
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 2px;
-    padding: 2px;
+  /* The theme toggle sits in the rail head, beside the brand, so it is in view
+     on every page and at every width (below 860px, next to the hamburger). Same
+     box as the hamburger, and like it drawn in CSS rather than taken from an
+     icon set: a disc half lit, the half that shows is the theme it switches to. */
+  .railtools { display: flex; align-items: center; gap: var(--ndo-spacing-2); }
+  .themetoggle {
+    display: inline-flex;
+    width: 32px;
+    height: 32px;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
     border: 1px solid rgb(255 255 255 / 0.15);
-    border-radius: var(--ndo-radius-pill);
-  }
-  .themeswitch__opt {
-    padding: 4px 10px;
-    border: 0;
-    border-radius: var(--ndo-radius-pill);
+    border-radius: var(--ndo-radius-md);
     background: transparent;
-    color: rgb(255 255 255 / 0.65);
-    font: inherit;
-    font-size: var(--ndo-text-xs);
-    font-weight: var(--ndo-weight-medium);
+    color: #fff;
     cursor: pointer;
     transition: var(--ndo-transition-colors);
   }
-  .themeswitch__opt:hover { background: rgb(255 255 255 / 0.07); color: rgb(255 255 255 / 0.92); }
-  .themeswitch__opt:focus-visible { outline: 2px solid rgb(var(--ndo-brand-teal-300)); outline-offset: 1px; }
-  .themeswitch__opt--on,
-  .themeswitch__opt--on:hover { background: rgb(255 255 255 / 0.12); color: #fff; box-shadow: inset 0 -2px 0 rgb(var(--ndo-brand-teal-500)); }
+  .themetoggle:hover { background: rgb(255 255 255 / 0.07); }
+  /* On a pinned page the toggle still works (the choice applies to the rest of
+     the site) but reads as quieter, so the light page does not look like a bug. */
+  .themetoggle--pinned { opacity: 0.5; }
+  .themetoggle:focus-visible { outline: 2px solid rgb(var(--ndo-brand-teal-300)); outline-offset: 2px; }
+  .themetoggle__disc {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    border: 1.5px solid currentColor;
+    background: linear-gradient(90deg, currentColor 50%, transparent 50%);
+    transition: transform var(--ndo-duration-base) var(--ndo-easing);
+  }
+  .themetoggle[aria-pressed='true'] .themetoggle__disc { transform: rotate(180deg); }
 
-  .version { margin: 0; padding: 0 8px; font-size: var(--ndo-text-xs); color: rgb(255 255 255 / 0.3); }
+  .version { margin: auto 0 0; padding: 0 8px; font-size: var(--ndo-text-xs); color: rgb(255 255 255 / 0.3); }
   kbd {
     font-family: var(--ndo-font-mono);
     border: 1px solid rgb(255 255 255 / 0.2);
@@ -431,6 +442,7 @@
     /* The gradient hairline moves from the right edge to the bottom edge. */
     .rail::after { top: auto; left: 0; width: auto; height: 2px; }
     .menutoggle { display: inline-flex; }
+    .themetoggle { width: 40px; height: 40px; }
     .railbody {
       display: none;
       position: absolute;

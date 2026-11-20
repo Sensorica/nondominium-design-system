@@ -91,6 +91,9 @@
 <style>
   .hero { display: flex; flex-direction: column; align-items: flex-start; gap: var(--ndo-spacing-3); }
   .hero__logo { width: 200px; max-width: 55vw; height: auto; }
+  /* The logo is navy on a near-white key; on the dark page it sits on its own
+     light plate, or the wordmark disappears into the background. */
+  :global([data-theme='dark']) .hero__logo { background: #fff; border-radius: var(--ndo-radius-lg); padding: var(--ndo-spacing-2); }
   .doors { display: grid; gap: var(--ndo-spacing-4); grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); }
   /* The door's top edge carries the mark's gradient. A pseudo-element, not
      border-image: border-image paints all four edges and swallows the card. */
