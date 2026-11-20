@@ -260,11 +260,18 @@ export function surfaceKeyForUrl(url: URL): string {
     const slug = url.pathname.split('/').filter(Boolean).pop();
     return slug ? `${BRAINSTORM_KEY_PREFIX}${slug}` : '';
   }
+  // And for an architecture board (`architecture:2026-11-20-nondominium-architecture`).
+  // The index at /architecture has no thread.
+  if (url.pathname.startsWith(paths.architecture() + '/')) {
+    const slug = url.pathname.split('/').filter(Boolean).pop();
+    return slug ? `${ARCHITECTURE_KEY_PREFIX}${slug}` : '';
+  }
   return screenKeyForUrl(url);
 }
 
 export const MEETING_KEY_PREFIX = 'meeting:';
 export const BRAINSTORM_KEY_PREFIX = 'brainstorm:';
+export const ARCHITECTURE_KEY_PREFIX = 'architecture:';
 
 /** Label for a resolved key; falls back to the key itself. */
 export function labelForKey(key: string): string {
@@ -272,5 +279,7 @@ export function labelForKey(key: string): string {
   if (key.startsWith(MEETING_KEY_PREFIX)) return `Meeting of ${key.slice(MEETING_KEY_PREFIX.length, MEETING_KEY_PREFIX.length + 10)}`;
   // `brainstorm:2026-10-27-...` -> "Brainstorm of 2026-10-27".
   if (key.startsWith(BRAINSTORM_KEY_PREFIX)) return `Brainstorm of ${key.slice(BRAINSTORM_KEY_PREFIX.length, BRAINSTORM_KEY_PREFIX.length + 10)}`;
+  // `architecture:2026-11-20-...` -> "Architecture of 2026-11-20".
+  if (key.startsWith(ARCHITECTURE_KEY_PREFIX)) return `Architecture of ${key.slice(ARCHITECTURE_KEY_PREFIX.length, ARCHITECTURE_KEY_PREFIX.length + 10)}`;
   return KEY_LABEL[key] ?? key;
 }

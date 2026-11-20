@@ -23,6 +23,7 @@ designsystem:
     review:        { backend: github-discussions, repo: Sensorica/nondominium-design-review, category_id: DIC_kwDOT06gls4DDH2j }
     static-deploy: { target: gh-pages, base: /nondominium-design-system }
     meetings:      { routes: [/meetings, '/meetings/{slug}'], content: content/meetings, module: src/lib/meetings, kinds: [lab, dev, team], thread: 'meeting:{slug}', docs: docs/MEETINGS.md }
+    architecture:  { routes: [/architecture, '/architecture/{slug}'], content: content/architecture, module: src/lib/architecture, thread: 'architecture:{slug}', docs: docs/ARCHITECTURE_BOARDS.md }
     previews:      { route: /previews, module: src/lib/previews.ts, workflow: .github/workflows/deploy-cloudflare.yml, docs: docs/PREVIEWS.md }
     registry:      { format: .svelte, status: active }
     parity:        { source: ../nondominium/ui, isa: ISA.md }

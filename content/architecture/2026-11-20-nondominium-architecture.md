@@ -53,7 +53,7 @@ The issue counts are `gh issue list --milestone <title> --state open` on 2026-11
 
 ## Related boards
 
-The commitment-pool experiment on Tibi's branch has its own architecture board, [Commitment pool MVP](/brainstorms/2026-11-13-commitment-pool-mvp-architecture), and is not redrawn here.
+The commitment-pool experiment on Tibi's branch has its own architecture board, [Commitment pool MVP](/architecture/2026-11-13-commitment-pool-mvp-architecture), and is not redrawn here.
 What of it reached `dev` through [#183](https://github.com/Sensorica/nondominium/pull/183) (commitments per NDO, the fulfillment closure, `Measure`) is drawn here as part of the governance zome; the Use and Consume fork it still holds is the planned [#204](https://github.com/Sensorica/nondominium/issues/204).
 
 The [group model requirements](/brainstorms/2026-11-03-group-model-requirements) are the requirements this architecture answers for groups, Moss and standalone, and the [v0.1.0 Moss release plan](/brainstorms/2026-10-27-v0-1-0-moss-release-plan) is the project-management board for the pilot.

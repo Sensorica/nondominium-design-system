@@ -3,12 +3,15 @@
 // index frontmatter (title, date, lifecycle, project, status, summary, lang), and its
 // compiled page beside the site as static/brainstorms/boards/<same name>.html (docs/BRAINSTORMS.md).
 // An empty directory is a valid state: the list page renders its empty message.
+//
+// Architecture boards (content/architecture/) are the same kind of file with a
+// different home; src/lib/architecture/index.ts reuses `parseBoard` below.
 
 import { paths } from '$lib/paths';
 
 const files = import.meta.glob('/content/brainstorms/*.md', { query: '?raw', import: 'default', eager: true }) as Record<string, string>;
 
-export interface Brainstorm {
+export interface Board {
   slug: string;
   date: string; // YYYY-MM-DD
   title: string;
@@ -18,7 +21,7 @@ export interface Brainstorm {
   status: string;
   summary: string;
   lang: string;
-  /** The compiled board, served from static/brainstorms/. */
+  /** The compiled board, served from static/<surface>/boards/. */
   board: string;
   /** Lowercased text the index searches: the frontmatter plus the source's prose. */
   haystack: string;
@@ -43,7 +46,8 @@ function prose(src: string): string {
     .toLowerCase();
 }
 
-function parse(file: string, src: string): Brainstorm {
+/** One board source as an index entry; `boardPath` is where its compiled page is served. */
+export function parseBoard(file: string, src: string, boardPath: (slug: string) => string): Board {
   const slug = file.split('/').pop()!.replace(/\.md$/, '');
   const fm = frontmatter(src);
   const date = fm.date ?? slug.slice(0, 10);
@@ -57,13 +61,15 @@ function parse(file: string, src: string): Brainstorm {
     status: fm.status ?? 'open',
     summary: fm.summary ?? '',
     lang: fm.lang ?? 'en',
-    board: paths.brainstormBoard(slug),
+    board: boardPath(slug),
   };
   return { ...b, haystack: `${title} ${b.summary} ${b.lifecycle} ${b.project} ${b.status} ${prose(src)}`.toLowerCase() };
 }
 
+export type Brainstorm = Board;
+
 export const brainstorms: Brainstorm[] = Object.entries(files)
-  .map(([file, src]) => parse(file, src))
+  .map(([file, src]) => parseBoard(file, src, paths.brainstormBoard))
   .sort((a, b) => b.slug.localeCompare(a.slug));
 
 export function brainstormBySlug(slug: string): Brainstorm | undefined {
