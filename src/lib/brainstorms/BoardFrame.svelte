@@ -23,8 +23,16 @@
   // The board's own theme button is hidden: the site's toggle drives it, and two
   // switches that disagree would be worse than one.
   let frame = $state<HTMLIFrameElement>();
-  // Read once: a src that changed with the theme would reload the board.
-  const src = $derived(`${b.board}?theme=${untrack(() => theme.mode)}`);
+  // The frame is mounted on the client only. Its src carries the theme, which
+  // the prerendered HTML cannot know, and hydration does not repair a src.
+  // Read once from what app.html (or the layout) already wrote on <html>: a src
+  // that changed with the theme would reload the board; a new board (b.board)
+  // is a new src.
+  let src = $state('');
+  $effect(() => {
+    const t = document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'light';
+    src = `${b.board}?theme=${t}`;
+  });
 
   function paintBoard(el: HTMLIFrameElement | undefined, mode: Theme): void {
     if (!el) return;
@@ -73,7 +81,11 @@
     </div>
   </div>
   <h1 class="sr">{b.title}</h1>
-  <iframe bind:this={frame} {src} title={b.title} lang={b.lang} onload={() => paintBoard(frame, theme.mode)}></iframe>
+  {#if src}
+    <iframe bind:this={frame} {src} title={b.title} lang={b.lang} onload={() => paintBoard(frame, theme.mode)}></iframe>
+  {:else}
+    <div class="frame-wait"></div>
+  {/if}
 </div>
 
 <style>
@@ -92,5 +104,6 @@
   .actions button, .actions a { font: inherit; font-size: var(--ndo-text-xs); font-weight: var(--ndo-weight-medium); color: var(--ndo-color-text-primary); background: transparent; border: 1px solid var(--ndo-color-border); border-radius: var(--ndo-radius-pill); padding: 3px 12px; cursor: pointer; text-decoration: none; white-space: nowrap; }
   .actions button:hover, .actions a:hover { border-color: rgb(var(--ndo-primary-600)); }
   .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+  .frame-wait { flex: 1; background: var(--ndo-color-bg-app); }
   iframe { flex: 1; width: 100%; border: 0; background: rgb(var(--ndo-color-card-bg)); }
 </style>
