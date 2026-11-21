@@ -12,6 +12,7 @@
   import '../app.css';
   import 'virtual:uno.css';
   import '$lib/styles/app.css';
+  import '$lib/styles/scrollbars.css';
   import { page } from '$app/state';
   import { afterNavigate } from '$app/navigation';
   import { paths } from '$lib/paths';
