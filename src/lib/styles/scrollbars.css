@@ -1,0 +1,52 @@
+/* Scrollbars: the one place they are styled.
+ *
+ * Colours come from the --ndo-scrollbar-* tokens in static/tokens.css, which
+ * flip with [data-theme='dark'] like every other semantic token, so a scrollbar
+ * always matches the surface it sits on. Nothing here is a colour literal.
+ *
+ * Two mechanisms, never both on one element: Chromium 121+ and Firefox read the
+ * standard properties and ignore ::-webkit-scrollbar once those are set, so the
+ * WebKit block lives behind a feature query for older WebKit and Chromium.
+ */
+
+/* Standard: Firefox, Chromium 121+, Safari 18.2+. */
+@supports (scrollbar-color: auto) {
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: var(--ndo-scrollbar-thumb) var(--ndo-scrollbar-track);
+  }
+  /* Clearer while the pointer is over the container. html and body are always
+     under the pointer, so the page scrollbar keeps its resting colour. */
+  *:not(html, body):hover {
+    scrollbar-color: var(--ndo-scrollbar-thumb-hover) var(--ndo-scrollbar-track);
+  }
+}
+
+/* Older WebKit and Chromium before 121. */
+@supports not (scrollbar-color: auto) {
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+  ::-webkit-scrollbar-track,
+  ::-webkit-scrollbar-corner {
+    background: var(--ndo-scrollbar-track);
+  }
+  ::-webkit-scrollbar-thumb {
+    background-color: var(--ndo-scrollbar-thumb);
+    border: 3px solid transparent;
+    background-clip: padding-box;
+    border-radius: 999px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background-color: var(--ndo-scrollbar-thumb-hover);
+  }
+}
+
+/* The brand-ink rail is dark in both themes: it takes the light-on-dark pair.
+   Custom properties inherit, so a scroller inside the rail follows. */
+.rail,
+.ndo-shell__aside {
+  --ndo-scrollbar-thumb: var(--ndo-scrollbar-thumb-ink);
+  --ndo-scrollbar-thumb-hover: var(--ndo-scrollbar-thumb-ink-hover);
+}

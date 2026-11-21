@@ -240,6 +240,15 @@
   --ndo-color-link:           rgb(var(--ndo-primary-600));
   --ndo-color-overlay:        rgb(var(--ndo-gray-900) / 0.45);
 
+  /* Scrollbars. Thin and quiet at rest, clear on hover; the track is empty so
+     it takes the surface behind it. Consumed by src/lib/styles/scrollbars.css.
+     The -ink pair is for the brand-ink rail, which is dark in both themes. */
+  --ndo-scrollbar-thumb:       rgb(var(--ndo-gray-400) / 0.55);
+  --ndo-scrollbar-thumb-hover: rgb(var(--ndo-gray-500));
+  --ndo-scrollbar-track:       transparent;
+  --ndo-scrollbar-thumb-ink:       rgb(255 255 255 / 0.22);
+  --ndo-scrollbar-thumb-ink-hover: rgb(255 255 255 / 0.55);
+
   /* Focus ring — one definition, every interactive element */
   --ndo-focus-ring: 0 0 0 3px rgb(var(--ndo-primary-500) / 0.45);
 
@@ -342,6 +351,9 @@
   --ndo-color-text-muted:     rgb(var(--ndo-gray-400));
   --ndo-color-text-mono:      rgb(var(--ndo-gray-500));
   --ndo-color-text-inverse:   17 24 39;
+
+  --ndo-scrollbar-thumb:       rgb(var(--ndo-gray-500) / 0.55);
+  --ndo-scrollbar-thumb-hover: rgb(var(--ndo-gray-400));
   --ndo-color-link:           rgb(var(--ndo-primary-400));
   --ndo-color-overlay:        rgb(0 0 0 / 0.6);
 }
