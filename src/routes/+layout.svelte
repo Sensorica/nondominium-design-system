@@ -34,13 +34,16 @@
   const current = $derived(page.url.pathname);
   // Full-bleed: the replica at /app, and each prototype direction. The
   // direction index at /prototypes keeps the chrome.
+  // An error page keeps the chrome even under those subtrees: a mistyped
+  // /app/... or /guidelines/... URL must still show the way back.
   const isApp = $derived(
-    current.startsWith(paths.appHome()) ||
+    !page.error &&
+    (current.startsWith(paths.appHome()) ||
       DIRECTION_LIST.some((d) => current === paths.protoDirection(d.slug as DirectionSlug)) ||
       // A guideline card's isolated frame (/guidelines/<id>) must paint only the
       // card body, same as the original's own <body> — not the index at
       // /guidelines itself, which keeps the chrome.
-      (current.startsWith(paths.guidelines() + '/') && current !== paths.guidelines())
+      (current.startsWith(paths.guidelines() + '/') && current !== paths.guidelines()))
   );
 
   // No icons in the lists. The app has no icon set, and inventing one for the
