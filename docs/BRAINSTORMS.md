@@ -35,10 +35,10 @@ A board is a Niceboard: one markdown source compiled into an interactive, offlin
 2. Compile it, from the repository root, into `static/brainstorms/boards/` under the same name:
 
    ```bash
-   bun ~/.claude/skills/Niceboard/Tools/Board.ts content/brainstorms/<file>.md --out static/brainstorms/boards/<file>.html --public --no-drawer --no-sketch --theme <path to nondominium>/.local/state/theme.css --icon static/favicon.png
+   bun ~/.claude/skills/Niceboard/Tools/Board.ts content/brainstorms/<file>.md --embed --out static/brainstorms/boards/<file>.html --theme <path to nondominium>/.local/state/theme.css --icon static/favicon.png
    ```
 
-   `--public` builds the board without anything that only works on the author's machine; `--no-drawer` leaves out the live assistant drawer, since the site has its own comments drawer; `--no-sketch` leaves out the sketch wall, whose embedded Excalidraw bundle carries key-shaped strings the public-repo scan refuses and weighs about 8 MB. The compiler also writes a `<file>.manifest.json` beside the page: delete it, it is not published.
+   `--embed` builds the board for a frame on this site: it implies `--public` (nothing that only works on the author's machine), `--no-drawer` (the site has its own comments drawer), `--no-sketch` (the sketch wall's Excalidraw bundle carries key-shaped strings the public-repo scan refuses and weighs about 8 MB) and `--no-sync`, and it leaves out the controls that only serve a local answering loop, such as the board's own theme switch and comment pins. The compiler also writes a `<file>.manifest.json` beside the page: delete it, it is not published.
 
 3. Commit both files. The build picks the board up; nothing else to register. With no boards the list shows its empty message.
 
@@ -87,4 +87,4 @@ The board's own interactions (picks on decision cards, notes, stickies) stay in 
 
 - **Size.** Each compiled board is 1.3 to 1.7 MB, because it carries its fonts and diagram renderer inline so it works offline. Every board adds that weight to the deploy and to the first load of its page.
 - **No sketch wall.** Published boards are built with `--no-sketch`; sketching stays in the author's local copy of the board.
-- **The frame.** The board runs in an iframe on `/brainstorms/<slug>`; its own theme follows the reader's system setting rather than the site's theme switch. "Open full page" shows it without the frame.
+- **The frame.** The board runs in an iframe on `/brainstorms/<slug>` and follows the site's theme: the frame's address carries `?theme=` for the first paint, and `src/lib/brainstorms/BoardFrame.svelte` writes `data-theme` on the board's `<html>` whenever the reader switches. "Open full page" shows it without the frame, in the theme its address names or, with none, its own default.

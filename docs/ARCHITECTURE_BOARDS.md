@@ -15,6 +15,8 @@ The frontmatter, the compile command, what may be published and the known limits
 
 - The source goes in `content/architecture/` as `YYYY-MM-DD-<slug>.md`, and the compiled page in `static/architecture/boards/<same name>.html`.
 - The frontmatter carries `template: architecture` and `lifecycle: architecture`.
+- The frontmatter also carries `repo: Sensorica/nondominium` and the full `sha:` of the commit the board is read at, so every code reference in a spec links to its file and lines on GitHub at that commit.
+- Every component carries `links:`, a list of `label` and `url`: the issues, pull requests and documents it names, on GitHub, and the pages of this site that show it (a replica screen, a scenario, the ndo-ui playbook) as root-relative paths. A component that names none links to its source at the board's commit.
 
 Compile it from the repository root with the command in step 2 of [BRAINSTORMS.md](BRAINSTORMS.md#adding-a-board), reading `content/architecture/<file>.md` and writing `static/architecture/boards/<file>.html`.
 Delete the `<file>.manifest.json` the compiler writes beside the page.

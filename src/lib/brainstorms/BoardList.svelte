@@ -160,7 +160,7 @@
   .filter .label { font-size: var(--ndo-text-xs); font-weight: var(--ndo-weight-bold); letter-spacing: 0.08em; text-transform: uppercase; color: var(--ndo-color-text-muted); min-width: 5.5rem; }
   .filter button { font: inherit; font-size: var(--ndo-text-xs); font-weight: var(--ndo-weight-medium); color: var(--ndo-color-text-primary); background: rgb(var(--ndo-color-card-bg)); border: 1px solid var(--ndo-color-border); border-radius: var(--ndo-radius-pill); padding: 3px 12px; cursor: pointer; }
   .filter button i { font-style: normal; color: var(--ndo-color-text-muted); margin-left: 2px; }
-  .filter button.on { background: rgb(var(--ndo-primary-600)); border-color: rgb(var(--ndo-primary-600)); color: rgb(var(--ndo-color-text-inverse)); }
+  .filter button.on { background: rgb(var(--ndo-primary-600)); border-color: rgb(var(--ndo-primary-600)); color: rgb(var(--ndo-color-text-on-fill)); }
   .filter button.on i { color: inherit; opacity: 0.85; }
   .shown { margin: 0; font-size: var(--ndo-text-xs); color: var(--ndo-color-text-secondary); }
   .reset { font: inherit; font-size: inherit; color: var(--ndo-color-link); background: none; border: 0; padding: 0; cursor: pointer; text-decoration: underline; }

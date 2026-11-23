@@ -237,6 +237,10 @@
   --ndo-color-text-muted:     rgb(var(--ndo-gray-500));
   --ndo-color-text-mono:      rgb(var(--ndo-gray-400));
   --ndo-color-text-inverse:   255 255 255;
+  /* The label on a saturated fill (a primary or destructive button, an active
+     chip). White in both themes: text-inverse flips to near-black in dark,
+     which on a blue-600 fill is unreadable. Not redefined under dark. */
+  --ndo-color-text-on-fill:   255 255 255;
   --ndo-color-link:           rgb(var(--ndo-primary-600));
   --ndo-color-overlay:        rgb(var(--ndo-gray-900) / 0.45);
 

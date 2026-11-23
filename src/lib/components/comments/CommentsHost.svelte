@@ -105,6 +105,7 @@
 
 <svelte:window onkeydown={onKeydown} />
 
+{#if comments.inlineTriggers === 0}
 <button
   class="fab"
   class:fab--on={comments.open}
@@ -115,6 +116,7 @@
   💬
   {#if count > 0}<span class="fab__badge">{count}</span>{/if}
 </button>
+{/if}
 
 {#if comments.open}
   <div class="drawer" role="dialog" aria-label="Comments" aria-modal="false">

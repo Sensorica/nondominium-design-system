@@ -50,6 +50,13 @@ export const comments = $state({
    * top-level compose box takes it and clears it.
    */
   about: null as About | null,
+  /**
+   * How many mounted pages carry their own Comments button and want the
+   * floating one gone, such as a framed board, where the fixed button would sit
+   * over the board's own controls. A count, not a flag, so a page leaving and
+   * the next arriving in either order cannot strand it.
+   */
+  inlineTriggers: 0,
 });
 
 /**

@@ -7,6 +7,7 @@ project: nondominium
 status: open
 summary: "Tibi's commitment-pool-experiment branch drawn as it stands: a Group is a pool, a Commitment lives on its NDO, and fulfillment is one closure that writes the event, the claim and two receipts. Marks what is on dev since #183 and what is branch only, with the decision cards that concern dev still open."
 lang: en
+repo: Sensorica/nondominium
 sha: 057c5eb5b1a8ad0def907c05838d17fa872db747
 ---
 
@@ -83,11 +84,17 @@ The [v0.2 plan](https://github.com/Sensorica/nondominium/blob/dev/documentation/
   level: system
   kind: person
   does: A participant of a group who lists promises, admits them into the pool and fulfills them with a counterparty.
+  links:
+    - label: "Design system: the app replica"
+      url: "/app"
 - id: ge
   name: Grassroots Economics collaborators
   level: system
   kind: person
   does: The commitment-pooling community the experiment is built to show the admit, fulfill and receipt loop to.
+  links:
+    - label: "Design system: the commitment pooling MVP brainstorm"
+      url: "/brainstorms/2026-10-06-commitment-pooling-mvp"
 - id: happ
   name: Nondominium hApp
   level: system
@@ -95,6 +102,9 @@ The [v0.2 plan](https://github.com/Sensorica/nondominium/blob/dev/documentation/
   tech: Holochain 0.7, SvelteKit
   does: "The multi-DNA hApp where a Group doubles as a Commitment Pool over NDO commitments. The hApp is on dev; the pool is branch only."
   change: modified
+  links:
+    - label: "Design system: the app replica"
+      url: "/app"
 - id: dsys
   name: Nondominium design system
   level: system
@@ -102,6 +112,13 @@ The [v0.2 plan](https://github.com/Sensorica/nondominium/blob/dev/documentation/
   tech: "@nondominium/ndo-ui, release-prototype branch"
   does: "The sibling repository whose Resource Perspective components the experiment remixes into the hApp. Branch only, through a file path and Vite aliases; dev is to take it as a private nix flake input (D1, #205, v0.3)."
   change: new
+  links:
+    - label: "#205: feat(ui): design-system adapters with a resolvable ndo-ui dependency"
+      url: "https://github.com/Sensorica/nondominium/issues/205"
+    - label: "Design system: the ndo-ui playbook"
+      url: "/playbook"
+    - label: "Design system: the ndo-ui UI kit"
+      url: "/ui-kit"
 
 - id: ui
   name: hApp UI
@@ -111,6 +128,11 @@ The [v0.2 plan](https://github.com/Sensorica/nondominium/blob/dev/documentation/
   tech: SvelteKit 2, Svelte 5, Effect-TS
   does: "Lobby, Group and NDO views. On dev: the v0.1 views with the commitment and event forms from #183, which propose commitments and log events but never call the closure. Branch only: design-system chrome, the pool surfaces and the reworked forms of 2f5834c."
   change: modified
+  links:
+    - label: "PR #183: feat: bring Tibi's general backend work from commitment-pool-experiment onto dev"
+      url: "https://github.com/Sensorica/nondominium/pull/183"
+    - label: "Design system: the app replica"
+      url: "/app"
 - id: groupdna
   name: Group DNA
   level: container
@@ -119,6 +141,9 @@ The [v0.2 plan](https://github.com/Sensorica/nondominium/blob/dev/documentation/
   tech: Rust, HDK 0.7
   does: "One cloned cell per group. On dev: membership and NDO anchors, and per ADR-014 the future home of work contexts. Branch only: the pool's commitment anchors."
   change: modified
+  links:
+    - label: "ADR-014-work-contexts-in-group-dht.md at 057c5eb"
+      url: "https://github.com/Sensorica/nondominium/blob/057c5eb5b1a8ad0def907c05838d17fa872db747/documentation/specifications/adr/ADR-014-work-contexts-in-group-dht.md"
 - id: ndodna
   name: Nondominium DNA
   level: container
@@ -127,6 +152,9 @@ The [v0.2 plan](https://github.com/Sensorica/nondominium/blob/dev/documentation/
   tech: Rust, HDK 0.7
   does: "NDO identities, resources and governance. On dev since #183: commitments per NDO, the fulfillment closure with its receipts, Measure and the Layer 1 foreshadow fields. Branch only: the Use and Consume fork, the author and fulfilled flags on commitment reads, and distinct provider and receiver."
   change: modified
+  links:
+    - label: "PR #183: feat: bring Tibi's general backend work from commitment-pool-experiment onto dev"
+      url: "https://github.com/Sensorica/nondominium/pull/183"
 - id: shared
   name: Shared crate
   level: container
@@ -135,6 +163,9 @@ The [v0.2 plan](https://github.com/Sensorica/nondominium/blob/dev/documentation/
   tech: Rust, nondominium_shared
   does: "Types both DNAs share. On dev: Measure and the foreshadow enums. Branch only: the Use and Consume fork and closure reasons."
   change: modified
+  links:
+    - label: "Source at 057c5eb: crates/shared/src/types.rs"
+      url: "https://github.com/Sensorica/nondominium/blob/057c5eb5b1a8ad0def907c05838d17fa872db747/crates/shared/src/types.rs"
 
 - id: poolui
   name: Pool surfaces
@@ -149,6 +180,11 @@ The [v0.2 plan](https://github.com/Sensorica/nondominium/blob/dev/documentation/
     - ui/src/lib/components/ndo/AdmitToPoolModal.svelte:1-88
     - ui/src/lib/components/ndo/FulfillCommitmentModal.svelte:1-60
     - ui/src/lib/components/ndo/ParticipationClaimsPanel.svelte:1-78
+  links:
+    - label: "The commitment-pool-experiment branch"
+      url: "https://github.com/Sensorica/nondominium/tree/commitment-pool-experiment"
+    - label: "Source at 057c5eb: ui/src/lib/components/"
+      url: "https://github.com/Sensorica/nondominium/tree/057c5eb5b1a8ad0def907c05838d17fa872db747/ui/src/lib/components"
 - id: dsshell
   name: Design-system shell
   level: component
@@ -161,6 +197,11 @@ The [v0.2 plan](https://github.com/Sensorica/nondominium/blob/dev/documentation/
     - ui/src/lib/components/group/NdoCreateWizard.svelte:1-87
     - ui/src/lib/components/group/GroupView.svelte:1-40
     - ui/src/lib/components/group/AgentDirectory.svelte:1-40
+  links:
+    - label: "Design system: the ndo-ui UI kit"
+      url: "/ui-kit"
+    - label: "Source at 057c5eb: ui/src/lib/components/group/"
+      url: "https://github.com/Sensorica/nondominium/tree/057c5eb5b1a8ad0def907c05838d17fa872db747/ui/src/lib/components/group"
 - id: adapters
   name: Design-system adapters
   level: component
@@ -172,6 +213,13 @@ The [v0.2 plan](https://github.com/Sensorica/nondominium/blob/dev/documentation/
   code:
     - ui/src/lib/utils/ndo-ui-adapters.ts:1-60
     - ui/src/lib/utils/governance-template-map.ts:1-60
+  links:
+    - label: "#205: feat(ui): design-system adapters with a resolvable ndo-ui dependency"
+      url: "https://github.com/Sensorica/nondominium/issues/205"
+    - label: "Design system: the ndo-ui playbook"
+      url: "/playbook"
+    - label: "Design system: the ndo-ui UI kit"
+      url: "/ui-kit"
 - id: services
   name: Zome services and stores
   level: component
@@ -184,6 +232,9 @@ The [v0.2 plan](https://github.com/Sensorica/nondominium/blob/dev/documentation/
     - ui/src/lib/services/zomes/governance.service.ts:195-230
     - ui/src/lib/services/zomes/group.service.ts:270-305
     - ui/src/lib/services/zomes/governance.service.ts:350-370
+  links:
+    - label: "Source at 057c5eb: ui/src/lib/services/zomes/"
+      url: "https://github.com/Sensorica/nondominium/tree/057c5eb5b1a8ad0def907c05838d17fa872db747/ui/src/lib/services/zomes"
 
 - id: anchor
   name: Commitment anchor
@@ -197,6 +248,9 @@ The [v0.2 plan](https://github.com/Sensorica/nondominium/blob/dev/documentation/
     - dnas/group/zomes/integrity/zome_group_integrity/src/lib.rs:112-130
     - dnas/group/zomes/coordinator/zome_group/src/commitment_anchor.rs:41-66
     - dnas/group/zomes/coordinator/zome_group/src/commitment_anchor.rs:182-209
+  links:
+    - label: "Source at 057c5eb: dnas/group/zomes/"
+      url: "https://github.com/Sensorica/nondominium/tree/057c5eb5b1a8ad0def907c05838d17fa872db747/dnas/group/zomes"
 - id: membership
   name: Group membership
   level: component
@@ -206,6 +260,11 @@ The [v0.2 plan](https://github.com/Sensorica/nondominium/blob/dev/documentation/
   does: "Membership entries and the member list; its validation accepts any entry today, on dev as on the branch."
   code:
     - dnas/group/zomes/integrity/zome_group_integrity/src/lib.rs:229-235
+  links:
+    - label: "Design system: replica of a group page"
+      url: "/app/group/sensorica-lab-7f3a"
+    - label: "Source at 057c5eb: dnas/group/zomes/integrity/zome_group_integrity/src/lib.rs"
+      url: "https://github.com/Sensorica/nondominium/blob/057c5eb5b1a8ad0def907c05838d17fa872db747/dnas/group/zomes/integrity/zome_group_integrity/src/lib.rs"
 - id: ndoanchor
   name: NDO anchor
   level: component
@@ -215,6 +274,9 @@ The [v0.2 plan](https://github.com/Sensorica/nondominium/blob/dev/documentation/
   does: "The pattern the commitment anchor copies, a pointer from a group to an NDO cell with immutable coordinates. On dev, the same lines 58 to 70; ADR-014 has work contexts name NDOs the same way."
   code:
     - dnas/group/zomes/integrity/zome_group_integrity/src/lib.rs:58-70
+  links:
+    - label: "ADR-014-work-contexts-in-group-dht.md at 057c5eb"
+      url: "https://github.com/Sensorica/nondominium/blob/057c5eb5b1a8ad0def907c05838d17fa872db747/documentation/specifications/adr/ADR-014-work-contexts-in-group-dht.md"
 
 - id: commitments
   name: Commitments per NDO
@@ -227,6 +289,11 @@ The [v0.2 plan](https://github.com/Sensorica/nondominium/blob/dev/documentation/
   code:
     - dnas/nondominium/zomes/coordinator/zome_gouvernance/src/commitment.rs:61-72
     - dnas/nondominium/zomes/coordinator/zome_gouvernance/src/commitment.rs:169-258
+  links:
+    - label: "PR #183: feat: bring Tibi's general backend work from commitment-pool-experiment onto dev"
+      url: "https://github.com/Sensorica/nondominium/pull/183"
+    - label: "Design system: replica of the commitment form"
+      url: "/app/ndo/uhC0kVX5k7dL2mPqR8sT1uW4xY7zA0bC3dE6fG9h?modal=commitment"
 - id: fulfill
   name: Fulfillment closure
   level: component
@@ -240,6 +307,11 @@ The [v0.2 plan](https://github.com/Sensorica/nondominium/blob/dev/documentation/
     - dnas/nondominium/zomes/coordinator/zome_gouvernance/src/fulfillment.rs:345-370
     - dnas/nondominium/zomes/coordinator/zome_gouvernance/src/fulfillment.rs:538-560
     - dnas/nondominium/zomes/coordinator/zome_gouvernance/src/lib.rs:43-63
+  links:
+    - label: "PR #183: feat: bring Tibi's general backend work from commitment-pool-experiment onto dev"
+      url: "https://github.com/Sensorica/nondominium/pull/183"
+    - label: "Design system: replica of the event form"
+      url: "/app/ndo/uhC0kVX5k7dL2mPqR8sT1uW4xY7zA0bC3dE6fG9h?modal=event"
 - id: identity
   name: NDO identity
   level: component
@@ -252,6 +324,11 @@ The [v0.2 plan](https://github.com/Sensorica/nondominium/blob/dev/documentation/
     - dnas/nondominium/zomes/integrity/zome_resource/src/lib.rs:92-153
     - dnas/nondominium/zomes/coordinator/zome_resource/src/ndo_identity.rs:244-330
     - dnas/nondominium/zomes/coordinator/zome_resource/src/ndo_identity.rs:689-710
+  links:
+    - label: "#204: feat(resource): bring the Use and Consume fork from the experiment branch"
+      url: "https://github.com/Sensorica/nondominium/issues/204"
+    - label: "Design system: replica of an NDO page"
+      url: "/app/ndo/uhC0kVX5k7dL2mPqR8sT1uW4xY7zA0bC3dE6fG9h"
 - id: inventory
   name: Layer 1 inventory
   level: component
@@ -262,6 +339,9 @@ The [v0.2 plan](https://github.com/Sensorica/nondominium/blob/dev/documentation/
   code:
     - dnas/nondominium/zomes/integrity/zome_resource/src/lib.rs:16-53
     - dnas/nondominium/zomes/coordinator/zome_resource/src/economic_resource.rs:509-528
+  links:
+    - label: "PR #183: feat: bring Tibi's general backend work from commitment-pool-experiment onto dev"
+      url: "https://github.com/Sensorica/nondominium/pull/183"
 
 - id: types
   name: Shared types
@@ -274,6 +354,9 @@ The [v0.2 plan](https://github.com/Sensorica/nondominium/blob/dev/documentation/
   code:
     - crates/shared/src/types.rs:140-175
     - crates/shared/src/types.rs:320-340
+  links:
+    - label: "PR #183: feat: bring Tibi's general backend work from commitment-pool-experiment onto dev"
+      url: "https://github.com/Sensorica/nondominium/pull/183"
 ```
 
 ```board-relations

@@ -87,7 +87,7 @@
 }
 .ndo-btn.ndo-btn--primary {
   background: rgb(var(--ndo-primary-600));
-  color: rgb(var(--ndo-color-text-inverse));
+  color: rgb(var(--ndo-color-text-on-fill));
 }
 .ndo-btn.ndo-btn--primary:hover:not(:disabled) { background: rgb(var(--ndo-primary-700)); }
 .ndo-btn.ndo-btn--ghost {
@@ -101,7 +101,7 @@
 }
 .ndo-btn.ndo-btn--destructive {
   background: rgb(var(--ndo-red-600));
-  color: rgb(var(--ndo-color-text-inverse));
+  color: rgb(var(--ndo-color-text-on-fill));
 }
 .ndo-btn.ndo-btn--destructive:hover:not(:disabled) { background: rgb(var(--ndo-red-700)); }
 .ndo-btn--sm {

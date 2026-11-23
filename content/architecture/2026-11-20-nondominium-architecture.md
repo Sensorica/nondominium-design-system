@@ -7,6 +7,7 @@ project: nondominium
 status: open
 summary: "The complete architecture of the Nondominium hApp on dev at 2e2f235, from the C4 context down to every DNA, zome and UI module, with the planned work of the v0.1.0 Moss pilot, v0.2 and v0.3 drawn as planified, modified or removed parts. A map to explore the app, with no decision to take."
 lang: en
+repo: Sensorica/nondominium
 sha: 2e2f235d980e27753ea8a6d8a4d252863d293de7
 change-new: planified
 ---
@@ -69,6 +70,23 @@ Inside the NDO cell, integrity refuses an identity whose name, regime or nature 
 
 Inside Moss, the Moss group takes the place of the lobby: the tool's provisioned `group` cell is the group, profiles come from Moss, clone cells are created through the WeaveClient, and every NDO is offered to other tools as a Moss asset.
 
+## Inside an NDO: three layers and a surface
+
+An NDO is not one record but three layers on one anchor (prima materia §4).
+Layer 0, the `NondominiumIdentity`, is always there and is never deleted; Layer 1, the specification, is attached to it by `NdoToSpecification` and runs on `dev` today; Layer 2, the process, is to be attached by `NDOToProcess` and is not started.
+Each layer adds coordination only when the resource's social complexity asks for it, which is why the NDO DNA's map draws them as three boxes on the identity.
+
+## Capability slots, the attachment surface
+
+Capability slots are how anything the NDO's designers did not foresee attaches to it (prima materia §6).
+A slot is a typed DHT link from a stable identity hash to any other hash, tagged with its `SlotType`, which any accountable agent may create without the custodian's permission and which stays readable at every lifecycle stage.
+The surface spans two anchors: the NDO's Layer 0 identity, and a person's `Person` entry (§6.5, G15).
+
+Almost every integration after the MVP goes through it, so it is drawn as a container of its own, the **Capability slot surface**, rather than as a link type inside one zome.
+Open it to see the slot types and what attaches through each: file storage through `DigitalAsset`, Flowsta through `FlowstaIdentity` on a person, Unyt through `UnytAgreement`, Moss through `WeaveWAL`, and any other hApp, the commitment pool included, through `CustomApp`.
+Governance reads the surface twice: it marks which slots are trusted, and its engine can require an endorsed Unyt agreement or a verified Flowsta identity before it approves a transition (the two-tier model of §6.6 and §6.7).
+None of it is in the code yet: the substrate is [#184](https://github.com/Sensorica/nondominium/issues/184) in v0.2, under the [capability slots epic](https://github.com/Sensorica/nondominium/issues/209), and each slot type is its own issue.
+
 ```board-components
 - id: member
   name: Member
@@ -76,12 +94,26 @@ Inside Moss, the Moss group takes the place of the lobby: the tool's provisioned
   kind: person
   entry: a member of a group, in Moss or standalone
   does: "A person in an open value network who creates groups and NDOs, joins them, proposes commitments, logs economic events and fulfills commitments with a counterparty."
+  links:
+    - label: "Design system: the app replica"
+      url: "/app"
+    - label: "Design system: scenarios"
+      url: "/scenarios"
+    - label: "Design system: the v0.1 UI prototypes"
+      url: "/prototypes"
 - id: developer
   name: Developer
   level: system
   kind: person
   entry: a developer running the app locally
   does: "A contributor who builds the zomes and the UI and runs two agents locally, in weave dev mode inside Moss or in a Holochain sandbox."
+  links:
+    - label: "README.md at 2e2f235"
+      url: "https://github.com/Sensorica/nondominium/blob/2e2f235d980e27753ea8a6d8a4d252863d293de7/README.md"
+    - label: "CONTRIBUTING.md at 2e2f235"
+      url: "https://github.com/Sensorica/nondominium/blob/2e2f235d980e27753ea8a6d8a4d252863d293de7/CONTRIBUTING.md"
+    - label: "documentation/README.md at 2e2f235"
+      url: "https://github.com/Sensorica/nondominium/blob/2e2f235d980e27753ea8a6d8a4d252863d293de7/documentation/README.md"
 
 - id: nd
   name: Nondominium hApp
@@ -92,6 +124,13 @@ Inside Moss, the Moss group takes the place of the lobby: the tool's provisioned
   code:
     - workdir/happ.yaml:1-60
     - Cargo.toml:7-43
+  links:
+    - label: "Design system: the app replica"
+      url: "/app"
+    - label: "Source at 2e2f235: workdir/happ.yaml"
+      url: "https://github.com/Sensorica/nondominium/blob/2e2f235d980e27753ea8a6d8a4d252863d293de7/workdir/happ.yaml"
+    - label: "Source at 2e2f235: Cargo.toml"
+      url: "https://github.com/Sensorica/nondominium/blob/2e2f235d980e27753ea8a6d8a4d252863d293de7/Cargo.toml"
 - id: conductor
   name: Holochain conductor
   level: system
@@ -101,6 +140,11 @@ Inside Moss, the Moss group takes the place of the lobby: the tool's provisioned
   code:
     - Cargo.toml:47-55
     - scripts/launch-happ.mjs:1-20
+  links:
+    - label: "Source at 2e2f235: Cargo.toml"
+      url: "https://github.com/Sensorica/nondominium/blob/2e2f235d980e27753ea8a6d8a4d252863d293de7/Cargo.toml"
+    - label: "Source at 2e2f235: scripts/launch-happ.mjs"
+      url: "https://github.com/Sensorica/nondominium/blob/2e2f235d980e27753ea8a6d8a4d252863d293de7/scripts/launch-happ.mjs"
 - id: moss
   name: Moss and The Weave
   level: system
@@ -110,6 +154,9 @@ Inside Moss, the Moss group takes the place of the lobby: the tool's provisioned
   code:
     - ui/package.json:47-58
     - documentation/specifications/moss-integration.md:1-91
+  links:
+    - label: "moss-integration.md at 2e2f235"
+      url: "https://github.com/Sensorica/nondominium/blob/2e2f235d980e27753ea8a6d8a4d252863d293de7/documentation/specifications/moss-integration.md"
 - id: netinfra
   name: Bootstrap and relay server
   level: system
@@ -119,6 +166,9 @@ Inside Moss, the Moss group takes the place of the lobby: the tool's provisioned
   change: new
   code:
     - weave/weave.dev.config.ts:1-14
+  links:
+    - label: "#122: feat(infra): bootstrap + relay server for the v0.1.0 Moss pilot"
+      url: "https://github.com/Sensorica/nondominium/issues/122"
 - id: alwayson
   name: Always-online node
   level: system
@@ -126,6 +176,9 @@ Inside Moss, the Moss group takes the place of the lobby: the tool's provisioned
   tech: wdocker, NixOS
   does: "A headless conductor on Sensorica's Holoports that joins the pilot group and keeps its group and NDO cells readable while every member is offline. Planned in #166 (v0.1.0 Moss pilot)."
   change: new
+  links:
+    - label: "#166: feat(infra): always-online wdocker node for the pilot group"
+      url: "https://github.com/Sensorica/nondominium/issues/166"
 - id: dsys
   name: Nondominium design system
   level: system
@@ -133,12 +186,22 @@ Inside Moss, the Moss group takes the place of the lobby: the tool's provisioned
   tech: "@nondominium/ndo-ui, nix flake input"
   does: "This design system's component package, to come into the UI as a pinned nix flake input rather than npm, resolved inside nix develop. Planned in #205 (v0.3)."
   change: new
+  links:
+    - label: "#205: feat(ui): design-system adapters with a resolvable ndo-ui dependency"
+      url: "https://github.com/Sensorica/nondominium/issues/205"
+    - label: "Design system: the ndo-ui playbook"
+      url: "/playbook"
+    - label: "Design system: the ndo-ui UI kit"
+      url: "/ui-kit"
 - id: mosslib
   name: Moss public library
   level: system
   kind: external
   does: "The catalogue a Moss group installs tools from; the tool is to be listed there once Moss 0.16 is stable. Planned in #202 (v0.3)."
   change: new
+  links:
+    - label: "#202: release(moss): publish the tool to the Moss public library"
+      url: "https://github.com/Sensorica/nondominium/issues/202"
 - id: flowsta
   name: Flowsta
   level: system
@@ -147,6 +210,11 @@ Inside Moss, the Moss group takes the place of the lobby: the tool's provisioned
   change: new
   code:
     - documentation/requirements/post-mvp/flowsta-integration.md:1-12
+  links:
+    - label: "#156: feat(identity): link agents to Flowsta for cross-app identity and key recovery (Tier 1)"
+      url: "https://github.com/Sensorica/nondominium/issues/156"
+    - label: "flowsta-integration.md at 2e2f235"
+      url: "https://github.com/Sensorica/nondominium/blob/2e2f235d980e27753ea8a6d8a4d252863d293de7/documentation/requirements/post-mvp/flowsta-integration.md"
 - id: unyt
   name: Unyt
   level: system
@@ -155,6 +223,11 @@ Inside Moss, the Moss group takes the place of the lobby: the tool's provisioned
   change: new
   code:
     - documentation/requirements/post-mvp/unyt-integration.md:141-160
+  links:
+    - label: "#222: feat(gouvernance): store the distribution placeholder and the license share parameter"
+      url: "https://github.com/Sensorica/nondominium/issues/222"
+    - label: "unyt-integration.md at 2e2f235"
+      url: "https://github.com/Sensorica/nondominium/blob/2e2f235d980e27753ea8a6d8a4d252863d293de7/documentation/requirements/post-mvp/unyt-integration.md"
 
 - id: ui
   name: hApp UI
@@ -167,6 +240,17 @@ Inside Moss, the Moss group takes the place of the lobby: the tool's provisioned
   code:
     - ui/package.json:1-58
     - ui/scripts/check-architecture.ts:1-13
+  links:
+    - label: "#150: chore(deps): migrate the ui package to SvelteKit 3"
+      url: "https://github.com/Sensorica/nondominium/issues/150"
+    - label: "#193: feat(ui): economic reads through hREA, with the GraphQL adapter from npm"
+      url: "https://github.com/Sensorica/nondominium/issues/193"
+    - label: "#203: release(standalone): ship the standalone build beside Moss"
+      url: "https://github.com/Sensorica/nondominium/issues/203"
+    - label: "Design system: the app replica"
+      url: "/app"
+    - label: "Design system: the v0.1 UI prototypes"
+      url: "/prototypes"
 - id: lobbydna
   name: Lobby DNA
   level: container
@@ -177,6 +261,11 @@ Inside Moss, the Moss group takes the place of the lobby: the tool's provisioned
   code:
     - workdir/happ.yaml:4-14
     - dnas/lobby/workdir/dna.yaml:1-17
+  links:
+    - label: "Source at 2e2f235: workdir/happ.yaml"
+      url: "https://github.com/Sensorica/nondominium/blob/2e2f235d980e27753ea8a6d8a4d252863d293de7/workdir/happ.yaml"
+    - label: "Source at 2e2f235: dnas/lobby/workdir/dna.yaml"
+      url: "https://github.com/Sensorica/nondominium/blob/2e2f235d980e27753ea8a6d8a4d252863d293de7/dnas/lobby/workdir/dna.yaml"
 - id: coredna
   name: Nondominium DNA
   level: container
@@ -188,6 +277,9 @@ Inside Moss, the Moss group takes the place of the lobby: the tool's provisioned
   code:
     - workdir/happ.yaml:15-23
     - dnas/nondominium/workdir/dna.yaml:1-36
+  links:
+    - label: "#185: Epic: hREA as the economic substrate (v0.2)"
+      url: "https://github.com/Sensorica/nondominium/issues/185"
 - id: groupdna
   name: Group DNA
   level: container
@@ -199,17 +291,27 @@ Inside Moss, the Moss group takes the place of the lobby: the tool's provisioned
   code:
     - workdir/happ.yaml:34-43
     - dnas/group/workdir/dna.yaml:1-17
+  links:
+    - label: "#201: feat(group): work contexts in the group DHT"
+      url: "https://github.com/Sensorica/nondominium/issues/201"
+    - label: "ADR-014-work-contexts-in-group-dht.md at 2e2f235"
+      url: "https://github.com/Sensorica/nondominium/blob/2e2f235d980e27753ea8a6d8a4d252863d293de7/documentation/specifications/adr/ADR-014-work-contexts-in-group-dht.md"
 - id: ndodna
   name: NDO DNA
   level: container
   parent: nd
   kind: service
   tech: Rust, HDK 0.7.1, cloned per NDO
-  does: "One cloned cell per NDO, its DNA hash bound to the NDO's immutable Layer 0 fields: the identity, its members, its specifications, commitments, events and agreement. Planned: capability slots on the identity (#184, v0.2) and a fork's inherited share in its DNA properties (#223, v0.1.0)."
+  does: "One cloned cell per NDO, its DNA hash bound to the NDO's immutable Layer 0 fields: the three layers of the NDO on its identity, its members, commitments, events and agreement. Planned: the capability slots that hang off the identity (#184, v0.2, drawn as the Capability slot surface) and a fork's inherited share in its DNA properties (#223, v0.1.0)."
   change: modified
   code:
     - workdir/happ.yaml:44-53
     - dnas/ndo/workdir/dna.yaml:1-25
+  links:
+    - label: "#184: feat(resource): CapabilitySlot substrate on the NDO identity (REQ-NDO-CS-01, 02, 04, 06)"
+      url: "https://github.com/Sensorica/nondominium/issues/184"
+    - label: "#223: feat(gouvernance): a forked NDO must carry its parent's share, validated in integrity"
+      url: "https://github.com/Sensorica/nondominium/issues/223"
 - id: hreadna
   name: hREA DNA
   level: container
@@ -222,6 +324,29 @@ Inside Moss, the Moss group takes the place of the lobby: the tool's provisioned
     - workdir/happ.yaml:24-33
     - .gitmodules:1-3
     - vendor/README.md:1-3
+  links:
+    - label: "#185: Epic: hREA as the economic substrate (v0.2)"
+      url: "https://github.com/Sensorica/nondominium/issues/185"
+    - label: "#187: research(hrea): module interface RFC on h-REA/hREA"
+      url: "https://github.com/Sensorica/nondominium/issues/187"
+- id: capslots
+  name: Capability slot surface
+  level: container
+  parent: nd
+  kind: module
+  tech: CapabilitySlot links, compiled into zome_resource and zome_person
+  does: "The stigmergic attachment surface of prima materia §6: typed links from an NDO's Layer 0 identity, or from a Person, to any capability target, so tools nobody anticipated attach without changing the NDO. A protocol carried by the NDO cells and the core cell, not a DNA of its own. Planned in #184 (v0.2) under the capability slots epic #209, each slot type in its own issue."
+  change: new
+  code:
+    - documentation/requirements/ndo_prima_materia.md:547-606
+    - documentation/requirements/ndo_prima_materia.md:1356-1375
+  links:
+    - label: "#184: feat(resource): CapabilitySlot substrate on the NDO identity (REQ-NDO-CS-01, 02, 04, 06)"
+      url: "https://github.com/Sensorica/nondominium/issues/184"
+    - label: "#209: Epic: Capability slots"
+      url: "https://github.com/Sensorica/nondominium/issues/209"
+    - label: "ndo_prima_materia.md at 2e2f235"
+      url: "https://github.com/Sensorica/nondominium/blob/2e2f235d980e27753ea8a6d8a4d252863d293de7/documentation/requirements/ndo_prima_materia.md"
 - id: sharedcrate
   name: Shared Rust crate
   level: container
@@ -231,6 +356,9 @@ Inside Moss, the Moss group takes the place of the lobby: the tool's provisioned
   does: "The types, constraint checks, anchor paths and cross-zome call helpers every zome compiles in, so the DNAs agree on one vocabulary."
   code:
     - crates/shared/src/lib.rs:1-146
+  links:
+    - label: "Source at 2e2f235: crates/shared/src/lib.rs"
+      url: "https://github.com/Sensorica/nondominium/blob/2e2f235d980e27753ea8a6d8a4d252863d293de7/crates/shared/src/lib.rs"
 - id: bundle
   name: Bundle and packaging
   level: container
@@ -241,6 +369,11 @@ Inside Moss, the Moss group takes the place of the lobby: the tool's provisioned
   change: modified
   code:
     - package.json:10-34
+  links:
+    - label: "#121: chore(release): produce and smoke-test the v0.1.0 Moss tool .webhapp"
+      url: "https://github.com/Sensorica/nondominium/issues/121"
+    - label: "#203: release(standalone): ship the standalone build beside Moss"
+      url: "https://github.com/Sensorica/nondominium/issues/203"
 - id: testsuites
   name: Test suites
   level: container
@@ -251,6 +384,11 @@ Inside Moss, the Moss group takes the place of the lobby: the tool's provisioned
   code:
     - Cargo.toml:16-19
     - package.json:13-15
+  links:
+    - label: "Source at 2e2f235: Cargo.toml"
+      url: "https://github.com/Sensorica/nondominium/blob/2e2f235d980e27753ea8a6d8a4d252863d293de7/Cargo.toml"
+    - label: "Source at 2e2f235: package.json"
+      url: "https://github.com/Sensorica/nondominium/blob/2e2f235d980e27753ea8a6d8a4d252863d293de7/package.json"
 
 - id: routes
   name: Routes and root layout
@@ -262,6 +400,11 @@ Inside Moss, the Moss group takes the place of the lobby: the tool's provisioned
   code:
     - ui/src/routes/+layout.svelte:1-58
     - ui/src/routes/ndo/new/+page.svelte:1-32
+  links:
+    - label: "Design system: the app replica"
+      url: "/app"
+    - label: "Source at 2e2f235: ui/src/routes/"
+      url: "https://github.com/Sensorica/nondominium/tree/2e2f235d980e27753ea8a6d8a4d252863d293de7/ui/src/routes"
 - id: shell
   name: App shell
   level: component
@@ -272,6 +415,15 @@ Inside Moss, the Moss group takes the place of the lobby: the tool's provisioned
   code:
     - ui/src/lib/components/shell/AppShell.svelte:1-72
     - ui/src/lib/components/shell/Sidebar.svelte:1-294
+  links:
+    - label: "Design system: the app replica"
+      url: "/app"
+    - label: "Design system: shell patterns"
+      url: "/patterns/shell"
+    - label: "Design system: ndo-ui shell"
+      url: "/playbook/shell"
+    - label: "Source at 2e2f235: ui/src/lib/components/shell/"
+      url: "https://github.com/Sensorica/nondominium/tree/2e2f235d980e27753ea8a6d8a4d252863d293de7/ui/src/lib/components/shell"
 - id: lobbyviews
   name: Lobby views
   level: component
@@ -284,6 +436,13 @@ Inside Moss, the Moss group takes the place of the lobby: the tool's provisioned
     - ui/src/lib/components/lobby/NdoBrowser.svelte:1-279
     - ui/src/lib/components/lobby/GroupSidebar.svelte:1-184
     - ui/src/lib/components/lobby/ProfileSetupModal.svelte:1-79
+  links:
+    - label: "Design system: the app replica"
+      url: "/app"
+    - label: "Design system: the lobby browse scenario"
+      url: "/scenarios/lobby-browse"
+    - label: "Source at 2e2f235: ui/src/lib/components/lobby/"
+      url: "https://github.com/Sensorica/nondominium/tree/2e2f235d980e27753ea8a6d8a4d252863d293de7/ui/src/lib/components/lobby"
 - id: groupviews
   name: Group views
   level: component
@@ -295,6 +454,13 @@ Inside Moss, the Moss group takes the place of the lobby: the tool's provisioned
     - ui/src/lib/components/group/GroupView.svelte:1-228
     - ui/src/lib/components/group/NdoCreateModal.svelte:1-245
     - ui/src/lib/components/group/MemberList.svelte:1-36
+  links:
+    - label: "Design system: replica of a group page"
+      url: "/app/group/sensorica-lab-7f3a"
+    - label: "Design system: the group collaboration scenario"
+      url: "/scenarios/group-collaboration"
+    - label: "Source at 2e2f235: ui/src/lib/components/group/"
+      url: "https://github.com/Sensorica/nondominium/tree/2e2f235d980e27753ea8a6d8a4d252863d293de7/ui/src/lib/components/group"
 - id: ndoviews
   name: NDO views
   level: component
@@ -310,6 +476,15 @@ Inside Moss, the Moss group takes the place of the lobby: the tool's provisioned
     - ui/src/lib/components/ndo/EconomicEventCreateForm.svelte:1-289
     - ui/src/lib/components/ndo/ForkNdoModal.svelte:1-102
     - ui/src/lib/components/ndo/LifecycleTransitionModal.svelte:1-182
+  links:
+    - label: "PR #183: feat: bring Tibi's general backend work from commitment-pool-experiment onto dev"
+      url: "https://github.com/Sensorica/nondominium/pull/183"
+    - label: "#223: feat(gouvernance): a forked NDO must carry its parent's share, validated in integrity"
+      url: "https://github.com/Sensorica/nondominium/issues/223"
+    - label: "Design system: replica of an NDO page"
+      url: "/app/ndo/uhC0kVX5k7dL2mPqR8sT1uW4xY7zA0bC3dE6fG9h"
+    - label: "Design system: the NDO lifecycle scenario"
+      url: "/scenarios/ndo-lifecycle"
 - id: piechart
   name: Contribution pie chart
   level: component
@@ -318,6 +493,13 @@ Inside Moss, the Moss group takes the place of the lobby: the tool's provisioned
   tech: Svelte 5
   does: "Shows and edits an NDO's contribution pie chart, the shares of its agreement. Planned in #221 (v0.1.0 Moss pilot), with #220 (shares sum to exactly 100) and #224 (import pie-chart.json)."
   change: new
+  links:
+    - label: "#221: feat(ui): show and edit an NDO's contribution pie chart"
+      url: "https://github.com/Sensorica/nondominium/issues/221"
+    - label: "#220: fix(gouvernance): agreement shares must sum to exactly 100"
+      url: "https://github.com/Sensorica/nondominium/issues/220"
+    - label: "#224: feat(gouvernance): import pie-chart.json into the project NDO's agreement"
+      url: "https://github.com/Sensorica/nondominium/issues/224"
 - id: dsadapters
   name: Design-system adapters
   level: component
@@ -326,6 +508,13 @@ Inside Moss, the Moss group takes the place of the lobby: the tool's provisioned
   tech: TypeScript
   does: "Convert between the design system's component shapes and the app's create inputs and rule data. On Tibi's experiment branch today; to land on dev with a resolvable ndo-ui dependency in #205 (v0.3)."
   change: new
+  links:
+    - label: "#205: feat(ui): design-system adapters with a resolvable ndo-ui dependency"
+      url: "https://github.com/Sensorica/nondominium/issues/205"
+    - label: "Design system: the ndo-ui playbook"
+      url: "/playbook"
+    - label: "Design system: the ndo-ui UI kit"
+      url: "/ui-kit"
 - id: stores
   name: Stores
   level: component
@@ -338,6 +527,9 @@ Inside Moss, the Moss group takes the place of the lobby: the tool's provisioned
     - ui/src/lib/stores/lobby.store.svelte.ts:1-237
     - ui/src/lib/stores/governance.store.svelte.ts:1-430
     - ui/src/lib/stores/moss.store.svelte.ts:1-96
+  links:
+    - label: "Source at 2e2f235: ui/src/lib/stores/"
+      url: "https://github.com/Sensorica/nondominium/tree/2e2f235d980e27753ea8a6d8a4d252863d293de7/ui/src/lib/stores"
 - id: domainlayer
   name: Domain layer
   level: component
@@ -350,6 +542,9 @@ Inside Moss, the Moss group takes the place of the lobby: the tool's provisioned
     - ui/src/lib/domain/lifecycle.ts:1-29
     - ui/src/lib/domain/entity-state.ts:1-104
     - ui/src/lib/domain/ndo-filters.ts:1-25
+  links:
+    - label: "Source at 2e2f235: ui/src/lib/domain/"
+      url: "https://github.com/Sensorica/nondominium/tree/2e2f235d980e27753ea8a6d8a4d252863d293de7/ui/src/lib/domain"
 - id: zomeservices
   name: Zome services
   level: component
@@ -362,6 +557,9 @@ Inside Moss, the Moss group takes the place of the lobby: the tool's provisioned
     - ui/src/lib/services/zomes/lobby.service.ts:627-675
     - ui/src/lib/services/zomes/governance.service.ts:1-273
     - ui/src/lib/services/zomes/moss-lobby.ts:1-25
+  links:
+    - label: "Source at 2e2f235: ui/src/lib/services/zomes/"
+      url: "https://github.com/Sensorica/nondominium/tree/2e2f235d980e27753ea8a6d8a4d252863d293de7/ui/src/lib/services/zomes"
 - id: schemas
   name: Schemas and errors
   level: component
@@ -372,6 +570,9 @@ Inside Moss, the Moss group takes the place of the lobby: the tool's provisioned
   code:
     - ui/src/lib/schemas/resource.schemas.ts:1-190
     - ui/src/lib/errors/error-contexts.ts:1-142
+  links:
+    - label: "Source at 2e2f235: ui/src/lib/"
+      url: "https://github.com/Sensorica/nondominium/tree/2e2f235d980e27753ea8a6d8a4d252863d293de7/ui/src/lib"
 - id: hcservice
   name: Holochain client service
   level: component
@@ -383,6 +584,9 @@ Inside Moss, the Moss group takes the place of the lobby: the tool's provisioned
     - ui/src/lib/services/holochain.service.svelte.ts:1-60
     - ui/src/lib/services/holochain.service.svelte.ts:230-300
     - ui/src/lib/services/cell.manager.ts:1-85
+  links:
+    - label: "Source at 2e2f235: ui/src/lib/services/"
+      url: "https://github.com/Sensorica/nondominium/tree/2e2f235d980e27753ea8a6d8a4d252863d293de7/ui/src/lib/services"
 - id: hcconnect
   name: Connection modes
   level: component
@@ -392,6 +596,15 @@ Inside Moss, the Moss group takes the place of the lobby: the tool's provisioned
   does: "Opens the conductor connection in one of four modes: the launcher, the hc-connection.json manifest the dev launcher writes, environment variables, or the applet client Moss hands the tool."
   code:
     - ui/src/lib/utils/hc-connect.ts:1-287
+  links:
+    - label: "Design system: replica of the connecting screen"
+      url: "/app/connecting"
+    - label: "Design system: replica of the connection error screen"
+      url: "/app/connection-error"
+    - label: "Design system: replica of the disconnected screen"
+      url: "/app/disconnected"
+    - label: "Source at 2e2f235: ui/src/lib/utils/hc-connect.ts"
+      url: "https://github.com/Sensorica/nondominium/blob/2e2f235d980e27753ea8a6d8a4d252863d293de7/ui/src/lib/utils/hc-connect.ts"
 - id: mossadapter
   name: Moss host layer
   level: component
@@ -406,6 +619,9 @@ Inside Moss, the Moss group takes the place of the lobby: the tool's provisioned
     - ui/src/lib/moss/assets.ts:1-55
     - ui/src/lib/moss/profile.ts:1-64
     - ui/src/lib/moss/ndo-clone.ts:1-43
+  links:
+    - label: "Source at 2e2f235: ui/src/lib/moss/"
+      url: "https://github.com/Sensorica/nondominium/tree/2e2f235d980e27753ea8a6d8a4d252863d293de7/ui/src/lib/moss"
 - id: sharedtypes
   name: Shared TypeScript types
   level: component
@@ -416,6 +632,9 @@ Inside Moss, the Moss group takes the place of the lobby: the tool's provisioned
   code:
     - packages/shared-types/src/index.ts:1-43
     - packages/shared-types/src/resource.types.ts:1-463
+  links:
+    - label: "Source at 2e2f235: packages/shared-types/src/"
+      url: "https://github.com/Sensorica/nondominium/tree/2e2f235d980e27753ea8a6d8a4d252863d293de7/packages/shared-types/src"
 - id: archcheck
   name: Architecture check
   level: component
@@ -425,6 +644,9 @@ Inside Moss, the Moss group takes the place of the lobby: the tool's provisioned
   does: "Fails the UI check when a Svelte file reaches effect or the services (I1), a store imports another store (I2), or the domain layer imports Svelte, Effect, services or stores (I3)."
   code:
     - ui/scripts/check-architecture.ts:1-60
+  links:
+    - label: "Source at 2e2f235: ui/scripts/check-architecture.ts"
+      url: "https://github.com/Sensorica/nondominium/blob/2e2f235d980e27753ea8a6d8a4d252863d293de7/ui/scripts/check-architecture.ts"
 - id: vendoredadapter
   name: Vendored GraphQL adapter
   level: component
@@ -436,6 +658,11 @@ Inside Moss, the Moss group takes the place of the lobby: the tool's provisioned
   code:
     - ui/package.json:54-54
     - vendor/README.md:5-21
+  links:
+    - label: "#153: chore(deps): vendor the hREA GraphQL adapter 0.700.0-rc.0 into the UI"
+      url: "https://github.com/Sensorica/nondominium/issues/153"
+    - label: "#193: feat(ui): economic reads through hREA, with the GraphQL adapter from npm"
+      url: "https://github.com/Sensorica/nondominium/issues/193"
 - id: hreareads
   name: hREA economic reads
   level: component
@@ -446,6 +673,11 @@ Inside Moss, the Moss group takes the place of the lobby: the tool's provisioned
   change: new
   code:
     - documentation/hREA/v0.2-release-plan.md:126-135
+  links:
+    - label: "#193: feat(ui): economic reads through hREA, with the GraphQL adapter from npm"
+      url: "https://github.com/Sensorica/nondominium/issues/193"
+    - label: "v0.2-release-plan.md at 2e2f235"
+      url: "https://github.com/Sensorica/nondominium/blob/2e2f235d980e27753ea8a6d8a4d252863d293de7/documentation/hREA/v0.2-release-plan.md"
 
 - id: lobbyint
   name: zome_lobby_integrity
@@ -457,6 +689,9 @@ Inside Moss, the Moss group takes the place of the lobby: the tool's provisioned
   code:
     - dnas/lobby/zomes/integrity/zome_lobby_integrity/src/lib.rs:6-47
     - dnas/lobby/zomes/integrity/zome_lobby_integrity/src/lib.rs:63-120
+  links:
+    - label: "Source at 2e2f235: dnas/lobby/zomes/integrity/zome_lobby_integrity/src/"
+      url: "https://github.com/Sensorica/nondominium/tree/2e2f235d980e27753ea8a6d8a4d252863d293de7/dnas/lobby/zomes/integrity/zome_lobby_integrity/src"
 - id: lobbycoord
   name: zome_lobby_coordinator
   level: component
@@ -466,6 +701,9 @@ Inside Moss, the Moss group takes the place of the lobby: the tool's provisioned
   does: "Nine hdk_extern functions, init included: upsert and read lobby profiles, announce a group, and list all groups, my groups or one group by its DNA hash."
   code:
     - dnas/lobby/zomes/coordinator/zome_lobby_coordinator/src/lib.rs:1-291
+  links:
+    - label: "Source at 2e2f235: dnas/lobby/zomes/coordinator/zome_lobby_coordinator/src/lib.rs"
+      url: "https://github.com/Sensorica/nondominium/blob/2e2f235d980e27753ea8a6d8a4d252863d293de7/dnas/lobby/zomes/coordinator/zome_lobby_coordinator/src/lib.rs"
 
 - id: personint
   name: zome_person integrity
@@ -477,6 +715,11 @@ Inside Moss, the Moss group takes the place of the lobby: the tool's provisioned
   code:
     - dnas/nondominium/zomes/integrity/zome_person/src/lib.rs:42-120
     - dnas/nondominium/zomes/integrity/zome_person/src/lib.rs:264-306
+  links:
+    - label: "Design system: replica of an agent profile"
+      url: "/app/agent/uhCAkZ4x0cV7bN2mQ5wE8rT1yU4iO7pA0sD3fG6hJ9kL2"
+    - label: "Source at 2e2f235: dnas/nondominium/zomes/integrity/zome_person/src/"
+      url: "https://github.com/Sensorica/nondominium/tree/2e2f235d980e27753ea8a6d8a4d252863d293de7/dnas/nondominium/zomes/integrity/zome_person/src"
 - id: personcoord
   name: zome_person coordinator
   level: component
@@ -490,6 +733,13 @@ Inside Moss, the Moss group takes the place of the lobby: the tool's provisioned
     - dnas/nondominium/zomes/coordinator/zome_person/src/capability_based_sharing.rs:30-120
     - dnas/nondominium/zomes/coordinator/zome_person/src/device_management.rs:46-130
     - dnas/nondominium/zomes/coordinator/zome_person/src/hrea_bridge.rs:1-39
+  links:
+    - label: "Design system: replica of an agent profile"
+      url: "/app/agent/uhCAkZ4x0cV7bN2mQ5wE8rT1yU4iO7pA0sD3fG6hJ9kL2"
+    - label: "Design system: the agent identity scenario"
+      url: "/scenarios/agent-identity"
+    - label: "Source at 2e2f235: dnas/nondominium/zomes/coordinator/zome_person/src/"
+      url: "https://github.com/Sensorica/nondominium/tree/2e2f235d980e27753ea8a6d8a4d252863d293de7/dnas/nondominium/zomes/coordinator/zome_person/src"
 - id: resint
   name: zome_resource integrity
   level: component
@@ -501,6 +751,11 @@ Inside Moss, the Moss group takes the place of the lobby: the tool's provisioned
   code:
     - dnas/nondominium/zomes/integrity/zome_resource/src/lib.rs:15-145
     - dnas/nondominium/zomes/integrity/zome_resource/src/lib.rs:146-209
+  links:
+    - label: "#184: feat(resource): CapabilitySlot substrate on the NDO identity (REQ-NDO-CS-01, 02, 04, 06)"
+      url: "https://github.com/Sensorica/nondominium/issues/184"
+    - label: "#204: feat(resource): bring the Use and Consume fork from the experiment branch"
+      url: "https://github.com/Sensorica/nondominium/issues/204"
 - id: rescoord
   name: zome_resource coordinator
   level: component
@@ -515,6 +770,17 @@ Inside Moss, the Moss group takes the place of the lobby: the tool's provisioned
     - dnas/nondominium/zomes/coordinator/zome_resource/src/economic_resource.rs:390-509
     - dnas/nondominium/zomes/coordinator/zome_resource/src/governance_rule.rs:25-107
     - dnas/nondominium/zomes/coordinator/zome_resource/src/lib.rs:44-80
+  links:
+    - label: "#206: feat(resource): Layer 1 specification versions, the latest link canonical (REQ-NDO-L1-03)"
+      url: "https://github.com/Sensorica/nondominium/issues/206"
+    - label: "#207: feat(resource): dormant Layer 1 marks the specification inactive (REQ-NDO-L1-04)"
+      url: "https://github.com/Sensorica/nondominium/issues/207"
+    - label: "#144: bug(resource): changing a specification's scope never reconciles the global discovery anchor"
+      url: "https://github.com/Sensorica/nondominium/issues/144"
+    - label: "#189: feat(hrea): ResourceSpecification through ReaResourceSpecification, behind dual-read"
+      url: "https://github.com/Sensorica/nondominium/issues/189"
+    - label: "#190: feat(hrea): EconomicResource through ReaEconomicResource, behind dual-read"
+      url: "https://github.com/Sensorica/nondominium/issues/190"
 - id: govint
   name: zome_gouvernance integrity
   level: component
@@ -527,6 +793,17 @@ Inside Moss, the Moss group takes the place of the lobby: the tool's provisioned
     - dnas/nondominium/zomes/integrity/zome_gouvernance/src/lib.rs:17-158
     - dnas/nondominium/zomes/integrity/zome_gouvernance/src/lib.rs:160-202
     - dnas/nondominium/zomes/integrity/zome_gouvernance/src/ppr.rs:253-330
+  links:
+    - label: "#220: fix(gouvernance): agreement shares must sum to exactly 100"
+      url: "https://github.com/Sensorica/nondominium/issues/220"
+    - label: "#222: feat(gouvernance): store the distribution placeholder and the license share parameter"
+      url: "https://github.com/Sensorica/nondominium/issues/222"
+    - label: "#223: feat(gouvernance): a forked NDO must carry its parent's share, validated in integrity"
+      url: "https://github.com/Sensorica/nondominium/issues/223"
+    - label: "Design system: replica of an NDO's governance tab"
+      url: "/app/ndo/uhC0kVX5k7dL2mPqR8sT1uW4xY7zA0bC3dE6fG9h?tab=governance"
+    - label: "Design system: the governance review scenario"
+      url: "/scenarios/governance-review"
 - id: govcoord
   name: zome_gouvernance coordinator
   level: component
@@ -542,6 +819,15 @@ Inside Moss, the Moss group takes the place of the lobby: the tool's provisioned
     - dnas/nondominium/zomes/coordinator/zome_gouvernance/src/ppr.rs:85-120
     - dnas/nondominium/zomes/coordinator/zome_gouvernance/src/transition.rs:1-70
     - dnas/nondominium/zomes/coordinator/zome_gouvernance/src/lib.rs:42-68
+  links:
+    - label: "#191: feat(hrea): Commitment through ReaCommitment, behind dual-read"
+      url: "https://github.com/Sensorica/nondominium/issues/191"
+    - label: "#192: feat(hrea): EconomicEvent through ReaEconomicEvent, behind dual-read"
+      url: "https://github.com/Sensorica/nondominium/issues/192"
+    - label: "Design system: replica of an NDO's governance tab"
+      url: "/app/ndo/uhC0kVX5k7dL2mPqR8sT1uW4xY7zA0bC3dE6fG9h?tab=governance"
+    - label: "Design system: the governance review scenario"
+      url: "/scenarios/governance-review"
 - id: misc
   name: misc
   level: component
@@ -551,6 +837,9 @@ Inside Moss, the Moss group takes the place of the lobby: the tool's provisioned
   does: "A coordinator zome with one function, ping, answering Pong: a liveness probe for the core cell."
   code:
     - dnas/nondominium/zomes/coordinator/misc/src/lib.rs:1-6
+  links:
+    - label: "Source at 2e2f235: dnas/nondominium/zomes/coordinator/misc/src/lib.rs"
+      url: "https://github.com/Sensorica/nondominium/blob/2e2f235d980e27753ea8a6d8a4d252863d293de7/dnas/nondominium/zomes/coordinator/misc/src/lib.rs"
 - id: nativevf
   name: Native Valueflows types
   level: component
@@ -563,6 +852,11 @@ Inside Moss, the Moss group takes the place of the lobby: the tool's provisioned
     - dnas/nondominium/zomes/integrity/zome_resource/src/lib.rs:15-90
     - dnas/nondominium/zomes/integrity/zome_gouvernance/src/lib.rs:28-69
     - documentation/hREA/v0.2-release-plan.md:52-85
+  links:
+    - label: "#194: refactor(hrea): remove the native Phase A types once parity holds"
+      url: "https://github.com/Sensorica/nondominium/issues/194"
+    - label: "v0.2-release-plan.md at 2e2f235"
+      url: "https://github.com/Sensorica/nondominium/blob/2e2f235d980e27753ea8a6d8a4d252863d293de7/documentation/hREA/v0.2-release-plan.md"
 - id: govengine
   name: Governance engine
   level: component
@@ -573,6 +867,82 @@ Inside Moss, the Moss group takes the place of the lobby: the tool's provisioned
   change: new
   code:
     - documentation/specifications/governance/governance-operator-architecture.md:1-36
+  links:
+    - label: "#41: Define cross-zome interface types for governance-as-operator protocol"
+      url: "https://github.com/Sensorica/nondominium/issues/41"
+    - label: "#42: Implement pure-function GovernanceEngine for state transition evaluation"
+      url: "https://github.com/Sensorica/nondominium/issues/42"
+    - label: "#145: design: decide whether write paths funnel through evaluate_state_transition or stay parallel"
+      url: "https://github.com/Sensorica/nondominium/issues/145"
+    - label: "#43: Refactor resource zome to use Request-Evaluate-Apply pattern"
+      url: "https://github.com/Sensorica/nondominium/issues/43"
+    - label: "#44: Automatic economic event generation on approved state transitions"
+      url: "https://github.com/Sensorica/nondominium/issues/44"
+    - label: "#45: Governance-as-operator testing infrastructure: mock engine and cross-zome tests"
+      url: "https://github.com/Sensorica/nondominium/issues/45"
+    - label: "governance-operator-architecture.md at 2e2f235"
+      url: "https://github.com/Sensorica/nondominium/blob/2e2f235d980e27753ea8a6d8a4d252863d293de7/documentation/specifications/governance/governance-operator-architecture.md"
+- id: ppr
+  name: Private participation receipts
+  level: component
+  parent: coredna
+  kind: store
+  tech: PrivateParticipationClaim, private entries
+  does: "The user-sovereign reputation primitive: a bilaterally signed receipt in one of the ParticipationClaimType categories, held as a private entry on each party's own chain, and a ReputationSummary the agent derives and chooses to share. No global score, no third-party visibility. Planned: they stay private entries through the hREA migration (#200, v0.2)."
+  code:
+    - dnas/nondominium/zomes/integrity/zome_gouvernance/src/ppr.rs:7-33
+    - dnas/nondominium/zomes/integrity/zome_gouvernance/src/ppr.rs:253-349
+    - dnas/nondominium/zomes/coordinator/zome_gouvernance/src/ppr.rs:85-120
+  links:
+    - label: "#200: test(ppr): PPRs stay private entries after the migration"
+      url: "https://github.com/Sensorica/nondominium/issues/200"
+- id: roles
+  name: Roles and governance tiers
+  level: component
+  parent: coredna
+  kind: store
+  tech: PersonRole, RoleType
+  does: "The graduated trust of the network: three governance tiers (Simple, Accountable, Primary Accountable Agent) and three functional roles (Transport, Repair, Storage), assigned by agents of the right tier after private identity validation and, for the higher tiers, PPR milestones."
+  code:
+    - dnas/nondominium/zomes/integrity/zome_person/src/lib.rs:76-157
+    - dnas/nondominium/zomes/coordinator/zome_person/src/role.rs:55-104
+  links:
+    - label: "Design system: replica of an NDO's governance tab"
+      url: "/app/ndo/uhC0kVX5k7dL2mPqR8sT1uW4xY7zA0bC3dE6fG9h?tab=governance"
+    - label: "Design system: the governance review scenario"
+      url: "/scenarios/governance-review"
+    - label: "Source at 2e2f235: dnas/nondominium/zomes/"
+      url: "https://github.com/Sensorica/nondominium/tree/2e2f235d980e27753ea8a6d8a4d252863d293de7/dnas/nondominium/zomes"
+- id: privdata
+  name: Private data and capability grants
+  level: component
+  parent: coredna
+  kind: store
+  tech: Holochain capability grants, private entries
+  does: "A person's private identity data, shared field by field through capability grants that expire after 30 days at most, with a revocation marker because a revoked Holochain grant leaves no trace of its own."
+  code:
+    - dnas/nondominium/zomes/integrity/zome_person/src/lib.rs:56-75
+    - dnas/nondominium/zomes/integrity/zome_person/src/lib.rs:156-188
+    - dnas/nondominium/zomes/coordinator/zome_person/src/capability_based_sharing.rs:30-120
+  links:
+    - label: "Source at 2e2f235: dnas/nondominium/zomes/"
+      url: "https://github.com/Sensorica/nondominium/tree/2e2f235d980e27753ea8a6d8a4d252863d293de7/dnas/nondominium/zomes"
+- id: flowstazomes
+  name: Flowsta agent-linking zomes
+  level: component
+  parent: coredna
+  kind: module
+  tech: flowsta-agent-linking integrity and coordinator
+  does: "Flowsta's zomes added to the DNA manifest, committing the dual-signed IsSamePersonEntry (the NDO agent key and the Flowsta Vault key) on the DHT the Person lives in. Planned in #156 (v0.3), Phase 1 of flowsta-integration.md."
+  change: new
+  code:
+    - documentation/requirements/post-mvp/flowsta-integration.md:105-118
+    - documentation/requirements/post-mvp/flowsta-integration.md:131-143
+  links:
+    - label: "#156: feat(identity): link agents to Flowsta for cross-app identity and key recovery (Tier 1)"
+      url: "https://github.com/Sensorica/nondominium/issues/156"
+    - label: "flowsta-integration.md at 2e2f235"
+      url: "https://github.com/Sensorica/nondominium/blob/2e2f235d980e27753ea8a6d8a4d252863d293de7/documentation/requirements/post-mvp/flowsta-integration.md"
 - id: filestorage
   name: File storage zomes
   level: component
@@ -581,6 +951,9 @@ Inside Moss, the Moss group takes the place of the lobby: the tool's provisioned
   tech: holochain-open-dev/file-storage
   does: "Chunked, peer-hosted file storage so an NDO carries its design files, models and documents as DigitalAsset capability slots. Planned in #99 (v0.2), which names the nondominium DNA as its home; it predates the per-NDO cells."
   change: new
+  links:
+    - label: "#99: Integrate holochain-open-dev/file-storage as DigitalAsset CapabilitySlot for NDO content attachments"
+      url: "https://github.com/Sensorica/nondominium/issues/99"
 
 - id: groupint
   name: zome_group_integrity
@@ -592,6 +965,11 @@ Inside Moss, the Moss group takes the place of the lobby: the tool's provisioned
   code:
     - dnas/group/zomes/integrity/zome_group_integrity/src/lib.rs:12-93
     - dnas/group/zomes/integrity/zome_group_integrity/src/lib.rs:180-241
+  links:
+    - label: "Design system: replica of a group page"
+      url: "/app/group/sensorica-lab-7f3a"
+    - label: "Source at 2e2f235: dnas/group/zomes/integrity/zome_group_integrity/src/"
+      url: "https://github.com/Sensorica/nondominium/tree/2e2f235d980e27753ea8a6d8a4d252863d293de7/dnas/group/zomes/integrity/zome_group_integrity/src"
 - id: groupcoord
   name: zome_group coordinator
   level: component
@@ -604,6 +982,11 @@ Inside Moss, the Moss group takes the place of the lobby: the tool's provisioned
     - dnas/group/zomes/coordinator/zome_group/src/membership.rs:7-113
     - dnas/group/zomes/coordinator/zome_group/src/ndo_anchor.rs:1-117
     - dnas/group/zomes/coordinator/zome_group/src/work_log.rs:13-44
+  links:
+    - label: "Design system: replica of a group page"
+      url: "/app/group/sensorica-lab-7f3a"
+    - label: "Source at 2e2f235: dnas/group/zomes/coordinator/zome_group/src/"
+      url: "https://github.com/Sensorica/nondominium/tree/2e2f235d980e27753ea8a6d8a4d252863d293de7/dnas/group/zomes/coordinator/zome_group/src"
 - id: workctx
   name: Work contexts
   level: component
@@ -614,6 +997,11 @@ Inside Moss, the Moss group takes the place of the lobby: the tool's provisioned
   change: new
   code:
     - documentation/specifications/adr/ADR-014-work-contexts-in-group-dht.md:23-31
+  links:
+    - label: "#201: feat(group): work contexts in the group DHT"
+      url: "https://github.com/Sensorica/nondominium/issues/201"
+    - label: "ADR-014-work-contexts-in-group-dht.md at 2e2f235"
+      url: "https://github.com/Sensorica/nondominium/blob/2e2f235d980e27753ea8a6d8a4d252863d293de7/documentation/specifications/adr/ADR-014-work-contexts-in-group-dht.md"
 
 - id: ndoresint
   name: zome_resource integrity (NDO cell)
@@ -625,6 +1013,11 @@ Inside Moss, the Moss group takes the place of the lobby: the tool's provisioned
   code:
     - dnas/ndo/workdir/dna.yaml:3-12
     - dnas/nondominium/zomes/integrity/zome_resource/src/lib.rs:675-692
+  links:
+    - label: "Source at 2e2f235: dnas/ndo/workdir/dna.yaml"
+      url: "https://github.com/Sensorica/nondominium/blob/2e2f235d980e27753ea8a6d8a4d252863d293de7/dnas/ndo/workdir/dna.yaml"
+    - label: "Source at 2e2f235: dnas/nondominium/zomes/integrity/zome_resource/src/lib.rs"
+      url: "https://github.com/Sensorica/nondominium/blob/2e2f235d980e27753ea8a6d8a4d252863d293de7/dnas/nondominium/zomes/integrity/zome_resource/src/lib.rs"
 - id: ndorescoord
   name: zome_resource coordinator (NDO cell)
   level: component
@@ -636,6 +1029,13 @@ Inside Moss, the Moss group takes the place of the lobby: the tool's provisioned
     - dnas/ndo/workdir/dna.yaml:13-19
     - dnas/nondominium/zomes/coordinator/zome_resource/src/ndo_identity.rs:140-214
     - dnas/nondominium/zomes/coordinator/zome_resource/src/ndo_membership.rs:31-118
+  links:
+    - label: "Source at 2e2f235: dnas/ndo/workdir/dna.yaml"
+      url: "https://github.com/Sensorica/nondominium/blob/2e2f235d980e27753ea8a6d8a4d252863d293de7/dnas/ndo/workdir/dna.yaml"
+    - label: "Source at 2e2f235: dnas/nondominium/zomes/coordinator/zome_resource/src/ndo_identity.rs"
+      url: "https://github.com/Sensorica/nondominium/blob/2e2f235d980e27753ea8a6d8a4d252863d293de7/dnas/nondominium/zomes/coordinator/zome_resource/src/ndo_identity.rs"
+    - label: "Source at 2e2f235: dnas/nondominium/zomes/coordinator/zome_resource/src/ndo_membership.rs"
+      url: "https://github.com/Sensorica/nondominium/blob/2e2f235d980e27753ea8a6d8a4d252863d293de7/dnas/nondominium/zomes/coordinator/zome_resource/src/ndo_membership.rs"
 - id: ndogovint
   name: zome_gouvernance integrity (NDO cell)
   level: component
@@ -645,6 +1045,9 @@ Inside Moss, the Moss group takes the place of the lobby: the tool's provisioned
   does: "The same zome_gouvernance integrity wasm, validating the NDO's commitments, claims, events and agreement inside its own DHT."
   code:
     - dnas/ndo/workdir/dna.yaml:9-12
+  links:
+    - label: "Source at 2e2f235: dnas/ndo/workdir/dna.yaml"
+      url: "https://github.com/Sensorica/nondominium/blob/2e2f235d980e27753ea8a6d8a4d252863d293de7/dnas/ndo/workdir/dna.yaml"
 - id: ndogovcoord
   name: zome_gouvernance coordinator (NDO cell)
   level: component
@@ -655,6 +1058,11 @@ Inside Moss, the Moss group takes the place of the lobby: the tool's provisioned
   code:
     - dnas/ndo/workdir/dna.yaml:20-25
     - dnas/nondominium/zomes/coordinator/zome_gouvernance/src/commitment.rs:121-163
+  links:
+    - label: "Source at 2e2f235: dnas/ndo/workdir/dna.yaml"
+      url: "https://github.com/Sensorica/nondominium/blob/2e2f235d980e27753ea8a6d8a4d252863d293de7/dnas/ndo/workdir/dna.yaml"
+    - label: "Source at 2e2f235: dnas/nondominium/zomes/coordinator/zome_gouvernance/src/commitment.rs"
+      url: "https://github.com/Sensorica/nondominium/blob/2e2f235d980e27753ea8a6d8a4d252863d293de7/dnas/nondominium/zomes/coordinator/zome_gouvernance/src/commitment.rs"
 - id: dnaprops
   name: NDO DNA properties
   level: component
@@ -666,17 +1074,227 @@ Inside Moss, the Moss group takes the place of the lobby: the tool's provisioned
   code:
     - crates/shared/src/types.rs:277-282
     - documentation/specifications/adr/ADR-010-013-per-ndo-cells.md:1-40
-- id: capslot
-  name: Capability slots
+  links:
+    - label: "#223: feat(gouvernance): a forked NDO must carry its parent's share, validated in integrity"
+      url: "https://github.com/Sensorica/nondominium/issues/223"
+    - label: "ADR-010-013-per-ndo-cells.md at 2e2f235"
+      url: "https://github.com/Sensorica/nondominium/blob/2e2f235d980e27753ea8a6d8a4d252863d293de7/documentation/specifications/adr/ADR-010-013-per-ndo-cells.md"
+- id: layer0
+  name: "Layer 0: identity"
   level: component
   parent: ndodna
-  kind: module
-  tech: CapabilitySlot link type in zome_resource
-  does: "A link from an NDO identity to any DHT hash, tagged with its SlotType (CustomApp included), that any accountable agent may attach and that stays readable at every lifecycle stage. Planned in #184 (v0.2), the attachment point for #99 and #156."
+  kind: store
+  tech: NondominiumIdentity genesis entry
+  does: "The NDO's permanent anchor: the identity every layer and every capability slot links to, never deleted and readable as a tombstone at EndOfLife, its classification immutable and only its lifecycle stage moving through the integrity-checked state machine. Planned: transitions approved by the governance engine with role checks (REQ-NDO-LC-07, #41 and #42, v0.2) and an EconomicEvent per transition (#44, v0.3)."
+  change: modified
+  code:
+    - dnas/nondominium/zomes/integrity/zome_resource/src/lib.rs:88-130
+    - documentation/requirements/ndo_prima_materia.md:223-266
+  links:
+    - label: "#41: Define cross-zome interface types for governance-as-operator protocol"
+      url: "https://github.com/Sensorica/nondominium/issues/41"
+    - label: "#42: Implement pure-function GovernanceEngine for state transition evaluation"
+      url: "https://github.com/Sensorica/nondominium/issues/42"
+    - label: "#44: Automatic economic event generation on approved state transitions"
+      url: "https://github.com/Sensorica/nondominium/issues/44"
+    - label: "ndo_prima_materia.md at 2e2f235"
+      url: "https://github.com/Sensorica/nondominium/blob/2e2f235d980e27753ea8a6d8a4d252863d293de7/documentation/requirements/ndo_prima_materia.md"
+    - label: "Design system: replica of the new NDO form"
+      url: "/app/ndo/new"
+    - label: "Design system: the NDO creation scenario"
+      url: "/scenarios/ndo-creation"
+- id: layer1
+  name: "Layer 1: specification"
+  level: component
+  parent: ndodna
+  kind: store
+  tech: ResourceSpecification over NdoToSpecification
+  does: "The NDO's form: specifications and their governance rules, activated by an NdoToSpecification link from the identity (#132), its files attached as DigitalAsset slots rather than embedded (REQ-NDO-L1-06). Planned: versions with the latest link canonical (#206) and a dormant layer marked inactive (#207), both v0.2."
+  change: modified
+  code:
+    - dnas/nondominium/zomes/coordinator/zome_resource/src/resource_specification.rs:228-236
+    - documentation/requirements/ndo_prima_materia.md:268-293
+  links:
+    - label: "PR #132: feat(resource)!: NDO Layer 1 typed governance rules, classification constraints, and OperationalState"
+      url: "https://github.com/Sensorica/nondominium/pull/132"
+    - label: "#206: feat(resource): Layer 1 specification versions, the latest link canonical (REQ-NDO-L1-03)"
+      url: "https://github.com/Sensorica/nondominium/issues/206"
+    - label: "#207: feat(resource): dormant Layer 1 marks the specification inactive (REQ-NDO-L1-04)"
+      url: "https://github.com/Sensorica/nondominium/issues/207"
+    - label: "ndo_prima_materia.md at 2e2f235"
+      url: "https://github.com/Sensorica/nondominium/blob/2e2f235d980e27753ea8a6d8a4d252863d293de7/documentation/requirements/ndo_prima_materia.md"
+    - label: "Design system: replica of the specification form"
+      url: "/app/ndo/uhC0kVX5k7dL2mPqR8sT1uW4xY7zA0bC3dE6fG9h?modal=spec-create"
+- id: layer2
+  name: "Layer 2: process"
+  level: component
+  parent: ndodna
+  kind: store
+  tech: NDOToProcess link, planned
+  does: "The NDO's activity: a Valueflows process attached to the identity, through which its events, commitments, claims and receipts are linked (REQ-NDO-L2-01 to L2-06). Not started and under no milestone (epic #78); today the NDO cell links commitments to the NDO directly (#183)."
   change: new
   code:
-    - documentation/requirements/ndo_prima_materia.md:547-606
-    - documentation/requirements/ndo_prima_materia.md:1131-1160
+    - documentation/requirements/ndo_prima_materia.md:295-320
+    - documentation/requirements/ndo_prima_materia.md:1320-1329
+  links:
+    - label: "#78: [Epic] NDO Three-Layer Architecture"
+      url: "https://github.com/Sensorica/nondominium/issues/78"
+    - label: "PR #183: feat: bring Tibi's general backend work from commitment-pool-experiment onto dev"
+      url: "https://github.com/Sensorica/nondominium/pull/183"
+    - label: "ndo_prima_materia.md at 2e2f235"
+      url: "https://github.com/Sensorica/nondominium/blob/2e2f235d980e27753ea8a6d8a4d252863d293de7/documentation/requirements/ndo_prima_materia.md"
+
+- id: slotlink
+  name: CapabilitySlot link
+  level: component
+  parent: capslots
+  kind: module
+  tech: LinkTypes::CapabilitySlot, CapabilitySlotTag, SlotType
+  does: "A link from an NDO identity hash to any DHT hash or external reference, its tag carrying the SlotType, the time it was attached and a label. Any accountable agent attaches one without the custodian's permission (REQ-NDO-CS-02), and it stays listed at every stage, EndOfLife included (REQ-NDO-CS-06). Planned in #184 (v0.2), in zome_resource integrity, so it lives in each NDO cell."
+  change: new
+  code:
+    - documentation/requirements/ndo_prima_materia.md:1131-1155
+    - documentation/requirements/ndo_prima_materia.md:563-585
+  links:
+    - label: "#184: feat(resource): CapabilitySlot substrate on the NDO identity (REQ-NDO-CS-01, 02, 04, 06)"
+      url: "https://github.com/Sensorica/nondominium/issues/184"
+    - label: "ndo_prima_materia.md at 2e2f235"
+      url: "https://github.com/Sensorica/nondominium/blob/2e2f235d980e27753ea8a6d8a4d252863d293de7/documentation/requirements/ndo_prima_materia.md"
+- id: slotapi
+  name: Slot functions
+  level: component
+  parent: capslots
+  kind: service
+  tech: zome_resource coordinator
+  does: "Attach a slot to an NDO and list its slots, all of them or filtered by SlotType, CustomApp included. Planned in #184 (v0.2)."
+  change: new
+  code:
+    - documentation/specifications/ndo-v1-architecture-design.md:632-636
+  links:
+    - label: "#184: feat(resource): CapabilitySlot substrate on the NDO identity (REQ-NDO-CS-01, 02, 04, 06)"
+      url: "https://github.com/Sensorica/nondominium/issues/184"
+    - label: "ndo-v1-architecture-design.md at 2e2f235"
+      url: "https://github.com/Sensorica/nondominium/blob/2e2f235d980e27753ea8a6d8a4d252863d293de7/documentation/specifications/ndo-v1-architecture-design.md"
+- id: personslot
+  name: Person capability slot
+  level: component
+  parent: capslots
+  kind: module
+  tech: PersonCapabilitySlot link type in zome_person
+  does: "The same surface on a person: a link from a Person entry hash to a DID document, a credential wallet, a reputation oracle or a Flowsta attestation, with the same tag and SlotType, the Person schema unchanged (G15, REQ-AGENT-11, REQ-NDO-AGENT-07). A TODO in zome_person today; built in #156 (v0.3) or split out ahead of it."
+  change: new
+  code:
+    - dnas/nondominium/zomes/integrity/zome_person/src/lib.rs:28-37
+    - documentation/requirements/ndo_prima_materia.md:607-622
+  links:
+    - label: "#156: feat(identity): link agents to Flowsta for cross-app identity and key recovery (Tier 1)"
+      url: "https://github.com/Sensorica/nondominium/issues/156"
+    - label: "ndo_prima_materia.md at 2e2f235"
+      url: "https://github.com/Sensorica/nondominium/blob/2e2f235d980e27753ea8a6d8a4d252863d293de7/documentation/requirements/ndo_prima_materia.md"
+- id: slottrust
+  name: Slot trust marking
+  level: component
+  parent: capslots
+  kind: module
+  tech: governance validation of slots
+  does: "Which slots are surfaced: those of the initiator and custodians trusted by default, those of accountable agents conditionally, those of unknown agents filtered until governance validates them (REQ-NDO-CS-03). Attachment stays permissionless; trust is read side. The follow-up #184 leaves out of scope."
+  change: new
+  code:
+    - documentation/requirements/ndo_prima_materia.md:594-606
+  links:
+    - label: "#184: feat(resource): CapabilitySlot substrate on the NDO identity (REQ-NDO-CS-01, 02, 04, 06)"
+      url: "https://github.com/Sensorica/nondominium/issues/184"
+    - label: "ndo_prima_materia.md at 2e2f235"
+      url: "https://github.com/Sensorica/nondominium/blob/2e2f235d980e27753ea8a6d8a4d252863d293de7/documentation/requirements/ndo_prima_materia.md"
+- id: slotdigital
+  name: DigitalAsset slot
+  level: component
+  parent: capslots
+  kind: store
+  tech: SlotType::DigitalAsset
+  does: "Design files, 3D models, code and manifests attached to an NDO's identity, the target being a file-storage manifest hash (REQ-NDO-L1-06); a specification package references these slots by hash (REQ-PROJ-SPEC-03). Planned in #99 (v0.2)."
+  change: new
+  code:
+    - documentation/requirements/post-mvp/project-type-ndo-specifications.md:87-96
+  links:
+    - label: "#99: Integrate holochain-open-dev/file-storage as DigitalAsset CapabilitySlot for NDO content attachments"
+      url: "https://github.com/Sensorica/nondominium/issues/99"
+    - label: "project-type-ndo-specifications.md at 2e2f235"
+      url: "https://github.com/Sensorica/nondominium/blob/2e2f235d980e27753ea8a6d8a4d252863d293de7/documentation/requirements/post-mvp/project-type-ndo-specifications.md"
+- id: slotflowsta
+  name: FlowstaIdentity slot
+  level: component
+  parent: capslots
+  kind: store
+  tech: SlotType::FlowstaIdentity on a Person
+  does: "Links an agent's own Person hash to the dual-signed IsSamePersonEntry that proves its NDO key and its Flowsta Vault key belong to one person, giving it a W3C DID (REQ-NDO-CS-12, CS-13). Tier 1, a voluntary trust signal; Tier 2 lets governance require it. Planned in #156 (v0.3)."
+  change: new
+  code:
+    - documentation/requirements/post-mvp/flowsta-integration.md:105-118
+  links:
+    - label: "#156: feat(identity): link agents to Flowsta for cross-app identity and key recovery (Tier 1)"
+      url: "https://github.com/Sensorica/nondominium/issues/156"
+    - label: "flowsta-integration.md at 2e2f235"
+      url: "https://github.com/Sensorica/nondominium/blob/2e2f235d980e27753ea8a6d8a4d252863d293de7/documentation/requirements/post-mvp/flowsta-integration.md"
+- id: slotunyt
+  name: UnytAgreement slot
+  level: component
+  parent: capslots
+  kind: store
+  tech: SlotType::UnytAgreement(network seed)
+  does: "Attaches a proposed Unyt Smart Agreement to an NDO's identity, the String carrying the Alliance network seed (REQ-NDO-CS-07, CS-08). The slot makes the agreement discoverable; an endorsed EconomicAgreement governance rule makes it mandatory. Post-MVP, under no milestone."
+  change: new
+  code:
+    - documentation/requirements/post-mvp/unyt-integration.md:169-174
+    - documentation/requirements/ndo_prima_materia.md:641-660
+  links:
+    - label: "unyt-integration.md at 2e2f235"
+      url: "https://github.com/Sensorica/nondominium/blob/2e2f235d980e27753ea8a6d8a4d252863d293de7/documentation/requirements/post-mvp/unyt-integration.md"
+    - label: "ndo_prima_materia.md at 2e2f235"
+      url: "https://github.com/Sensorica/nondominium/blob/2e2f235d980e27753ea8a6d8a4d252863d293de7/documentation/requirements/ndo_prima_materia.md"
+- id: slotweave
+  name: WeaveWAL slot
+  level: component
+  parent: capslots
+  kind: store
+  tech: SlotType::WeaveWAL
+  does: "Declares the NDO a Weave asset by pointing at its WAL, so other Moss tools attach to its identity and answer its lifecycle transitions (REQ-NDO-CS-05). Today the Moss host layer offers NDOs as assets without a slot (#165); no issue yet for the slot."
+  change: new
+  code:
+    - documentation/requirements/ndo_prima_materia.md:586-593
+  links:
+    - label: "#165: feat(moss): NDOs as Moss assets"
+      url: "https://github.com/Sensorica/nondominium/issues/165"
+    - label: "ndo_prima_materia.md at 2e2f235"
+      url: "https://github.com/Sensorica/nondominium/blob/2e2f235d980e27753ea8a6d8a4d252863d293de7/documentation/requirements/ndo_prima_materia.md"
+- id: slotcustom
+  name: CustomApp slot
+  level: component
+  parent: capslots
+  kind: store
+  tech: SlotType::CustomApp(label)
+  does: "Any other hApp, labelled by its consumer (REQ-NDO-CS-04). The commitment pool experiment plans a CustomApp CommitmentPool slot as its NDO-side index once #184 lands."
+  change: new
+  code:
+    - documentation/requirements/ndo_prima_materia.md:1141-1153
+  links:
+    - label: "#184: feat(resource): CapabilitySlot substrate on the NDO identity (REQ-NDO-CS-01, 02, 04, 06)"
+      url: "https://github.com/Sensorica/nondominium/issues/184"
+    - label: "ndo_prima_materia.md at 2e2f235"
+      url: "https://github.com/Sensorica/nondominium/blob/2e2f235d980e27753ea8a6d8a4d252863d293de7/documentation/requirements/ndo_prima_materia.md"
+- id: slotother
+  name: Other predefined slot types
+  level: component
+  parent: capslots
+  kind: store
+  tech: Documentation, IssueTracker, FabricationQueue, GovernanceDAO, VersionGraph
+  does: "The rest of the vocabulary of prima materia §6.2: docs and wikis, issue trackers, fabrication queues, governance DAOs and version graphs, each attaching its own hApp or entry to the NDO identity. Specified, with no issue yet."
+  change: new
+  code:
+    - documentation/requirements/ndo_prima_materia.md:563-585
+  links:
+    - label: "ndo_prima_materia.md at 2e2f235"
+      url: "https://github.com/Sensorica/nondominium/blob/2e2f235d980e27753ea8a6d8a4d252863d293de7/documentation/requirements/ndo_prima_materia.md"
 
 - id: hreazomes
   name: hREA zomes
@@ -688,6 +1306,11 @@ Inside Moss, the Moss group takes the place of the lobby: the tool's provisioned
   code:
     - crates/shared/src/lib.rs:83-110
     - vendor/README.md:1-3
+  links:
+    - label: "Source at 2e2f235: crates/shared/src/lib.rs"
+      url: "https://github.com/Sensorica/nondominium/blob/2e2f235d980e27753ea8a6d8a4d252863d293de7/crates/shared/src/lib.rs"
+    - label: "Source at 2e2f235: vendor/README.md"
+      url: "https://github.com/Sensorica/nondominium/blob/2e2f235d980e27753ea8a6d8a4d252863d293de7/vendor/README.md"
 - id: hreamodif
   name: hREA module interface
   level: component
@@ -697,6 +1320,13 @@ Inside Moss, the Moss group takes the place of the lobby: the tool's provisioned
   change: new
   code:
     - documentation/hREA/v0.2-release-plan.md:37-48
+  links:
+    - label: "#187: research(hrea): module interface RFC on h-REA/hREA"
+      url: "https://github.com/Sensorica/nondominium/issues/187"
+    - label: "#199: feat(hrea): register InitialTransfer and AccessForUse through the module interface"
+      url: "https://github.com/Sensorica/nondominium/issues/199"
+    - label: "v0.2-release-plan.md at 2e2f235"
+      url: "https://github.com/Sensorica/nondominium/blob/2e2f235d980e27753ea8a6d8a4d252863d293de7/documentation/hREA/v0.2-release-plan.md"
 - id: hreamodules
   name: Nondominium hREA modules
   level: component
@@ -706,6 +1336,17 @@ Inside Moss, the Moss group takes the place of the lobby: the tool's provisioned
   change: new
   code:
     - documentation/hREA/v0.2-release-plan.md:70-80
+  links:
+    - label: "#195: feat(hrea): the source module"
+      url: "https://github.com/Sensorica/nondominium/issues/195"
+    - label: "#196: feat(hrea): the nondominium-identity module"
+      url: "https://github.com/Sensorica/nondominium/issues/196"
+    - label: "#197: feat(hrea): the governance module"
+      url: "https://github.com/Sensorica/nondominium/issues/197"
+    - label: "#198: feat(hrea): the federation module"
+      url: "https://github.com/Sensorica/nondominium/issues/198"
+    - label: "v0.2-release-plan.md at 2e2f235"
+      url: "https://github.com/Sensorica/nondominium/blob/2e2f235d980e27753ea8a6d8a4d252863d293de7/documentation/hREA/v0.2-release-plan.md"
 
 - id: shareddomain
   name: Domain types and constraints
@@ -717,6 +1358,9 @@ Inside Moss, the Moss group takes the place of the lobby: the tool's provisioned
   code:
     - crates/shared/src/types.rs:13-401
     - crates/shared/src/constraints.rs:128-260
+  links:
+    - label: "Source at 2e2f235: crates/shared/src/"
+      url: "https://github.com/Sensorica/nondominium/tree/2e2f235d980e27753ea8a6d8a4d252863d293de7/crates/shared/src"
 - id: sharedcalls
   name: Call helpers and paths
   level: component
@@ -727,6 +1371,9 @@ Inside Moss, the Moss group takes the place of the lobby: the tool's provisioned
   code:
     - crates/shared/src/lib.rs:29-110
     - crates/shared/src/paths.rs:1-36
+  links:
+    - label: "Source at 2e2f235: crates/shared/src/"
+      url: "https://github.com/Sensorica/nondominium/tree/2e2f235d980e27753ea8a6d8a4d252863d293de7/crates/shared/src"
 
 - id: happyaml
   name: hApp manifest
@@ -737,6 +1384,9 @@ Inside Moss, the Moss group takes the place of the lobby: the tool's provisioned
   does: "Declares the five roles, which are provisioned at install and which are cloned on demand, and their clone limits."
   code:
     - workdir/happ.yaml:1-60
+  links:
+    - label: "Source at 2e2f235: workdir/happ.yaml"
+      url: "https://github.com/Sensorica/nondominium/blob/2e2f235d980e27753ea8a6d8a4d252863d293de7/workdir/happ.yaml"
 - id: mossmanifest
   name: webhapp and Moss manifests
   level: component
@@ -748,6 +1398,9 @@ Inside Moss, the Moss group takes the place of the lobby: the tool's provisioned
   code:
     - workdir/web-happ.yaml:1-6
     - workdir/moss.yaml:1-11
+  links:
+    - label: "#121: chore(release): produce and smoke-test the v0.1.0 Moss tool .webhapp"
+      url: "https://github.com/Sensorica/nondominium/issues/121"
 - id: standalone
   name: Standalone release
   level: component
@@ -755,6 +1408,9 @@ Inside Moss, the Moss group takes the place of the lobby: the tool's provisioned
   kind: module
   does: "A released standalone .webhapp from the same tag as the Moss tool, the target chosen by a Vite build flag, each with a smoke test. Planned in #203 (v0.2)."
   change: new
+  links:
+    - label: "#203: release(standalone): ship the standalone build beside Moss"
+      url: "https://github.com/Sensorica/nondominium/issues/203"
 - id: weavedev
   name: Weave dev config
   level: component
@@ -764,6 +1420,9 @@ Inside Moss, the Moss group takes the place of the lobby: the tool's provisioned
   does: "Starts two Moss agents, Alice and Bob, in one dev group with the tool served from the local Vite server."
   code:
     - weave/weave.dev.config.ts:1-60
+  links:
+    - label: "Source at 2e2f235: weave/weave.dev.config.ts"
+      url: "https://github.com/Sensorica/nondominium/blob/2e2f235d980e27753ea8a6d8a4d252863d293de7/weave/weave.dev.config.ts"
 - id: launcher
   name: Dev network launcher
   level: component
@@ -773,6 +1432,9 @@ Inside Moss, the Moss group takes the place of the lobby: the tool's provisioned
   does: "Starts a bootstrap server and one sandbox conductor per agent, installs the .happ by path and writes the connection manifest the UI reads."
   code:
     - scripts/launch-happ.mjs:1-60
+  links:
+    - label: "Source at 2e2f235: scripts/launch-happ.mjs"
+      url: "https://github.com/Sensorica/nondominium/blob/2e2f235d980e27753ea8a6d8a4d252863d293de7/scripts/launch-happ.mjs"
 
 - id: sweettest
   name: Sweettest suites
@@ -785,6 +1447,13 @@ Inside Moss, the Moss group takes the place of the lobby: the tool's provisioned
     - dnas/nondominium/tests/src/nondominium/ndo_layer0/mod.rs:1-80
     - dnas/group/tests/src/ndo_anchor/mod.rs:1-80
     - dnas/lobby/tests/src/lobby/mod.rs:1-60
+  links:
+    - label: "Source at 2e2f235: dnas/nondominium/tests/src/nondominium/ndo_layer0/mod.rs"
+      url: "https://github.com/Sensorica/nondominium/blob/2e2f235d980e27753ea8a6d8a4d252863d293de7/dnas/nondominium/tests/src/nondominium/ndo_layer0/mod.rs"
+    - label: "Source at 2e2f235: dnas/group/tests/src/ndo_anchor/mod.rs"
+      url: "https://github.com/Sensorica/nondominium/blob/2e2f235d980e27753ea8a6d8a4d252863d293de7/dnas/group/tests/src/ndo_anchor/mod.rs"
+    - label: "Source at 2e2f235: dnas/lobby/tests/src/lobby/mod.rs"
+      url: "https://github.com/Sensorica/nondominium/blob/2e2f235d980e27753ea8a6d8a4d252863d293de7/dnas/lobby/tests/src/lobby/mod.rs"
 - id: e2e
   name: Playwright end-to-end
   level: component
@@ -795,6 +1464,11 @@ Inside Moss, the Moss group takes the place of the lobby: the tool's provisioned
   code:
     - ui/playwright.config.ts:1-67
     - ui/tests/e2e/specs/multi-agent.spec.ts:1-60
+  links:
+    - label: "Source at 2e2f235: ui/playwright.config.ts"
+      url: "https://github.com/Sensorica/nondominium/blob/2e2f235d980e27753ea8a6d8a4d252863d293de7/ui/playwright.config.ts"
+    - label: "Source at 2e2f235: ui/tests/e2e/specs/multi-agent.spec.ts"
+      url: "https://github.com/Sensorica/nondominium/blob/2e2f235d980e27753ea8a6d8a4d252863d293de7/ui/tests/e2e/specs/multi-agent.spec.ts"
 - id: tryorama
   name: Tryorama suite (deprecated)
   level: component
@@ -804,6 +1478,9 @@ Inside Moss, the Moss group takes the place of the lobby: the tool's provisioned
   does: "The legacy TypeScript suite, kept as reference only: it cannot connect to a Holochain 0.7 conductor."
   code:
     - tests/DEPRECATED.md:1-20
+  links:
+    - label: "Source at 2e2f235: tests/DEPRECATED.md"
+      url: "https://github.com/Sensorica/nondominium/blob/2e2f235d980e27753ea8a6d8a4d252863d293de7/tests/DEPRECATED.md"
 - id: parity
   name: Dual-read parity harness
   level: component
@@ -814,6 +1491,11 @@ Inside Moss, the Moss group takes the place of the lobby: the tool's provisioned
   change: new
   code:
     - documentation/hREA/v0.2-release-plan.md:89-108
+  links:
+    - label: "#188: test(hrea): dual-read parity harness for Phase A"
+      url: "https://github.com/Sensorica/nondominium/issues/188"
+    - label: "v0.2-release-plan.md at 2e2f235"
+      url: "https://github.com/Sensorica/nondominium/blob/2e2f235d980e27753ea8a6d8a4d252863d293de7/documentation/hREA/v0.2-release-plan.md"
 ```
 
 ```board-relations
@@ -874,14 +1556,30 @@ Inside Moss, the Moss group takes the place of the lobby: the tool's provisioned
   to: mosslib
   says: is published as a tool
   change: new
-- from: personcoord
+- from: slotflowsta
   to: flowsta
-  says: links an agent to its Flowsta identity
-  via: Person capability slot
+  says: makes the agent's Flowsta DID discoverable
+  via: IsSamePersonEntry
   change: new
-- from: govcoord
+- from: flowstazomes
+  to: flowsta
+  says: links the agent key to a Flowsta Vault key
+  via: "@flowsta/holochain, Vault"
+  change: new
+- from: slotunyt
   to: unyt
-  says: hands the agreement to Smart Agreements for settlement
+  says: points at a Smart Agreement on an Alliance DHT
+  via: Alliance network seed
+  change: new
+- from: govengine
+  to: unyt
+  says: validates the settlement proof before approving a triggering transition
+  via: RAVE, cross-DNA call
+  change: new
+- from: slotweave
+  to: moss
+  says: declares the NDO a Weave asset other tools attach to
+  via: WAL
   change: new
 
 - from: routes
@@ -1036,8 +1734,50 @@ Inside Moss, the Moss group takes the place of the lobby: the tool's provisioned
   says: delegates transition evaluation
   change: new
 - from: filestorage
-  to: capslot
-  says: fills DigitalAsset slots
+  to: slotdigital
+  says: fills DigitalAsset slots with file manifests
+  change: new
+- from: govcoord
+  to: ppr
+  says: issues a receipt to each party on fulfillment
+- from: personcoord
+  to: roles
+  says: assigns and promotes
+- from: personcoord
+  to: privdata
+  says: shares fields through capability grants
+- from: govengine
+  to: roles
+  says: checks the role each transition requires
+  change: new
+- from: rescoord
+  to: govengine
+  says: requests each state transition and applies only what it approves
+  change: new
+- from: personslot
+  to: personint
+  says: adds the PersonCapabilitySlot link type to
+  change: new
+- from: slotflowsta
+  to: flowstazomes
+  says: targets the IsSamePersonEntry committed by
+  change: new
+- from: govcoord
+  to: slottrust
+  says: marks slots trusted or untrusted
+  change: new
+- from: govengine
+  to: slotunyt
+  says: requires an endorsed agreement's settlement for triggering actions
+  change: new
+- from: govengine
+  to: slotflowsta
+  says: requires a verified identity for high-trust promotions
+  change: new
+- from: zomeservices
+  to: slotapi
+  says: attaches and lists an NDO's slots
+  via: NDO clone cell id
   change: new
 
 - from: groupcoord
@@ -1071,10 +1811,68 @@ Inside Moss, the Moss group takes the place of the lobby: the tool's provisioned
   to: ndorescoord
   says: reads the NDO, updates operational state on fulfillment
   via: same-cell call
-- from: capslot
+- from: slotlink
   to: ndoresint
   says: adds the CapabilitySlot link type to
   change: new
+- from: slotlink
+  to: layer0
+  says: hangs off the identity's action hash
+  change: new
+- from: ndorescoord
+  to: layer0
+  says: writes the genesis identity and its lifecycle transitions
+- from: layer0
+  to: dnaprops
+  says: carries the same name, regime and nature as
+- from: ndorescoord
+  to: layer1
+  says: activates with an NdoToSpecification link
+- from: layer1
+  to: layer0
+  says: is attached to
+  via: NdoToSpecification
+- from: layer2
+  to: layer0
+  says: is to be attached to
+  via: NDOToProcess
+  change: new
+- from: ndogovcoord
+  to: layer2
+  says: is to link events, commitments and claims through
+  change: new
+- from: layer1
+  to: slotdigital
+  says: carries its files as
+  change: new
+
+- from: slotapi
+  to: slotlink
+  says: creates and lists
+- from: personslot
+  to: slotlink
+  says: reuses the tag and SlotType of
+- from: slottrust
+  to: slotlink
+  says: decides which links are surfaced
+- from: slotdigital
+  to: slotlink
+  says: is a SlotType of
+- from: slotunyt
+  to: slotlink
+  says: is a SlotType of
+- from: slotweave
+  to: slotlink
+  says: is a SlotType of
+- from: slotcustom
+  to: slotlink
+  says: is a SlotType of
+- from: slotother
+  to: slotlink
+  says: are SlotTypes of
+- from: slotflowsta
+  to: personslot
+  says: is a SlotType carried by
 - from: piechart
   to: ndogovcoord
   says: writes the NDO's agreement
