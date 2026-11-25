@@ -14,9 +14,13 @@ The frontmatter, the compile command, what may be published and the known limits
 
 - The source goes in `content/research/` as `YYYY-MM-DD-<slug>.md`, and the compiled page in `static/research/boards/<same name>.html`.
 - The frontmatter carries no `lifecycle:`: research is not a stage the compiler knows, and it refuses one it does not. `src/lib/research` marks every board `research` instead.
-- The page is a reading surface, not the brainstorm wall: compile it with a theme that layers the reading overrides (no tilts, no hand lettering) over the Nondominium theme.
+- The page is a reading surface, not the brainstorm wall: it is compiled with `content/research/theme.css`, the Nondominium board theme with the reading overrides (no tilts, no hand lettering) appended.
 
-Compile it from the repository root with the command in step 2 of [BRAINSTORMS.md](BRAINSTORMS.md#adding-a-board), reading `content/research/<file>.md` and writing `static/research/boards/<file>.html`.
+Compile it from the repository root:
+
+```bash
+bun ~/.claude/skills/Niceboard/Tools/Board.ts content/research/<file>.md --out static/research/boards/<file>.html --public --no-drawer --no-sketch --theme content/research/theme.css --icon static/favicon.png
+```
 Delete the `<file>.manifest.json` the compiler writes beside the page.
 Commit both files; the build picks the board up and nothing else needs registering.
 
