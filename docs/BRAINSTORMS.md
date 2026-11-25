@@ -3,6 +3,7 @@
 `/brainstorms` lists every published Nondominium design board, newest first, with full-text search and filters by stage, status, project and language. Each one opens at `/brainstorms/<slug>` inside the site chrome, with the comments drawer on its own thread and a link to open the board full page.
 
 Boards that draw the system's structure rather than weigh options (`template: architecture`) go under `content/architecture/` and are published at `/architecture`: see [ARCHITECTURE_BOARDS.md](ARCHITECTURE_BOARDS.md).
+Boards that compare Nondominium with other systems go under `content/research/` and are published at `/research`: see [RESEARCH_BOARDS.md](RESEARCH_BOARDS.md).
 
 A board is a Niceboard: one markdown source compiled into an interactive, offline page (stickies, decision cards with a "copy my answers" export, zoomable diagrams). The site publishes the compiled page as it is and indexes the source's frontmatter.
 

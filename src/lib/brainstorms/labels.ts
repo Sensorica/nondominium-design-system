@@ -24,6 +24,8 @@ export const STAGE_LABEL: Record<string, string> = {
   implementation: 'Implementation',
   proofs: 'Proofs',
   deployments: 'Deployments',
+  // Not a stage of the V: what /research sets on its boards (src/lib/research).
+  research: 'Research',
 };
 
 export const STATUS_LABEL: Record<string, string> = {
