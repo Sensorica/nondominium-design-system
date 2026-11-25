@@ -160,6 +160,11 @@ export const paths = {
   /** The compiled board itself, full page, outside the site chrome. */
   architectureBoardFile: (slug: string) => `${base}/architecture/boards/${encodeURIComponent(slug)}.html`,
 
+  // ── Research: the Niceboard sources in content/research/, compiled to static/research/boards/ ──
+  research: () => `${base}/research`,
+  researchBoard: (slug: string) => `${base}/research/${encodeURIComponent(slug)}`,
+  researchBoardFile: (slug: string) => `${base}/research/boards/${encodeURIComponent(slug)}.html`,
+
   // ── Workflow: the iterative V, with the published boards at each stage ──
   workflow: () => `${base}/workflow`,
 

@@ -1,0 +1,130 @@
+/* Nondominium, main theme for every HTML artefact rendered into this repo (brainstorm boards, PutItDown and RenderMarkdown pages). Soushi, 2026-10-09: "make Nondominium theme for the HTML artefacts of nondominium".
+   Source: ../nondominium-design-system/static/tokens.css § BRAND, sampled from nondominium_logo.png: teal #14b8b8 (the mark's dominant hue), violet #7048d8, blue #2f6bcc, wordmark navy #0b1a38. Lifecycle hues (amber, rose, green) from the same file.
+   Dark first: the base is the wordmark navy, light only when the OS asks for it. The hand-drawn board fonts (Kalam, Caveat) are kept: boards stay sketches, only the colours become Nondominium's.
+   Previous theme (generic gray and Tailwind blue): .local/.attic/2026-10-09/state/theme.css.
+   html-prefixed selectors win over Board.css, which loads after this file. Editable: resolveTheme never rewrites an existing file. */
+
+html:root{
+  --bg:#0b1a38; --panel:#12244a; --ink:#e8eef8; --dim:#9fb0cc; --line:#24396a;
+  --accent:#2fd0cf; --accent-strong:#8ce8e6; --accent-soft:#103a4a;
+  --violet:#a58af0; --blue:#7fa8ec;
+  --ok:#4ade80; --warn:#fbbf24; --bad:#f87171; --idle:#6b7fa3;
+  --mono:ui-monospace,'JetBrains Mono',SFMono-Regular,Menlo,Consolas,monospace;
+  /* sticky papers: the three logo hues first, then the lifecycle hues, all light enough for navy ink */
+  --k-works:#7fe0dc; --k-model:#a9c4f2; --k-idea:#c9b6f6; --k-gotcha:#fcd28a; --k-risk:#f6a8b8; --k-habit:#e9e3a6;
+  --paper-ink:#0b1a38;
+  --ndo-gradient:linear-gradient(135deg,#14b8b8,#2f6bcc 55%,#7048d8);
+  color-scheme:dark;
+}
+@media (prefers-color-scheme:light){
+  html:root:not([data-theme="dark"]){
+    --bg:#f4f7fb; --panel:#ffffff; --ink:#0b1a38; --dim:#2f3b55; --line:#c3cede;
+    --accent:#0a6f6f; --accent-strong:#085757; --accent-soft:#d4f6f5;
+    --violet:#5232ab; --blue:#23509b;
+    --ok:#15803d; --warn:#b45309; --bad:#b91c1c; --idle:#5b6782;
+    --k-works:#a6e8e5; --k-model:#c3d6f6; --k-idea:#dccff8; --k-gotcha:#fbd894; --k-risk:#f8bccb; --k-habit:#ebe4a8;
+    color-scheme:light;
+  }
+}
+html:root[data-theme="light"]{
+    --bg:#f4f7fb; --panel:#ffffff; --ink:#0b1a38; --dim:#2f3b55; --line:#c3cede;
+    --accent:#0a6f6f; --accent-strong:#085757; --accent-soft:#d4f6f5;
+    --violet:#5232ab; --blue:#23509b;
+    --ok:#15803d; --warn:#b45309; --bad:#b91c1c; --idle:#5b6782;
+    --k-works:#a6e8e5; --k-model:#c3d6f6; --k-idea:#dccff8; --k-gotcha:#fbd894; --k-risk:#f8bccb; --k-habit:#ebe4a8;
+    color-scheme:light;
+}
+
+html body{background:var(--bg);background-image:radial-gradient(rgba(47,208,207,.07) 1px,transparent 1px);background-size:22px 22px}
+html a{color:var(--accent);text-underline-offset:2px}
+html ::selection{background:rgba(47,208,207,.3)}
+
+/* Top bar */
+html .bar{background:color-mix(in srgb,var(--bg) 90%,transparent);backdrop-filter:blur(6px);border-bottom:1px solid var(--line)}
+html .bar a:hover{color:var(--accent)}
+html .btn{border-color:var(--accent);color:var(--accent)}
+html .btn:hover{background:var(--accent);color:var(--bg)}
+
+/* Hero: the logo's teal to blue to violet sweep, as a band */
+html .hero{position:relative;background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:2.2rem 2.4rem;margin:1.6rem 0 1.4rem;overflow:hidden}
+html .hero::before{content:"";position:absolute;inset:0 0 auto 0;height:5px;background:var(--ndo-gradient)}
+html .hero h1{color:var(--ink)}
+html .hero h1 em{background:none;color:transparent;background-image:var(--ndo-gradient);-webkit-background-clip:text;background-clip:text;padding:0 .4em .08em .06em;margin-right:-.3em;-webkit-box-decoration-break:clone;box-decoration-break:clone}
+html .idea{color:var(--accent-strong);border-left:3px solid var(--violet);padding-left:1rem}
+@media (prefers-color-scheme:light){html .idea{color:var(--accent)}}
+
+/* Zones */
+html .zone{background:var(--panel);border:1px solid var(--line);border-radius:14px}
+html .zone h2 .n{border-color:var(--accent);color:var(--accent)}
+html .md h3{color:var(--accent)}
+html .md blockquote{color:var(--violet)}
+html .md code{background:var(--accent-soft);color:var(--accent-strong);border-radius:4px;padding:.05em .3em}
+@media (prefers-color-scheme:light){html .md code{color:var(--accent-strong)}}
+html .md table th{color:var(--accent)}
+html .md table td,html .md table th{border-color:var(--line)}
+
+/* Stickies keep their paper look, on Nondominium hues */
+html .sticky{box-shadow:3px 5px 0 rgba(3,10,26,.45)}
+html .sticky code{background:rgba(11,26,56,.12);color:var(--paper-ink)}
+html .sticky a{color:#0b5f8a}
+html .sticky.add{border-color:var(--line);color:var(--dim);background:transparent}
+
+/* Figures: a navy frame so the dark Mermaid rendering sits on the brand ground */
+html .figwrap{background:#0e1f42;border:1px solid var(--line);border-radius:12px}
+html .figwrap figcaption .fn{border-color:var(--accent);color:var(--accent)}
+@media (prefers-color-scheme:light){html .figwrap{background:#ffffff}}
+
+/* Compare: teal on one side, violet on the other, the two ends of the mark */
+html .prof.left{border-color:var(--accent)}
+html .prof.right{border-color:var(--violet)}
+html .prof.left h3{color:var(--accent)}
+html .prof.right h3{color:var(--violet)}
+html .vsmid{color:var(--blue)}
+
+/* Tally */
+html .tally .big{color:var(--accent)}
+
+/* Decisions */
+html .dec{border-color:var(--line);background:color-mix(in srgb,var(--panel) 70%,var(--bg))}
+html .opt{border-color:var(--line)}
+html .opt:hover{border-color:var(--accent)}
+html .opt .rec{color:var(--warn)}
+html .stamp{color:var(--ok)}
+html textarea{background:var(--bg);color:var(--ink);border-color:var(--line)}
+html textarea:focus,html .opt:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+
+/* Light mode legibility: the handwritten face is thin, so body text, ledes and nav sit on the
+   darker --dim; legend swatches get an outline so pale kinds stay distinguishable. */
+html:root:not(.dark) .legend i{border:1px solid var(--dim)}
+html:root:not(.dark) .bar a{color:var(--dim)}
+html:root:not(.dark) .lede,html:root:not(.dark) .hero .md,html:root:not(.dark) .hero .md p{color:var(--dim)}
+
+/* The diagram frame follows the board mode (html.dark, set by the runtime and the switch), not the OS:
+   a light rendering on the navy frame drew black hatching on navy. */
+html:not(.dark) .figwrap{background:#ffffff!important;border-color:var(--line)}
+html.dark .figwrap{background:#0e1f42!important}
+/* Research reading surface over the Sensorica theme (2026-11-24): no tilts, no hand-drawn sticky look. */
+html .zone,html .idea,html .sticky,html .dec{transform:none!important}
+html .zone{border-radius:10px;border:1px solid var(--line);box-shadow:none}
+html .idea{border:none;border-left:3px solid var(--accent);border-radius:0;box-shadow:none;font-style:normal;font-weight:600;font-size:1.2rem;line-height:1.45}
+html .idea small{font-weight:400;font-size:.95rem}
+html .sticky{background:var(--card,var(--panel))!important;color:var(--ink);border:1px solid var(--line);box-shadow:none;border-radius:8px}
+html .sticky.k-fact{border-left:4px solid var(--info)}
+html .sticky.k-model{border-left:4px solid var(--accent)}
+html .sticky.k-risk{border-left:4px solid var(--bad)}
+html .sticky.k-idea{border-left:4px solid var(--ok)}
+html .sticky b.t{font-size:1.05rem;font-weight:600;line-height:1.3}
+html .tally .big{font-size:2.2rem}
+html .md blockquote{font-size:1rem;color:var(--dim);border-left:3px solid var(--line);padding-left:.8rem}
+html td,html th{vertical-align:top}
+html table{font-size:.94rem}
+html:root,html:root[data-theme]{--sans:"Inter","Noto Sans","Helvetica Neue",Arial,system-ui,sans-serif;--hand:var(--sans);--title:var(--sans)}
+html body{font-family:var(--sans);font-size:16px;line-height:1.6;background-image:none}
+html h1,html .hero h1{font-family:var(--sans);font-weight:700;letter-spacing:-.01em;line-height:1.15}
+html .zone h2{font-family:var(--sans);font-weight:650;font-size:1.45rem}
+html .bar a,html .bar .name,html .bar button.name,html .btn,html .saved{font-family:var(--sans);font-size:.85rem}
+html .idea{font-family:var(--sans)}
+html .figwrap figcaption,html .dec h3,html .vsmid,html .prof h3,html .stamp{font-family:var(--sans)}
+html .prof h3{font-size:1.25rem;font-weight:650}
+html .vsmid{font-size:1.2rem}
+html .sticky,html .dec,html .dec textarea,html .anypop textarea{font-family:var(--sans)}

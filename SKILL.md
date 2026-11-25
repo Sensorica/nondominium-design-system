@@ -24,6 +24,7 @@ designsystem:
     static-deploy: { target: gh-pages, base: /nondominium-design-system }
     meetings:      { routes: [/meetings, '/meetings/{slug}'], content: content/meetings, module: src/lib/meetings, kinds: [lab, dev, team], thread: 'meeting:{slug}', docs: docs/MEETINGS.md }
     architecture:  { routes: [/architecture, '/architecture/{slug}'], content: content/architecture, module: src/lib/architecture, thread: 'architecture:{slug}', docs: docs/ARCHITECTURE_BOARDS.md }
+    research:      { routes: [/research, '/research/{slug}'], content: content/research, module: src/lib/research, thread: 'research:{slug}', docs: docs/RESEARCH_BOARDS.md }
     previews:      { route: /previews, module: src/lib/previews.ts, workflow: .github/workflows/deploy-cloudflare.yml, docs: docs/PREVIEWS.md }
     registry:      { format: .svelte, status: active }
     parity:        { source: ../nondominium/ui, isa: ISA.md }

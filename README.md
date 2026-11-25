@@ -39,6 +39,7 @@ bun run dev
 | `/app` | **The replica**: 44 keyed states of the real app, on mock data |
 | `/brainstorms` | The design boards where options are weighed ([docs/BRAINSTORMS.md](docs/BRAINSTORMS.md)) |
 | `/architecture` | The architecture boards: the system's structure, as it runs and as it is planned ([docs/ARCHITECTURE_BOARDS.md](docs/ARCHITECTURE_BOARDS.md)) |
+| `/research` | The research boards: other systems compared with Nondominium, every finding sourced ([docs/RESEARCH_BOARDS.md](docs/RESEARCH_BOARDS.md)) |
 
 ---
 
