@@ -46,5 +46,8 @@
   .actions button, .actions a { font: inherit; font-size: var(--ndo-text-xs); font-weight: var(--ndo-weight-medium); color: var(--ndo-color-text-primary); background: transparent; border: 1px solid var(--ndo-color-border); border-radius: var(--ndo-radius-pill); padding: 3px 12px; cursor: pointer; text-decoration: none; white-space: nowrap; }
   .actions button:hover, .actions a:hover { border-color: rgb(var(--ndo-primary-600)); }
   .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+  /* On a phone the meta row would be squeezed between the back link and the actions until the date broke over two lines: it takes its own row below them. */
+  @media (max-width: 600px) { .meta { order: 3; flex-basis: 100%; } .actions { margin-left: auto; } }
+  .date, .lang { white-space: nowrap; }
   iframe { flex: 1; width: 100%; border: 0; background: rgb(var(--ndo-color-card-bg)); }
 </style>

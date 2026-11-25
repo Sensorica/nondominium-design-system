@@ -22,6 +22,7 @@ Compile it from the repository root:
 bun ~/.claude/skills/Niceboard/Tools/Board.ts content/research/<file>.md --out static/research/boards/<file>.html --public --no-drawer --no-sketch --theme content/research/theme.css --icon static/favicon.png
 ```
 Delete the `<file>.manifest.json` the compiler writes beside the page.
+Screenshots a board shows go in `static/research/boards/shots/`, referenced from the source as `shots/<name>.png`, so the framed and the full page both find them.
 Commit both files; the build picks the board up and nothing else needs registering.
 
 ## Code
