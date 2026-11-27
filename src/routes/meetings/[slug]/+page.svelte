@@ -14,6 +14,7 @@
   import { ensureDiscussion, addComment, updateComment } from '$lib/comments/github-client';
   import { labelForKey } from '$lib/surface-keys';
   import { isText, type TextBlock, type Span } from '$lib/meetings/parse';
+  import { cutLabel, pickRecording } from '$lib/meetings/recording';
   import MermaidFigure from '$lib/components/meetings/MermaidFigure.svelte';
 
   let { data } = $props();
@@ -33,6 +34,27 @@
   }
   const m = $derived(showOriginal && data.original ? data.original : data.meeting);
   const fr = $derived(m.lang === 'fr');
+
+  // ── Recording: the version on screen, else the other version's ──
+  // The audio is the published, privacy-cut file. Every minute chip seeks it.
+  const other = $derived(m === data.meeting ? data.original : data.meeting);
+  const rec = $derived(
+    pickRecording(
+      m.recording ? { url: m.recording, cuts: m.recordingCuts } : null,
+      other?.recording ? { url: other.recording, cuts: other.recordingCuts } : null
+    )
+  );
+  let audio: HTMLAudioElement | undefined = $state();
+  function playAt(t: number) {
+    if (!audio) return;
+    audio.currentTime = t;
+    void audio.play().catch(() => {});
+  }
+  // `#t=<seconds>` seeks on load. It only seeks: browsers refuse autoplay without a gesture.
+  $effect(() => {
+    const t = timeFromHash(page.url.hash);
+    if (audio && t !== null) audio.currentTime = t;
+  });
 
   // ── Reader state, per meeting, in this browser ──
   type Local = {
@@ -74,7 +96,7 @@
   );
   const pct = (min: number) => `${(min / length) * 100}%`;
   const ticks = $derived(Array.from({ length: Math.floor(length / 30) + 1 }, (_, i) => i * 30));
-  const fmtSpans = (spans: Span[]) => spans.map(([a, b]) => (a === b ? `${a}m` : `${a}–${b}m`));
+  const fmtSpans = (spans: Span[]) => spans.map(([a, b]) => ({ label: a === b ? `${a}m` : `${a}–${b}m`, t: a * 60 }));
 
   // ── Comments: point the next comment in the shared drawer at the paragraph ──
   // Posted, the comment carries the paragraph's id (about.ts) and its first minute
@@ -109,7 +131,11 @@
     if (t !== null) showMoment(t);
   });
   $effect(() => {
-    const onSeek = (e: Event) => showMoment((e as CustomEvent<number>).detail);
+    const onSeek = (e: Event) => {
+      const t = (e as CustomEvent<number>).detail;
+      showMoment(t);
+      playAt(t);
+    };
     const onAbout = (e: Event) => showId((e as CustomEvent<string>).detail);
     addEventListener(SEEK_EVENT, onSeek);
     addEventListener(ABOUT_EVENT, onAbout);
@@ -213,8 +239,21 @@
 
 <svelte:head><title>{m.date} {KIND_LABEL[m.kind] ?? 'Meeting'} — Nondominium Design System</title></svelte:head>
 
-<div class="bar">
+{#snippet chips(spans: Span[])}
+  {#each fmtSpans(spans) as c}
+    {#if rec}
+      <button type="button" class="chip seek" title="Play from minute {c.t / 60}" onclick={() => playAt(c.t)}>{c.label}</button>
+    {:else}
+      <span class="chip">{c.label}</span>
+    {/if}
+  {/each}
+{/snippet}
+
+<div class="bar" class:has-rec={!!rec}>
   <a class="back" href={paths.meetings()}>← Meetings</a>
+  {#if rec}
+    <audio class="player" controls preload="metadata" src={rec.url} bind:this={audio} aria-label={fr ? 'Enregistrement de la rencontre' : 'Meeting recording'}></audio>
+  {/if}
 </div>
 
 <div class="wrap">
@@ -257,6 +296,11 @@
       </div>
       {#if m.attendees}<p class="attendees"><strong>{fr ? 'Participants' : 'Attendees'}.</strong> {@html m.attendees}</p>{/if}
       {#if m.context}<p class="context">{@html m.context}</p>{/if}
+      {#if rec?.cuts.length}
+        <ul class="cuts" aria-label={fr ? 'Passages retirés de l’enregistrement' : 'Passages removed from the recording'}>
+          {#each rec.cuts as c}<li>{cutLabel(c, m.lang)}</li>{/each}
+        </ul>
+      {/if}
 
       {#if segments.length}
         <div class="timeline" aria-label="The meeting, minute by minute">
@@ -264,6 +308,11 @@
             {#each m.breaks as [a, b]}
               <span class="seg brk" style="left:{pct(a)};width:{pct(b - a)}" title="break, {a}–{b}m"></span>
             {/each}
+            {#if rec}
+              {#each rec.cuts as c}
+                <span class="seg cut" style="left:{pct(c[0] / 60)};width:max(4px, {pct((c[1] - c[0]) / 60)})" title={cutLabel(c, m.lang)} role="img" aria-label={cutLabel(c, m.lang)}></span>
+              {/each}
+            {/if}
             {#each segments as s}
               <a class="seg tone-{s.tone}" href="#{s.id}" style="left:{pct(s.span[0])};width:max(6px, {pct(s.span[1] - s.span[0] + 1)})" title="{s.lead} · {s.span[0]}–{s.span[1]}m" aria-label={s.lead}></a>
             {/each}
@@ -274,6 +323,7 @@
           <div class="legend">
             {#each proseSections as s}<span><i class="tone-{toneOf(s.id)}"></i>{s.title}</span>{/each}
             {#if m.breaks.length}<span><i class="brk"></i>break</span>{/if}
+            {#if rec?.cuts.length}<span><i class="cut"></i>{fr ? 'retiré pour confidentialité' : 'removed for privacy'}</span>{/if}
             <span class="dim">click a block to jump to it</span>
           </div>
         </div>
@@ -304,7 +354,7 @@
               {#each mine as a (a.id)}
                 <div class="act" class:done={isOn(a.id, a.recorded)} id={a.id} title={whoOn(a.id, a.recorded)}>
                   <label><input type="checkbox" checked={isOn(a.id, a.recorded)} disabled={a.recorded} onchange={(e) => setFollow(a.id, e.currentTarget.checked)} /><span>{@html a.html}</span></label>
-                  {#each fmtSpans(a.spans) as c}<span class="chip">{c}</span>{/each}
+                  {@render chips(a.spans)}
                   <input class="act-note" placeholder="note" bind:value={st.notes[a.id]} />
                 </div>
               {/each}
@@ -323,7 +373,7 @@
             <article class="entry" class:flash={flash === b.id} id={b.id}>
               <div class="entry-head">
                 {#if b.leadHtml}<h3>{@html b.leadHtml}</h3>{/if}
-                <span class="chips">{#each fmtSpans(b.spans) as c}<span class="chip">{c}</span>{/each}</span>
+                <span class="chips">{@render chips(b.spans)}</span>
               </div>
               <p>{@html b.html}</p>
               <button class="cm" class:has={pins[b.id]} onclick={() => commentOn(b)}>💬 {pins[b.id] ? pins[b.id] : 'comment'}</button>
@@ -332,7 +382,7 @@
             <div class="card ok" class:flash={flash === b.id} id={b.id}>
               <div class="card-body">
                 {#if b.leadHtml}<strong>{@html b.leadHtml}</strong>{/if} {@html b.html}
-                {#each fmtSpans(b.spans) as c}<span class="chip">{c}</span>{/each}
+                {@render chips(b.spans)}
               </div>
               <div class="react">
                 <button class:on={st.react[b.id] === 'agree'} class="agree" onclick={() => (st.react[b.id] === 'agree' ? delete st.react[b.id] : (st.react[b.id] = 'agree'))}>✓ agree</button>
@@ -348,7 +398,7 @@
             <div class="card warn" class:answered={settled} class:flash={flash === b.id} id={b.id}>
               <div class="card-body">
                 {#if b.leadHtml}<strong>{@html b.leadHtml}</strong>{/if} {@html b.html}
-                {#each fmtSpans(b.spans) as c}<span class="chip">{c}</span>{/each}
+                {@render chips(b.spans)}
               </div>
               <div class="react">
                 <button class="settle" class:on={settled} disabled={b.type === 'item' && !!b.recorded} title={whoOn(b.id, b.type === 'item' && !!b.recorded) || 'Mark this question as settled for everyone'} onclick={() => setFollow(b.id, !settled)}>{settled ? '✓ settled' : 'settle'}</button>
@@ -360,7 +410,7 @@
             <div class="card {s.kind === 'corrections' ? 'bad' : s.kind === 'outstanding' ? 'warn' : 'plain'}" class:flash={flash === b.id} id={b.id}>
               <div class="card-body">
                 {#if b.leadHtml}<strong>{@html b.leadHtml}</strong>{/if} {@html b.html}
-                {#each fmtSpans(b.spans) as c}<span class="chip">{c}</span>{/each}
+                {@render chips(b.spans)}
                 <button class="cm inline" class:has={pins[b.id]} onclick={() => commentOn(b)}>💬{pins[b.id] ? ` ${pins[b.id]}` : ''}</button>
               </div>
             </div>
@@ -375,11 +425,13 @@
 <style>
   /* Colours are the design system's own tokens; nothing here is a R&O hue. */
   .bar { position: sticky; top: 0; z-index: 5; display: flex; gap: var(--ndo-spacing-3); align-items: center; flex-wrap: wrap; padding: var(--ndo-spacing-3) var(--ndo-spacing-6); background: var(--ndo-color-surface); border-bottom: 1px solid var(--ndo-color-border); font-size: var(--ndo-text-sm); font-weight: var(--ndo-weight-medium); color: var(--ndo-color-text-secondary); }
+  .bar.has-rec { padding-top: var(--ndo-spacing-2); padding-bottom: var(--ndo-spacing-2); }
+  .player { margin-left: auto; flex: 1 1 280px; max-width: 520px; height: 40px; color-scheme: light dark; }
   .bar .back { color: var(--ndo-color-link); text-decoration: none; font-weight: var(--ndo-weight-semibold); }
   .bar .primary { background: rgb(var(--ndo-primary-600)); border-color: rgb(var(--ndo-primary-600)); color: rgb(var(--ndo-color-text-inverse)); }
 
   .wrap { display: grid; grid-template-columns: 220px minmax(0, 720px); gap: 48px; justify-content: center; padding: var(--ndo-spacing-8) var(--ndo-spacing-6) 6rem; }
-  .rail { position: sticky; top: 64px; align-self: start; font-size: var(--ndo-text-sm); line-height: var(--ndo-lh-sm); }
+  .rail { position: sticky; top: 72px; align-self: start; font-size: var(--ndo-text-sm); line-height: var(--ndo-lh-sm); }
   .rail nav a { display: block; padding: 4px 10px; color: var(--ndo-color-text-secondary); text-decoration: none; border-left: 2px solid var(--ndo-color-border); }
   .rail nav a.on { color: var(--ndo-color-text-primary); font-weight: var(--ndo-weight-semibold); border-left-color: rgb(var(--ndo-primary-600)); }
   .stats { margin-top: var(--ndo-spacing-5); color: var(--ndo-color-text-secondary); }
@@ -406,6 +458,7 @@
   .seg { position: absolute; top: 4px; bottom: 4px; border-radius: 3px; opacity: 0.8; }
   .seg:hover { opacity: 1; outline: 2px solid var(--ndo-color-text-primary); }
   .seg.brk, .legend i.brk { background: repeating-linear-gradient(45deg, var(--ndo-color-border-strong) 0 4px, transparent 4px 8px); top: 0; bottom: 0; opacity: 1; }
+  .seg.cut, .legend i.cut { background: repeating-linear-gradient(135deg, rgb(var(--ndo-red-600)) 0 3px, transparent 3px 6px); border: 1px solid rgb(var(--ndo-red-600)); top: 0; bottom: 0; opacity: 1; box-sizing: border-box; }
   .tone-primary { background: rgb(var(--ndo-primary-400)); }
   .tone-warning { background: rgb(var(--ndo-amber-600)); }
   .tone-tertiary { background: rgb(var(--ndo-brand-violet-500)); }
@@ -430,6 +483,10 @@
   .entry p { margin: 0; }
   .chips { white-space: nowrap; }
   .chip { display: inline-block; font-family: var(--ndo-font-mono); font-size: 11px; line-height: 18px; font-weight: var(--ndo-weight-semibold); color: var(--ndo-color-link); background: rgb(var(--ndo-primary-600) / 0.1); border-radius: var(--ndo-radius-pill); padding: 0 8px; margin-left: 4px; }
+  .cuts { list-style: none; margin: 10px 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: 6px; font-size: var(--ndo-text-xs); line-height: var(--ndo-lh-xs); }
+  .cuts li { color: var(--ndo-color-text-primary); background: rgb(var(--ndo-red-600) / 0.08); border: 1px solid rgb(var(--ndo-red-600) / 0.35); border-radius: var(--ndo-radius-pill); padding: 1px 10px; }
+  .chip.seek { font: inherit; font-family: var(--ndo-font-mono); font-size: 11px; line-height: 18px; font-weight: var(--ndo-weight-semibold); border: 0; cursor: pointer; }
+  .chip.seek:hover, .chip.seek:focus-visible { background: rgb(var(--ndo-primary-600)); color: rgb(var(--ndo-color-text-inverse)); }
   .cm { font: inherit; font-size: var(--ndo-text-xs); line-height: var(--ndo-lh-xs); color: var(--ndo-color-text-muted); background: none; border: 0; padding: 4px 0 0; cursor: pointer; opacity: 0; transition: opacity 0.15s; }
   .entry:hover .cm, .card:hover .cm, .cm:focus-visible, .cm.has { opacity: 1; }
   .cm:hover { color: var(--ndo-color-link); }
